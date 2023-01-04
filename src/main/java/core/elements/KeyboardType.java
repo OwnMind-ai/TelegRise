@@ -1,9 +1,9 @@
 package core.elements;
 
-public enum KeyboadType {
+public enum KeyboardType {
     INLINE, REPLY;
 
-    public static KeyboadType of(String value){
+    public static KeyboardType of(String value){
         switch (value.toLowerCase()){
             case "reply": return REPLY;
             case "inline": return INLINE;
