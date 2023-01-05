@@ -16,7 +16,7 @@ public class TranscriptionParsingException extends Exception{
 
         for (int i = 0; i < problematicNode.getAttributes().getLength(); i++) {
             Node item = problematicNode.getAttributes().item(i);
-            result.append(item.getNodeName()).append("=\"").append(item.getTextContent()).append("\" ");
+            result.append(item.getNodeName()).append("=\"").append(item.getNodeValue()).append("\" ");
         }
 
         return result.append(">").toString();
