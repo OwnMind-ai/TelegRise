@@ -1,4 +1,4 @@
-package core.elements;
+package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.objects.Update;

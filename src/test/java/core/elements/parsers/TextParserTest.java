@@ -1,7 +1,8 @@
 package core.elements.parsers;
 
-import core.TranscriptionParsingException;
-import core.elements.Text;
+import org.telegram.telegrise.core.TranscriptionParsingException;
+import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.parsers.TextParser;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 

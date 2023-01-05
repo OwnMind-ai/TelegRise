@@ -1,7 +1,7 @@
-package core.elements.parsers;
+package org.telegram.telegrise.core.elements.parsers;
 
-import core.TranscriptionParsingException;
-import core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.TranscriptionParsingException;
+import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
 

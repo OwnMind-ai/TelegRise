@@ -1,6 +1,6 @@
-package core.elements;
+package org.telegram.telegrise.core.elements;
 
-import core.InvocationList;
+import org.telegram.telegrise.core.InvocationList;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.function.Predicate;

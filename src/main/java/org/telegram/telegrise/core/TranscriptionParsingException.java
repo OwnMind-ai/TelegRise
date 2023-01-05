@@ -1,4 +1,4 @@
-package core;
+package org.telegram.telegrise.core;
 
 import org.w3c.dom.Node;
 

@@ -1,4 +1,4 @@
-package core.elements;
+package org.telegram.telegrise.core.elements;
 
 public enum KeyboardType {
     INLINE, REPLY;
