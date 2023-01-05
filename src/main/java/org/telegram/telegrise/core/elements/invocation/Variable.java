@@ -1,4 +1,4 @@
-package org.telegram.telegrise.core;
+package org.telegram.telegrise.core.elements.invocation;
 
 import lombok.AllArgsConstructor;
 

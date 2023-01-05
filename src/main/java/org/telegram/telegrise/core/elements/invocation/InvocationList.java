@@ -1,6 +1,5 @@
-package org.telegram.telegrise.core;
+package org.telegram.telegrise.core.elements.invocation;
 
-import org.telegram.telegrise.core.elements.Invocable;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;

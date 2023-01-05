@@ -31,12 +31,12 @@ class TextParserTest {
         Node node = toNode("<text parseMode=\"html\">val</text>");
         assertEquals("html", TextParser.getParseMode(node));
 
+        node = toNode("<text>val</text>");
+        assertNull(TextParser.getParseMode(node));
+
         node = toNode("<text parseMode=\"wrong\">val</text>");
         Node finalNode = node;
         assertThrows(TranscriptionParsingException.class, () -> TextParser.getParseMode(finalNode));
-
-        node = toNode("<text>val</text>");
-        assertNull(TextParser.getParseMode(node));
     }
 
     @org.junit.jupiter.api.Test
@@ -44,9 +44,16 @@ class TextParserTest {
         TextParser parser = new TextParser();
 
         Node node = toNode("<text parseMode=\"html\">val</text>");
-        assertEquals(new Text("val", "html"), parser.parse(node));
+        assertText(new Text("val", "html"), parser.parse(node));
 
         node = toNode("<text>v<b>a</b>l</text>");
-        assertEquals(new Text("v<b>a</b>l", null), parser.parse(node));
+        assertText(new Text("v<b>a</b>l", null), parser.parse(node));
+    }
+
+    public void assertText(Text expected, Text actual){
+        assertTrue(
+                expected.getText().equalsTo(actual.getText(), null, null)
+                && expected.getText().equalsTo(actual.getText(),null, null)
+        );
     }
 }

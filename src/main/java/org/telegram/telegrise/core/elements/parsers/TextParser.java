@@ -27,6 +27,8 @@ public class TextParser implements ElementParser<Text> {
     @Override
     public Text parse(Node node) throws TranscriptionParsingException {
         String parse = getParseMode(node);
+
+        //TODO text generation support
         return new Text(XMLUtils.innerXML(node), parse);
     }
 }

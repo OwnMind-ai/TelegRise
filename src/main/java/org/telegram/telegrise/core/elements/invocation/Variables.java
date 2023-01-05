@@ -1,4 +1,4 @@
-package org.telegram.telegrise.core;
+package org.telegram.telegrise.core.elements.invocation;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;

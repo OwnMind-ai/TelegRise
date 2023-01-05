@@ -1,6 +1,5 @@
-package org.telegram.telegrise.core.elements;
+package org.telegram.telegrise.core.elements.invocation;
 
-import org.telegram.telegrise.core.Variables;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface Invocable {
