@@ -50,7 +50,7 @@ class TextParserTest {
         assertText(new Text("v<b>a</b>l", null), parser.parse(node));
     }
 
-    public void assertText(Text expected, Text actual){
+    public static void assertText(Text expected, Text actual){
         assertTrue(
                 expected.getText().equalsTo(actual.getText(), null, null)
                 && expected.getText().equalsTo(actual.getText(),null, null)
