@@ -13,10 +13,8 @@ import org.w3c.dom.NodeList;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ElementsParser {
     private static final String ELEMENTS_PACKAGE = "org.telegram.telegrise.core.elements";
@@ -84,20 +82,30 @@ public class ElementsParser {
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
         Element innerElementData = field.getType().getAnnotation(Element.class);
 
-        Node fieldNode = null;
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            if (nodeList.item(i).getNodeName().equals(innerElementData.name())) {
-                fieldNode = nodeList.item(i);
-                break;
-            }
-        }
+        LinkedList<Node> fieldNodes = new LinkedList<>();
+        for (int i = 0; i < nodeList.getLength(); i++)
+            if (nodeList.item(i).getNodeName().equals(innerElementData.name()))
+                fieldNodes.add(nodeList.item(i));
 
-        if (fieldNode == null && fieldData.nullable()) return;
-        else if (fieldNode == null)
-            throw new TranscriptionParsingException("Field " + innerElementData.name() + "can't be null", node);
+        if (fieldNodes.isEmpty() && fieldData.nullable()) return;
+        else if (fieldNodes.isEmpty())
+            throw new TranscriptionParsingException("Field \"" + innerElementData.name() + "\" can't be null", node);
 
         try {
-            PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNode));  //TODO need to be tested
+            //TODO need to be tested
+            if (field.getType().isInstance(List.class)) {
+                PropertyUtils.setSimpleProperty(instance, field.getName(), fieldNodes.stream()
+                        .map(n -> {
+                            try { return parse(n); } catch (Exception e) { throw new RuntimeException(e); }
+                        }).collect(Collectors.toUnmodifiableList())
+                );
+            } else {
+                if (fieldNodes.size() == 1)
+                    PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNodes.getFirst()));
+                else
+                    throw new TranscriptionParsingException(
+                            "Field \"" + innerElementData.name() + "\" has more than one definition", node);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +131,7 @@ public class ElementsParser {
 
         if (attribute == null && elementField.nullable()) return;
         else if (attribute == null)
-            throw new TranscriptionParsingException("Field " + elementField.name() + "can't be null", node);
+            throw new TranscriptionParsingException("Field \"" + elementField.name() + "\" can't be null", node);
 
         if (field.getType().isArray())
             PropertyUtils.setSimpleProperty(to, field.getName(), this.parseList(attribute.getNodeValue()));
