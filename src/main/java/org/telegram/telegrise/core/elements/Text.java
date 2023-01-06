@@ -1,25 +1,34 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.utils.XMLUtils;
+import org.w3c.dom.Node;
 
-import java.util.List;
-
-@ToString
+@Element(name = "text")
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Text implements TranscriptionElement{
-    @Getter
-    private final GeneratedValue<String> text;
-    @Getter
+    private GeneratedValue<String> text;
+
+    @ElementField(name = "parseMode", expression = true)
     private GeneratedValue<String> parseMode;
-    @Getter
-    private GeneratedValue<List<MessageEntity>> entities;
+
+    //TODO message entities list
 
     public Text(String text, String parseMode){
         this.text = GeneratedValue.ofValue(text);
         this.parseMode = GeneratedValue.ofValue(parseMode);
+    }
+
+    @ElementField(nullable = false)
+    private void parseText(Node node){
+        //FIXME
+        this.text = GeneratedValue.ofValue(XMLUtils.innerXML(node));
     }
 }

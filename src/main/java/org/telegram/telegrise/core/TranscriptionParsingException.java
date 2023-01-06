@@ -2,7 +2,7 @@ package org.telegram.telegrise.core;
 
 import org.w3c.dom.Node;
 
-public class TranscriptionParsingException extends Exception{
+public class TranscriptionParsingException extends RuntimeException{
     private final String message;
     private final Node problematicNode;
 
