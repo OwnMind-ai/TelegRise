@@ -8,6 +8,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.TranscriptionParsingException;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -71,7 +72,35 @@ public class ElementsParser {
                     }
                 });
 
+        Arrays.stream(element.getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(InnerElement.class))
+                .forEach(f -> this.parseInnerElement(node, f, instance));
+
         return instance;
+    }
+    
+    private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
+        NodeList nodeList = node.getChildNodes();
+        InnerElement fieldData = field.getAnnotation(InnerElement.class);
+        Element innerElementData = field.getType().getAnnotation(Element.class);
+
+        Node fieldNode = null;
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            if (nodeList.item(i).getNodeName().equals(innerElementData.name())) {
+                fieldNode = nodeList.item(i);
+                break;
+            }
+        }
+
+        if (fieldNode == null && fieldData.nullable()) return;
+        else if (fieldNode == null)
+            throw new TranscriptionParsingException("Field " + innerElementData.name() + "can't be null", node);
+
+        try {
+            PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNode));  //TODO need to be tested
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {

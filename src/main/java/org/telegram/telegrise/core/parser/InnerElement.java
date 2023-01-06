@@ -1,0 +1,10 @@
+package org.telegram.telegrise.core.parser;
+
+import java.lang.annotation.*;
+
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface InnerElement {
+    boolean nullable() default true;
+}
