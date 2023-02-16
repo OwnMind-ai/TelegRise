@@ -7,7 +7,7 @@ public interface GeneratedValue<T> {
         return (resourcePool) -> value;
     }
 
-    default boolean equalsTo(GeneratedValue<T> other, ResourcePool resourcePool){
+    default boolean equalsTo(GeneratedValue<?> other, ResourcePool resourcePool){
         return other != null && Objects.equals(this.generate(resourcePool), other.generate(resourcePool));
     }
 
