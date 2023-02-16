@@ -36,8 +36,8 @@ class ElementsParserTest {
 
     public static void assertText(Text expected, Text actual){
         assertTrue(
-                expected.getParseMode().equalsTo(actual.getParseMode(), null, null)
-                        && expected.getText().equalsTo(actual.getText(),null, null)
+                expected.getParseMode().equalsTo(actual.getParseMode(), null)
+                        && expected.getText().equalsTo(actual.getText(),null)
         );
     }
 }
