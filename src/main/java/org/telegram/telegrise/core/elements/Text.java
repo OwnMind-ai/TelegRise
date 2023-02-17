@@ -17,7 +17,7 @@ public class Text implements TranscriptionElement{
     private GeneratedValue<String> text;
 
     @ElementField(name = "parseMode", expression = true)
-    private GeneratedValue<String> parseMode;
+    private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
 
     //TODO message entities list
 

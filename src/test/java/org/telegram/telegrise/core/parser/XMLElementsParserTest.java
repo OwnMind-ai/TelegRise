@@ -5,6 +5,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.actions.Send;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -40,6 +41,23 @@ class XMLElementsParserTest {
         assertElements(new Text("val", "html"), parser.parse(node));
     }
 
+    @Test
+    void parseSend() throws Exception {
+        XMLElementsParser parser = new XMLElementsParser();
+        parser.load();
+
+        //TODO add other elements
+        Node node = toNode("<send chat=\"-1\">\n" +
+                "                    <text>Text</text>\n" +
+                "                </send>");
+
+        Send expected = new Send();
+        expected.setText(new Text("Text", "html"));
+        expected.setChatId(GeneratedValue.ofValue(-1L));
+
+        assertElements(expected, parser.parse(node));
+    }
+
     private static void assertElements(TranscriptionElement expected, TranscriptionElement actual){
         if(!expected.getClass().equals(actual.getClass()))
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
@@ -55,7 +73,7 @@ class XMLElementsParserTest {
         for (String name : expectedFields.keySet()) {
             try {
                 if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual))
-                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name), expectedFields.get(name)));
+                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual), expectedFields.get(name).get(expected)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -66,8 +84,14 @@ class XMLElementsParserTest {
         expected.setAccessible(true);
         actual.setAccessible(true);
 
-        return (expected.getType().equals(GeneratedValue.class) && actual.getType().equals(GeneratedValue.class)
+        if (!TranscriptionElement.class.isAssignableFrom(expected.getType()))
+            return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
+                (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)
                     && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), new ResourcePool(new HashMap<>())))
                 || (expected.get(expectedInstance).equals(actual.get(actualInstance)));
+        else {
+            assertElements((TranscriptionElement) expected.get(expectedInstance), (TranscriptionElement) actual.get(actualInstance));
+            return true;
+        }
     }
 }

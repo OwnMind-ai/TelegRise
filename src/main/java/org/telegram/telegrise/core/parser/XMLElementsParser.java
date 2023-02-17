@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
-import org.telegram.telegrise.core.TranscriptionParsingException;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -13,10 +12,11 @@ import org.w3c.dom.NodeList;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ElementsParser {
+public class XMLElementsParser {
     private static final String ELEMENTS_PACKAGE = "org.telegram.telegrise.core.elements";
     private static final String LIST_SPLITERATOR = "(?<!\\\\);";
 
@@ -27,7 +27,7 @@ public class ElementsParser {
     private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
 
     public void load(){
-        ElementsParser.loadClasses().stream()
+        XMLElementsParser.loadClasses().stream()
                 .filter(clazz -> !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers()))
                 .forEach(clazz -> {
             assert clazz.isAnnotationPresent(Element.class) :
@@ -137,7 +137,8 @@ public class ElementsParser {
             PropertyUtils.setSimpleProperty(to, field.getName(), this.parseList(attribute.getNodeValue()));
         else
             PropertyUtils.setSimpleProperty(to, field.getName(),
-                    elementField.expression() ? ExpressionFactory.parseExpression(attribute.getNodeValue())
+                    elementField.expression() ? ExpressionFactory.parseExpression(attribute.getNodeValue(),
+                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])  // Gets an actual type of GeneratedValue
                             : attribute.getNodeValue()
             );
     }

@@ -13,7 +13,7 @@ import org.telegram.telegrise.core.parser.InnerElement;
 @Element(name = "send")
 @Data @NoArgsConstructor
 public class Send implements ActionElement{
-    @ElementField(name = "chatId", nullable = false, expression = true)
+    @ElementField(name = "chat", nullable = false, expression = true)
     private GeneratedValue<Long> chatId;
     @InnerElement(nullable = false)
     private Text text;
