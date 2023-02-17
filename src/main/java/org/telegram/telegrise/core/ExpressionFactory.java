@@ -11,8 +11,9 @@ public class ExpressionFactory {
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else if (String.class.isAssignableFrom(type)) {
+        } else if (Boolean.class.isAssignableFrom(type)) {
+            return GeneratedValue.ofValue(type.cast(text.equals("true")));
+        } else if (String.class.isAssignableFrom(type)) {
             return GeneratedValue.ofValue(type.cast(text));
         } else {
             throw new UnsupportedOperationException();  //TODO

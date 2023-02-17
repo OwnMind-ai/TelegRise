@@ -47,13 +47,14 @@ class XMLElementsParserTest {
         parser.load();
 
         //TODO add other elements
-        Node node = toNode("<send chat=\"-1\">\n" +
+        Node node = toNode("<send chat=\"-1\" disableWebPreview=\"true\">\n" +
                 "                    <text>Text</text>\n" +
                 "                </send>");
 
         Send expected = new Send();
         expected.setText(new Text("Text", "html"));
         expected.setChatId(GeneratedValue.ofValue(-1L));
+        expected.setDisableWebPreview(GeneratedValue.ofValue(true));
 
         assertElements(expected, parser.parse(node));
     }

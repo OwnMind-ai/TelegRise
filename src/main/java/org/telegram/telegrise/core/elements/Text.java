@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.EmbeddableElement;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
@@ -13,7 +14,7 @@ import org.w3c.dom.Node;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Text implements TranscriptionElement{
+public class Text implements TranscriptionElement, EmbeddableElement {
     private GeneratedValue<String> text;
 
     @ElementField(name = "parseMode", expression = true)

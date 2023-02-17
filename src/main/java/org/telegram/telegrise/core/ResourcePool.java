@@ -1,9 +1,22 @@
 package org.telegram.telegrise.core;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public final class ResourcePool {
     private final Map<String, Object> resources;
+    @Getter @Setter
+    private Update update;
+
+    public ResourcePool(Update update){
+        this.resources = new HashMap<>();
+        this.update = update;
+    }
 
     public ResourcePool(Map<String, Object> resources) {
         this.resources = resources;
