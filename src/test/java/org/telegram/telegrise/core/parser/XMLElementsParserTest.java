@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -88,7 +87,7 @@ class XMLElementsParserTest {
         if (!TranscriptionElement.class.isAssignableFrom(expected.getType()))
             return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
                 (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)
-                    && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), new ResourcePool(new HashMap<>())))
+                    && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), new ResourcePool()))
                 || (expected.get(expectedInstance).equals(actual.get(actualInstance)));
         else {
             assertElements((TranscriptionElement) expected.get(expectedInstance), (TranscriptionElement) actual.get(actualInstance));

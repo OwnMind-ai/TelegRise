@@ -1,6 +1,5 @@
 package org.telegram.telegrise.core;
 
-import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,19 +15,19 @@ public final class MethodReference {
         this.method.setAccessible(true);
     }
 
-    public Object invoke(Object instance, ResourcePool pool) throws InvocationTargetException, IllegalAccessException {
-        Object result = this.invokeSingle(instance, pool);
+    public Object invoke(ResourcePool pool) throws InvocationTargetException, IllegalAccessException {
+        Object result = this.invokeSingle(pool);
 
-        return this.next == null ? result : this.next.invokeWithNext(instance, result);
+        return this.next == null ? result : this.next.invokeWithNext(pool.getHandler(), result);
     }
 
-    public Object invokeSingle(Object instance, ResourcePool pool) throws InvocationTargetException, IllegalAccessException {
+    public Object invokeSingle(ResourcePool pool) throws InvocationTargetException, IllegalAccessException {
         if (method.getParameterTypes().length == 0)
-            return this.method.invoke(instance);
+            return this.method.invoke(pool.getHandler());
         else if (Arrays.equals(method.getParameterTypes(), new Class[]{Update.class})) {
-            return this.method.invoke(instance, pool.getUpdate());
+            return this.method.invoke(pool.getHandler(), pool.getUpdate());
         } else {
-            throw new UnsupportedOperationException();    //FIXME Not sure that there is any sense of ResourcePool, perhaps it would be useful in future
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -37,6 +36,17 @@ public final class MethodReference {
                 this.method.invoke(instance) : this.method.invoke(instance, parameter);
 
         return this.next == null ? result : this.next.invokeWithNext(instance, result);
+    }
+
+    public <T> GeneratedValue<T> toGeneratedValue(Class<T> tClass){
+        return pool -> {
+            try {
+                assert pool.getHandler() != null : "Unable to invoke method reference: handler object in ResourcePool is null";
+                return tClass.cast(invoke(pool));
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e.getCause());
+            }
+        };
     }
 
     public void andThen(MethodReference reference){

@@ -3,23 +3,22 @@ package org.telegram.telegrise.core.parser;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.w3c.dom.Node;
 
-import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MethodReferenceParserTest {
 
     @Test
-    void parse() throws InvocationTargetException, IllegalAccessException {
+    void parse() {
         Node node = XMLElementsParserTest.toNode("<tag methods=\"#first -> #second -> #third ; #another\"/>");
 
         var instance = new MethodReferenceParserTest();
-        var result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", instance.getClass(), node);
+        GeneratedValue<String> result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", instance.getClass(), node)[0].toGeneratedValue(String.class);
 
-        assertEquals("144.0", result[0].invoke(instance, new ResourcePool(new Update())));
+        assertEquals("144.0", result.generate(new ResourcePool(new Update(), instance)));
     }
 
     @SuppressWarnings("unused")
