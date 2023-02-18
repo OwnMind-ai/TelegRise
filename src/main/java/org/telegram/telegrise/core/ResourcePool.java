@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.HashMap;
 import java.util.Map;
 
-@Deprecated
 public final class ResourcePool {
     private final Map<String, Object> resources;
     @Getter @Setter
