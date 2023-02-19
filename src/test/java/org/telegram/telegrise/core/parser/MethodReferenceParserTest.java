@@ -17,7 +17,7 @@ class MethodReferenceParserTest {
         Node node = XMLElementsParserTest.toNode("<tag methods=\"#first -> #second -> #third ; #another\"/>");
 
         var instance = new MethodReferenceParserTest();
-        GeneratedValue<String> result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", instance.getClass(), node)[0].toGeneratedValue(String.class);
+        GeneratedValue<String> result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", instance.getClass(), node)[0].toGeneratedValue(String.class, node);
 
         assertEquals("144.0", result.generate(new ResourcePool(new Update(), instance)));
     }

@@ -19,8 +19,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Objects;
 
 public class ExpressionParser {
+    public static String getTempDirectory(){
+        return Objects.requireNonNullElse(
+                System.getProperty("telegrise.tempDirectory"),
+                System.getProperty("user.home") + "/.telegrise/temp"
+        );
+    }
+
     private static String className(int hashcode){
         return "Expression" + hashcode;
     }
@@ -78,6 +86,8 @@ public class ExpressionParser {
 
     private File createSourceFile(JavaClassSource source, int hashcode) throws IOException {
         File result = new File(tempDirectoryPath, className(hashcode) + ".java");
+        //noinspection ResultOfMethodCallIgnored
+        result.getParentFile().mkdirs();
         Files.write(result.toPath(), source.toString().getBytes(StandardCharsets.UTF_8));
 
         return result;
@@ -91,11 +101,12 @@ public class ExpressionParser {
         source.addImport(returnType);
         source.addInterface(GeneratedValue.class.getSimpleName() + '<' + returnType.getSimpleName() + '>');
 
+        String safeExpression = returnType.equals(String.class) ? "String.valueOf(" + expression + ")" : expression;
         MethodSource<JavaClassSource> method = source.addMethod()
                 .setPublic()
                 .setName(GeneratedValue.ABSTRACT_METHOD_NAME)
                 .setParameters(ResourcePool.class.getSimpleName() + " pool")
-                .setBody(pool.getResourceInitializationCode("pool") + "return " + expression + ";");
+                .setBody(pool.getResourceInitializationCode("pool") + "return " + safeExpression + ";");
 
         if (returnType.equals(Void.class))
             method.setReturnTypeVoid();

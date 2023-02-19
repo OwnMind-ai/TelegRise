@@ -10,7 +10,7 @@ public final class ResourcePool {
     private Update update;
     private Object handler;
 
-    //FIXME Use map instead
+    //FIXME Use Namespace class instead
     private String updateName = "update";
     private String handlerName = "handler";  //TODO try to make it "this" by default
 

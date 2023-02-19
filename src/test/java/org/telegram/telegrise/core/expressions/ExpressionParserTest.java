@@ -16,7 +16,7 @@ public class ExpressionParserTest {
 
     @Test
     void parse() throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        ExpressionParser parser = new ExpressionParser(System.getProperty("user.dir"));
+        ExpressionParser parser = new ExpressionParser(ExpressionParser.getTempDirectory());
         String expression = "handler.getData(update.getCallbackQuery())";
         ResourcePool resourcePool = new ResourcePool(new Update(), this);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));

@@ -2,10 +2,12 @@ package org.telegram.telegrise.core.expressions;
 
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,6 +17,29 @@ import java.util.stream.Collectors;
 public final class MethodReferenceParser {
     public static MethodReference[] parse(String text, Class<?> clazz, Node node){
         return new MethodReferenceParser(clazz, node, text).parse();
+    }
+
+    public static <T> GeneratedValue<T> concat(MethodReference[] references, Class<T> returnType, Node node){
+        assert references.length > 0;
+        MethodReference toBeReturned = references[0];
+        List<MethodReference> rest = references.length == 1 ? List.of() : List.of(references).subList(1, references.length);
+
+        return (pool) -> {
+            T result = toBeReturned.toGeneratedValue(returnType, node).generate(pool);
+            rest.forEach(methodReference -> {
+                try {
+                    methodReference.invoke(pool);
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            return result;
+        };
+    }
+
+    public static boolean isMethodReference(String expression){
+        return expression.startsWith(Syntax.METHOD_REFERENCE_START);
     }
 
     private final Class<?> handlerClass;
@@ -31,7 +56,7 @@ public final class MethodReferenceParser {
     }
 
     private MethodReference parseSingle(@NotNull String part){
-        if (!part.trim().startsWith(Syntax.METHOD_REFERENCE_START))
+        if (!part.trim().startsWith(Syntax.METHOD_REFERENCE_START))   // TODO Allow ClassName#staticMethod syntax
             throw new TranscriptionParsingException("Invalid syntax for method reference", this.node);
 
         String name = part.trim().substring(1);

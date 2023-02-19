@@ -1,10 +1,12 @@
 package org.telegram.telegrise.core.parser;
 
+import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,6 +27,8 @@ public class XMLElementsParser {
     }
 
     private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
+    @Setter
+    private ResourcePool pool;
 
     public void load(){
         XMLElementsParser.loadClasses().stream()
@@ -137,8 +141,8 @@ public class XMLElementsParser {
             PropertyUtils.setSimpleProperty(to, field.getName(), this.parseList(attribute.getNodeValue()));
         else
             PropertyUtils.setSimpleProperty(to, field.getName(),
-                    elementField.expression() ? ExpressionFactory.parseExpression(attribute.getNodeValue(),
-                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])  // Gets an actual type of GeneratedValue
+                    elementField.expression() ? ExpressionFactory.createExpression(attribute.getNodeValue(),
+                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0], node, pool)  // Gets an actual type of GeneratedValue
                             : attribute.getNodeValue()
             );
     }

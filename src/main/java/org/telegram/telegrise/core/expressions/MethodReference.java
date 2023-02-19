@@ -3,6 +3,8 @@ package org.telegram.telegrise.core.expressions;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.w3c.dom.Node;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,15 +42,22 @@ public final class MethodReference {
         return this.next == null ? result : this.next.invokeWithNext(instance, result);
     }
 
-    public boolean isReturnsVoid(){
-        return this.method.getReturnType().equals(Void.class);
+    private Method getLast(){
+        return this.next == null ? this.method : this.next.getLast();
     }
 
-    public <T> GeneratedValue<T> toGeneratedValue(Class<T> tClass){
+    public <T> GeneratedValue<T> toGeneratedValue(Class<T> tClass, Node node){
+        Method last = this.getLast();
+        Class<?> actualReturnType = last.getReturnType();
+        if (!tClass.isAssignableFrom(actualReturnType))
+            throw new TranscriptionParsingException(String.format("Return type '%s' of method '%s' cannot be casted to type '%s'",
+                    actualReturnType.getSimpleName(), last.getName(), tClass.getSimpleName()) , node);
+
         return pool -> {
             try {
                 assert pool.getHandler() != null : "Unable to invoke method reference: handler object in ResourcePool is null";
-                return tClass.cast(invoke(pool));
+                Object result = invoke(pool);
+                return tClass.equals(Void.class) ? null : tClass.cast(result);
             } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e.getCause());
             }
