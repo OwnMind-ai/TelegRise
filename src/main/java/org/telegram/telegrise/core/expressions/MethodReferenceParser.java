@@ -1,9 +1,9 @@
-package org.telegram.telegrise.core.parser;
+package org.telegram.telegrise.core.expressions;
 
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.annotations.Reference;
-import org.telegram.telegrise.core.MethodReference;
 import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.lang.reflect.Method;

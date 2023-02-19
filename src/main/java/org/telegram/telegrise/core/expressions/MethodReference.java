@@ -1,6 +1,8 @@
-package org.telegram.telegrise.core;
+package org.telegram.telegrise.core.expressions;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

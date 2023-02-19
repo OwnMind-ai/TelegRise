@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.expressions.MethodReferenceParser;
 import org.w3c.dom.Node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
