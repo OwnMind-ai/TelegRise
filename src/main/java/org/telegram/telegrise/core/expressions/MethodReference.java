@@ -40,6 +40,10 @@ public final class MethodReference {
         return this.next == null ? result : this.next.invokeWithNext(instance, result);
     }
 
+    public boolean isReturnsVoid(){
+        return this.method.getReturnType().equals(Void.class);
+    }
+
     public <T> GeneratedValue<T> toGeneratedValue(Class<T> tClass){
         return pool -> {
             try {

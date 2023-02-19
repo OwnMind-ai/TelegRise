@@ -24,6 +24,6 @@ public class TranscriptionParsingException extends RuntimeException{
 
     @Override
     public String toString() {
-        return "Transcription parsing error at :\n\n" + this.nodeTag() + "\n\n" + message;
+        return "Transcription parsing error at:\n\n" + this.nodeTag() + "\n\n" + message + "\n";
     }
 }

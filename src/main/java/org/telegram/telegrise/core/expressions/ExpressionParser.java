@@ -1,12 +1,16 @@
 package org.telegram.telegrise.core.expressions;
 
+import org.jboss.forge.roaster.ParserException;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.w3c.dom.Node;
 
 import javax.tools.ToolProvider;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -33,17 +37,22 @@ public class ExpressionParser {
         }
     }
 
-    public GeneratedValue<?> parse(String expression, ResourcePool pool, Class<?> returnType) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
-        int hashcode = expression.hashCode();
+    public GeneratedValue<?> parse(String expression, ResourcePool pool, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
+        int hashcode = Math.abs(expression.hashCode());
 
         if (isExpressionExists(hashcode)) {
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
         }
 
-        JavaClassSource source = this.createSource(expression, hashcode, returnType, pool);
+        JavaClassSource source;
+        try {
+            source = this.createSource(expression, hashcode, returnType, pool);
+        } catch (ParserException e) {
+            throw new TranscriptionParsingException("Syntax error in expression: " + e.getProblems().get(0).getMessage(), node);
+        }
 
         File sourceFile = this.createSourceFile(source, hashcode);
-        compileSourceFile(sourceFile);
+        compileSourceFile(sourceFile, node);
 
         return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
     }
@@ -57,9 +66,14 @@ public class ExpressionParser {
         return Class.forName(className(hashcode), true, this.classLoader);
     }
 
-    private void compileSourceFile(File source) throws IOException {
-        ToolProvider.getSystemJavaCompiler().run(null, null, null, source.getPath());
-        Files.delete(source.toPath());
+    private void compileSourceFile(File source, Node node) throws IOException {
+        try (ByteArrayOutputStream err = new ByteArrayOutputStream()){
+            ToolProvider.getSystemJavaCompiler().run(null, null, err, source.getPath());
+            Files.delete(source.toPath());
+
+            if (err.size() > 0)
+                throw new TranscriptionParsingException("An error occurred while compiling the expression", node);
+        }
     }
 
     private File createSourceFile(JavaClassSource source, int hashcode) throws IOException {

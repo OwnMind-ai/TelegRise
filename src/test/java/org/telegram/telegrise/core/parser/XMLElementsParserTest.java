@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class XMLElementsParserTest {
+public class XMLElementsParserTest {
     public static Node toNode(String node){
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder()

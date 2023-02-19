@@ -22,6 +22,5 @@ public final class ResourcePool {
     public String getResourceInitializationCode(String poolName){
         return String.format("%s %s = %s.getUpdate();\n%s %s = (%s) %s.getHandler();\n",
                 Update.class.getName(), updateName, poolName, handler.getClass().getName(), handlerName, handler.getClass().getName(), poolName);
-
     }
 }
