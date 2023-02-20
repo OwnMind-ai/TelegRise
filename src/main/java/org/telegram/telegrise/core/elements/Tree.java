@@ -1,19 +1,18 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Element(name = "tree")
+@Data
 @NoArgsConstructor
 public class Tree implements TranscriptionElement{
-    @Getter
     @ElementField(name = "name", nullable = false)
     private String name;
     @ElementField(name = "type")
@@ -25,10 +24,11 @@ public class Tree implements TranscriptionElement{
     private String[] keys;
     @ElementField(name = "callbackTriggers")
     private String[] callbackTriggers;
-    @ElementField(name = "predicate")
-    private Predicate<Update> predicate;
+    @ElementField(name = "predicate", expression = true)
+    private GeneratedValue<Boolean> predicate;
 
     @ElementField(name = "handler")
+    private String handlerName;
     private Class<?> handler;
 
     @InnerElement
@@ -38,8 +38,4 @@ public class Tree implements TranscriptionElement{
     @InnerElement
     private List<Menu> menus;
 
-    public Tree(String name, String type) {
-        this.name = name;
-        this.type = type;
-    }
 }

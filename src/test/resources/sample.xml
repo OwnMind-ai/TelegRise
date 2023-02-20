@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bot username="bot" token="token">
+    <menu name="Main" type="reply">
+        <tree name="name" predicate="true" callbackTriggers="callback-data" keys="first; second" commands="example"
+              handler="SimpleHandler" type="reply">
+            <text parseMode="markdown">
+                Text
+            </text>
+            <branch when="true">
+                <send chat="-1">
+                    <text>Text</text>
+                </send>
+                <send chat="-1">
+                    <text>Text</text>
+                </send>
+            </branch>
+        </tree>
+    </menu>
+</bot>

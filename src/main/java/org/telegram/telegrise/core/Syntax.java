@@ -6,4 +6,5 @@ public final class Syntax {
     public static final String METHOD_REFERENCE_START = "#";
     public static final String EXPRESSION_START = "${";
     public static final String EXPRESSION_END = "}";
+    public static final String LIST_SPLITERATOR = "(?<!\\\\);";
 }

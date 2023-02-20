@@ -6,6 +6,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -82,7 +84,49 @@ public class XMLElementsParserTest {
         assertElements(expected, parser.parse(node));
     }
 
-    private static void assertElements(TranscriptionElement expected, TranscriptionElement actual){
+    @Test
+    void parseTree() throws Exception{
+        XMLElementsParser parser = new XMLElementsParser();
+        parser.load();
+
+        Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
+                "              handler=\"SimpleHandler\" type=\"reply\">\n" +
+                "            <text parseMode=\"markdown\">\n" +
+                "               Text\n" +
+                "            </text>" +
+                "            <branch when=\"true\">\n" +
+                "                <send chat=\"-1\">\n" +
+                "                    <text>Text</text>\n" +
+                "                </send>\n" +
+                "                <send chat=\"-1\">\n" +
+                "                    <text>Text</text>\n" +
+                "                </send>\n"+
+                "            </branch>" +
+                "       </tree>");
+
+        Send expectedSend = new Send();
+        expectedSend.setText(new Text("Text", "html"));
+        expectedSend.setChatId(GeneratedValue.ofValue(-1L));
+
+        Branch expectedBranch = new Branch();
+        expectedBranch.setWhen(GeneratedValue.ofValue(true));
+        expectedBranch.setActions(List.of(expectedSend, expectedSend));
+
+        Tree expected = new Tree();
+        expected.setName("name");
+        expected.setPredicate(GeneratedValue.ofValue(true));
+        expected.setCallbackTriggers(new String[]{"callback-data"});
+        expected.setKeys(new String[]{"first", "second"});
+        expected.setCommands(new String[]{"example"});
+        expected.setHandlerName("SimpleHandler");
+        expected.setType("reply");
+        expected.setText(new Text("Text", "markdown"));
+        expected.setBranches(List.of(expectedBranch));
+
+        assertElements(expected, parser.parse(node));
+    }
+
+    public static void assertElements(TranscriptionElement expected, TranscriptionElement actual){
         if(!expected.getClass().equals(actual.getClass()))
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
 
@@ -97,7 +141,7 @@ public class XMLElementsParserTest {
         for (String name : expectedFields.keySet()) {
             try {
                 if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual))
-                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual), expectedFields.get(name).get(expected)));
+                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual).toString(), expectedFields.get(name).get(expected).toString()));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -114,12 +158,17 @@ public class XMLElementsParserTest {
             @SuppressWarnings("unchecked") List<TranscriptionElement> expectedList = (List<TranscriptionElement>) expected.get(expectedInstance);
             @SuppressWarnings("unchecked") List<TranscriptionElement> actualList = (List<TranscriptionElement>) actual.get(actualInstance);
 
-            if(expectedList.size() != actualList.size()) return false;
+            if (expectedList == actualList) return true;
+            if((expectedList != null && actualList != null) && expectedList.size() != actualList.size()) return false;
 
-            for (int i = 0; i < expectedList.size(); i++)
+            for (int i = 0; i < Objects.requireNonNull(expectedList).size(); i++) {
+                assert actualList != null;
                 assertElements(expectedList.get(i), actualList.get(i));
+            }
 
             return true;
+        } else if (expected.getType().isArray()) {
+            return Arrays.equals((Object[]) expected.get(expectedInstance), (Object[]) actual.get(actualInstance));
         } else if (!TranscriptionElement.class.isAssignableFrom(expected.getType()))
             return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
                 (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)

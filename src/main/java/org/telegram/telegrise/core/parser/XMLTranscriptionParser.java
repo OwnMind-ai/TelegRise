@@ -1,8 +1,7 @@
 package org.telegram.telegrise.core.parser;
 
-import org.telegram.telegrise.core.BotTranscription;
+import org.telegram.telegrise.core.elements.BotTranscription;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class XMLTranscriptionParser implements TranscriptionParser{
     private final Document document;

@@ -7,6 +7,7 @@ import org.reflections.Reflections;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 
 public class XMLElementsParser {
     private static final String ELEMENTS_PACKAGE = "org.telegram.telegrise.core.elements";
-    private static final String LIST_SPLITERATOR = "(?<!\\\\);";
 
     private static Set<Class<? extends TranscriptionElement>> loadClasses(){
         return new Reflections(ELEMENTS_PACKAGE).getSubTypesOf(TranscriptionElement.class);
@@ -154,6 +154,6 @@ public class XMLElementsParser {
     }
 
     private String[] parseList(String value){
-        return value.split(LIST_SPLITERATOR);
+        return Arrays.stream(value.split(Syntax.LIST_SPLITERATOR)).map(String::trim).toArray(String[]::new);
     }
 }
