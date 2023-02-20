@@ -84,7 +84,10 @@ public class XMLElementsParser {
     private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
-        Element innerElementData = field.getType().getAnnotation(Element.class);
+        Element innerElementData = List.class.isAssignableFrom(field.getType()) ?
+                ((Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
+                        .getAnnotation(Element.class)
+                : field.getType().getAnnotation(Element.class);
 
         LinkedList<Node> fieldNodes = new LinkedList<>();
         for (int i = 0; i < nodeList.getLength(); i++)
@@ -96,8 +99,7 @@ public class XMLElementsParser {
             throw new TranscriptionParsingException("Field \"" + innerElementData.name() + "\" can't be null", node);
 
         try {
-            //TODO need to be tested
-            if (field.getType().isInstance(List.class)) {
+            if (List.class.isAssignableFrom(field.getType())) {
                 PropertyUtils.setSimpleProperty(instance, field.getName(), fieldNodes.stream()
                         .map(n -> {
                             try { return parse(n); } catch (Exception e) { throw new RuntimeException(e); }
