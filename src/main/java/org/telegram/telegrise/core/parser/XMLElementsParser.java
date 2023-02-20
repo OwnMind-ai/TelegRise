@@ -84,19 +84,23 @@ public class XMLElementsParser {
     private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
-        Element innerElementData = List.class.isAssignableFrom(field.getType()) ?
+        Class<?> actualType =  List.class.isAssignableFrom(field.getType()) ?
                 ((Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
-                        .getAnnotation(Element.class)
-                : field.getType().getAnnotation(Element.class);
+                : field.getType();
+
+        Element innerElementData = actualType.getAnnotation(Element.class);
 
         LinkedList<Node> fieldNodes = new LinkedList<>();
         for (int i = 0; i < nodeList.getLength(); i++)
-            if (nodeList.item(i).getNodeName().equals(innerElementData.name()))
+            // Node name equals Element.name() or Element type is inherited
+            if ((innerElementData != null && nodeList.item(i).getNodeName().equals(innerElementData.name()))
+                    || (elements.containsKey(nodeList.item(i).getNodeName())
+                        && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName()))))
                 fieldNodes.add(nodeList.item(i));
 
         if (fieldNodes.isEmpty() && fieldData.nullable()) return;
         else if (fieldNodes.isEmpty())
-            throw new TranscriptionParsingException("Field \"" + innerElementData.name() + "\" can't be null", node);
+            throw new TranscriptionParsingException("Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" can't be null", node);
 
         try {
             if (List.class.isAssignableFrom(field.getType())) {
@@ -110,7 +114,7 @@ public class XMLElementsParser {
                     PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNodes.getFirst()));
                 else
                     throw new TranscriptionParsingException(
-                            "Field \"" + innerElementData.name() + "\" has more than one definition", node);
+                            "Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" has more than one definition", node);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
