@@ -4,10 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.core.expressions.ExpressionParser;
 import org.telegram.telegrise.core.expressions.MethodReference;
 import org.telegram.telegrise.core.expressions.MethodReferenceParser;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +31,27 @@ public class ExpressionFactory {
         if (type.equals(String.class))
             return parseFormattedString(text, type, node, pool);
 
-        throw new UnsupportedOperationException(); //FIXME
+        if (text.trim().startsWith(Syntax.EXPRESSION_START) && text.trim().endsWith(Syntax.EXPRESSION_END)){
+            String expression = text.trim().substring(Syntax.EXPRESSION_START.length(), text.trim().length() - Syntax.EXPRESSION_END.length());
+            try {
+                GeneratedValue<?> raw =  expressionParser.parse(expression, pool, type, node);
+                return p -> type.cast(raw.generate(p));
+            } catch (Exception e) { throw new RuntimeException(e); }
+        }
+
+        if (Number.class.isAssignableFrom(type)) {
+            try {
+                return GeneratedValue.ofValue(type.cast(NumberFormat.getInstance().parse(text)));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (Boolean.class.isAssignableFrom(type)) {
+            if (!text.equals("true") && !text.equals("false"))
+                throw new TranscriptionParsingException("Cannot parse boolean value from '" + text + "'", node);
+            return GeneratedValue.ofValue(type.cast(Boolean.parseBoolean(text)));
+        } else {
+            throw new TranscriptionParsingException("Unable to parse value '" + text + "'", node);
+        }
     }
 
     private static <T> GeneratedValue<T> parseFormattedString(String text, Class<T> tClass, Node node, ResourcePool pool){
