@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<?import org.telegram.telegrise.core.parser.XMLTranscriptionParserTest ?>
 <bot username="bot" token="token">
     <menu name="Main" type="reply">
         <tree name="name" predicate="true" callbackTriggers="callback-data" keys="first; second" commands="example"
-              handler="SimpleHandler" type="reply">
+              handler="XMLTranscriptionParserTest" type="reply">
             <text parseMode="markdown">
                 Text
             </text>

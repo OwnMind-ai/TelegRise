@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertElements;
 
-class XMLTranscriptionParserTest {
+public class XMLTranscriptionParserTest {
 
     @Test
     void parse() throws Exception {
@@ -28,7 +28,7 @@ class XMLTranscriptionParserTest {
 
         var elementParser = new XMLElementsParser();
         elementParser.load();
-        XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser);
+        XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
 
         Send expectedSend = new Send();
         expectedSend.setText(new Text("Text", "html"));
@@ -44,7 +44,7 @@ class XMLTranscriptionParserTest {
         expectedTree.setCallbackTriggers(new String[]{"callback-data"});
         expectedTree.setKeys(new String[]{"first", "second"});
         expectedTree.setCommands(new String[]{"example"});
-        expectedTree.setHandlerName("SimpleHandler");
+        expectedTree.setHandlerName("XMLTranscriptionParserTest");
         expectedTree.setType("reply");
         expectedTree.setText(new Text("Text", "markdown"));
         expectedTree.setBranches(List.of(expectedBranch));

@@ -18,23 +18,23 @@ import java.util.stream.Collectors;
 public class ExpressionFactory {
     private static final ExpressionParser expressionParser = new ExpressionParser(ExpressionParser.getTempDirectory());
 
-    public static @NotNull GeneratedValue<Void> createExpression(String text, Node node, ResourcePool pool){
-        return createExpression(text, Void.class, node, pool);
+    public static @NotNull GeneratedValue<Void> createExpression(String text, Node node, LocalNamespace namespace){
+        return createExpression(text, Void.class, node, namespace);
     }
 
-    public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, ResourcePool pool) {
+    public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
         if(MethodReferenceParser.isMethodReference(text)){
             MethodReference[] references = MethodReferenceParser.parse(text, type, node);
             return MethodReferenceParser.concat(references, type, node);
         }
 
         if (type.equals(String.class))
-            return parseFormattedString(text, type, node, pool);
+            return parseFormattedString(text, type, node, namespace);
 
         if (text.trim().startsWith(Syntax.EXPRESSION_START) && text.trim().endsWith(Syntax.EXPRESSION_END)){
             String expression = text.trim().substring(Syntax.EXPRESSION_START.length(), text.trim().length() - Syntax.EXPRESSION_END.length());
             try {
-                GeneratedValue<?> raw =  expressionParser.parse(expression, pool, type, node);
+                GeneratedValue<?> raw =  expressionParser.parse(expression, namespace, type, node);
                 return p -> type.cast(raw.generate(p));
             } catch (Exception e) { throw new RuntimeException(e); }
         }
@@ -54,21 +54,21 @@ public class ExpressionFactory {
         }
     }
 
-    private static <T> GeneratedValue<T> parseFormattedString(String text, Class<T> tClass, Node node, ResourcePool pool){
-        return new StringExpressionParser(text, node, pool).parse(tClass);
+    private static <T> GeneratedValue<T> parseFormattedString(String text, Class<T> tClass, Node node, LocalNamespace namespace){
+        return new StringExpressionParser(text, node, namespace).parse(tClass);
     }
 
     private static class StringExpressionParser{
         private static final char ESCAPE_CHAR = '\\';
         private final String source;
         private final Node node;
-        private final ResourcePool pool;
+        private final LocalNamespace namespace;
         private int pointer = 0;
 
-        private StringExpressionParser(String source, Node node, ResourcePool pool) {
+        private StringExpressionParser(String source, Node node, LocalNamespace namespace) {
             this.source = source;
             this.node = node;
-            this.pool = pool;
+            this.namespace = namespace;
         }
 
         public <T> GeneratedValue<T> parse(Class<T> tClass){
@@ -111,7 +111,7 @@ public class ExpressionFactory {
             String expression = left.substring(0, left.indexOf(Syntax.EXPRESSION_END));
             pointer += expression.length() + Syntax.EXPRESSION_END.length();
 
-            GeneratedValue<?> raw = expressionParser.parse(expression, pool, String.class, node);
+            GeneratedValue<?> raw = expressionParser.parse(expression, namespace, String.class, node);
             return (pool) -> String.valueOf(raw.generate(pool));
         }
     }

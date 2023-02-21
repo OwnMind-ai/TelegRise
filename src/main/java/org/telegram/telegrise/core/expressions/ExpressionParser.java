@@ -5,6 +5,7 @@ import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
@@ -45,7 +46,7 @@ public class ExpressionParser {
         }
     }
 
-    public GeneratedValue<?> parse(String expression, ResourcePool pool, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
+    public GeneratedValue<?> parse(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         int hashcode = Math.abs(expression.hashCode());
 
         if (isExpressionExists(hashcode)) {
@@ -54,7 +55,7 @@ public class ExpressionParser {
 
         JavaClassSource source;
         try {
-            source = this.createSource(expression, hashcode, returnType, pool);
+            source = this.createSource(expression, hashcode, returnType, namespace);
         } catch (ParserException e) {
             throw new TranscriptionParsingException("Syntax error in expression: " + e.getProblems().get(0).getMessage(), node);
         }
@@ -93,7 +94,7 @@ public class ExpressionParser {
         return result;
     }
 
-    private JavaClassSource createSource(String expression, int hashcode, Class<?> returnType, ResourcePool pool){
+    private JavaClassSource createSource(String expression, int hashcode, Class<?> returnType, LocalNamespace namespace){
         JavaClassSource source = Roaster.create(JavaClassSource.class);
         source.setName(className(hashcode));
         source.addImport(GeneratedValue.class);
@@ -106,7 +107,7 @@ public class ExpressionParser {
                 .setPublic()
                 .setName(GeneratedValue.ABSTRACT_METHOD_NAME)
                 .setParameters(ResourcePool.class.getSimpleName() + " pool")
-                .setBody(pool.getResourceInitializationCode("pool") + "return " + safeExpression + ";");
+                .setBody(namespace.getResourceInitializationCode("pool") + "return " + safeExpression + ";");
 
         if (returnType.equals(Void.class))
             method.setReturnTypeVoid();
