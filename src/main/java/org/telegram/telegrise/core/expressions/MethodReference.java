@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.expressions;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
@@ -49,7 +50,7 @@ public final class MethodReference {
     public <T> GeneratedValue<T> toGeneratedValue(Class<T> tClass, Node node){
         Method last = this.getLast();
         Class<?> actualReturnType = last.getReturnType();
-        if (!tClass.isAssignableFrom(actualReturnType))
+        if (!tClass.isAssignableFrom(actualReturnType) && !(ClassUtils.wrapperToPrimitive(tClass).equals(actualReturnType)))
             throw new TranscriptionParsingException(String.format("Return type '%s' of method '%s' cannot be casted to type '%s'",
                     actualReturnType.getSimpleName(), last.getName(), tClass.getSimpleName()) , node);
 

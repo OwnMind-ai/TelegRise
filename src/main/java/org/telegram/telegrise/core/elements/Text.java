@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
@@ -28,7 +29,7 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     }
 
     @ElementField(nullable = false)
-    private void parseText(Node node){
+    private void parseText(Node node, ApplicationNamespace namespace){
         //FIXME
         this.text = GeneratedValue.ofValue(XMLUtils.innerXML(node));
     }

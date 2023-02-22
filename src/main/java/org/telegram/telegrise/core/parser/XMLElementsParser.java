@@ -9,10 +9,7 @@ import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +23,10 @@ public class XMLElementsParser {
     private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
     @Setter
     private LocalNamespace namespace;
+
+    public XMLElementsParser(LocalNamespace namespace){
+        this.namespace = namespace;
+    }
 
     public void load(){
         XMLElementsParser.loadClasses().stream()
@@ -47,9 +48,29 @@ public class XMLElementsParser {
         Class<? extends TranscriptionElement> element = this.elements.get(node.getNodeName());
         TranscriptionElement instance = element.getConstructor().newInstance();
 
+        Arrays.stream(element.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(ElementField.class))
+                .sorted(Comparator.<Method>comparingDouble(m -> m.getAnnotation(ElementField.class).priority()).reversed())
+                .forEach(m -> {
+                    m.setAccessible(true);
+                    assert Arrays.equals(m.getParameterTypes(), new Class<?>[]{Node.class, ApplicationNamespace.class});
+
+                    try {
+                        Object namespace = m.invoke(instance, node, this.namespace.getApplicationNamespace());
+
+                        if (namespace instanceof LocalNamespace)
+                            this.namespace = (LocalNamespace) namespace;
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e.getTargetException());
+                    }
+                });
+
         // Parse fields
         Arrays.stream(element.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(ElementField.class))
+                .sorted(Comparator.<Field>comparingDouble(m -> m.getAnnotation(ElementField.class).priority()).reversed())
                 .forEach(f -> {
                     try {
                         this.parseField(f, node, instance);
@@ -58,22 +79,13 @@ public class XMLElementsParser {
                     }
                 });
 
-        Arrays.stream(element.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(ElementField.class))
-                .forEach(m -> {
-                    m.setAccessible(true);
-                    assert Arrays.equals(m.getParameterTypes(), new Class<?>[]{Node.class});
-
-                    try {
-                        m.invoke(instance, node);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
         Arrays.stream(element.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(InnerElement.class))
                 .forEach(f -> this.parseInnerElement(node, f, instance));
+
+        LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
+        if (newNamespace != null)
+            this.namespace = newNamespace;
 
         return instance;
     }

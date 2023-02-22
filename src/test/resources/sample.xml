@@ -2,7 +2,7 @@
 <?import org.telegram.telegrise.core.parser.XMLTranscriptionParserTest ?>
 <bot username="bot" token="token">
     <menu name="Main" type="reply">
-        <tree name="name" predicate="true" callbackTriggers="callback-data" keys="first; second" commands="example"
+        <tree name="name" predicate="#predicate" callbackTriggers="callback-data" keys="first; second" commands="example"
               handler="XMLTranscriptionParserTest" type="reply">
             <text parseMode="markdown">
                 Text

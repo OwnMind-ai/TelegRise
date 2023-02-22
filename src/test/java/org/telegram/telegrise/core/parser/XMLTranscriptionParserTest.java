@@ -1,6 +1,11 @@
 package org.telegram.telegrise.core.parser;
 
 import org.junit.jupiter.api.Test;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.core.ApplicationNamespace;
+import org.telegram.telegrise.core.LocalNamespace;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.Branch;
@@ -26,7 +31,7 @@ public class XMLTranscriptionParserTest {
         Document document = db.parse(new File("src/test/resources/sample.xml"));
         document.getDocumentElement().normalize();
 
-        var elementParser = new XMLElementsParser();
+        var elementParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
         elementParser.load();
         XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
 
@@ -44,7 +49,7 @@ public class XMLTranscriptionParserTest {
         expectedTree.setCallbackTriggers(new String[]{"callback-data"});
         expectedTree.setKeys(new String[]{"first", "second"});
         expectedTree.setCommands(new String[]{"example"});
-        expectedTree.setHandlerName("XMLTranscriptionParserTest");
+        expectedTree.setHandler(this.getClass());
         expectedTree.setType("reply");
         expectedTree.setText(new Text("Text", "markdown"));
         expectedTree.setBranches(List.of(expectedBranch));
@@ -59,6 +64,11 @@ public class XMLTranscriptionParserTest {
         transcription.setToken("token");
         transcription.setMenus(List.of(expectedMenu));
 
-        assertElements(transcription, parser.parse());
+        assertElements(transcription, parser.parse(), new ResourcePool(null, this));
+    }
+
+    @Reference
+    private boolean predicate(Update update){
+        return true;
     }
 }

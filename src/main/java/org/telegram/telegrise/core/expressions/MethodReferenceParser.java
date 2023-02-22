@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public final class MethodReferenceParser {
     public static MethodReference[] parse(String text, Class<?> clazz, Node node){
+        assert clazz != null;
         return new MethodReferenceParser(clazz, node, text).parse();
     }
 

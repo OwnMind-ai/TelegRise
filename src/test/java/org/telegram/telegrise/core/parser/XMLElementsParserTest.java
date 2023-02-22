@@ -1,7 +1,9 @@
 package org.telegram.telegrise.core.parser;
 
 import org.junit.jupiter.api.Test;
+import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.Text;
@@ -38,16 +40,16 @@ public class XMLElementsParserTest {
     }
     @Test
     void parseText() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser();
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
         parser.load();
         Node node = toNode("<text parseMode=\"html\">val</text>");
 
-        assertElements(new Text("val", "html"), parser.parse(node));
+        assertElements(new Text("val", "html"), parser.parse(node), new ResourcePool());
     }
 
     @Test
     void parseSend() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser();
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
         parser.load();
 
         Node node = toNode("<send chat=\"-1\" disableWebPreview=\"true\">\n" +
@@ -59,12 +61,12 @@ public class XMLElementsParserTest {
         expected.setChatId(GeneratedValue.ofValue(-1L));
         expected.setDisableWebPreview(GeneratedValue.ofValue(true));
 
-        assertElements(expected, parser.parse(node));
+        assertElements(expected, parser.parse(node), new ResourcePool());
     }
 
     @Test
     void parseBranch() throws Exception{
-        XMLElementsParser parser = new XMLElementsParser();
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
         parser.load();
 
         Node node = toNode("<branch when=\"true\">\n" +
@@ -81,16 +83,18 @@ public class XMLElementsParserTest {
         expected.setWhen(GeneratedValue.ofValue(true));
         expected.setActions(List.of(expectedSend));
 
-        assertElements(expected, parser.parse(node));
+        assertElements(expected, parser.parse(node), new ResourcePool());
     }
 
     @Test
     void parseTree() throws Exception{
-        XMLElementsParser parser = new XMLElementsParser();
+        ApplicationNamespace namespace = new ApplicationNamespace(this.getClass().getClassLoader());
+        namespace.addClass(this.getClass().getName());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(this.getClass(), namespace));
         parser.load();
 
         Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
-                "              handler=\"SimpleHandler\" type=\"reply\">\n" +
+                "              handler=\"XMLElementsParserTest\" type=\"reply\">\n" +
                 "            <text parseMode=\"markdown\">\n" +
                 "               Text\n" +
                 "            </text>" +
@@ -118,15 +122,15 @@ public class XMLElementsParserTest {
         expected.setCallbackTriggers(new String[]{"callback-data"});
         expected.setKeys(new String[]{"first", "second"});
         expected.setCommands(new String[]{"example"});
-        expected.setHandlerName("SimpleHandler");
+        expected.setHandler(this.getClass());
         expected.setType("reply");
         expected.setText(new Text("Text", "markdown"));
         expected.setBranches(List.of(expectedBranch));
 
-        assertElements(expected, parser.parse(node));
+        assertElements(expected, parser.parse(node), new ResourcePool());
     }
 
-    public static void assertElements(TranscriptionElement expected, TranscriptionElement actual){
+    public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){
         if(!expected.getClass().equals(actual.getClass()))
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
 
@@ -140,7 +144,7 @@ public class XMLElementsParserTest {
 
         for (String name : expectedFields.keySet()) {
             try {
-                if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual))
+                if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual, pool))
                     fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual).toString(), expectedFields.get(name).get(expected).toString()));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -148,7 +152,7 @@ public class XMLElementsParserTest {
         }
     }
 
-    private static boolean compareFields(Field expected, TranscriptionElement expectedInstance, Field actual, TranscriptionElement actualInstance) throws IllegalAccessException {
+    private static boolean compareFields(Field expected, TranscriptionElement expectedInstance, Field actual, TranscriptionElement actualInstance, ResourcePool pool) throws IllegalAccessException {
         expected.setAccessible(true);
         actual.setAccessible(true);
 
@@ -163,7 +167,7 @@ public class XMLElementsParserTest {
 
             for (int i = 0; i < Objects.requireNonNull(expectedList).size(); i++) {
                 assert actualList != null;
-                assertElements(expectedList.get(i), actualList.get(i));
+                assertElements(expectedList.get(i), actualList.get(i), pool);
             }
 
             return true;
@@ -172,10 +176,10 @@ public class XMLElementsParserTest {
         } else if (!TranscriptionElement.class.isAssignableFrom(expected.getType()))
             return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
                 (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)
-                    && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), new ResourcePool()))
+                    && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), pool))
                 || (expected.get(expectedInstance).equals(actual.get(actualInstance)));
         else {
-            assertElements((TranscriptionElement) expected.get(expectedInstance), (TranscriptionElement) actual.get(actualInstance));
+            assertElements((TranscriptionElement) expected.get(expectedInstance), (TranscriptionElement) actual.get(actualInstance), pool);
             return true;
         }
     }

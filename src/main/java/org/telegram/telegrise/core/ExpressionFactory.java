@@ -24,7 +24,7 @@ public class ExpressionFactory {
 
     public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
         if(MethodReferenceParser.isMethodReference(text)){
-            MethodReference[] references = MethodReferenceParser.parse(text, type, node);
+            MethodReference[] references = MethodReferenceParser.parse(text, namespace.getHandlerClass(), node);
             return MethodReferenceParser.concat(references, type, node);
         }
 

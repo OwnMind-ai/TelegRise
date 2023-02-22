@@ -35,4 +35,8 @@ public final class ApplicationNamespace {
     public LocalNamespace localNamespaceForClass(String classname){
         return new LocalNamespace(this.getClass(classname), this);
     }
+
+    public LocalNamespace emptyLocal(){
+        return new LocalNamespace(null, this);
+    }
 }

@@ -11,5 +11,5 @@ public @interface ElementField {
     boolean isTextContext() default false;
     boolean nullable() default true;
     boolean expression() default false;
-
+    double priority() default Double.NEGATIVE_INFINITY;
 }
