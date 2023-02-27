@@ -1,17 +1,15 @@
 package org.telegram.telegrise.core.parser;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.core.ApplicationNamespace;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.BotTranscription;
-import org.telegram.telegrise.core.GeneratedValue;
-import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.Menu;
-import org.telegram.telegrise.core.elements.Text;
-import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.w3c.dom.Document;
 
@@ -22,10 +20,13 @@ import java.util.List;
 
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertElements;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XMLTranscriptionParserTest {
 
-    @Test
-    void parse() throws Exception {
+    private BotTranscription transcription;
+
+    @BeforeAll
+    void before() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(new File("src/test/resources/sample.xml"));
@@ -35,6 +36,11 @@ public class XMLTranscriptionParserTest {
         elementParser.load();
         XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
 
+        this.transcription = parser.parse();
+    }
+
+    @Test
+    void parse() {
         Send expectedSend = new Send();
         expectedSend.setText(new Text("Text", "html"));
         expectedSend.setChatId(GeneratedValue.ofValue(-1L));
@@ -64,7 +70,7 @@ public class XMLTranscriptionParserTest {
         transcription.setToken("token");
         transcription.setMenus(List.of(expectedMenu));
 
-        assertElements(transcription, parser.parse(), new ResourcePool(null, this));
+        assertElements(transcription, this.transcription, new ResourcePool(null, this));
     }
 
     @Reference

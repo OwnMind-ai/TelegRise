@@ -22,4 +22,7 @@ public class Branch implements TranscriptionElement{
 
     @InnerElement
     private List<ActionElement> actions;
+
+    @InnerElement
+    private List<Branch> branches;
 }
