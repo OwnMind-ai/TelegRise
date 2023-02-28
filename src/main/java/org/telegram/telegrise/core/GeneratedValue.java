@@ -1,8 +1,9 @@
 package org.telegram.telegrise.core;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public interface GeneratedValue<T> {
+public interface GeneratedValue<T> extends Serializable {
     String ABSTRACT_METHOD_NAME = "generate";
 
     static <V> GeneratedValue<V> ofValue(V value){
