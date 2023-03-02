@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.annotations.TreeHandler;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertElements;
 
+@TreeHandler
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XMLTranscriptionParserTest {
 
