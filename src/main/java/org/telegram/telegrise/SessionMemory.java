@@ -1,5 +1,9 @@
 package org.telegram.telegrise;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.telegram.telegrise.core.elements.Branch;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +16,14 @@ public class SessionMemory implements Serializable {
         NOTE: In order to keep compatibly with Redis database, SessionMemory and all their elements should be serializable.
      */
     private final Map<String, Serializable> memory = Collections.synchronizedMap(new HashMap<>());
+    @Getter
+    private final int transcriptionHashcode;
+    @Getter @Setter
+    private Branch currentBranch;
+
+    public SessionMemory(int transcriptionHashcode) {
+        this.transcriptionHashcode = transcriptionHashcode;
+    }
 
     public Map<String, Serializable> getMemoryMap(){
         return memory;
