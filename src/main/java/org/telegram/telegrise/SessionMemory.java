@@ -1,56 +1,18 @@
 package org.telegram.telegrise;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.BranchingElement;
-
 import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.Map;
 
-public class SessionMemory implements Serializable {
-    private static final long serialVersionUID = -8011212970107619938L;
+public interface SessionMemory extends Serializable {
+    Map<String, Serializable> getMemoryMap();
 
-    /*
-        NOTE: In order to keep compatibly with Redis database, SessionMemory and all their elements should be serializable.
-     */
-    private final Map<String, Serializable> memory = Collections.synchronizedMap(new HashMap<>());
-    @Getter
-    private final int transcriptionHashcode;
-    @Getter @Setter
-    private Branch currentBranch;
-    @Getter
-    private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
+    void put(String key, Serializable value);
 
-    public SessionMemory(int transcriptionHashcode) {
-        this.transcriptionHashcode = transcriptionHashcode;
-    }
+    Serializable get(String key);
 
-    public Map<String, Serializable> getMemoryMap(){
-        return memory;
-    }
+    <T extends Serializable> T get(String key, Class<T> tClass);
 
-    public void put(String key, Serializable value){
-        this.memory.put(key, value);
-    }
+    String addComponent(Serializable value);
 
-    public Serializable get(String key){
-        return this.memory.get(key);
-    }
-
-    public <T extends Serializable> T get(String key, Class<T> tClass){
-        return tClass.cast(this.memory.get(key));
-    }
-
-    public String addComponent(Serializable value){
-        String key = value.getClass().getName();
-        this.memory.put(key, value);
-
-        return key;
-    }
-
-    public <T extends Serializable> T getComponent(Class<T> tClass){
-        return tClass.cast(this.memory.get(tClass.getName()));
-    }
+    <T extends Serializable> T getComponent(Class<T> tClass);
 }

@@ -5,9 +5,10 @@ import org.telegram.telegrise.core.elements.Tree;
 import java.lang.reflect.InvocationTargetException;
 
 public final class TreeExecutor {
-    public static TreeExecutor create(Tree tree) {
+    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector) {
         try {
             Object handler = tree.getHandler().getConstructor().newInstance();
+            resourceInjector.injectResources(handler);
 
             return new TreeExecutor(handler, tree);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
