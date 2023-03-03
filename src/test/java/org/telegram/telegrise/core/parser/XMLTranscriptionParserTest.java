@@ -53,7 +53,6 @@ public class XMLTranscriptionParserTest {
 
         Tree expectedTree = new Tree();
         expectedTree.setName("name");
-        expectedTree.setPredicate(GeneratedValue.ofValue(true));
         expectedTree.setCallbackTriggers(new String[]{"callback-data"});
         expectedTree.setKeys(new String[]{"first", "second"});
         expectedTree.setCommands(new String[]{"example"});
@@ -70,7 +69,7 @@ public class XMLTranscriptionParserTest {
         BotTranscription transcription = new BotTranscription();
         transcription.setUsername("bot");
         transcription.setToken("token");
-        transcription.setMenus(List.of(expectedMenu));
+        transcription.setRootMenu(expectedMenu);
 
         assertElements(transcription, this.transcription, new ResourcePool(null, this));
     }

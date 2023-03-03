@@ -6,8 +6,6 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
 
-import java.util.List;
-
 @Element(name = "bot")
 @Data
 @NoArgsConstructor
@@ -24,5 +22,5 @@ public final class BotTranscription implements TranscriptionElement {
     private String defaultParseMode = "html";
 
     @InnerElement(nullable = false)
-    private List<Menu> menus;
+    private Menu rootMenu;
 }

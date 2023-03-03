@@ -3,11 +3,10 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrise.core.elements.Branch;
+import org.telegram.telegrise.core.elements.BranchingElement;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SessionMemory implements Serializable {
     private static final long serialVersionUID = -8011212970107619938L;
@@ -20,6 +19,8 @@ public class SessionMemory implements Serializable {
     private final int transcriptionHashcode;
     @Getter @Setter
     private Branch currentBranch;
+    @Getter
+    private final Deque<BranchingElement> branchingElements = new LinkedList<>();
 
     public SessionMemory(int transcriptionHashcode) {
         this.transcriptionHashcode = transcriptionHashcode;
