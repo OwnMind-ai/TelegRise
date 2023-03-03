@@ -52,14 +52,14 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
         parser.load();
 
-        Node node = toNode("<send chat=\"-1\" disableWebPreview=\"true\">\n" +
+        Node node = toNode("<send chat=\"-1\" disableWebPagePreview=\"true\">\n" +
                 "                    <text>Text</text>\n" +
                 "                </send>");
 
         Send expected = new Send();
         expected.setText(new Text("Text", "html"));
         expected.setChatId(GeneratedValue.ofValue(-1L));
-        expected.setDisableWebPreview(GeneratedValue.ofValue(true));
+        expected.setDisableWebPagePreview(GeneratedValue.ofValue(true));
 
         assertElements(expected, parser.parse(node), new ResourcePool());
     }

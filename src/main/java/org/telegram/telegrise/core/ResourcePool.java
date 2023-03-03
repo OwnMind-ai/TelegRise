@@ -9,8 +9,4 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public final class ResourcePool {
     private Update update;
     private Object handler;
-
-    public ResourcePool(Update update) {
-        this.update = update;
-    }
 }

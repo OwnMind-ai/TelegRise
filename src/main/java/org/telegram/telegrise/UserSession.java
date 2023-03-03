@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 
 import java.util.Deque;
@@ -22,7 +23,7 @@ public class UserSession implements Runnable{
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode());
         this.transcription = transcription;
         this.sender = sender;
-        this.resourceInjector = new ResourceInjector(this.sessionMemory);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
     }
 
     public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender) {
@@ -45,5 +46,12 @@ public class UserSession implements Runnable{
 
     public void handleUpdate(Update update) {
 
+    }
+
+    private ResourcePool createResourcePool(Update update) {
+        return new ResourcePool(
+                update,
+                this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast()
+        );
     }
 }

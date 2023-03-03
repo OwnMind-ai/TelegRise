@@ -3,7 +3,10 @@ package org.telegram.telegrise.core.parser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.TreeHandler;
 import org.telegram.telegrise.core.ApplicationNamespace;
@@ -26,6 +29,7 @@ import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertEle
 public class XMLTranscriptionParserTest {
 
     private BotTranscription transcription;
+    private Update update;
 
     @BeforeAll
     void before() throws Exception {
@@ -39,17 +43,34 @@ public class XMLTranscriptionParserTest {
         XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
 
         this.transcription = parser.parse();
+
+        this.update = new Update();
+        this.update.setMessage(new Message());
+        this.update.getMessage().setChat(new Chat(-1L, "chat"));
+        this.update.getMessage().setFrom(new User(-2L, "First Name", false));
     }
 
     @Test
     void parse() {
+        Send expectedSendFolded = new Send();
+        expectedSendFolded.setText(new Text("<b>Bye</b>", "html"));
+        expectedSendFolded.setChatId(GeneratedValue.ofValue(update.getMessage().getChatId()));
+
+        Branch expectedBranchFolded = new Branch();
+        expectedBranchFolded.setWhen(GeneratedValue.ofValue(true));
+        expectedBranchFolded.setActions(List.of(expectedSendFolded));
+
         Send expectedSend = new Send();
-        expectedSend.setText(new Text("Text", "html"));
-        expectedSend.setChatId(GeneratedValue.ofValue(-1L));
+        expectedSend.setText(new Text(
+                "Hi, " + update.getMessage().getFrom().getFirstName(),
+                "html"
+        ));
+        expectedSend.setChatId(GeneratedValue.ofValue(update.getMessage().getChatId()));
 
         Branch expectedBranch = new Branch();
-        expectedBranch.setWhen(GeneratedValue.ofValue(true));
-        expectedBranch.setActions(List.of(expectedSend, expectedSend));
+        expectedBranch.setWhen(GeneratedValue.ofValue(update.hasMessage()));
+        expectedBranch.setActions(List.of(expectedSend));
+        expectedBranch.setBranches(List.of(expectedBranchFolded));
 
         Tree expectedTree = new Tree();
         expectedTree.setName("name");
@@ -71,7 +92,7 @@ public class XMLTranscriptionParserTest {
         transcription.setToken("token");
         transcription.setRootMenu(expectedMenu);
 
-        assertElements(transcription, this.transcription, new ResourcePool(null, this));
+        assertElements(transcription, this.transcription, new ResourcePool(update, this));
     }
 
     @Reference

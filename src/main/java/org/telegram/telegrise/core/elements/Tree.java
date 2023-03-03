@@ -42,11 +42,11 @@ public class Tree implements BranchingElement{
     private List<Menu> menus;
 
     @ElementField(priority = Double.POSITIVE_INFINITY)
-    private LocalNamespace extractHandler(Node node, ApplicationNamespace namespace){
+    private LocalNamespace extractHandler(Node node, LocalNamespace namespace){
         if (node.getAttributes().getNamedItem("handler") != null)
-            this.handler = namespace.getClass(node.getAttributes().getNamedItem("handler").getNodeValue());
+            this.handler = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("handler").getNodeValue());
 
-        return this.createNamespace(namespace);
+        return this.createNamespace(namespace.getApplicationNamespace());
     }
 
     @Override

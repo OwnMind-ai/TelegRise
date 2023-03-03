@@ -2,9 +2,11 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
@@ -18,8 +20,8 @@ public class Send implements ActionElement{
     @InnerElement(nullable = false)
     private Text text;
 
-    @ElementField(name = "disableWebPreview", expression = true)
-    private GeneratedValue<Boolean> disableWebPreview;
+    @ElementField(name = "disableWebPagePreview", expression = true)
+    private GeneratedValue<Boolean> disableWebPagePreview;
     @ElementField(name = "disableNotification", expression = true)
     private GeneratedValue<Boolean> disableNotification;
     @ElementField(name = "protectContent", expression = true)
@@ -29,11 +31,18 @@ public class Send implements ActionElement{
     @ElementField(name = "replyTo", expression = true)
     private GeneratedValue<Integer> replyTo;
 
-    //TODO inner element of <keyboard>
+    //TODO inner element of <keyboard> ; add other fields
     private GeneratedValue<ReplyKeyboard> replyMarkup;
 
     @Override
-    public PartialBotApiMethod<?> generateMethod() {
-        return null;
+    public BotApiMethod<?> generateMethod(ResourcePool pool) {
+        return SendMessage.builder()
+                .chatId(chatId.generate(pool))
+                .text(text.getText().generate(pool))
+                .disableWebPagePreview(disableWebPagePreview.generate(pool))
+                .disableNotification(disableNotification.generate(pool))
+                .protectContent(protectContent.generate(pool))
+                .replyToMessageId(replyTo.generate(pool))
+                .build();
     }
 }

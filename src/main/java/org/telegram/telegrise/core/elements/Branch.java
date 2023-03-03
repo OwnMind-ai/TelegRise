@@ -18,7 +18,7 @@ public class Branch implements TranscriptionElement{
     private GeneratedValue<Boolean> when;
 
     @ElementField(name = "handler")
-    private GeneratedValue<Void> toInvoke;
+    private GeneratedValue<Void> toInvoke; // TODO Or GeneratedValue<BotApiMethod<?>>
 
     @InnerElement
     private List<ActionElement> actions;

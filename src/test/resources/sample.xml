@@ -7,13 +7,15 @@
             <text parseMode="markdown">
                 Text
             </text>
-            <branch when="true">
-                <send chat="-1">
-                    <text>Text</text>
+            <branch when="${update.hasMessage()}">
+                <send chat="${update.getMessage().getChatId()}">
+                    <text>Hi, ${update.getMessage().getFrom().getFirstName()}</text>
                 </send>
-                <send chat="-1">
-                    <text>Text</text>
-                </send>
+                <branch when="#predicate">
+                    <send chat="${update.getMessage().getChatId()}">
+                        <text><b>Bye</b></text>
+                    </send>
+                </branch>
             </branch>
         </tree>
     </menu>

@@ -53,10 +53,10 @@ public class XMLElementsParser {
                 .sorted(Comparator.<Method>comparingDouble(m -> m.getAnnotation(ElementField.class).priority()).reversed())
                 .forEach(m -> {
                     m.setAccessible(true);
-                    assert Arrays.equals(m.getParameterTypes(), new Class<?>[]{Node.class, ApplicationNamespace.class});
+                    assert Arrays.equals(m.getParameterTypes(), new Class<?>[]{Node.class, LocalNamespace.class});
 
                     try {
-                        Object namespace = m.invoke(instance, node, this.namespace.getApplicationNamespace());
+                        Object namespace = m.invoke(instance, node, this.namespace);
 
                         if (namespace instanceof LocalNamespace)
                             this.namespace = (LocalNamespace) namespace;
