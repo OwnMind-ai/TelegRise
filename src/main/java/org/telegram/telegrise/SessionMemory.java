@@ -7,6 +7,7 @@ import org.telegram.telegrise.core.elements.BranchingElement;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class SessionMemory implements Serializable {
     private static final long serialVersionUID = -8011212970107619938L;
@@ -20,7 +21,7 @@ public class SessionMemory implements Serializable {
     @Getter @Setter
     private Branch currentBranch;
     @Getter
-    private final Deque<BranchingElement> branchingElements = new LinkedList<>();
+    private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
 
     public SessionMemory(int transcriptionHashcode) {
         this.transcriptionHashcode = transcriptionHashcode;
