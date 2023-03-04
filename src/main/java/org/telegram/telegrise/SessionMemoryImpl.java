@@ -22,12 +22,15 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter
     private final int transcriptionHashcode;
     @Getter
+    private final UserIdentifier userIdentifier;
+    @Getter
     private final AtomicReference<Branch> currentBranch = new AtomicReference<>();
     @Getter
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
 
-    public SessionMemoryImpl(int transcriptionHashcode) {
+    public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier) {
         this.transcriptionHashcode = transcriptionHashcode;
+        this.userIdentifier = userIdentifier;
     }
 
     @Override

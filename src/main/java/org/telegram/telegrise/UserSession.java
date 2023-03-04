@@ -9,7 +9,9 @@ import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.Deque;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
@@ -20,9 +22,13 @@ public class UserSession implements Runnable{
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
 
+    private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
+    @Getter
+    private boolean running;
+
     public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender) {
         this.userIdentifier.set(userIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode());
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier);
         this.transcription = transcription;
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
@@ -43,16 +49,27 @@ public class UserSession implements Runnable{
         this.initialize();
     }
 
-    public void initialize(){
+    private void initialize(){
         this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
+    }
+
+    public void update(Update update){
+        this.updateQueue.add(update);
     }
 
     @Override
     public void run() {
+        try {
+            this.running = true;
 
+            while (!this.updateQueue.isEmpty())
+                this.handleUpdate(this.updateQueue.remove());
+        } finally {
+            this.running = false;
+        }
     }
 
-    public void handleUpdate(Update update) {
+    private void handleUpdate(Update update) {
         if (this.sessionMemory.isOnStack(Menu.class))
             this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
         else if (this.sessionMemory.isOnStack(Tree.class))
