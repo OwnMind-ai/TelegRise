@@ -29,6 +29,7 @@ public final class TreeExecutor {
     }
 
     private final Object handlerInstance;
+    @Getter
     private final Tree tree;
     private final DefaultAbsSender sender;
     @Getter

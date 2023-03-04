@@ -5,6 +5,8 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -13,7 +15,7 @@ public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
-    private final DefaultAbsSender sender;
+    private final DefaultAbsSender sender;  //FIXME
     private final ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
@@ -24,6 +26,7 @@ public class UserSession implements Runnable{
         this.transcription = transcription;
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
+        this.initialize();
     }
 
     public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender) {
@@ -37,6 +40,11 @@ public class UserSession implements Runnable{
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
         this.resourceInjector = new ResourceInjector(this.sessionMemory);
+        this.initialize();
+    }
+
+    public void initialize(){
+        this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
     }
 
     @Override
@@ -45,7 +53,38 @@ public class UserSession implements Runnable{
     }
 
     public void handleUpdate(Update update) {
+        if (this.sessionMemory.isOnStack(Menu.class))
+            this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
+        else if (this.sessionMemory.isOnStack(Tree.class))
+            this.updateTree(update);
+    }
 
+    private void initializeTree(Update update, Menu menu) {
+        Tree tree = menu.findTree(this.createResourcePool(update));
+
+        if (tree != null){
+            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender);
+            this.treeExecutors.add(executor);
+
+            this.updateTree(update);
+        }
+    }
+
+    private void updateTree(Update update) {
+        TreeExecutor executor = this.treeExecutors.getLast();
+
+        executor.update(update);
+        this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
+
+        if (executor.isClosed()){
+            this.treeExecutors.remove(executor);
+            this.sessionMemory.getCurrentBranch().set(null);
+
+            assert this.sessionMemory.getBranchingElements().getLast().equals(executor.getTree());
+            this.sessionMemory.getBranchingElements().removeLast();
+        } else {
+            this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
+        }
     }
 
     private ResourcePool createResourcePool(Update update) {

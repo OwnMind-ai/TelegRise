@@ -62,4 +62,14 @@ public class SessionMemoryImpl implements SessionMemory {
     public <T extends Serializable> T getComponent(Class<T> tClass){
         return tClass.cast(this.memory.get(tClass.getName()));
     }
+
+    public boolean isOnStack(Class<?> clazz){
+        return !this.memory.isEmpty() && clazz.isInstance(this.branchingElements.getLast());
+    }
+
+    public <T> T getFromStack(Class<T> tClass){
+        assert tClass.isInstance(this.branchingElements.getLast());
+
+        return tClass.cast(this.branchingElements.getLast());
+    }
 }
