@@ -2,9 +2,11 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.*;
+import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -12,6 +14,7 @@ import org.w3c.dom.Node;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Element(name = "tree")
 @Data
@@ -19,8 +22,6 @@ import java.util.List;
 public class Tree implements BranchingElement{
     @ElementField(name = "name", nullable = false)
     private String name;
-    @ElementField(name = "type")
-    private String type;
 
     @ElementField(name = "commands")
     private String[] commands;
@@ -35,7 +36,7 @@ public class Tree implements BranchingElement{
     private Class<?> handler;
 
     @InnerElement
-    private Text text;
+    private List<ActionElement> actions;
     @InnerElement
     private List<Branch> branches;
     @InnerElement
@@ -75,5 +76,10 @@ public class Tree implements BranchingElement{
         }
 
         return false;
+    }
+
+    @Override
+    public List<BotApiMethod<?>> getMethods(ResourcePool pool) {
+        return actions != null ? this.actions.stream().map(a -> a.generateMethod(pool)).collect(Collectors.toList()) : List.of();
     }
 }

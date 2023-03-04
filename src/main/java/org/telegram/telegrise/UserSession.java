@@ -2,9 +2,12 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Tree;
 
@@ -83,7 +86,7 @@ public class UserSession implements Runnable{
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender);
             this.treeExecutors.add(executor);
 
-            this.updateTree(update);
+            this.executeBranchingElement(tree, update);
         }
     }
 
@@ -99,6 +102,9 @@ public class UserSession implements Runnable{
 
             assert this.sessionMemory.getBranchingElements().getLast().equals(executor.getTree());
             this.sessionMemory.getBranchingElements().removeLast();
+
+            assert this.sessionMemory.getBranchingElements() instanceof Menu;
+            this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
         } else {
             this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
         }
@@ -107,7 +113,17 @@ public class UserSession implements Runnable{
     private ResourcePool createResourcePool(Update update) {
         return new ResourcePool(
                 update,
-                this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast()
+                this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getHandlerInstance()
         );
+    }
+
+    private void executeBranchingElement(BranchingElement element, Update update){
+        for (BotApiMethod<?> botApiMethod : element.getMethods(this.createResourcePool(update))) {
+            try {
+                this.sender.execute(botApiMethod);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

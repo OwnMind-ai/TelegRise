@@ -4,9 +4,9 @@
     <menu name="Main" type="reply">
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               handler="XMLTranscriptionParserTest" type="reply">
-            <text parseMode="markdown">
-                Text
-            </text>
+            <send chat="-1">
+                <text parseMode="markdown">Text</text>
+            </send>
             <branch when="${update.hasMessage()}">
                 <send chat="${update.getMessage().getChatId()}">
                     <text>Hi, ${update.getMessage().getFrom().getFirstName()}</text>

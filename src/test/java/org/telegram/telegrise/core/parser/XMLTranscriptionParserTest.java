@@ -72,19 +72,22 @@ public class XMLTranscriptionParserTest {
         expectedBranch.setActions(List.of(expectedSend));
         expectedBranch.setBranches(List.of(expectedBranchFolded));
 
+        Send treeSend = new Send();
+        treeSend.setText(new Text("Text", "markdown"));
+        treeSend.setChatId(GeneratedValue.ofValue(-1L));
+
         Tree expectedTree = new Tree();
         expectedTree.setName("name");
         expectedTree.setCallbackTriggers(new String[]{"callback-data"});
         expectedTree.setKeys(new String[]{"first", "second"});
         expectedTree.setCommands(new String[]{"example"});
         expectedTree.setHandler(this.getClass());
-        expectedTree.setType("reply");
-        expectedTree.setText(new Text("Text", "markdown"));
+        expectedTree.setActions(List.of(treeSend));
         expectedTree.setBranches(List.of(expectedBranch));
 
         Menu expectedMenu = new Menu();
         expectedMenu.setName("Main");
-        expectedMenu.setType("reply");
+        expectedMenu.setActions(null);
         expectedMenu.setTrees(List.of(expectedTree));
 
         BotTranscription transcription = new BotTranscription();

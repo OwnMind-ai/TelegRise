@@ -95,9 +95,9 @@ public class XMLElementsParserTest {
 
         Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
                 "              handler=\"XMLElementsParserTest\" type=\"reply\">\n" +
-                "            <text parseMode=\"markdown\">\n" +
-                "               Text\n" +
-                "            </text>" +
+                "            <send chat=\"-1\">\n" +
+                "               <text parseMode=\"markdown\">Text</text>\n" +
+                "            </send>" +
                 "            <branch when=\"true\">\n" +
                 "                <send chat=\"-1\">\n" +
                 "                    <text>Text</text>\n" +
@@ -116,6 +116,10 @@ public class XMLElementsParserTest {
         expectedBranch.setWhen(GeneratedValue.ofValue(true));
         expectedBranch.setActions(List.of(expectedSend, expectedSend));
 
+        Send treeSend = new Send();
+        treeSend.setText(new Text("Text", "markdown"));
+        treeSend.setChatId(GeneratedValue.ofValue(-1L));
+
         Tree expected = new Tree();
         expected.setName("name");
         expected.setPredicate(GeneratedValue.ofValue(true));
@@ -123,8 +127,7 @@ public class XMLElementsParserTest {
         expected.setKeys(new String[]{"first", "second"});
         expected.setCommands(new String[]{"example"});
         expected.setHandler(this.getClass());
-        expected.setType("reply");
-        expected.setText(new Text("Text", "markdown"));
+        expected.setActions(List.of(treeSend));
         expected.setBranches(List.of(expectedBranch));
 
         assertElements(expected, parser.parse(node), new ResourcePool());

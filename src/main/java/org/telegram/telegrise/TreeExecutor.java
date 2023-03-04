@@ -28,6 +28,7 @@ public final class TreeExecutor {
         }
     }
 
+    @Getter
     private final Object handlerInstance;
     @Getter
     private final Tree tree;
