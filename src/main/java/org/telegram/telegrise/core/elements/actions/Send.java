@@ -39,10 +39,11 @@ public class Send implements ActionElement{
         return SendMessage.builder()
                 .chatId(chatId.generate(pool))
                 .text(text.getText().generate(pool))
-                .disableWebPagePreview(disableWebPagePreview.generate(pool))
-                .disableNotification(disableNotification.generate(pool))
-                .protectContent(protectContent.generate(pool))
-                .replyToMessageId(replyTo.generate(pool))
+                .disableWebPagePreview(disableWebPagePreview != null ? disableWebPagePreview.generate(pool) : null)
+                .disableNotification(disableNotification != null ? disableNotification.generate(pool) : null)
+                .protectContent(protectContent != null ? protectContent.generate(pool) : null)
+                .replyToMessageId(replyTo != null ? replyTo.generate(pool) : null)
+                .parseMode(text.getParseMode().generate(pool))
                 .build();
     }
 }

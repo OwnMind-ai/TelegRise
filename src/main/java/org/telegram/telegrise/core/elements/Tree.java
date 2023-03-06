@@ -67,7 +67,7 @@ public class Tree implements BranchingElement{
 
             if (isCommand && this.commands != null)
                 return Arrays.stream(this.commands)
-                        .anyMatch(c -> c.equals(update.getMessage().getText()));
+                        .anyMatch(c -> c.equals(update.getMessage().getText().substring(1)));
             else if (this.keys != null)
                 return Arrays.stream(this.keys)
                         .anyMatch(c -> c.equals(update.getMessage().getText()));

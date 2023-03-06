@@ -1,5 +1,7 @@
 package org.telegram.telegrise;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -11,12 +13,13 @@ import java.util.concurrent.ConcurrentMap;
 public class TelegramSessionsController {
     private final ThreadGroup threadGroup = new ThreadGroup(this.getClass().getSimpleName());
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
+    @Getter
     private final BotTranscription transcription;
-    private final DefaultAbsSender sender;
+    @Setter
+    private DefaultAbsSender sender;
 
-    public TelegramSessionsController(BotTranscription transcription, DefaultAbsSender sender) {
+    public TelegramSessionsController(BotTranscription transcription) {
         this.transcription = transcription;
-        this.sender = sender;
     }
 
     public void onUpdateReceived(Update update){
@@ -32,6 +35,7 @@ public class TelegramSessionsController {
         }
     }
 
+    //TODO custom session loader
     public void loadSession(SessionMemory memory){
         if (!(memory instanceof SessionMemoryImpl))  //FIXME
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");

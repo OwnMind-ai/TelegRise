@@ -67,7 +67,7 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     public boolean isOnStack(Class<?> clazz){
-        return !this.memory.isEmpty() && clazz.isInstance(this.branchingElements.getLast());
+        return !this.branchingElements.isEmpty() && clazz.isInstance(this.branchingElements.getLast());
     }
 
     public <T> T getFromStack(Class<T> tClass){

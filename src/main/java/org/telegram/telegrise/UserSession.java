@@ -85,6 +85,7 @@ public class UserSession implements Runnable{
         if (tree != null){
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender);
             this.treeExecutors.add(executor);
+            this.sessionMemory.getBranchingElements().add(tree);
 
             this.executeBranchingElement(tree, update);
         }

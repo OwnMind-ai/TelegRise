@@ -1,23 +1,27 @@
 package org.telegram.telegrise.core.parser;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
 
 public class TranscriptionParsingException extends RuntimeException{
     private final String message;
     private final Node problematicNode;
 
-    public TranscriptionParsingException(String message, Node problematicNode) {
+    public TranscriptionParsingException(String message, @NotNull Node problematicNode) {
         this.message = message;
         this.problematicNode = problematicNode;
     }
 
-    private String nodeTag(){
+    private String nodeTag() {
         StringBuilder result = new StringBuilder("<" + problematicNode.getNodeName() + " ");
 
-        for (int i = 0; i < problematicNode.getAttributes().getLength(); i++) {
-            Node item = problematicNode.getAttributes().item(i);
-            result.append(item.getNodeName()).append("=\"").append(item.getNodeValue()).append("\" ");
-        }
+        if (problematicNode.getNodeType() == Node.ELEMENT_NODE){
+            for (int i = 0; i < problematicNode.getAttributes().getLength(); i++) {
+                Node item = problematicNode.getAttributes().item(i);
+                result.append(item.getNodeName()).append("=\"").append(item.getNodeValue()).append("\" ");
+            }
+        } else
+            result.append(problematicNode);
 
         return result.append(">").toString();
     }

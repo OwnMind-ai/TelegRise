@@ -62,7 +62,7 @@ public final class TreeExecutor {
         if (branch.getToInvoke() != null)
             branch.getToInvoke().generate(pool);
 
-        if (branch.getBranches() != null)
+        if (branch.getActions() != null)
             branch.getActions().stream().map(action -> action.generateMethod(pool))
                     .forEach(m -> {
                         try {
