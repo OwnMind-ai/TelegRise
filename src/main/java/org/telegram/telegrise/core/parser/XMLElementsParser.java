@@ -107,9 +107,22 @@ public class XMLElementsParser {
                         && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName()))))
                 fieldNodes.add(nodeList.item(i));
 
-        if (fieldNodes.isEmpty() && fieldData.nullable()) return;
-        else if (fieldNodes.isEmpty())
-            throw new TranscriptionParsingException("Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" can't be null", node);
+        if (fieldNodes.isEmpty()){
+            if (EmbeddableElement.class.isAssignableFrom(actualType)){
+                try {
+                    EmbeddableElement object = (EmbeddableElement) actualType.getConstructor().newInstance();
+                    object.parse(node, this.namespace);
+
+                    PropertyUtils.setSimpleProperty(instance, field.getName(), object);
+                    return;
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else if (fieldData.nullable()) return;
+            else throw new TranscriptionParsingException("Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" can't be null", node);
+        }
 
         try {
             if (List.class.isAssignableFrom(field.getType())) {

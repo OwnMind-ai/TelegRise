@@ -33,4 +33,9 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     private void parseText(Node node, LocalNamespace namespace){
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }
+
+    @Override
+    public void parse(Node parent, LocalNamespace namespace) {
+        this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(parent), String.class, parent, namespace);
+    }
 }

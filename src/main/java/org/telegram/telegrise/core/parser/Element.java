@@ -7,5 +7,4 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface Element {
     String name();
-    String embedded() default "";  //TODO
 }
