@@ -4,7 +4,7 @@
     <menu name="Main" type="reply">
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               handler="XMLTranscriptionParserTest" type="reply">
-            <send chat="-1">
+            <send>
                 <text parseMode="markdown">Text</text>
             </send>
             <branch when="${update.hasMessage()}">

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
@@ -12,10 +13,12 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
 
+import java.util.Objects;
+
 @Element(name = "send")
 @Data @NoArgsConstructor
 public class Send implements ActionElement{
-    @ElementField(name = "chat", nullable = false, expression = true)
+    @ElementField(name = "chat", expression = true)
     private GeneratedValue<Long> chatId;
     @InnerElement(nullable = false)
     private Text text;
@@ -37,7 +40,7 @@ public class Send implements ActionElement{
     @Override
     public BotApiMethod<?> generateMethod(ResourcePool pool) {
         return SendMessage.builder()
-                .chatId(chatId.generate(pool))
+                .chatId(chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId())
                 .text(text.getText().generate(pool))
                 .disableWebPagePreview(disableWebPagePreview != null ? disableWebPagePreview.generate(pool) : null)
                 .disableNotification(disableNotification != null ? disableNotification.generate(pool) : null)

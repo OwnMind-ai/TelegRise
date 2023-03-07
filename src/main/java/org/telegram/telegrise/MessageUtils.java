@@ -1,5 +1,6 @@
 package org.telegram.telegrise;
 
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -24,6 +25,18 @@ public class MessageUtils {
                 : update.hasPollAnswer() ? update.getPollAnswer().getUser()
                 : update.hasShippingQuery() ? update.getShippingQuery().getFrom()
                 : update.hasPreCheckoutQuery() ? update.getPreCheckoutQuery().getFrom()
+                : null;
+    }
+
+    public static Chat getChat(Update update) {
+        return update.hasMessage() ? update.getMessage().getChat()
+                : update.hasCallbackQuery() ? update.getCallbackQuery().getMessage().getChat()
+                : update.hasEditedMessage() ? update.getEditedMessage().getChat()
+                : update.hasChannelPost() ? update.getChannelPost().getChat()
+                : update.hasMyChatMember() ? update.getMyChatMember().getChat()
+                : update.hasChatMember() ? update.getChatMember().getChat()
+                : update.hasEditedChannelPost() ? update.getEditedChannelPost().getChat()
+                : update.hasChatJoinRequest() ? update.getChatJoinRequest().getChat()
                 : null;
     }
 }

@@ -74,7 +74,6 @@ public class XMLTranscriptionParserTest {
 
         Send treeSend = new Send();
         treeSend.setText(new Text("Text", "markdown"));
-        treeSend.setChatId(GeneratedValue.ofValue(-1L));
 
         Tree expectedTree = new Tree();
         expectedTree.setName("name");
