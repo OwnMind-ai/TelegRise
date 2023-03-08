@@ -20,7 +20,7 @@ import java.util.Objects;
 public class Send implements ActionElement{
     @ElementField(name = "chat", expression = true)
     private GeneratedValue<Long> chatId;
-    @InnerElement(nullable = false)
+    @InnerElement
     private Text text;
 
     @ElementField(name = "disableWebPagePreview", expression = true)

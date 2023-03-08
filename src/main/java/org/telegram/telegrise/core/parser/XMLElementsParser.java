@@ -93,22 +93,37 @@ public class XMLElementsParser {
     private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
-        Class<?> actualType =  List.class.isAssignableFrom(field.getType()) ?
-                ((Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
-                : field.getType();
+        Class<?> actualType = getActualType(field);
 
         Element innerElementData = actualType.getAnnotation(Element.class);
 
+        LinkedList<String> nodeNames = new LinkedList<>();
         LinkedList<Node> fieldNodes = new LinkedList<>();
-        for (int i = 0; i < nodeList.getLength(); i++)
+        for (int i = 0; i < nodeList.getLength(); i++) {
             // Node name equals Element.name() or Element type is inherited
             if ((innerElementData != null && nodeList.item(i).getNodeName().equals(innerElementData.name()))
                     || (elements.containsKey(nodeList.item(i).getNodeName())
-                        && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName()))))
+                    && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName()))))
                 fieldNodes.add(nodeList.item(i));
 
+            nodeNames.add(nodeList.item(i).getNodeName());
+        }
+
         if (fieldNodes.isEmpty()){
-            if (EmbeddableElement.class.isAssignableFrom(actualType)){
+            if (EmbeddableElement.class.isAssignableFrom(actualType)) {
+                //FIXME optimize (use #text node name)
+                if (Arrays.stream(field.getDeclaringClass().getDeclaredFields())
+                        .filter(f -> f.isAnnotationPresent(InnerElement.class))
+                        .map(f -> getActualType(f).getAnnotation(Element.class).name())
+                        .anyMatch(nodeNames::contains)
+                ) {
+                    if (fieldData.nullable()) return;
+                    else {
+                        assert innerElementData != null;
+                        throw new TranscriptionParsingException("Embedded element '" + innerElementData.name() + "' is not allowed here, use <" + innerElementData.name() + "> instead", node);
+                    }
+                }
+
                 try {
                     EmbeddableElement object = (EmbeddableElement) actualType.getConstructor().newInstance();
                     object.parse(node, this.namespace);
@@ -141,6 +156,12 @@ public class XMLElementsParser {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Class<?> getActualType(Field field) {
+        return List.class.isAssignableFrom(field.getType()) ?
+                ((Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
+                : field.getType();
     }
 
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
