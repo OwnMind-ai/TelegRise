@@ -37,15 +37,19 @@ public class Send implements ActionElement{
     //TODO inner element of <keyboard> ; add other fields
     private GeneratedValue<ReplyKeyboard> replyMarkup;
 
+    public long generateChatId(ResourcePool pool){
+        return chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
+    }
+
     @Override
     public BotApiMethod<?> generateMethod(ResourcePool pool) {
         return SendMessage.builder()
-                .chatId(chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId())
+                .chatId(this.generateChatId(pool))
                 .text(text.getText().generate(pool))
-                .disableWebPagePreview(disableWebPagePreview != null ? disableWebPagePreview.generate(pool) : null)
-                .disableNotification(disableNotification != null ? disableNotification.generate(pool) : null)
-                .protectContent(protectContent != null ? protectContent.generate(pool) : null)
-                .replyToMessageId(replyTo != null ? replyTo.generate(pool) : null)
+                .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))
+                .disableNotification( generateNullableProperty(disableNotification, pool))
+                .protectContent( generateNullableProperty(protectContent, pool))
+                .replyToMessageId( generateNullableProperty(replyTo, pool))
                 .parseMode(text.getParseMode().generate(pool))
                 .build();
     }
