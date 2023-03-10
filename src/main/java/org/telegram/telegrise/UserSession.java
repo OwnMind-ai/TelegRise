@@ -2,7 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
@@ -119,9 +119,9 @@ public class UserSession implements Runnable{
     }
 
     private void executeBranchingElement(BranchingElement element, Update update){
-        for (BotApiMethod<?> botApiMethod : element.getMethods(this.createResourcePool(update))) {
+        for (PartialBotApiMethod<?> botApiMethod : element.getMethods(this.createResourcePool(update))) {
             try {
-                this.sender.execute(botApiMethod);
+                UniversalSender.execute(sender, botApiMethod, null);
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }

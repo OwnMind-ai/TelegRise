@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.MessageUtils;
@@ -42,7 +42,7 @@ public class Send implements ActionElement{
     }
 
     @Override
-    public BotApiMethod<?> generateMethod(ResourcePool pool) {
+    public PartialBotApiMethod<?> generateMethod(ResourcePool pool) {
         return SendMessage.builder()
                 .chatId(this.generateChatId(pool))
                 .text(text.getText().generate(pool))

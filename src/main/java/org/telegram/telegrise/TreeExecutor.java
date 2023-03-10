@@ -66,7 +66,7 @@ public final class TreeExecutor {
             branch.getActions().stream().map(action -> action.generateMethod(pool))
                     .forEach(m -> {
                         try {
-                            this.sender.execute(m);
+                            UniversalSender.execute(sender, m, null);
                         } catch (TelegramApiException e) {
                             throw new RuntimeException(e);
                         }

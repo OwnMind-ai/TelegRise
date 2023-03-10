@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.*;
@@ -79,7 +79,7 @@ public class Tree implements BranchingElement{
     }
 
     @Override
-    public List<BotApiMethod<?>> getMethods(ResourcePool pool) {
+    public List<PartialBotApiMethod<?>> getMethods(ResourcePool pool) {
         return actions != null ? this.actions.stream().map(a -> a.generateMethod(pool)).collect(Collectors.toList()) : List.of();
     }
 }

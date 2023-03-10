@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
@@ -30,7 +30,7 @@ public class Menu implements BranchingElement{
     }
 
     @Override
-    public List<BotApiMethod<?>> getMethods(ResourcePool pool) {
+    public List<PartialBotApiMethod<?>> getMethods(ResourcePool pool) {
         return actions != null ? this.actions.stream().map(a -> a.generateMethod(pool)).collect(Collectors.toList()) : List.of();
     }
 }
