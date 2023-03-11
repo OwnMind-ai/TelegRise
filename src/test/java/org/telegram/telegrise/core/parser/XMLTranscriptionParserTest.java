@@ -15,6 +15,7 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.Send;
+import org.telegram.telegrise.core.elements.media.Photo;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -52,8 +53,12 @@ public class XMLTranscriptionParserTest {
 
     @Test
     void parse() {
+        Photo photo = new Photo();
+        photo.setFileId(GeneratedValue.ofValue("id"));
+
         Send expectedSendFolded = new Send();
         expectedSendFolded.setText(new Text("<b>Bye</b>", "html"));
+        expectedSendFolded.setMedias(List.of(photo));
         expectedSendFolded.setChatId(GeneratedValue.ofValue(update.getMessage().getChatId()));
 
         Branch expectedBranchFolded = new Branch();

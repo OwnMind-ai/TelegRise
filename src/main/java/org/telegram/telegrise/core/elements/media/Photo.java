@@ -1,8 +1,9 @@
 package org.telegram.telegrise.core.elements.media;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMediaBotMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -16,7 +17,7 @@ import org.telegram.telegrise.core.parser.ElementField;
 
 @Element(name = "photo")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 public class Photo implements MediaType{
     //TODO url (treat as fileId)
     @ElementField(name = "fileId", expression = true)
@@ -41,7 +42,7 @@ public class Photo implements MediaType{
     }
 
     @Override
-    public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
+    public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
        return SendPhoto.builder()
                 .chatId(parent.generateChatId(pool))
                 .photo(this.createInputFile(pool))
@@ -50,6 +51,7 @@ public class Photo implements MediaType{
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
                 .caption(parent.getText() != null ? parent.getText().getText().generate(pool) : null)
                 .parseMode(parent.getText() != null ? parent.getText().getParseMode().generate(pool) : null)
+                .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
                 .build();
     }
 

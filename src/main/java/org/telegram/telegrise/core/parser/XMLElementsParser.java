@@ -4,7 +4,10 @@ import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
-import org.telegram.telegrise.core.*;
+import org.telegram.telegrise.core.ExpressionFactory;
+import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.LocalNamespace;
+import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -12,6 +15,7 @@ import org.w3c.dom.NodeList;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class XMLElementsParser {
     private static final String ELEMENTS_PACKAGE = "org.telegram.telegrise.core.elements";
@@ -97,7 +101,7 @@ public class XMLElementsParser {
 
         Element innerElementData = actualType.getAnnotation(Element.class);
 
-        LinkedList<String> nodeNames = new LinkedList<>();
+        HashSet<String> nodeNames = new HashSet<>();
         LinkedList<Node> fieldNodes = new LinkedList<>();
         for (int i = 0; i < nodeList.getLength(); i++) {
             // Node name equals Element.name() or Element type is inherited
@@ -114,7 +118,14 @@ public class XMLElementsParser {
                 //FIXME optimize (use #text node name)
                 if (Arrays.stream(field.getDeclaringClass().getDeclaredFields())
                         .filter(f -> f.isAnnotationPresent(InnerElement.class))
-                        .map(f -> getActualType(f).getAnnotation(Element.class).name())
+                        .flatMap(f -> {
+                            Class<?> actual = getActualType(f);
+                            if (actual.isAnnotationPresent(Element.class))
+                                return Stream.of(actual);
+                            else
+                                return elements.values().stream().filter(actual::isAssignableFrom);
+                        })
+                        .map(c -> c.getAnnotation(Element.class).name())
                         .anyMatch(nodeNames::contains)
                 ) {
                     if (fieldData.nullable()) return;

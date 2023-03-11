@@ -13,7 +13,8 @@
                 </send>
                 <branch when="#predicate">
                     <send chat="${update.getMessage().getChatId()}">
-                        <b>Bye</b>
+                        <photo fileId="id"/>
+                        <text><b>Bye</b></text>
                     </send>
                 </branch>
             </branch>
