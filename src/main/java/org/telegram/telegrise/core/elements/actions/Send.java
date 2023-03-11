@@ -3,7 +3,9 @@ package org.telegram.telegrise.core.elements.actions;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -16,6 +18,8 @@ import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Element(name = "send")
 @Data @NoArgsConstructor
@@ -51,7 +55,27 @@ public class Send implements ActionElement{
         if (medias.size() == 1){
             return this.medias.get(0).createSender(this, pool);
         } else if (medias.size() > 1) {
-            //TODO send mediagroup
+            List<InputMedia> first = this.medias.get(0).createInputMedia(this, pool);
+            assert first.size() > 0;
+
+            if (this.text != null){
+                first.get(0).setCaption(this.text.getText().generate(pool));
+                first.get(0).setParseMode(this.text.getParseMode().generate(pool));
+            }
+
+            return SendMediaGroup.builder()
+                    .chatId(this.generateChatId(pool))
+                    .medias(
+                            Stream.concat(
+                                    first.stream(),
+                                    this.medias.subList(1, this.medias.size()).stream()
+                                            .flatMap(m -> m.createInputMedia(this, pool).stream())
+                            ).collect(Collectors.toList())
+                    )
+                    .disableNotification( generateNullableProperty(disableNotification, pool))
+                    .protectContent( generateNullableProperty(protectContent, pool))
+                    .replyToMessageId( generateNullableProperty(replyTo, pool))
+                    .build();
         }
 
         return SendMessage.builder()

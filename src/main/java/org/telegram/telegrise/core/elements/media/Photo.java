@@ -15,6 +15,8 @@ import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 
+import java.util.List;
+
 @Element(name = "photo")
 @Data
 @NoArgsConstructor @AllArgsConstructor
@@ -56,10 +58,9 @@ public class Photo implements MediaType{
     }
 
     @Override
-    public InputMedia createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
         var result = InputMediaPhoto.builder()
-                .caption(parent.getText() != null ? parent.getText().getText().generate(pool) : null)
-                .parseMode(parent.getText() != null ? parent.getText().getParseMode().generate(pool) : null);
+                .hasSpoiler(generateNullableProperty(this.spoiler, pool));
 
         String fileId = generateNullableProperty(this.fileId, pool);
         if (fileId == null)
@@ -68,6 +69,6 @@ public class Photo implements MediaType{
         else
             result.media(fileId);
 
-        return result.build();
+        return List.of(result.build());
     }
 }
