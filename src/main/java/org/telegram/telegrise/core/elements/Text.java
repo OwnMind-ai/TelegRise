@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -12,6 +13,8 @@ import org.telegram.telegrise.core.parser.EmbeddableElement;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
+import java.util.List;
+
 @Element(name = "text")
 @Data
 @NoArgsConstructor
@@ -20,13 +23,14 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     private GeneratedValue<String> text;
 
     @ElementField(name = "parseMode", expression = true)
-    private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
+    private GeneratedValue<String> parseMode;
 
-    //TODO message entities list
+    @ElementField(name = "entities", expression = true)
+    private GeneratedValue<List<MessageEntity>> entities;
 
     public Text(String text, String parseMode){
         this.text = GeneratedValue.ofValue(text);
-        this.parseMode = GeneratedValue.ofValue(parseMode);
+        this.parseMode = parseMode != null ? GeneratedValue.ofValue(parseMode) : null;
     }
 
     @ElementField(nullable = false)

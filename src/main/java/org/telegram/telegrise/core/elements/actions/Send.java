@@ -26,6 +26,10 @@ import java.util.stream.Stream;
 public class Send implements ActionElement{
     @ElementField(name = "chat", expression = true)
     private GeneratedValue<Long> chatId;
+
+    @ElementField(name = "messageThreadId", expression = true)
+    private GeneratedValue<Integer> messageThreadId;
+
     @InnerElement
     private Text text;
 
@@ -37,6 +41,7 @@ public class Send implements ActionElement{
     private GeneratedValue<Boolean> protectContent;
     @ElementField(name = "allowSendingWithoutReply", expression = true)
     private GeneratedValue<Boolean> allowSendingWithoutReply;
+
     @ElementField(name = "replyTo", expression = true)
     private GeneratedValue<Integer> replyTo;
 
@@ -60,11 +65,13 @@ public class Send implements ActionElement{
 
             if (this.text != null){
                 first.get(0).setCaption(this.text.getText().generate(pool));
-                first.get(0).setParseMode(this.text.getParseMode().generate(pool));
+                first.get(0).setParseMode(generateNullableProperty(text.getParseMode(), pool));
+                first.get(0).setCaptionEntities(generateNullableProperty(text.getEntities(), pool));
             }
 
             return SendMediaGroup.builder()
                     .chatId(this.generateChatId(pool))
+                    .messageThreadId( generateNullableProperty(messageThreadId, pool))
                     .medias(
                             Stream.concat(
                                     first.stream(),
@@ -75,17 +82,21 @@ public class Send implements ActionElement{
                     .disableNotification( generateNullableProperty(disableNotification, pool))
                     .protectContent( generateNullableProperty(protectContent, pool))
                     .replyToMessageId( generateNullableProperty(replyTo, pool))
+                    .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
                     .build();
         }
 
         return SendMessage.builder()
                 .chatId(this.generateChatId(pool))
+                .messageThreadId( generateNullableProperty(messageThreadId, pool))
                 .text(text.getText().generate(pool))
                 .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))
                 .disableNotification( generateNullableProperty(disableNotification, pool))
                 .protectContent( generateNullableProperty(protectContent, pool))
                 .replyToMessageId( generateNullableProperty(replyTo, pool))
-                .parseMode(text.getParseMode().generate(pool))
+                .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
+                .parseMode(generateNullableProperty(text.getParseMode(), pool))
+                .entities(generateNullableProperty(text.getEntities(), pool))
                 .build();
     }
 }

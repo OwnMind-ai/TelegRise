@@ -11,8 +11,11 @@ public class LocalNamespace {
     private ApplicationNamespace applicationNamespace;
 
     public String getResourceInitializationCode(String poolName){
+        String handlerClassName = handlerClass != null ? handlerClass.getName() : "Object";
+
         return String.format("%s %s = %s.getUpdate();\n%s %s = (%s) %s.getHandler();\n",
-                Update.class.getName(), applicationNamespace.getUpdateName(), poolName, handlerClass.getName(),
-                applicationNamespace.getHandlerName(), handlerClass.getName(), poolName);
+                Update.class.getName(), applicationNamespace.getUpdateName(), poolName,
+                handlerClassName, applicationNamespace.getHandlerName(),
+                handlerClassName, poolName);
     }
 }

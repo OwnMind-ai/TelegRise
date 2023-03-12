@@ -47,12 +47,15 @@ public class Photo implements MediaType{
     public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
        return SendPhoto.builder()
                 .chatId(parent.generateChatId(pool))
+                .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .photo(this.createInputFile(pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
                 .caption(parent.getText() != null ? parent.getText().getText().generate(pool) : null)
-                .parseMode(parent.getText() != null ? parent.getText().getParseMode().generate(pool) : null)
+                .captionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), pool) : null)
+                .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
+                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
                 .build();
     }

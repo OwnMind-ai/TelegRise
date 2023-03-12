@@ -9,12 +9,12 @@
             </send>
             <branch when="${update.hasMessage()}">
                 <send chat="${update.getMessage().getChatId()}">
-                    <text>Hi, ${update.getMessage().getFrom().getFirstName()}</text>
+                    Hi, ${update.getMessage().getFrom().getFirstName()}
                 </send>
                 <branch when="#predicate">
                     <send chat="${update.getMessage().getChatId()}">
                         <photo fileId="id"/>
-                        <text><b>Bye</b></text>
+                        <text parseMode="html"><b>Bye</b></text>
                     </send>
                 </branch>
             </branch>

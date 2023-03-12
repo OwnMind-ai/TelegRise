@@ -9,6 +9,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.utils.ReflectionUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -97,7 +98,7 @@ public class XMLElementsParser {
     private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
-        Class<?> actualType = getActualType(field);
+        Class<?> actualType = ReflectionUtils.getRawGenericType(field);
 
         Element innerElementData = actualType.getAnnotation(Element.class);
 
@@ -119,7 +120,7 @@ public class XMLElementsParser {
                 if (Arrays.stream(field.getDeclaringClass().getDeclaredFields())
                         .filter(f -> f.isAnnotationPresent(InnerElement.class))
                         .flatMap(f -> {
-                            Class<?> actual = getActualType(f);
+                            Class<?> actual = ReflectionUtils.getRawGenericType(f);
                             if (actual.isAnnotationPresent(Element.class))
                                 return Stream.of(actual);
                             else
@@ -169,12 +170,6 @@ public class XMLElementsParser {
         }
     }
 
-    private static Class<?> getActualType(Field field) {
-        return List.class.isAssignableFrom(field.getType()) ?
-                ((Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
-                : field.getType();
-    }
-
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         field.setAccessible(true);
         ElementField elementData = field.getAnnotation(ElementField.class);
@@ -202,7 +197,7 @@ public class XMLElementsParser {
         else
             PropertyUtils.setSimpleProperty(to, field.getName(),
                     elementField.expression() ? ExpressionFactory.createExpression(attribute.getNodeValue(),
-                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0], node, namespace)  // Gets an actual type of GeneratedValue
+                            ReflectionUtils.getRawGenericType(field), node, namespace)  // Gets an actual type of GeneratedValue
                             : attribute.getNodeValue()
             );
     }

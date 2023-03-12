@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -40,11 +37,13 @@ public class XMLElementsParserTest {
     }
     @Test
     void parseText() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
         parser.load();
-        Node node = toNode("<text parseMode=\"html\">val</text>");
+        Node node = toNode("<text parseMode=\"html\" entities=\"${java.util.Collections.singletonList(null)}\">val</text>");
 
-        assertElements(new Text("val", "html"), parser.parse(node), new ResourcePool());
+        Text text = new Text("val", "html");
+        text.setEntities(GeneratedValue.ofValue(java.util.Collections.singletonList(null)));
+        assertElements(text, parser.parse(node), new ResourcePool());
     }
 
     @Test
@@ -57,7 +56,7 @@ public class XMLElementsParserTest {
                 "                </send>");
 
         Send expected = new Send();
-        expected.setText(new Text("Text", "html"));
+        expected.setText(new Text("Text", null));
         expected.setChatId(GeneratedValue.ofValue(-1L));
         expected.setDisableWebPagePreview(GeneratedValue.ofValue(true));
 
@@ -76,7 +75,7 @@ public class XMLElementsParserTest {
                 "            </branch>");
 
         Send expectedSend = new Send();
-        expectedSend.setText(new Text("Text", "html"));
+        expectedSend.setText(new Text("Text", null));
         expectedSend.setChatId(GeneratedValue.ofValue(-1L));
 
         Branch expected = new Branch();
@@ -109,7 +108,7 @@ public class XMLElementsParserTest {
                 "       </tree>");
 
         Send expectedSend = new Send();
-        expectedSend.setText(new Text("Text", "html"));
+        expectedSend.setText(new Text("Text", null));
         expectedSend.setChatId(GeneratedValue.ofValue(-1L));
 
         Branch expectedBranch = new Branch();
@@ -148,7 +147,7 @@ public class XMLElementsParserTest {
         for (String name : expectedFields.keySet()) {
             try {
                 if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual, pool))
-                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual).toString(), expectedFields.get(name).get(expected).toString()));
+                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual), expectedFields.get(name).get(expected)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
