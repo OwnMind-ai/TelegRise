@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.parser;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -20,7 +21,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -43,6 +47,7 @@ public class XMLElementsParserTest {
 
         Text text = new Text("val", "html");
         text.setEntities(GeneratedValue.ofValue(java.util.Collections.singletonList(null)));
+        Assertions.assertNull(text.getParseMode());
         assertElements(text, parser.parse(node), new ResourcePool());
     }
 
@@ -56,7 +61,7 @@ public class XMLElementsParserTest {
                 "                </send>");
 
         Send expected = new Send();
-        expected.setText(new Text("Text", null));
+        expected.setText(new Text("Text", "html"));
         expected.setChatId(GeneratedValue.ofValue(-1L));
         expected.setDisableWebPagePreview(GeneratedValue.ofValue(true));
 
@@ -75,7 +80,7 @@ public class XMLElementsParserTest {
                 "            </branch>");
 
         Send expectedSend = new Send();
-        expectedSend.setText(new Text("Text", null));
+        expectedSend.setText(new Text("Text", "html"));
         expectedSend.setChatId(GeneratedValue.ofValue(-1L));
 
         Branch expected = new Branch();
@@ -108,7 +113,7 @@ public class XMLElementsParserTest {
                 "       </tree>");
 
         Send expectedSend = new Send();
-        expectedSend.setText(new Text("Text", null));
+        expectedSend.setText(new Text("Text", "html"));
         expectedSend.setChatId(GeneratedValue.ofValue(-1L));
 
         Branch expectedBranch = new Branch();

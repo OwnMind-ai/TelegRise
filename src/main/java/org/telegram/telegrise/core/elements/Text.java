@@ -23,7 +23,7 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     private GeneratedValue<String> text;
 
     @ElementField(name = "parseMode", expression = true)
-    private GeneratedValue<String> parseMode;
+    private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
 
     @ElementField(name = "entities", expression = true)
     private GeneratedValue<List<MessageEntity>> entities;
@@ -31,6 +31,10 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     public Text(String text, String parseMode){
         this.text = GeneratedValue.ofValue(text);
         this.parseMode = parseMode != null ? GeneratedValue.ofValue(parseMode) : null;
+    }
+
+    public GeneratedValue<String> getParseMode(){
+        return this.entities == null ? this.parseMode : null;
     }
 
     @ElementField(nullable = false)

@@ -68,7 +68,7 @@ public class XMLTranscriptionParserTest {
         Send expectedSend = new Send();
         expectedSend.setText(new Text(
                 "Hi, " + update.getMessage().getFrom().getFirstName(),
-                null
+                "html"
         ));
         expectedSend.setChatId(GeneratedValue.ofValue(update.getMessage().getChatId()));
 
