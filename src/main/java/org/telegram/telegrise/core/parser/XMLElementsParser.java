@@ -28,6 +28,7 @@ public class XMLElementsParser {
     private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
     @Setter
     private LocalNamespace namespace;
+    private final ParserMemory parserMemory = new ParserMemory();
 
     public XMLElementsParser(LocalNamespace namespace){
         this.namespace = namespace;
@@ -53,15 +54,22 @@ public class XMLElementsParser {
         Class<? extends TranscriptionElement> element = this.elements.get(node.getNodeName());
         TranscriptionElement instance = element.getConstructor().newInstance();
 
+
+        final Map<Class<?>, Object> resourcesMap = Map.of(
+                Node.class, node,
+                LocalNamespace.class, this.namespace,
+                ParserMemory.class, this.parserMemory
+        );
+
         Arrays.stream(element.getDeclaredMethods())
                 .filter(m -> m.isAnnotationPresent(ElementField.class))
                 .sorted(Comparator.<Method>comparingDouble(m -> m.getAnnotation(ElementField.class).priority()).reversed())
                 .forEach(m -> {
                     m.setAccessible(true);
-                    assert Arrays.equals(m.getParameterTypes(), new Class<?>[]{Node.class, LocalNamespace.class});
+                    Object[] parameters = Arrays.stream(m.getParameterTypes()).map(resourcesMap::get).toArray();
 
                     try {
-                        Object namespace = m.invoke(instance, node, this.namespace);
+                        Object namespace = m.invoke(instance, parameters);
 
                         if (namespace instanceof LocalNamespace)
                             this.namespace = (LocalNamespace) namespace;
