@@ -60,7 +60,8 @@ public class XMLElementsParser {
         final Map<Class<?>, Object> resourcesMap = Map.of(
                 Node.class, node,
                 LocalNamespace.class, this.namespace,
-                ParserMemory.class, this.parserMemory
+                ParserMemory.class, this.parserMemory,
+                XMLElementsParser.class, this
         );
 
         Stream.concat(
