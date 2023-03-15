@@ -7,4 +7,5 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface InnerElement {
     boolean nullable() default true;
+    double priority() default 0;
 }
