@@ -2,6 +2,8 @@ package org.telegram.telegrise.core.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -11,6 +13,7 @@ import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
+import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class XMLElementsParserTest {
@@ -135,6 +139,30 @@ public class XMLElementsParserTest {
         expected.setBranches(List.of(expectedBranch));
 
         assertElements(expected, parser.parse(node), new ResourcePool());
+    }
+
+    @Test
+    void parseKeyboard() throws Exception {
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        parser.load();
+
+        Node node = toNode("<keyboard name=\"name\" type=\"inline\">\n" +
+                "                    <row>\n" +
+                "                        <button callbackData=\"first\">First</button>\n" +
+                "                        <button callbackData=\"second\">Second</button>\n" +
+                "                    </row>\n" +
+                "                    <row><button url=\"url\">URL</button></row>\n" +
+                "                </keyboard>");
+
+        InlineKeyboardMarkup expected = new InlineKeyboardMarkup(List.of(
+                List.of(
+                        InlineKeyboardButton.builder().text("First").callbackData("first").build(),
+                        InlineKeyboardButton.builder().text("Second").callbackData("second").build()
+                ),
+                List.of(InlineKeyboardButton.builder().text("URL").url("url").build())
+        ));
+
+        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool()));
     }
 
     public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){

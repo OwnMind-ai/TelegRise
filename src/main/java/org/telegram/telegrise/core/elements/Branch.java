@@ -17,6 +17,8 @@ public class Branch implements TranscriptionElement{
     @ElementField(name = "when", expression = true, nullable = false)
     private GeneratedValue<Boolean> when;
 
+    //TODO keys & callbacks
+
     @ElementField(name = "handler")
     private GeneratedValue<Void> toInvoke; // TODO implement
 

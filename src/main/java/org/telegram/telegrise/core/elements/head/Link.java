@@ -24,7 +24,7 @@ public class Link implements TranscriptionElement {
 
         try {
             Document document = XMLUtils.loadDocument(new File(this.source));
-            TranscriptionElement result = parser.parse(document.getDocumentElement());
+            TranscriptionElement result = parser.parse(document.getDocumentElement());  //FIXME fix scope restriction
 
             if (result instanceof StorableElement)
                 ((StorableElement) result).store(memory);
