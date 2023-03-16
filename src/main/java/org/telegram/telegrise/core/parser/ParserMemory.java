@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.parser;
 
+import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 
 import java.util.HashMap;
@@ -16,19 +17,18 @@ public final class ParserMemory {
         return elements.isEmpty();
     }
 
-    public boolean containsKey(String name) {
-        return elements.containsKey(name);
-    }
-
     public TranscriptionElement get(String name) {
         return elements.get(name);
     }
 
-    public TranscriptionElement put(String s, TranscriptionElement transcriptionElement) {
-        return elements.put(s, transcriptionElement);
+    public void put(String name, TranscriptionElement transcriptionElement) {
+        if (elements.containsKey(name))
+            throw new TelegRiseRuntimeException("Name '" + name + "' already exists");
+
+        elements.put(name, transcriptionElement);
     }
 
-    public TranscriptionElement remove(String name) {
-        return elements.remove(name);
+    public void set(String name, TranscriptionElement transcriptionElement){
+        elements.put(name, transcriptionElement);
     }
 }

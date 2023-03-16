@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.parser;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ public class XMLElementsParser {
     private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
     @Setter
     private LocalNamespace namespace;
+    @Getter
     private final ParserMemory parserMemory = new ParserMemory();
 
     public XMLElementsParser(LocalNamespace namespace){
