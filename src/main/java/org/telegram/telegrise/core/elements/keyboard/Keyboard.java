@@ -40,6 +40,25 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     }
 
     @Override
+    public void load(ParserMemory memory) {
+        if (byName != null){
+            TranscriptionElement element = memory.get(byName);
+
+            if (element == null)
+                throw new TelegRiseRuntimeException("Missing keyboard named '" + byName + "'");
+            else if (!(element instanceof Keyboard))
+                throw new TelegRiseRuntimeException(String.format("The name '%s' belongs to an object of type '%s', type keyboard is required",
+                        byName, element.getClass().getAnnotation(Element.class).name()));
+
+            Keyboard original = (Keyboard) element;
+            this.name = original.getName();
+            this.type = original.getType();
+            this.rows = original.getRows();
+            this.byName = null;
+        }
+    }
+
+    @Override
     public void store(ParserMemory memory) {
         assert name != null : "Unable to store keyboard without name";
         memory.put(name, this);

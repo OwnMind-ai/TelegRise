@@ -93,6 +93,7 @@ public class XMLElementsParser {
                 .forEach(f -> this.parseInnerElement(node, f, instance));
 
         instance.validate(node);
+        instance.load(parserMemory);
 
         LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
         if (newNamespace != null)
