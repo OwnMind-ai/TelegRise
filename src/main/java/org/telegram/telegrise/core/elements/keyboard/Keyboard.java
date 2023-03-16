@@ -9,10 +9,8 @@ import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
-import org.telegram.telegrise.core.parser.InnerElement;
-import org.telegram.telegrise.core.parser.ParserMemory;
+import org.telegram.telegrise.core.parser.*;
+import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +21,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
 
+    @ElementField(name = "byName")
+    private String byName;
+
     @ElementField(name = "type")
     private String type;
 
@@ -31,6 +32,12 @@ public class Keyboard implements StorableElement, TranscriptionElement {
 
     @InnerElement
     private List<Row> rows;
+
+    @Override
+    public void validate(Node node) {
+        if (!((type != null && name != null && rows != null) || byName != null))
+            throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
+    }
 
     @Override
     public void store(ParserMemory memory) {

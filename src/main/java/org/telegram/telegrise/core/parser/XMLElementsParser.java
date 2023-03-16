@@ -90,6 +90,8 @@ public class XMLElementsParser {
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
                 .forEach(f -> this.parseInnerElement(node, f, instance));
 
+        instance.validate(node);
+
         LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
         if (newNamespace != null)
             this.namespace = newNamespace;
