@@ -45,7 +45,7 @@ public class XMLElementsParserTest {
     }
     @Test
     void parseText() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
         parser.load();
         Node node = toNode("<text parseMode=\"html\" entities=\"${java.util.Collections.singletonList(null)}\">val</text>");
 
@@ -57,7 +57,7 @@ public class XMLElementsParserTest {
 
     @Test
     void parseSend() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
         parser.load();
 
         Node node = toNode("<send chat=\"-1\" disableWebPagePreview=\"true\">\n" +
@@ -74,7 +74,7 @@ public class XMLElementsParserTest {
 
     @Test
     void parseBranch() throws Exception{
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
         parser.load();
 
         Node node = toNode("<branch when=\"true\">\n" +
@@ -98,7 +98,7 @@ public class XMLElementsParserTest {
     void parseTree() throws Exception{
         ApplicationNamespace namespace = new ApplicationNamespace(this.getClass().getClassLoader());
         namespace.addClass(this.getClass().getName());
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(this.getClass(), namespace));
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(this.getClass(), namespace), null);
         parser.load();
 
         Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
@@ -143,7 +143,7 @@ public class XMLElementsParserTest {
 
     @Test
     void parseKeyboard() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
         parser.load();
 
         Node node = toNode("<keyboard name=\"name\" type=\"inline\">\n" +
@@ -167,6 +167,9 @@ public class XMLElementsParserTest {
     }
 
     public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){
+        if (expected == actual)
+            return;
+
         if(!expected.getClass().equals(actual.getClass()))
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
 

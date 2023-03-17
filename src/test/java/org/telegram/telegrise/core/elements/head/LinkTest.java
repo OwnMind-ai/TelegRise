@@ -8,16 +8,18 @@ import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.w3c.dom.Node;
 
+import java.io.File;
+
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertElements;
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.toNode;
 
 class LinkTest {
     @Test
     void linkTest() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), new File("src/test/resources/"));
         parser.load();
 
-        Node linkNode = toNode("<link src=\"src/test/resources/keyboards.xml\"/>");
+        Node linkNode = toNode("<link src=\"keyboards.xml\"/>");
 
         parser.parse(linkNode);
 

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
@@ -30,12 +31,15 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @ElementField(name = "name")
     private String name;
 
+    @ElementField(name = "create", expression = true)
+    private GeneratedValue<ReplyKeyboard> create;
+
     @InnerElement
     private List<Row> rows;
 
     @Override
     public void validate(Node node) {
-        if (!((type != null && name != null && rows != null) || byName != null))
+        if (!((type != null && name != null && rows != null) || byName != null || create != null))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
     }
 
@@ -65,6 +69,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){
+        if (this.create != null)
+            return this.create.generate(pool);
+
         switch (type.toLowerCase()) {
             case INLINE:
                 return new InlineKeyboardMarkup(rows.stream()

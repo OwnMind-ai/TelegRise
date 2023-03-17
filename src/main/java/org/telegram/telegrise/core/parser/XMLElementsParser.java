@@ -14,6 +14,7 @@ import org.telegram.telegrise.core.utils.ReflectionUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,9 +35,14 @@ public class XMLElementsParser {
     private LocalNamespace namespace;
     @Getter
     private final ParserMemory parserMemory = new ParserMemory();
+    @Getter
+    private final File rootDirectory;
 
-    public XMLElementsParser(LocalNamespace namespace){
+    public XMLElementsParser(LocalNamespace namespace, File rootDirectory){
+        assert rootDirectory == null || rootDirectory.isDirectory();
+
         this.namespace = namespace;
+        this.rootDirectory = rootDirectory;
     }
 
     public void load(){

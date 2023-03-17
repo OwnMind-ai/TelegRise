@@ -15,6 +15,11 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.Send;
+import org.telegram.telegrise.core.elements.head.HeadBlock;
+import org.telegram.telegrise.core.elements.head.Link;
+import org.telegram.telegrise.core.elements.keyboard.Button;
+import org.telegram.telegrise.core.elements.keyboard.Keyboard;
+import org.telegram.telegrise.core.elements.keyboard.Row;
 import org.telegram.telegrise.core.elements.media.Photo;
 import org.w3c.dom.Document;
 
@@ -39,7 +44,11 @@ public class XMLTranscriptionParserTest {
         Document document = db.parse(new File("src/test/resources/sample.xml"));
         document.getDocumentElement().normalize();
 
-        var elementParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
+        var elementParser = new XMLElementsParser(
+                new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())),
+                new File("src/test/resources/")
+        );
+
         elementParser.load();
         XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
 
@@ -65,11 +74,21 @@ public class XMLTranscriptionParserTest {
         expectedBranchFolded.setWhen(GeneratedValue.ofValue(true));
         expectedBranchFolded.setActions(List.of(expectedSendFolded));
 
+        Keyboard keyboard = new Keyboard();
+        keyboard.setName("first");
+        keyboard.setType("inline");
+
+        keyboard.setRows(List.of(
+                new Row(List.of(new Button("First", "first"))),
+                new Row(List.of(new Button("Second", "second")))
+        ));
+
         Send expectedSend = new Send();
         expectedSend.setText(new Text(
                 "Hi, " + update.getMessage().getFrom().getFirstName(),
                 "html"
         ));
+        expectedSend.setKeyboard(keyboard);
         expectedSend.setChatId(GeneratedValue.ofValue(update.getMessage().getChatId()));
 
         Branch expectedBranch = new Branch();
@@ -95,6 +114,7 @@ public class XMLTranscriptionParserTest {
         expectedMenu.setTrees(List.of(expectedTree));
 
         BotTranscription transcription = new BotTranscription();
+        transcription.setHead(new HeadBlock(List.of(new Link("keyboards.xml"))));
         transcription.setUsername("bot");
         transcription.setToken("token");
         transcription.setRootMenu(expectedMenu);

@@ -57,6 +57,7 @@ public class Photo implements MediaType{
                 .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
                 .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
+                .replyMarkup(parent.createKeyboard(pool))
                 .build();
     }
 

@@ -39,7 +39,7 @@ public final class TelegRiseApplication {
 
     public void start(){
         //FIXME
-        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)));
+        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)), transcription.getParentFile());
         elementsParser.load();
 
         TelegramSessionsController controller;

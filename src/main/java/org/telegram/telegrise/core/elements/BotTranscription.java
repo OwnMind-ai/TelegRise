@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -23,4 +24,7 @@ public final class BotTranscription implements TranscriptionElement {
 
     @InnerElement(nullable = false)
     private Menu rootMenu;
+
+    @InnerElement(priority = 10)
+    private HeadBlock head;
 }

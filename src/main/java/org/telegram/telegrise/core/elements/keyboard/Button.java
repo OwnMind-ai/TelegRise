@@ -35,6 +35,11 @@ public class Button implements TranscriptionElement {
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }
 
+    public Button(String text, String callbackData){
+        this.text = GeneratedValue.ofValue(text);
+        this.callbackData = GeneratedValue.ofValue(callbackData);
+    }
+
     public InlineKeyboardButton createInlineButton(ResourcePool pool){
         return InlineKeyboardButton.builder()
                 .text(text.generate(pool))

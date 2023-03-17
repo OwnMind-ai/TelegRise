@@ -23,6 +23,10 @@ public class Row implements TranscriptionElement {
     @ElementField(name = "when", expression = true)
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
+    public Row(List<Button> buttons){
+        this.buttons = buttons;
+    }
+
     public KeyboardRow createKeyboardRow(ResourcePool pool){
         return new KeyboardRow(this.buttons.stream().map(b -> b.createKeyboardButton(pool)).collect(Collectors.toList()));
     }

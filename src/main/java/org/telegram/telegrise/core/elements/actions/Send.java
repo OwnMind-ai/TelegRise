@@ -11,6 +11,7 @@ import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
@@ -48,11 +49,15 @@ public class Send implements ActionElement{
     @InnerElement
     private List<MediaType> medias = List.of();
 
-    //TODO inner element of <keyboard> ; add other fields
-    private GeneratedValue<ReplyKeyboard> replyMarkup;
+    @InnerElement
+    private Keyboard keyboard;
 
     public long generateChatId(ResourcePool pool){
         return chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
+    }
+
+    public ReplyKeyboard createKeyboard(ResourcePool pool){
+        return this.keyboard != null ? this.keyboard.createMarkup(pool) : null;
     }
 
     @Override
@@ -97,6 +102,7 @@ public class Send implements ActionElement{
                 .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), pool))
+                .replyMarkup(createKeyboard(pool))
                 .build();
     }
 }

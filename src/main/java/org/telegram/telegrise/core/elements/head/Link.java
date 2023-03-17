@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.elements.head;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.StorableElement;
@@ -14,7 +15,7 @@ import java.io.IOException;
 
 @Element(name = "link")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 public class Link implements TranscriptionElement {
     private String source;
 
@@ -23,7 +24,7 @@ public class Link implements TranscriptionElement {
         this.source = node.getAttributes().getNamedItem("src").getNodeValue();
 
         try {
-            Document document = XMLUtils.loadDocument(new File(this.source));
+            Document document = XMLUtils.loadDocument(new File(parser.getRootDirectory(), this.source));
             TranscriptionElement result = parser.parse(document.getDocumentElement());  //FIXME fix scope restriction
 
             if (result instanceof StorableElement)
