@@ -27,6 +27,9 @@ public class Button implements TranscriptionElement {
     @ElementField(name = "url", expression = true)
     private GeneratedValue<String> url;
 
+    @ElementField(name = "when", expression = true)
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @ElementField(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);

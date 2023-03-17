@@ -67,9 +67,13 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     public ReplyKeyboard createMarkup(ResourcePool pool){
         switch (type.toLowerCase()) {
             case INLINE:
-                return new InlineKeyboardMarkup(rows.stream().map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
+                return new InlineKeyboardMarkup(rows.stream()
+                        .filter(r -> r.getWhen().generate(pool))
+                        .map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
             case REPLY:
-                return new ReplyKeyboardMarkup(rows.stream().map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
+                return new ReplyKeyboardMarkup(rows.stream()
+                        .filter(r -> r.getWhen().generate(pool))
+                        .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
             default:
                 throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
         }

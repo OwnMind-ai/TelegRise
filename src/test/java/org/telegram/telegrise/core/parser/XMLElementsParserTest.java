@@ -143,13 +143,14 @@ public class XMLElementsParserTest {
 
     @Test
     void parseKeyboard() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace());
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())));
         parser.load();
 
         Node node = toNode("<keyboard name=\"name\" type=\"inline\">\n" +
                 "                    <row>\n" +
                 "                        <button callbackData=\"first\">First</button>\n" +
                 "                        <button callbackData=\"second\">Second</button>\n" +
+                "                        <button callbackData=\"third\" when=\"${false}\">Third</button>\n" +
                 "                    </row>\n" +
                 "                    <row><button url=\"url\">URL</button></row>\n" +
                 "                </keyboard>");
