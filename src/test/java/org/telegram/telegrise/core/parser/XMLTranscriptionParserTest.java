@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrise.annotations.Reference;
-import org.telegram.telegrise.annotations.TreeHandler;
+import org.telegram.telegrise.annotations.TreeController;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.assertElements;
 
-@TreeHandler
+@TreeController
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XMLTranscriptionParserTest {
 
