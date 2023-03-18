@@ -55,7 +55,10 @@ public final class TreeExecutor {
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty())
                 this.close();
-        } //TODO Otherwise invoke default branch
+        } //TODO Otherwise invoke default branch if exists
+        else {
+            this.close();
+        }
     }
 
     private void invokeBranch(Branch branch, ResourcePool pool){

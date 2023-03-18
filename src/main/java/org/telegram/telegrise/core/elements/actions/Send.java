@@ -71,7 +71,7 @@ public class Send implements ActionElement{
             if (this.text != null){
                 first.get(0).setCaption(this.text.getText().generate(pool));
                 first.get(0).setParseMode(generateNullableProperty(text.getParseMode(), pool));
-                first.get(0).setCaptionEntities(generateNullableProperty(text.getEntities(), pool));
+                first.get(0).setCaptionEntities(generateNullableProperty(text.getEntities(), List.of(), pool));
             }
 
             return SendMediaGroup.builder()
@@ -101,7 +101,7 @@ public class Send implements ActionElement{
                 .replyToMessageId( generateNullableProperty(replyTo, pool))
                 .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
-                .entities(generateNullableProperty(text.getEntities(), pool))
+                .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .replyMarkup(createKeyboard(pool))
                 .build();
     }

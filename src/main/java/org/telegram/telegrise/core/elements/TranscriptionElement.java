@@ -20,4 +20,8 @@ public interface TranscriptionElement extends Serializable {
     default <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){
         return property == null ? null : property.generate(pool);
     }
+
+    default <T> T generateNullableProperty(GeneratedValue<T> property, T orElse, ResourcePool pool){
+        return property == null ? orElse : property.generate(pool);
+    }
 }
