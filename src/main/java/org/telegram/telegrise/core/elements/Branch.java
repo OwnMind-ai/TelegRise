@@ -39,6 +39,6 @@ public class Branch implements TranscriptionElement{
     @Override
     public void validate(Node node) {
         if (when == null && callbackTriggers == null && keys == null)
-            throw new TranscriptionParsingException("Branch can't be executed, missing 'when', 'keys' or '%s' attributes", node);
+            throw new TranscriptionParsingException("Branch is unreachable, missing 'when', 'keys' or 'callbackTriggers' attributes", node);
     }
 }

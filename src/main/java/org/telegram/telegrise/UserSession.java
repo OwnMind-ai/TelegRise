@@ -88,6 +88,9 @@ public class UserSession implements Runnable{
             this.sessionMemory.getBranchingElements().add(tree);
 
             this.executeBranchingElement(tree, update);
+        } else if (menu.getDefaultBranch() != null){
+            TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
+                    this.createResourcePool(update), sender);
         }
     }
 

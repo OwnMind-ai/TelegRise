@@ -41,6 +41,8 @@ public class Tree implements BranchingElement{
     private List<Branch> branches;
     @InnerElement
     private List<Menu> menus;
+    @InnerElement
+    private DefaultBranch defaultBranch;
 
     @ElementField(priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractHandler(Node node, LocalNamespace namespace){

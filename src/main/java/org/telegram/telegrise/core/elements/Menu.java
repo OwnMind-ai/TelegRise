@@ -25,6 +25,9 @@ public class Menu implements BranchingElement{
     @InnerElement
     private List<ActionElement> actions;
 
+    @InnerElement
+    private DefaultBranch defaultBranch;
+
     public Tree findTree(ResourcePool pool){
         return trees.stream().filter(t -> t.canHandle(pool)).findFirst().orElse(null);
     }

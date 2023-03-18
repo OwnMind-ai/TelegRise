@@ -32,6 +32,20 @@ public final class TreeExecutor {
         }
     }
 
+    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, DefaultAbsSender sender){
+        if (toInvoke != null) toInvoke.generate(pool);
+
+        if (actions != null)
+            actions.stream().map(action -> action.generateMethod(pool))
+                    .forEach(m -> {
+                        try {
+                            UniversalSender.execute(sender, m, null);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+    }
+
     @Getter
     private final Object handlerInstance;
     @Getter
@@ -60,28 +74,20 @@ public final class TreeExecutor {
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty())
                 this.close();
-        } else if(previous.getDefaultBranch() != null) {
+        } else if(previous != null && previous.getDefaultBranch() != null) {
             DefaultBranch defaultBranch = previous.getDefaultBranch();
             this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
 
             this.currentBranch = previous;
-        }else {
+        } else if(previous == null && this.tree.getDefaultBranch() != null) {
+            this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
+        } else {
             this.close();
         }
     }
 
     private void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool){
-        if (toInvoke != null) toInvoke.generate(pool);
-
-        if (actions != null)
-            actions.stream().map(action -> action.generateMethod(pool))
-                    .forEach(m -> {
-                        try {
-                            UniversalSender.execute(sender, m, null);
-                        } catch (TelegramApiException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+        invokeBranch(toInvoke, actions, pool, this.sender);
     }
 
     private void close(){
