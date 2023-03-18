@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
 public class ExpressionFactory {
     private static final ExpressionParser expressionParser = new ExpressionParser(ExpressionParser.getTempDirectory());
 
-    public static @NotNull GeneratedValue<Void> createExpression(String text, Node node, LocalNamespace namespace){
-        return createExpression(text, Void.class, node, namespace);
-    }
-
     public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
         if(MethodReferenceParser.isMethodReference(text)){
             MethodReference[] references = MethodReferenceParser.parse(text, namespace.getHandlerClass(), node);

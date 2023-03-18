@@ -25,8 +25,9 @@ public final class MethodReferenceParser {
         MethodReference toBeReturned = references[0];
         List<MethodReference> rest = references.length == 1 ? List.of() : List.of(references).subList(1, references.length);
 
+        GeneratedValue<T> generatedValue = toBeReturned.toGeneratedValue(returnType, node);
         return (pool) -> {
-            T result = toBeReturned.toGeneratedValue(returnType, node).generate(pool);
+            T result = generatedValue.generate(pool);
             rest.forEach(methodReference -> {
                 try {
                     methodReference.invoke(pool);

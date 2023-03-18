@@ -7,6 +7,8 @@ import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.ElementField;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.w3c.dom.Node;
 
 import java.util.List;
 
@@ -14,12 +16,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Branch implements TranscriptionElement{
-    @ElementField(name = "when", expression = true, nullable = false)
+    @ElementField(name = "when", expression = true)
     private GeneratedValue<Boolean> when;
 
-    //TODO keys & callbacks
+    @ElementField(name = "keys")
+    private String[] keys;
+    @ElementField(name = "callbackTriggers")
+    private String[] callbackTriggers;
 
-    @ElementField(name = "handler")
+    @ElementField(name = "invoke", expression = true)
     private GeneratedValue<Void> toInvoke;
 
     @InnerElement
@@ -30,4 +35,10 @@ public class Branch implements TranscriptionElement{
 
     @InnerElement
     private DefaultBranch defaultBranch;
+
+    @Override
+    public void validate(Node node) {
+        if (when == null && callbackTriggers == null && keys == null)
+            throw new TranscriptionParsingException("Branch can't be executed, missing 'when', 'keys' or '%s' attributes", node);
+    }
 }

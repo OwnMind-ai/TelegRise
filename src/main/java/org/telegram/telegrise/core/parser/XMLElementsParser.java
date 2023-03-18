@@ -220,7 +220,7 @@ public class XMLElementsParser {
         else
             PropertyUtils.setSimpleProperty(to, field.getName(),
                     elementField.expression() ? ExpressionFactory.createExpression(attribute.getNodeValue(),
-                            ReflectionUtils.getRawGenericType(field), node, namespace)  // Gets an actual type of GeneratedValue
+                            ReflectionUtils.getRawGenericType(field), node, namespace)
                             : attribute.getNodeValue()
             );
     }

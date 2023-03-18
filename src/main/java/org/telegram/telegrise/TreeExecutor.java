@@ -12,6 +12,7 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 public final class TreeExecutor {
@@ -88,9 +89,16 @@ public final class TreeExecutor {
     }
 
     private Branch getNextBranch(List<Branch> branches, ResourcePool resourcePool) {
-        for (Branch branch : branches)
-            if (branch.getWhen().generate(resourcePool))
+        for (Branch branch : branches) {
+            if(branch.getKeys() != null && resourcePool.getUpdate().hasMessage() && !MessageUtils.hasMedia(resourcePool.getUpdate().getMessage())
+                    && Arrays.stream(branch.getKeys()).anyMatch(k -> k.equals(resourcePool.getUpdate().getMessage().getText())))
                 return branch;
+            else if (branch.getCallbackTriggers() != null && resourcePool.getUpdate().hasCallbackQuery()
+                    && Arrays.stream(branch.getCallbackTriggers()).anyMatch(t -> t.equals(resourcePool.getUpdate().getCallbackQuery().getData())))
+                return branch;
+            else if (branch.getWhen() != null && branch.getWhen().generate(resourcePool))
+                return branch;
+        }
 
         return null;
     }
