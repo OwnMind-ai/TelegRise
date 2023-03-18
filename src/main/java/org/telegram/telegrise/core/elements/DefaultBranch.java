@@ -10,24 +10,12 @@ import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 
-@Element(name = "branch")
-@Data
-@NoArgsConstructor
-public class Branch implements TranscriptionElement{
-    @ElementField(name = "when", expression = true, nullable = false)
-    private GeneratedValue<Boolean> when;
-
-    //TODO keys & callbacks
-
+@Element(name = "default")
+@Data @NoArgsConstructor
+public class DefaultBranch implements TranscriptionElement {
     @ElementField(name = "handler")
     private GeneratedValue<Void> toInvoke;
 
     @InnerElement
     private List<ActionElement> actions;
-
-    @InnerElement
-    private List<Branch> branches;
-
-    @InnerElement
-    private DefaultBranch defaultBranch;
 }

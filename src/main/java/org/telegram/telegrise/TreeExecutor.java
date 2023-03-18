@@ -4,9 +4,12 @@ import lombok.Getter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
+import org.telegram.telegrise.core.elements.DefaultBranch;
 import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.elements.actions.ActionElement;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -48,25 +51,29 @@ public final class TreeExecutor {
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
         ResourcePool resourcePool = new ResourcePool(update, handlerInstance);
 
+        Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
 
         if (this.currentBranch != null){
-            this.invokeBranch(this.currentBranch, resourcePool);
+            this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty())
                 this.close();
-        } //TODO Otherwise invoke default branch if exists
-        else {
+        } else if(previous.getDefaultBranch() != null) {
+            DefaultBranch defaultBranch = previous.getDefaultBranch();
+            this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
+
+            this.currentBranch = previous;
+        }else {
             this.close();
         }
     }
 
-    private void invokeBranch(Branch branch, ResourcePool pool){
-        if (branch.getToInvoke() != null)
-            branch.getToInvoke().generate(pool);
+    private void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool){
+        if (toInvoke != null) toInvoke.generate(pool);
 
-        if (branch.getActions() != null)
-            branch.getActions().stream().map(action -> action.generateMethod(pool))
+        if (actions != null)
+            actions.stream().map(action -> action.generateMethod(pool))
                     .forEach(m -> {
                         try {
                             UniversalSender.execute(sender, m, null);
