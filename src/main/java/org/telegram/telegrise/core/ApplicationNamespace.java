@@ -3,6 +3,7 @@ package org.telegram.telegrise.core;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,5 +39,9 @@ public final class ApplicationNamespace {
 
     public LocalNamespace emptyLocal(){
         return new LocalNamespace(null, this);
+    }
+
+    public Collection<Class<?>> getImportedClasses(){
+        return this.importedClasses.values();
     }
 }

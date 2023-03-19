@@ -9,7 +9,7 @@ import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 
-@Element(name = "head")  //FIXME find a better name
+@Element(name = "head")
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public class HeadBlock implements TranscriptionElement {

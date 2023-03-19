@@ -47,7 +47,7 @@ public class ExpressionParser {
     }
 
     public GeneratedValue<?> parse(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
-        int hashcode = Math.abs((expression.hashCode() + (namespace.getHandlerClass() != null ? namespace.getHandlerClass().getName() : "").hashCode()));
+        int hashcode = this.calculateHashcode(expression, namespace);  //TODO cleaning unused compiled expressions
 
         if (isExpressionExists(hashcode)) {
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
@@ -81,7 +81,7 @@ public class ExpressionParser {
             Files.delete(source.toPath());
 
             if (err.size() > 0)
-                throw new TranscriptionParsingException("An error occurred while compiling the expression", node);
+                throw new TranscriptionParsingException("An error occurred while compiling the expression:\n" + err, node);
         }
     }
 
@@ -109,11 +109,23 @@ public class ExpressionParser {
                 .setParameters(ResourcePool.class.getSimpleName() + " pool")
                 .setBody(namespace.getResourceInitializationCode("pool") + "return " + safeExpression + ";");
 
+        for (Class<?> imported : namespace.getApplicationNamespace().getImportedClasses())
+            if (source.requiresImport(imported))
+                source.addImport(imported);
+
         if (returnType.equals(Void.class))
             method.setReturnTypeVoid();
         else
             method.setReturnType(returnType);
 
         return source;
+    }
+
+    private int calculateHashcode(String expression, LocalNamespace namespace){
+        return Math.abs((
+                        expression +
+                        (namespace.getHandlerClass() != null ? namespace.getHandlerClass().getName() : "") +
+                        namespace.getApplicationNamespace().getImportedClasses().stream().map(Class::getName).sorted().hashCode()
+                ).hashCode());
     }
 }
