@@ -8,6 +8,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
+import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 
@@ -18,15 +19,18 @@ import java.util.List;
 public final class TreeExecutor {
     public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender) {
         try {
-            Object handler = tree.getHandler().getConstructor().newInstance();
-            resourceInjector.injectResources(handler);
+            Object handler = null;
+            if (tree.getHandler() != null) {
+                handler = tree.getHandler().getConstructor().newInstance();
+                resourceInjector.injectResources(handler);
+            }
 
             return new TreeExecutor(handler, tree, sender);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             String startMessage = "Cannot create instance of '" + tree.getHandler().getSimpleName() + "': ";
 
             if (e instanceof NoSuchMethodException)
-                throw new TelegRiseRuntimeException(startMessage + "class must have constructor with to arguments");
+                throw new TelegRiseRuntimeException(startMessage + "class must have constructor with no arguments");
             else
                 throw new TelegRiseRuntimeException(startMessage + e.getMessage());
         }
@@ -56,6 +60,9 @@ public final class TreeExecutor {
     @Getter
     private boolean closed;
 
+    @Getter
+    private Transition transition;
+
     public TreeExecutor(Object handlerInstance, Tree tree, DefaultAbsSender sender) {
         this.handlerInstance = handlerInstance;
         this.tree = tree;
@@ -72,8 +79,12 @@ public final class TreeExecutor {
         if (this.currentBranch != null){
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
-            if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty())
+            if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
+                if (this.currentBranch.getTransition() != null)
+                    this.transition = this.currentBranch.getTransition();
+
                 this.close();
+            }
         } else if(previous != null && previous.getDefaultBranch() != null) {
             DefaultBranch defaultBranch = previous.getDefaultBranch();
             this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);

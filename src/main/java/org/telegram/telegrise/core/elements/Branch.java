@@ -36,9 +36,15 @@ public class Branch implements TranscriptionElement{
     @InnerElement
     private DefaultBranch defaultBranch;
 
+    @InnerElement
+    private Transition transition;
+
     @Override
     public void validate(Node node) {
         if (when == null && callbackTriggers == null && keys == null)
             throw new TranscriptionParsingException("Branch is unreachable, missing 'when', 'keys' or 'callbackTriggers' attributes", node);
+
+        if (transition != null && (defaultBranch != null || (branches != null && !branches.isEmpty())))
+            throw new TranscriptionParsingException("Branch cannot contain other branches if a transition is defined", node);
     }
 }

@@ -41,7 +41,7 @@ public class Tree implements BranchingElement{
     @InnerElement
     private List<Branch> branches;
     @InnerElement
-    private List<Menu> menus;  //TODO implement
+    private List<Menu> menus;
     @InnerElement
     private DefaultBranch defaultBranch;
 
