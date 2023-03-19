@@ -21,6 +21,7 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ExpressionParser {
     public static String getTempDirectory(){
@@ -125,7 +126,7 @@ public class ExpressionParser {
         return Math.abs((
                         expression +
                         (namespace.getHandlerClass() != null ? namespace.getHandlerClass().getName() : "") +
-                        namespace.getApplicationNamespace().getImportedClasses().stream().map(Class::getName).sorted().hashCode()
+                        namespace.getApplicationNamespace().getImportedClasses().stream().map(Class::getName).sorted().collect(Collectors.joining())
                 ).hashCode());
     }
 }
