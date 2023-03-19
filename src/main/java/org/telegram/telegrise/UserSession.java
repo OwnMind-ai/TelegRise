@@ -54,6 +54,9 @@ public class UserSession implements Runnable{
 
     private void initialize(){
         this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
+
+        if(this.transcription.getRootMenu().getChatTypes() == null)
+            this.transcription.getRootMenu().setChatTypes(new String[]{"all"});
     }
 
     public void update(Update update){
@@ -80,7 +83,7 @@ public class UserSession implements Runnable{
     }
 
     private void initializeTree(Update update, Menu menu) {
-        Tree tree = menu.findTree(this.createResourcePool(update));
+        Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
 
         if (tree != null){
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender);
@@ -90,7 +93,7 @@ public class UserSession implements Runnable{
             this.executeBranchingElement(tree, update);
         } else if (menu.getDefaultBranch() != null){
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
-                    this.createResourcePool(update), sender);
+                    this.createResourcePool(update), sender);  //FIXME use universal chat getter to avoid mistype errors
         }
     }
 

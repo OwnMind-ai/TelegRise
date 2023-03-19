@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
@@ -29,10 +30,10 @@ public class Tree implements BranchingElement{
     private String[] keys;
     @ElementField(name = "callbackTriggers")
     private String[] callbackTriggers;
-
-    //TODO: only static method, static expressions or methods from parent
     @ElementField(name = "predicate", expression = true)
     private GeneratedValue<Boolean> predicate;
+    @ElementField(name = "chats")
+    private String[] chatTypes;
     private Class<?> handler;
 
     @InnerElement
@@ -40,7 +41,7 @@ public class Tree implements BranchingElement{
     @InnerElement
     private List<Branch> branches;
     @InnerElement
-    private List<Menu> menus;
+    private List<Menu> menus;  //TODO implement
     @InnerElement
     private DefaultBranch defaultBranch;
 
@@ -57,8 +58,11 @@ public class Tree implements BranchingElement{
         return handler == null ? null : new LocalNamespace(handler, global);
     }
 
-    public boolean canHandle(ResourcePool pool){
+    public boolean canHandle(ResourcePool pool, List<String> chatTypes){
         Update update = pool.getUpdate();
+
+        if(!ChatTypes.isApplicable(this.chatTypes == null ? chatTypes : List.of(this.chatTypes), MessageUtils.getChat(update)))
+            return false;
 
         if (this.predicate != null && this.predicate.generate(pool)) {
             return true;

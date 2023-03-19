@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BranchingElement extends TranscriptionElement{
     List<PartialBotApiMethod<?>> getMethods(ResourcePool pool);
+
+    String[] getChatTypes();
 }

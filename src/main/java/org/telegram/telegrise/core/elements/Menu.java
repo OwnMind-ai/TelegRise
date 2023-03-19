@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
@@ -19,6 +20,9 @@ public class Menu implements BranchingElement{
     @ElementField(name = "name", nullable = false)
     private String name;
 
+    @ElementField(name = "chats")
+    private String[] chatTypes;
+
     @InnerElement(nullable = false)
     private List<Tree> trees;
 
@@ -28,8 +32,10 @@ public class Menu implements BranchingElement{
     @InnerElement
     private DefaultBranch defaultBranch;
 
-    public Tree findTree(ResourcePool pool){
-        return trees.stream().filter(t -> t.canHandle(pool)).findFirst().orElse(null);
+    public Tree findTree(ResourcePool pool, SessionMemoryImpl sessionMemory){
+        List<String> chatTypes = List.of(sessionMemory.getLastChatTypes());
+
+        return trees.stream().filter(t -> t.canHandle(pool, chatTypes)).findFirst().orElse(null);
     }
 
     @Override

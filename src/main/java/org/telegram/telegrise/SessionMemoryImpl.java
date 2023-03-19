@@ -5,10 +5,7 @@ import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -74,5 +71,16 @@ public class SessionMemoryImpl implements SessionMemory {
         assert tClass.isInstance(this.branchingElements.getLast());
 
         return tClass.cast(this.branchingElements.getLast());
+    }
+
+    public String[] getLastChatTypes(){
+        for (Iterator<BranchingElement> it = this.branchingElements.descendingIterator(); it.hasNext(); ) {
+            BranchingElement element = it.next();
+
+            if (element.getChatTypes() != null)
+                return element.getChatTypes();
+        }
+
+        return new String[]{};
     }
 }
