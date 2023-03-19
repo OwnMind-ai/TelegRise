@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -13,10 +13,10 @@ public class Transition implements TranscriptionElement{
     public static final String NEXT = "next";
     public static final String PREVIOUS = "previous";
 
-    @ElementField(name = "direction", nullable = false)
+    @Attribute(name = "direction", nullable = false)
     private String direction;
 
-    @ElementField(name = "menu")
+    @Attribute(name = "menu")
     private String menu;
 
     @Override

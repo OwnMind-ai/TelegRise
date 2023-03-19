@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface ElementField {
+public @interface Attribute {
     String name() default "";
     boolean isTextContext() default false;
     boolean nullable() default true;

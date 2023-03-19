@@ -13,7 +13,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 
 import java.util.List;
 
@@ -22,13 +22,13 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class Photo implements MediaType{
     //TODO url (treat as fileId)
-    @ElementField(name = "fileId", expression = true)
+    @Attribute(name = "fileId", expression = true)
     private GeneratedValue<String> fileId;
 
-    @ElementField(name = "inputFile", expression = true)
+    @Attribute(name = "inputFile", expression = true)
     private GeneratedValue<InputFile> inputFile;
 
-    @ElementField(name = "spoiler", expression = true)
+    @Attribute(name = "spoiler", expression = true)
     private GeneratedValue<Boolean> spoiler;
 
     private InputFile createInputFile(ResourcePool pool){

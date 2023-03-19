@@ -9,7 +9,7 @@ import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.w3c.dom.Node;
 
@@ -21,18 +21,18 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class Tree implements BranchingElement{
-    @ElementField(name = "name", nullable = false)
+    @Attribute(name = "name", nullable = false)
     private String name;
 
-    @ElementField(name = "commands")
+    @Attribute(name = "commands")
     private String[] commands;
-    @ElementField(name = "keys")
+    @Attribute(name = "keys")
     private String[] keys;
-    @ElementField(name = "callbackTriggers")
+    @Attribute(name = "callbackTriggers")
     private String[] callbackTriggers;
-    @ElementField(name = "predicate", expression = true)
+    @Attribute(name = "predicate", expression = true)
     private GeneratedValue<Boolean> predicate;
-    @ElementField(name = "chats")
+    @Attribute(name = "chats")
     private String[] chatTypes;
     private Class<?> handler;
 
@@ -45,7 +45,7 @@ public class Tree implements BranchingElement{
     @InnerElement
     private DefaultBranch defaultBranch;
 
-    @ElementField(priority = Double.POSITIVE_INFINITY)
+    @Attribute(priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractHandler(Node node, LocalNamespace namespace){
         if (node.getAttributes().getNamedItem("handler") != null)
             this.handler = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("handler").getNodeValue());

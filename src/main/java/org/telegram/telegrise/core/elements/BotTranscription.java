@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 @Element(name = "bot")
@@ -13,13 +13,13 @@ import org.telegram.telegrise.core.parser.InnerElement;
 public final class BotTranscription implements TranscriptionElement {
 
     //TODO webhooks support
-    @ElementField(name = "username", nullable = false)
+    @Attribute(name = "username", nullable = false)
     private String username;
 
-    @ElementField(name = "token", nullable = false)
+    @Attribute(name = "token", nullable = false)
     private String token;
 
-    @ElementField(name = "defaultParseMode")
+    @Attribute(name = "defaultParseMode")
     private String defaultParseMode = "html";
 
     @InnerElement(nullable = false)

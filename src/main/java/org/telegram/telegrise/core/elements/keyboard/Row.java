@@ -8,7 +8,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class Row implements TranscriptionElement {
     @InnerElement(nullable = false)
     private List<Button> buttons;
 
-    @ElementField(name = "when", expression = true)
+    @Attribute(name = "when", expression = true)
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     public Row(List<Button> buttons){

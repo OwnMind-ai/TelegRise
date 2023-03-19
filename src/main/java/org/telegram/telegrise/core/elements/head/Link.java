@@ -19,7 +19,7 @@ import java.io.IOException;
 public class Link implements TranscriptionElement {
     private String source;
 
-    @ElementField(name = "src", nullable = false)
+    @Attribute(name = "src", nullable = false)
     private void linkSource(Node node, ParserMemory memory, XMLElementsParser parser){
         this.source = node.getAttributes().getNamedItem("src").getNodeValue();
 

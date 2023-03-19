@@ -22,16 +22,16 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
 
-    @ElementField(name = "byName")
+    @Attribute(name = "byName")
     private String byName;
 
-    @ElementField(name = "type")
+    @Attribute(name = "type")
     private String type;
 
-    @ElementField(name = "name")
+    @Attribute(name = "name")
     private String name;
 
-    @ElementField(name = "create", expression = true)
+    @Attribute(name = "create", expression = true)
     private GeneratedValue<ReplyKeyboard> create;
 
     @InnerElement

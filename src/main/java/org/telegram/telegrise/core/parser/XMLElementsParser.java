@@ -73,12 +73,12 @@ public class XMLElementsParser {
         );
 
         Stream.concat(
-                Arrays.stream(element.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(ElementField.class))
-                        .map(m -> Map.<ElementField, Object>entry(m.getAnnotation(ElementField.class), m)),
-                Arrays.stream(element.getDeclaredFields()).filter(m -> m.isAnnotationPresent(ElementField.class))
-                        .map(f -> Map.<ElementField, Object>entry(f.getAnnotation(ElementField.class), f))
+                Arrays.stream(element.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Attribute.class))
+                        .map(m -> Map.<Attribute, Object>entry(m.getAnnotation(Attribute.class), m)),
+                Arrays.stream(element.getDeclaredFields()).filter(m -> m.isAnnotationPresent(Attribute.class))
+                        .map(f -> Map.<Attribute, Object>entry(f.getAnnotation(Attribute.class), f))
             )
-            .sorted(Comparator.<Map.Entry<ElementField, Object>>comparingDouble(e -> e.getKey().priority()).reversed())
+            .sorted(Comparator.<Map.Entry<Attribute, Object>>comparingDouble(e -> e.getKey().priority()).reversed())
             .forEach(entry -> {
                 try {
                     if(entry.getValue() instanceof Method)
@@ -195,7 +195,7 @@ public class XMLElementsParser {
 
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         field.setAccessible(true);
-        ElementField elementData = field.getAnnotation(ElementField.class);
+        Attribute elementData = field.getAnnotation(Attribute.class);
         Class<?> fieldType = field.getType();
 
         if (elementData.expression() && !fieldType.equals(GeneratedValue.class))
@@ -208,7 +208,7 @@ public class XMLElementsParser {
         }
     }
 
-    private void setField(Node node, ElementField elementField, Object to, Field field) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    private void setField(Node node, Attribute elementField, Object to, Field field) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         Node attribute = node.getAttributes().getNamedItem(elementField.name());
 
         if (attribute == null && elementField.nullable()) return;

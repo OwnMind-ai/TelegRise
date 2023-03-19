@@ -10,7 +10,7 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
@@ -20,16 +20,16 @@ import org.w3c.dom.Node;
 public class Button implements TranscriptionElement {
     private GeneratedValue<String> text;
 
-    @ElementField(name = "callbackData", expression = true)
+    @Attribute(name = "callbackData", expression = true)
     private GeneratedValue<String> callbackData;
 
-    @ElementField(name = "url", expression = true)
+    @Attribute(name = "url", expression = true)
     private GeneratedValue<String> url;
 
-    @ElementField(name = "when", expression = true)
+    @Attribute(name = "when", expression = true)
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
-    @ElementField(nullable = false)
+    @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }

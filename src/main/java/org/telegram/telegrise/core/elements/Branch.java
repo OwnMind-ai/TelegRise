@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
@@ -16,15 +16,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Branch implements TranscriptionElement{
-    @ElementField(name = "when", expression = true)
+    @Attribute(name = "when", expression = true)
     private GeneratedValue<Boolean> when;
 
-    @ElementField(name = "keys")
+    @Attribute(name = "keys")
     private String[] keys;
-    @ElementField(name = "callbackTriggers")
+    @Attribute(name = "callbackTriggers")
     private String[] callbackTriggers;
 
-    @ElementField(name = "invoke", expression = true)
+    @Attribute(name = "invoke", expression = true)
     private GeneratedValue<Void> toInvoke;
 
     @InnerElement

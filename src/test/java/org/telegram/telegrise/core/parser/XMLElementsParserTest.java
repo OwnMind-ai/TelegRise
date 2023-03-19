@@ -174,11 +174,11 @@ public class XMLElementsParserTest {
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
 
         Map<String, Field> expectedFields = Arrays.stream(expected.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(ElementField.class) || f.isAnnotationPresent(InnerElement.class))
+                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class))
                 .collect(Collectors.toMap(Field::getName, f -> f));
 
         Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(ElementField.class) || f.isAnnotationPresent(InnerElement.class))
+                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class))
                 .collect(Collectors.toMap(Field::getName, f -> f));
 
         for (String name : expectedFields.keySet()) {

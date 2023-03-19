@@ -8,7 +8,7 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.EmbeddableElement;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
@@ -22,10 +22,10 @@ import java.util.List;
 public class Text implements TranscriptionElement, EmbeddableElement {
     private GeneratedValue<String> text;
 
-    @ElementField(name = "parseMode", expression = true)
+    @Attribute(name = "parseMode", expression = true)
     private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
 
-    @ElementField(name = "entities", expression = true)
+    @Attribute(name = "entities", expression = true)
     private GeneratedValue<List<MessageEntity>> entities;
 
     public Text(String text, String parseMode){
@@ -37,7 +37,7 @@ public class Text implements TranscriptionElement, EmbeddableElement {
         return this.entities == null ? this.parseMode : null;
     }
 
-    @ElementField(nullable = false)
+    @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }

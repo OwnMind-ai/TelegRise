@@ -7,7 +7,7 @@ import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class Menu implements BranchingElement{
-    @ElementField(name = "name", nullable = false)
+    @Attribute(name = "name", nullable = false)
     private String name;
 
-    @ElementField(name = "chats")
+    @Attribute(name = "chats")
     private String[] chatTypes;
 
     @InnerElement(nullable = false)

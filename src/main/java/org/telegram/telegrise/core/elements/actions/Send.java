@@ -14,7 +14,7 @@ import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.ElementField;
+import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
@@ -25,25 +25,25 @@ import java.util.stream.Stream;
 @Element(name = "send")
 @Data @NoArgsConstructor
 public class Send implements ActionElement{
-    @ElementField(name = "chat", expression = true)
+    @Attribute(name = "chat", expression = true)
     private GeneratedValue<Long> chatId;
 
-    @ElementField(name = "messageThreadId", expression = true)
+    @Attribute(name = "messageThreadId", expression = true)
     private GeneratedValue<Integer> messageThreadId;
 
     @InnerElement
     private Text text;
 
-    @ElementField(name = "disableWebPagePreview", expression = true)
+    @Attribute(name = "disableWebPagePreview", expression = true)
     private GeneratedValue<Boolean> disableWebPagePreview;
-    @ElementField(name = "disableNotification", expression = true)
+    @Attribute(name = "disableNotification", expression = true)
     private GeneratedValue<Boolean> disableNotification;
-    @ElementField(name = "protectContent", expression = true)
+    @Attribute(name = "protectContent", expression = true)
     private GeneratedValue<Boolean> protectContent;
-    @ElementField(name = "allowSendingWithoutReply", expression = true)
+    @Attribute(name = "allowSendingWithoutReply", expression = true)
     private GeneratedValue<Boolean> allowSendingWithoutReply;
 
-    @ElementField(name = "replyTo", expression = true)
+    @Attribute(name = "replyTo", expression = true)
     private GeneratedValue<Integer> replyTo;
 
     @InnerElement
