@@ -4,17 +4,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
-import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.w3c.dom.Node;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Element(name = "tree")
@@ -34,6 +37,13 @@ public class Tree implements BranchingElement{
     private GeneratedValue<Boolean> predicate;
     @Attribute(name = "chats")
     private String[] chatTypes;
+
+    @Attribute(name = "description")
+    private String description;
+
+    @Attribute(name = "commandScopes")
+    private String[] scopes;
+
     private Class<?> handler;
 
     @InnerElement
@@ -87,5 +97,17 @@ public class Tree implements BranchingElement{
     @Override
     public List<PartialBotApiMethod<?>> getMethods(ResourcePool pool) {
         return actions != null ? this.actions.stream().map(a -> a.generateMethod(pool)).collect(Collectors.toList()) : List.of();
+    }
+
+    public boolean isProducesBotCommands(BotCommandScope scope, Menu rootMenu){
+        List<String> scopes = this.scopes != null ? List.of(this.scopes) :
+                ChatTypes.chatTypesToScopes(Objects.requireNonNullElse(this.chatTypes ,rootMenu.getChatTypes()));
+
+        return this.description != null && ChatTypes.isApplicable(scopes, scope);
+    }
+
+    public List<BotCommand> getBotCommands(){
+        assert description != null;
+        return Arrays.stream(this.commands).map(c -> new BotCommand(c, description)).collect(Collectors.toList());
     }
 }

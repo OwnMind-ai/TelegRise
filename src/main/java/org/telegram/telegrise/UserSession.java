@@ -52,9 +52,6 @@ public class UserSession implements Runnable{
 
     private void initialize(){
         this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
-
-        if(this.transcription.getRootMenu().getChatTypes() == null)
-            this.transcription.getRootMenu().setChatTypes(new String[]{ChatTypes.ALL});
     }
 
     public void update(Update update){

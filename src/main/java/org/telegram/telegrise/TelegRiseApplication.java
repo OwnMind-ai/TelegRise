@@ -52,6 +52,7 @@ public final class TelegRiseApplication {
 
         TelegramLongPollingBot bot = BotFactory.createLongPooling(controller.getTranscription(), controller::onUpdateReceived);
         controller.setSender(bot);
+        controller.initialize();
 
         try {
             api.registerBot(bot);
