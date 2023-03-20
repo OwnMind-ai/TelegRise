@@ -21,9 +21,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public class Photo implements MediaType{
-    //TODO url (treat as fileId)
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
+
+    @Attribute(name = "url")
+    private GeneratedValue<String> url;
 
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
@@ -33,14 +35,18 @@ public class Photo implements MediaType{
 
     private InputFile createInputFile(ResourcePool pool){
         String fileId = generateNullableProperty(this.getFileId(), pool);
+        if (fileId != null)
+            return new InputFile(fileId);
+
+        String url = generateNullableProperty(this.url, pool);
+        if (url != null)
+            return new InputFile(url);
+
         InputFile file = generateNullableProperty(this.inputFile, pool);
+        if (file != null)
+            return file;
 
-        if (fileId != null && file != null)
-            throw new TelegRiseRuntimeException("Both fileID and inputFile were passed to the SendPhoto method");
-        if (fileId == null && file == null)
-            throw new TelegRiseRuntimeException("inputFile or fileId cannot be null in a SendPhoto method");
-
-        return file != null ? file : new InputFile(fileId);
+        throw new TelegRiseRuntimeException("fileId, url or inputFile cannot be null in a SendPhoto method");
     }
 
     @Override
@@ -66,12 +72,14 @@ public class Photo implements MediaType{
         var result = InputMediaPhoto.builder()
                 .hasSpoiler(generateNullableProperty(this.spoiler, pool));
 
-        String fileId = generateNullableProperty(this.fileId, pool);
-        if (fileId == null)
-            result.newMediaFile(generateNullableProperty(this.inputFile, pool).getNewMediaFile())
+        InputFile inputFile = generateNullableProperty(this.inputFile, pool);
+        if (inputFile != null)
+            result.newMediaFile(inputFile.getNewMediaFile())
                     .isNewMedia(true);
-        else
-            result.media(fileId);
+        else {
+            String fileId = generateNullableProperty(this.fileId, pool);
+            result.media(fileId != null ? fileId : generateNullableProperty(this.url, pool));
+        }
 
         return List.of(result.build());
     }
