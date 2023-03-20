@@ -196,10 +196,6 @@ public class XMLElementsParser {
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         field.setAccessible(true);
         Attribute elementData = field.getAnnotation(Attribute.class);
-        Class<?> fieldType = field.getType();
-
-        if (elementData.expression() && !fieldType.equals(GeneratedValue.class))
-            throw new RuntimeException("Trying to assign non-generated value to GeneratedValue<?> type field");
 
         if(elementData.isTextContext())
             field.set(instance, node.getTextContent());
@@ -219,7 +215,7 @@ public class XMLElementsParser {
             PropertyUtils.setSimpleProperty(to, field.getName(), this.parseList(attribute.getNodeValue()));
         else
             PropertyUtils.setSimpleProperty(to, field.getName(),
-                    elementField.expression() ? ExpressionFactory.createExpression(attribute.getNodeValue(),
+                    field.getType().equals(GeneratedValue.class) ? ExpressionFactory.createExpression(attribute.getNodeValue(),
                             ReflectionUtils.getRawGenericType(field), node, namespace)
                             : attribute.getNodeValue()
             );

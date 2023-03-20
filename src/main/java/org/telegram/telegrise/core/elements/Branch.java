@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Branch implements TranscriptionElement{
-    @Attribute(name = "when", expression = true)
+    @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
     @Attribute(name = "keys")
@@ -24,7 +24,7 @@ public class Branch implements TranscriptionElement{
     @Attribute(name = "callbackTriggers")
     private String[] callbackTriggers;
 
-    @Attribute(name = "invoke", expression = true)
+    @Attribute(name = "invoke")
     private GeneratedValue<Void> toInvoke;
 
     @InnerElement

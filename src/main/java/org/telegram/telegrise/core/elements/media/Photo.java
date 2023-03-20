@@ -22,13 +22,13 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class Photo implements MediaType{
     //TODO url (treat as fileId)
-    @Attribute(name = "fileId", expression = true)
+    @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
-    @Attribute(name = "inputFile", expression = true)
+    @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
-    @Attribute(name = "spoiler", expression = true)
+    @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
     private InputFile createInputFile(ResourcePool pool){

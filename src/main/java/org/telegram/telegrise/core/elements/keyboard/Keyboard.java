@@ -31,7 +31,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @Attribute(name = "name")
     private String name;
 
-    @Attribute(name = "create", expression = true)
+    @Attribute(name = "create")
     private GeneratedValue<ReplyKeyboard> create;
 
     @InnerElement

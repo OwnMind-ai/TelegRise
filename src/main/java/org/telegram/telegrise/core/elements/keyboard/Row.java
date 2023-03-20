@@ -20,7 +20,7 @@ public class Row implements TranscriptionElement {
     @InnerElement(nullable = false)
     private List<Button> buttons;
 
-    @Attribute(name = "when", expression = true)
+    @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     public Row(List<Button> buttons){

@@ -10,6 +10,6 @@ public @interface Attribute {
     String name() default "";
     boolean isTextContext() default false;
     boolean nullable() default true;
-    boolean expression() default false;
+
     double priority() default 0;
 }

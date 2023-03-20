@@ -33,7 +33,7 @@ public class Tree implements BranchingElement{
     private String[] keys;
     @Attribute(name = "callbackTriggers")
     private String[] callbackTriggers;
-    @Attribute(name = "predicate", expression = true)
+    @Attribute(name = "predicate")
     private GeneratedValue<Boolean> predicate;
     @Attribute(name = "chats")
     private String[] chatTypes;

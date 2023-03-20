@@ -20,13 +20,13 @@ import org.w3c.dom.Node;
 public class Button implements TranscriptionElement {
     private GeneratedValue<String> text;
 
-    @Attribute(name = "callbackData", expression = true)
+    @Attribute(name = "callbackData")
     private GeneratedValue<String> callbackData;
 
-    @Attribute(name = "url", expression = true)
+    @Attribute(name = "url")
     private GeneratedValue<String> url;
 
-    @Attribute(name = "when", expression = true)
+    @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Attribute(nullable = false)

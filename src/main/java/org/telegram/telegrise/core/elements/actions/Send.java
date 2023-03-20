@@ -25,25 +25,25 @@ import java.util.stream.Stream;
 @Element(name = "send")
 @Data @NoArgsConstructor
 public class Send implements ActionElement{
-    @Attribute(name = "chat", expression = true)
+    @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
-    @Attribute(name = "messageThreadId", expression = true)
+    @Attribute(name = "messageThreadId")
     private GeneratedValue<Integer> messageThreadId;
 
     @InnerElement
     private Text text;
 
-    @Attribute(name = "disableWebPagePreview", expression = true)
+    @Attribute(name = "disableWebPagePreview")
     private GeneratedValue<Boolean> disableWebPagePreview;
-    @Attribute(name = "disableNotification", expression = true)
+    @Attribute(name = "disableNotification")
     private GeneratedValue<Boolean> disableNotification;
-    @Attribute(name = "protectContent", expression = true)
+    @Attribute(name = "protectContent")
     private GeneratedValue<Boolean> protectContent;
-    @Attribute(name = "allowSendingWithoutReply", expression = true)
+    @Attribute(name = "allowSendingWithoutReply")
     private GeneratedValue<Boolean> allowSendingWithoutReply;
 
-    @Attribute(name = "replyTo", expression = true)
+    @Attribute(name = "replyTo")
     private GeneratedValue<Integer> replyTo;
 
     @InnerElement

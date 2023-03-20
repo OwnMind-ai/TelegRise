@@ -22,10 +22,10 @@ import java.util.List;
 public class Text implements TranscriptionElement, EmbeddableElement {
     private GeneratedValue<String> text;
 
-    @Attribute(name = "parseMode", expression = true)
+    @Attribute(name = "parseMode")
     private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
 
-    @Attribute(name = "entities", expression = true)
+    @Attribute(name = "entities")
     private GeneratedValue<List<MessageEntity>> entities;
 
     public Text(String text, String parseMode){
