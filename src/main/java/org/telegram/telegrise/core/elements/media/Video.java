@@ -1,25 +1,25 @@
 package org.telegram.telegrise.core.elements.media;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaBotMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaVideo;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.types.MediaSize;
 
 import java.util.List;
 
-@Element(name = "photo")
-@Data
-@NoArgsConstructor @AllArgsConstructor
-public class Photo implements MediaType{
+@Element(name="video")
+@Data @NoArgsConstructor
+public class Video implements MediaType, TranscriptionElement {
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
@@ -32,14 +32,31 @@ public class Photo implements MediaType{
     @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
+    @Attribute(name = "duration")
+    private GeneratedValue<Integer> duration;
 
+    @Attribute(name = "size")
+    private GeneratedValue<MediaSize> size;
+
+    @Attribute(name = "thumbnail")
+    private GeneratedValue<InputFile> thumbnail;
+
+    @Attribute(name = "supportsStreaming")
+    private GeneratedValue<Boolean> supportsStreaming;
 
     @Override
     public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
-       return SendPhoto.builder()
+        MediaSize size = this.generateNullableProperty(this.size, pool);
+
+        return SendVideo.builder()
                 .chatId(parent.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
-                .photo(this.createInputFile(pool))
+                .video(this.createInputFile(pool))
+                .duration(generateNullableProperty(duration, pool))
+                .width(size != null ? size.getWidth() : null)
+                .height(size != null ? size.getHeight() : null)
+                .thumb(generateNullableProperty(thumbnail, pool))
+                .supportsStreaming(generateNullableProperty(this.supportsStreaming, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -54,9 +71,15 @@ public class Photo implements MediaType{
 
     @Override
     public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
-        InputMediaPhoto mediaPhoto = new InputMediaPhoto();
-        mediaPhoto.setHasSpoiler(generateNullableProperty(this.spoiler, pool));
+        MediaSize size = this.generateNullableProperty(this.size, pool);
+        InputMediaVideo mediaVideo = new InputMediaVideo();
+        mediaVideo.setDuration(generateNullableProperty(duration, pool));
+        mediaVideo.setWidth(size != null ? size.getWidth() : null);
+        mediaVideo.setHeight(size != null ? size.getHeight() : null);
+        mediaVideo.setThumb(generateNullableProperty(thumbnail, pool));
+        mediaVideo.setSupportsStreaming(generateNullableProperty(this.supportsStreaming, pool));
+        mediaVideo.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);
 
-        return List.of(this.createInputMedia(mediaPhoto, pool));
+        return List.of(this.createInputMedia(mediaVideo, pool));
     }
 }

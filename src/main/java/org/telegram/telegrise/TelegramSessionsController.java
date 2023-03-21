@@ -64,7 +64,7 @@ public class TelegramSessionsController {
 
     //TODO custom session loader
     public void loadSession(SessionMemory memory){
-        if (!(memory instanceof SessionMemoryImpl))  //FIXME
+        if (!(memory instanceof SessionMemoryImpl))
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
         SessionMemoryImpl sessionMemory = (SessionMemoryImpl) memory;

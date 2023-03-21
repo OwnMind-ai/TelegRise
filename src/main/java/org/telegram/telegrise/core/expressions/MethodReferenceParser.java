@@ -58,7 +58,7 @@ public final class MethodReferenceParser {
     }
 
     private MethodReference parseSingle(@NotNull String part){
-        if (!part.trim().startsWith(Syntax.METHOD_REFERENCE_START))   // TODO Allow ClassName#staticMethod syntax
+        if (!part.trim().startsWith(Syntax.METHOD_REFERENCE_START))
             throw new TranscriptionParsingException("Invalid syntax for method reference", this.node);
 
         String name = part.trim().substring(1);

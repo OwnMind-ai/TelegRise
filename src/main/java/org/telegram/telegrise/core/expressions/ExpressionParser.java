@@ -48,7 +48,7 @@ public class ExpressionParser {
     }
 
     public GeneratedValue<?> parse(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
-        int hashcode = this.calculateHashcode(expression, namespace);  //TODO cleaning unused compiled expressions
+        int hashcode = this.calculateHashcode(expression, namespace);
 
         if (isExpressionExists(hashcode)) {
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
