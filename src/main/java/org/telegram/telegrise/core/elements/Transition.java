@@ -12,19 +12,19 @@ import org.w3c.dom.Node;
 public class Transition implements TranscriptionElement{
     public static final String NEXT = "next";
     public static final String PREVIOUS = "previous";
+    public static final String JUMP = "jump";
+    public static final String LOCAL = "local";
 
     @Attribute(name = "direction", nullable = false)
     private String direction;
 
-    @Attribute(name = "menu")
-    private String menu;
+    @Attribute(name = "target", nullable = false)
+    private String target;
 
     @Override
     public void validate(Node node) {
-        if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS))
-            throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '" + NEXT + "' or '" + PREVIOUS + "'" , node);
-
-        if (!((menu != null && NEXT.equals(direction)) || PREVIOUS.equals(direction)))
-            throw new TranscriptionParsingException("Invalid transition syntax", node);
+        if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP) && !direction.equals(LOCAL))
+            throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '"
+                    + NEXT + "', '" + PREVIOUS + "', '" + LOCAL + "' or '" + JUMP + "'" , node);
     }
 }

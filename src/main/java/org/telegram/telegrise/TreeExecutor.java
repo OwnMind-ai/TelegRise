@@ -101,7 +101,8 @@ public final class TreeExecutor {
         invokeBranch(toInvoke, actions, pool, this.sender);
     }
 
-    private void close(){
+    public void close(){
+        this.currentBranch = null;
         this.closed = true;
     }
 
@@ -118,5 +119,9 @@ public final class TreeExecutor {
         }
 
         return null;
+    }
+
+    public void clearTransition() {
+        this.transition = null;
     }
 }

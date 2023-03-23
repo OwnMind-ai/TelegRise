@@ -16,6 +16,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Branch implements TranscriptionElement{
+    @Attribute(name = "name")
+    private String name;
+
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 

@@ -6,10 +6,12 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -18,12 +20,13 @@ public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
-    private final DefaultAbsSender sender;  //FIXME
+    private final DefaultAbsSender sender;
     private final ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
 
     private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
+    private final TransitionController transitionController;
     @Getter
     private boolean running;
 
@@ -33,6 +36,7 @@ public class UserSession implements Runnable{
         this.transcription = transcription;
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors);
         this.initialize();
     }
 
@@ -47,6 +51,7 @@ public class UserSession implements Runnable{
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
         this.resourceInjector = new ResourceInjector(this.sessionMemory);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors);
         this.initialize();
     }
 
@@ -99,43 +104,15 @@ public class UserSession implements Runnable{
         this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
 
         if (executor.isClosed()){
-            this.treeExecutors.remove(executor);
-            this.sessionMemory.getCurrentBranch().set(null);
+            if (executor.getTransition() != null) {
+                this.transitionController.applyTransition(executor.getTree(), executor.getTransition());
+                executor.clearTransition();
+            } else
+                this.transitionController.removeExecutor(executor);
 
-
-            assert this.sessionMemory.getBranchingElements().getLast().equals(executor.getTree());
-            this.sessionMemory.getBranchingElements().removeLast();
-
-            if (executor.getTransition() != null)
-                this.applyTransition(executor.getTree(), executor.getTransition());
-
-            assert this.sessionMemory.getBranchingElements().getLast() instanceof Menu;
             this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
         } else {
             this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
-        }
-    }
-
-    private void applyTransition(Tree tree, Transition transition) {
-        if (Transition.NEXT.equals(transition.getDirection())){
-            Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(transition.getMenu())).findFirst()
-                    .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find menu '" + transition.getMenu() + "' in tree '" + tree.getName() + "'"));
-
-            this.sessionMemory.getBranchingElements().add(next);
-        } else if (Transition.PREVIOUS.equals(transition.getDirection())) {
-            assert this.sessionMemory.getBranchingElements().getLast() instanceof Menu;
-            this.sessionMemory.getBranchingElements().removeLast();  // Removing menu related to tree
-
-            for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
-                BranchingElement element = it.next();
-
-                if (element instanceof Menu && (transition.getMenu() == null || transition.getMenu().equals(((Menu) element).getName()))){
-                    this.sessionMemory.getBranchingElements().add(element);
-                    return;
-                }
-            }
-
-            throw new TelegRiseRuntimeException("Unable to return to previous menu in tree '" + tree.getName() + "'");
         }
     }
 
