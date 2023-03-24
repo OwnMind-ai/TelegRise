@@ -1,13 +1,13 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +35,9 @@ public final class BotTranscription implements TranscriptionElement {
 
     @InnerElement(priority = 10)
     private HeadBlock head;
+
+    @EqualsAndHashCode.Exclude
+    private TranscriptionMemory memory;
 
     public SetMyCommands getSetCommands(BotCommandScope scope){
         return new SetMyCommands(this.rootMenu.getTrees().stream()

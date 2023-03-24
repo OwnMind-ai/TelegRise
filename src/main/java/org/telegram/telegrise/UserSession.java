@@ -37,7 +37,7 @@ public class UserSession implements Runnable{
         this.transcription = transcription;
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
         this.initialize();
     }
 
@@ -52,7 +52,7 @@ public class UserSession implements Runnable{
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
         this.resourceInjector = new ResourceInjector(this.sessionMemory);
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
         this.initialize();
     }
 

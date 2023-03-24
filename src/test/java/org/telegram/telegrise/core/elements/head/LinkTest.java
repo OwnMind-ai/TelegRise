@@ -23,12 +23,12 @@ class LinkTest {
 
         parser.parse(linkNode);
 
-        Assertions.assertEquals("first", ((Keyboard) parser.getParserMemory().get("first")).getName());
-        Assertions.assertEquals("second", ((Keyboard) parser.getParserMemory().get("second")).getName());
+        Assertions.assertEquals("first", ((Keyboard) parser.getTranscriptionMemory().get("first")).getName());
+        Assertions.assertEquals("second", ((Keyboard) parser.getTranscriptionMemory().get("second")).getName());
 
         Node keyboardNode = toNode("<keyboard byName=\"first\"/>");
 
         Keyboard result = (Keyboard) parser.parse(keyboardNode);
-        assertElements(parser.getParserMemory().get("first"), result, new ResourcePool());
+        assertElements(parser.getTranscriptionMemory().get("first"), result, new ResourcePool());
     }
 }

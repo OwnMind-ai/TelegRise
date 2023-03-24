@@ -22,8 +22,13 @@ public class XMLTranscriptionParser implements TranscriptionParser{
     public BotTranscription parse() throws Exception {
         this.processInstructions(XMLUtils.getInstructions(document));
 
-        return (BotTranscription) elementsParser.parse(document.getElementsByTagName(
+        BotTranscription result = (BotTranscription) elementsParser.parse(document.getElementsByTagName(
                     BotTranscription.class.getAnnotation(Element.class).name()).item(0));
+
+        this.elementsParser.getTranscriptionMemory().setReadOnly();
+        result.setMemory(this.elementsParser.getTranscriptionMemory());
+
+        return result;
     }
 
     private void processInstructions(Node[] instructions){

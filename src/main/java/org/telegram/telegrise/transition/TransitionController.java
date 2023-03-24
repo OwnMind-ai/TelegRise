@@ -7,6 +7,7 @@ import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 
 import java.util.Deque;
 import java.util.Iterator;
@@ -14,10 +15,12 @@ import java.util.Iterator;
 public class TransitionController {
     public final SessionMemoryImpl sessionMemory;
     public final Deque<TreeExecutor> treeExecutors;
+    public final TranscriptionMemory transcriptionMemory;
 
-    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors) {
+    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory) {
         this.sessionMemory = sessionMemory;
         this.treeExecutors = treeExecutors;
+        this.transcriptionMemory = transcriptionMemory;
     }
 
     public void applyTransition(Tree tree, Transition transition){
@@ -53,9 +56,8 @@ public class TransitionController {
     }
 
     private void applyJump(Tree tree, Transition transition) {
-        BranchingElement requested = ((Menu) this.sessionMemory.getBranchingElements().getFirst()).getTrees().stream()
-                .filter(e -> e.getName().equals(transition.getTarget())).findFirst()
-                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find an element called '" + transition.getTarget() + "'"));
+        BranchingElement requested = this.transcriptionMemory.get(transition.getTarget(), BranchingElement.class, Transition.TYPE_LIST);
+        if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + transition.getTarget() + "'");
 
         this.sessionMemory.getBranchingElements().add(requested);
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested));

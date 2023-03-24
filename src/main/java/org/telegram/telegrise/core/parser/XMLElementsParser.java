@@ -9,6 +9,7 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
 import org.w3c.dom.Node;
@@ -34,7 +35,7 @@ public class XMLElementsParser {
     @Setter
     private LocalNamespace namespace;
     @Getter
-    private final ParserMemory parserMemory = new ParserMemory();
+    private final TranscriptionMemory transcriptionMemory = new TranscriptionMemory();
     @Getter
     private final File rootDirectory;
 
@@ -68,7 +69,7 @@ public class XMLElementsParser {
         final Map<Class<?>, Object> resourcesMap = Map.of(
                 Node.class, node,
                 LocalNamespace.class, this.namespace,
-                ParserMemory.class, this.parserMemory,
+                TranscriptionMemory.class, this.transcriptionMemory,
                 XMLElementsParser.class, this
         );
 
@@ -98,8 +99,11 @@ public class XMLElementsParser {
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
                 .forEach(f -> this.parseInnerElement(node, f, instance));
 
+        // ORDER MATTERS:
         instance.validate(node);
-        instance.load(parserMemory);
+        instance.load(transcriptionMemory);
+        if (instance instanceof StorableElement)
+            ((StorableElement) instance).store(transcriptionMemory);
 
         LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
         if (newNamespace != null)

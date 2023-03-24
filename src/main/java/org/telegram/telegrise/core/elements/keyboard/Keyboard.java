@@ -44,7 +44,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     }
 
     @Override
-    public void load(ParserMemory memory) {
+    public void load(TranscriptionMemory memory) {
         if (byName != null){
             TranscriptionElement element = memory.get(byName);
 
@@ -58,14 +58,13 @@ public class Keyboard implements StorableElement, TranscriptionElement {
             this.name = original.getName();
             this.type = original.getType();
             this.rows = original.getRows();
-            this.byName = null;
         }
     }
 
     @Override
-    public void store(ParserMemory memory) {
-        assert name != null : "Unable to store keyboard without name";
-        memory.put(name, this);
+    public void store(TranscriptionMemory memory) {
+         if (name != null && byName == null)
+            memory.put(name, this);
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){

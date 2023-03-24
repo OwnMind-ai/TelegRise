@@ -90,8 +90,9 @@ public final class TreeExecutor {
             this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
 
             this.currentBranch = previous;
-        } else if(previous == null && this.tree.getDefaultBranch() != null) {
-            this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
+        } else if(previous == null) {
+            if (this.tree.getDefaultBranch() != null)
+                this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
             this.close();
         }
