@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.transition.JumpPoint;
 
 import java.io.Serializable;
 import java.util.*;
@@ -24,6 +25,8 @@ public class SessionMemoryImpl implements SessionMemory {
     private final AtomicReference<Branch> currentBranch = new AtomicReference<>();
     @Getter
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
+    @Getter
+    private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
 
     public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier) {
         this.transcriptionHashcode = transcriptionHashcode;
@@ -82,5 +85,11 @@ public class SessionMemoryImpl implements SessionMemory {
         }
 
         return new String[]{};
+    }
+
+    public void updateJumpPoints(){
+        this.jumpPoints.forEach(p -> {
+            if (!this.branchingElements.contains(p.getTo())) this.jumpPoints.remove(p);
+        });
     }
 }

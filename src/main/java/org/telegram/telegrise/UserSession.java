@@ -10,6 +10,7 @@ import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.transition.TransitionController;
 
 import java.util.Deque;
 import java.util.Queue;
@@ -93,7 +94,7 @@ public class UserSession implements Runnable{
             this.executeBranchingElement(tree, update);
         } else if (menu.getDefaultBranch() != null){
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
-                    this.createResourcePool(update), sender);  //FIXME use universal chat getter to avoid mistype errors
+                    this.createResourcePool(update), sender);
         }
     }
 
@@ -109,6 +110,10 @@ public class UserSession implements Runnable{
                 executor.clearTransition();
             } else
                 this.transitionController.removeExecutor(executor);
+
+            BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
+            if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
+                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender));
 
             this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
         } else {
