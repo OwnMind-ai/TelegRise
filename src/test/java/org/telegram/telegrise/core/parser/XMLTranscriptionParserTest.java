@@ -77,6 +77,7 @@ public class XMLTranscriptionParserTest {
         Keyboard keyboard = new Keyboard();
         keyboard.setName("first");
         keyboard.setType("inline");
+        keyboard.setByName(keyboard.getName());
 
         keyboard.setRows(List.of(
                 new Row(List.of(new Button("First", "first"))),

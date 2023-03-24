@@ -31,6 +31,9 @@ public class Transition implements TranscriptionElement{
     @Attribute(name = "type")
     private String type;
 
+    @Attribute(name = "execute")
+    private boolean execute;
+
     @Override
     public void validate(Node node) {
         if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP)

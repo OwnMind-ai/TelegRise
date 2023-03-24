@@ -221,6 +221,7 @@ public class XMLElementsParser {
             PropertyUtils.setSimpleProperty(to, field.getName(),
                     field.getType().equals(GeneratedValue.class) ? ExpressionFactory.createExpression(attribute.getNodeValue(),
                             ReflectionUtils.getRawGenericType(field), node, namespace)
+                            : field.getType().equals(boolean.class) || field.getType().equals(Boolean.class) ? Boolean.parseBoolean(attribute.getNodeValue())
                             : attribute.getNodeValue()
             );
     }

@@ -106,8 +106,10 @@ public class UserSession implements Runnable{
 
         if (executor.isClosed()){
             if (executor.getTransition() != null) {
-                this.transitionController.applyTransition(executor.getTree(), executor.getTransition());
+                boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getTransition(), this.createResourcePool(update));
                 executor.clearTransition();
+
+                if (interrupted) return;
             } else
                 this.transitionController.removeExecutor(executor);
 

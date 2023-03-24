@@ -1,6 +1,7 @@
 package org.telegram.telegrise;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -54,8 +55,9 @@ public final class TreeExecutor {
     private final Object handlerInstance;
     @Getter
     private final Tree tree;
-    private final DefaultAbsSender sender;
     @Getter
+    private final DefaultAbsSender sender;
+    @Getter @Setter
     private Branch currentBranch;
     @Getter
     private boolean closed;
@@ -70,6 +72,7 @@ public final class TreeExecutor {
     }
 
     public void update(Update update){
+        this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
         ResourcePool resourcePool = new ResourcePool(update, handlerInstance);
 

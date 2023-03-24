@@ -3,14 +3,13 @@ package org.telegram.telegrise.transition;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.TreeExecutor;
-import org.telegram.telegrise.core.elements.BranchingElement;
-import org.telegram.telegrise.core.elements.Menu;
-import org.telegram.telegrise.core.elements.Transition;
-import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 public class TransitionController {
     public final SessionMemoryImpl sessionMemory;
@@ -23,13 +22,13 @@ public class TransitionController {
         this.transcriptionMemory = transcriptionMemory;
     }
 
-    public void applyTransition(Tree tree, Transition transition){
+    public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
         switch (transition.getDirection()){
-            case Transition.NEXT: this.applyNext(tree, transition); break;
-            case Transition.PREVIOUS: this.applyPrevious(transition); break;
-            case Transition.JUMP: this.applyJump(tree, transition); break;
-            case Transition.LOCAL: this.applyLocal(tree, transition); break;
-            case Transition.CALLER: this.applyCaller(tree, transition); break;
+            case Transition.NEXT: this.applyNext(tree, transition); return false;
+            case Transition.PREVIOUS: this.applyPrevious(transition); return false;
+            case Transition.JUMP: this.applyJump(tree, transition); return false;
+            case Transition.LOCAL: this.applyLocal(tree, transition, pool); return true;   // INTERRUPTING
+            case Transition.CALLER: this.applyCaller(tree, transition); return false;
             default: throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
         }
     }
@@ -41,7 +40,7 @@ public class TransitionController {
         if (point == null)
             throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'");
 
-        this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null));
+        this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false));
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
         if (transition.getType().equals(Transition.MENU_TYPE)){
@@ -52,7 +51,16 @@ public class TransitionController {
         }
     }
 
-    private void applyLocal(Tree tree, Transition transition) {
+    private void applyLocal(Tree tree, Transition transition, ResourcePool pool) {
+        TreeExecutor last = this.treeExecutors.getLast();
+        assert last.getTree().getName().equals(tree.getName());
+
+        Branch next = this.transcriptionMemory.get(transition.getTarget(), Branch.class, List.of("branch"));
+        last.setCurrentBranch(next);
+
+        if (transition.isExecute()){
+            TreeExecutor.invokeBranch(next.getToInvoke(), next.getActions(), pool, last.getSender());
+        }
     }
 
     private void applyJump(Tree tree, Transition transition) {
