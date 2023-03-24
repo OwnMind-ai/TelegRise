@@ -2,24 +2,22 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaBotMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrambots.meta.api.objects.media.InputMediaVideo;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaAudio;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.types.MediaSize;
 
 import java.util.List;
 
-@Element(name = "video")
+@Element(name = "audio")
 @Data @NoArgsConstructor
-public class Video implements MediaType, TranscriptionElement {
+public class Audio implements MediaType{
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
@@ -29,34 +27,24 @@ public class Video implements MediaType, TranscriptionElement {
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
-    @Attribute(name = "spoiler")
-    private GeneratedValue<Boolean> spoiler;
-
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
-    @Attribute(name = "size")
-    private GeneratedValue<MediaSize> size;
+    @Attribute(name = "title")
+    private GeneratedValue<String> title;
 
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
-    @Attribute(name = "supportsStreaming")
-    private GeneratedValue<Boolean> supportsStreaming;
-
     @Override
     public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
-        MediaSize size = this.generateNullableProperty(this.size, pool);
-
-        return SendVideo.builder()
+        return SendAudio.builder()
                 .chatId(parent.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
-                .video(this.createInputFile(pool))
+                .audio(this.createInputFile(pool))
                 .duration(generateNullableProperty(duration, pool))
-                .width(size != null ? size.getWidth() : null)
-                .height(size != null ? size.getHeight() : null)
                 .thumb(generateNullableProperty(thumbnail, pool))
-                .supportsStreaming(generateNullableProperty(this.supportsStreaming, pool))
+                .title(generateNullableProperty(title, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -64,22 +52,17 @@ public class Video implements MediaType, TranscriptionElement {
                 .captionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), List.of(), pool) : List.of())
                 .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
                 .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
-                .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
                 .replyMarkup(parent.createKeyboard(pool))
                 .build();
     }
 
     @Override
     public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
-        MediaSize size = this.generateNullableProperty(this.size, pool);
-        InputMediaVideo mediaVideo = new InputMediaVideo();
-        mediaVideo.setDuration(generateNullableProperty(duration, pool));
-        mediaVideo.setWidth(size != null ? size.getWidth() : null);
-        mediaVideo.setHeight(size != null ? size.getHeight() : null);
-        mediaVideo.setThumb(generateNullableProperty(thumbnail, pool));
-        mediaVideo.setSupportsStreaming(generateNullableProperty(this.supportsStreaming, pool));
-        mediaVideo.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);
+        InputMediaAudio mediaAudio = new InputMediaAudio();
+        mediaAudio.setDuration(generateNullableProperty(duration, pool));
+        mediaAudio.setThumb(generateNullableProperty(thumbnail, pool));
+        mediaAudio.setTitle(generateNullableProperty(title, pool));
 
-        return List.of(this.createInputMedia(mediaVideo, pool));
+        return List.of(this.createInputMedia(mediaAudio, pool));
     }
 }
