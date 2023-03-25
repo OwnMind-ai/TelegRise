@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.send.SendMediaBotMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -45,7 +45,7 @@ public class Video implements MediaType, TranscriptionElement {
     private GeneratedValue<Boolean> supportsStreaming;
 
     @Override
-    public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
+    public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
 
         return SendVideo.builder()

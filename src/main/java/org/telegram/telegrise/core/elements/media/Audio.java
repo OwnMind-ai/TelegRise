@@ -2,8 +2,8 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
-import org.telegram.telegrambots.meta.api.methods.send.SendMediaBotMethod;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaAudio;
@@ -37,7 +37,7 @@ public class Audio implements MediaType{
     private GeneratedValue<InputFile> thumbnail;
 
     @Override
-    public SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool) {
+    public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         return SendAudio.builder()
                 .chatId(parent.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
