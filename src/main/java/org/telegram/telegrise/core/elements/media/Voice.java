@@ -51,4 +51,9 @@ public class Voice implements MediaType{
     public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
         return null;
     }
+
+    @Override
+    public boolean isGroupable() {
+        return false;
+    }
 }

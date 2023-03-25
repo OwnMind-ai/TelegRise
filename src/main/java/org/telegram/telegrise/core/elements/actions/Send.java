@@ -13,9 +13,11 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
-import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +53,12 @@ public class Send implements ActionElement{
 
     @InnerElement
     private Keyboard keyboard;
+
+    @Override
+    public void validate(Node node) {
+        if (!this.medias.stream().allMatch(MediaType::isGroupable))
+            throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
+    }
 
     public long generateChatId(ResourcePool pool){
         return chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();

@@ -15,6 +15,10 @@ public interface MediaType extends TranscriptionElement {
     SendMediaBotMethod<?> createSender(Send parent, ResourcePool pool);
     List<InputMedia> createInputMedia(Send parent, ResourcePool pool);
 
+    default boolean isGroupable() {
+        return true;
+    }
+
     GeneratedValue<String> getFileId();
     GeneratedValue<String> getUrl();
     GeneratedValue<InputFile> getInputFile();
