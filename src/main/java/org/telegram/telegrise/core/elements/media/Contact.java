@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements.media;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendVideoNote;
+import org.telegram.telegrambots.meta.api.methods.send.SendContact;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -14,36 +14,28 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
-@Element(name = "videoNote")
+@Element(name = "contact")
 @Data @NoArgsConstructor
-public class VideoNote implements MediaType{
-    @Attribute(name = "fileId")
-    private GeneratedValue<String> fileId;
+public class Contact implements MediaType {
+    @Attribute(name = "phoneNumber")
+    private GeneratedValue<String> phoneNumber;
 
-    @Attribute(name = "url")
-    private GeneratedValue<String> url;
+    @Attribute(name = "firstName")
+    private GeneratedValue<String> firstName;
 
-    @Attribute(name = "inputFile")
-    private GeneratedValue<InputFile> inputFile;
+    @Attribute(name = "lastName")
+    private GeneratedValue<String> lastName;
 
-    @Attribute(name = "duration")
-    private GeneratedValue<Integer> duration;
-
-    @Attribute(name = "length")
-    private GeneratedValue<Integer> length;
-
-    @Attribute(name = "thumbnail")
-    private GeneratedValue<InputFile> thumbnail;
+    @Attribute(name = "vcard")
+    private GeneratedValue<String> vcard;
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
-        return SendVideoNote.builder()
-                .chatId(parent.generateChatId(pool))
-                .messageThreadId(generateNullableProperty(parent.getMessageThreadId(), pool))
-                .videoNote(this.createInputFile(pool))
-                .duration(generateNullableProperty(duration, pool))
-                .length(generateNullableProperty(length, pool))
-                .thumb(generateNullableProperty(thumbnail, pool))
+        return SendContact.builder()
+                .phoneNumber(generateNullableProperty(phoneNumber, pool))
+                .firstName(generateNullableProperty(firstName, pool))
+                .lastName(generateNullableProperty(lastName, pool))
+                .vCard(generateNullableProperty(vcard, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -60,5 +52,20 @@ public class VideoNote implements MediaType{
     @Override
     public boolean isGroupable() {
         return false;
+    }
+
+    @Override
+    public GeneratedValue<String> getFileId() {
+        return null;
+    }
+
+    @Override
+    public GeneratedValue<String> getUrl() {
+        return null;
+    }
+
+    @Override
+    public GeneratedValue<InputFile> getInputFile() {
+        return null;
     }
 }

@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements.media;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendVideoNote;
+import org.telegram.telegrambots.meta.api.methods.send.SendDice;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -14,36 +14,16 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
-@Element(name = "videoNote")
+@Element(name = "dice")
 @Data @NoArgsConstructor
-public class VideoNote implements MediaType{
-    @Attribute(name = "fileId")
-    private GeneratedValue<String> fileId;
-
-    @Attribute(name = "url")
-    private GeneratedValue<String> url;
-
-    @Attribute(name = "inputFile")
-    private GeneratedValue<InputFile> inputFile;
-
-    @Attribute(name = "duration")
-    private GeneratedValue<Integer> duration;
-
-    @Attribute(name = "length")
-    private GeneratedValue<Integer> length;
-
-    @Attribute(name = "thumbnail")
-    private GeneratedValue<InputFile> thumbnail;
+public class Dice implements MediaType{
+    @Attribute(name = "emoji")
+    private GeneratedValue<String> emoji;
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
-        return SendVideoNote.builder()
-                .chatId(parent.generateChatId(pool))
-                .messageThreadId(generateNullableProperty(parent.getMessageThreadId(), pool))
-                .videoNote(this.createInputFile(pool))
-                .duration(generateNullableProperty(duration, pool))
-                .length(generateNullableProperty(length, pool))
-                .thumb(generateNullableProperty(thumbnail, pool))
+        return SendDice.builder()
+                .emoji(generateNullableProperty(emoji, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -60,5 +40,20 @@ public class VideoNote implements MediaType{
     @Override
     public boolean isGroupable() {
         return false;
+    }
+
+    @Override
+    public GeneratedValue<String> getFileId() {
+        return null;
+    }
+
+    @Override
+    public GeneratedValue<String> getUrl() {
+        return null;
+    }
+
+    @Override
+    public GeneratedValue<InputFile> getInputFile() {
+        return null;
     }
 }
