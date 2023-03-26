@@ -36,6 +36,8 @@ public class UniversalSender {
 
 
     public <T extends Serializable> T execute(PartialBotApiMethod<T> method, DefaultAbsSender sender, Class<T> tClass) throws TelegramApiException {
+        if (method == null) return null;
+
         if (method instanceof BotApiMethod)
             return sender.execute((BotApiMethod<T>) method);
 

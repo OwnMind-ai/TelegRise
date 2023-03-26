@@ -104,20 +104,25 @@ public class ExpressionParser {
         source.addInterface(GeneratedValue.class.getSimpleName() + '<' + returnType.getSimpleName() + '>');
 
         String safeExpression = returnType.equals(String.class) ? "String.valueOf(" + expression + ")" : expression;
+        StringBuilder builder = new StringBuilder(namespace.getResourceInitializationCode("pool"));
+        builder.append("try{\n");
+        if (returnType.equals(Void.class))
+            builder.append(safeExpression).append(";\nreturn null;");
+        else
+            builder.append("return ").append(safeExpression).append(";");
+        builder.append("} catch(Exception e){ throw new RuntimeException(e); }");
+
         MethodSource<JavaClassSource> method = source.addMethod()
                 .setPublic()
                 .setName(GeneratedValue.ABSTRACT_METHOD_NAME)
                 .setParameters(ResourcePool.class.getSimpleName() + " pool")
-                .setBody(namespace.getResourceInitializationCode("pool") + "return " + safeExpression + ";");
+                .setBody(builder.toString());
 
         for (Class<?> imported : namespace.getApplicationNamespace().getImportedClasses())
             if (source.requiresImport(imported))
                 source.addImport(imported);
 
-        if (returnType.equals(Void.class))
-            method.setReturnTypeVoid();
-        else
-            method.setReturnType(returnType);
+        method.setReturnType(returnType);
 
         return source;
     }
