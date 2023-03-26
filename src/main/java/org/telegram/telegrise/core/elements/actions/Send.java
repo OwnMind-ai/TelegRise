@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
@@ -20,7 +19,6 @@ import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,9 +58,6 @@ public class Send implements ActionElement{
             throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
     }
 
-    public long generateChatId(ResourcePool pool){
-        return chatId != null ? chatId.generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
-    }
 
     public ReplyKeyboard createKeyboard(ResourcePool pool){
         return this.keyboard != null ? this.keyboard.createMarkup(pool) : null;
