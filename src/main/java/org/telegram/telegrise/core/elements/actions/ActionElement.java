@@ -12,7 +12,7 @@ public interface ActionElement extends TranscriptionElement {
     PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool);
     GeneratedValue<Long> getChatId();
 
-    default long generateChatId(ResourcePool pool){
+    default Long generateChatId(ResourcePool pool){
         return getChatId() != null ? getChatId().generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
     }
 

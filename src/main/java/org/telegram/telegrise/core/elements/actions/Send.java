@@ -68,7 +68,7 @@ public class Send implements ActionElement{
         if (medias.size() == 1){
             return this.medias.get(0).createSender(this, pool);
         } else if (medias.size() > 1) {
-            List<InputMedia> first = this.medias.get(0).createInputMedia(this, pool);
+            List<InputMedia> first = this.medias.get(0).createInputMedia(pool);
             assert first.size() > 0;
 
             if (this.text != null){
@@ -84,7 +84,7 @@ public class Send implements ActionElement{
                             Stream.concat(
                                     first.stream(),
                                     this.medias.subList(1, this.medias.size()).stream()
-                                            .flatMap(m -> m.createInputMedia(this, pool).stream())
+                                            .flatMap(m -> m.createInputMedia(pool).stream())
                             ).collect(Collectors.toList())
                     )
                     .disableNotification( generateNullableProperty(disableNotification, pool))
@@ -98,13 +98,13 @@ public class Send implements ActionElement{
                 .chatId(this.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(messageThreadId, pool))
                 .text(text.getText().generate(pool))
+                .parseMode(generateNullableProperty(text.getParseMode(), pool))
+                .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))
                 .disableNotification( generateNullableProperty(disableNotification, pool))
                 .protectContent( generateNullableProperty(protectContent, pool))
                 .replyToMessageId( generateNullableProperty(replyTo, pool))
                 .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
-                .parseMode(generateNullableProperty(text.getParseMode(), pool))
-                .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .replyMarkup(createKeyboard(pool))
                 .build();
     }

@@ -65,7 +65,7 @@ public class Animation implements MediaType{
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
         InputMediaAnimation mediaAnimation = new InputMediaAnimation();
         mediaAnimation.setDuration(generateNullableProperty(duration, pool));

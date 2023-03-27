@@ -70,7 +70,7 @@ public class Video implements MediaType, TranscriptionElement {
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
         InputMediaVideo mediaVideo = new InputMediaVideo();
         mediaVideo.setDuration(generateNullableProperty(duration, pool));

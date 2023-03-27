@@ -57,7 +57,7 @@ public class Audio implements MediaType{
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         InputMediaAudio mediaAudio = new InputMediaAudio();
         mediaAudio.setDuration(generateNullableProperty(duration, pool));
         mediaAudio.setThumb(generateNullableProperty(thumbnail, pool));

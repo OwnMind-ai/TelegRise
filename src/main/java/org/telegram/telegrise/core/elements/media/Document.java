@@ -49,7 +49,7 @@ public class Document implements MediaType{
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         InputMediaDocument mediaDocument = new InputMediaDocument();
         mediaDocument.setThumb(generateNullableProperty(thumbnail, pool));
 

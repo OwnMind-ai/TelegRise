@@ -53,7 +53,7 @@ public class Photo implements MediaType{
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         InputMediaPhoto mediaPhoto = new InputMediaPhoto();
         mediaPhoto.setHasSpoiler(generateNullableProperty(this.spoiler, pool));
 

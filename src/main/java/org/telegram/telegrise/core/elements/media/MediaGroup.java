@@ -33,7 +33,7 @@ public class MediaGroup implements MediaType{
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         return inputMedia.generate(pool);
     }
 

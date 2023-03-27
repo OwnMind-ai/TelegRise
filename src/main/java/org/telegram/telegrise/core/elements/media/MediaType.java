@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface MediaType extends TranscriptionElement {
     PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool);
-    List<InputMedia> createInputMedia(Send parent, ResourcePool pool);
+    List<InputMedia> createInputMedia(ResourcePool pool);
 
     default boolean isGroupable() {
         return true;

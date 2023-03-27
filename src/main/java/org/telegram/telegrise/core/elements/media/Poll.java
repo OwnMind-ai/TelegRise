@@ -67,7 +67,7 @@ public class Poll implements MediaType {
     }
 
     @Override
-    public List<InputMedia> createInputMedia(Send parent, ResourcePool pool) {
+    public List<InputMedia> createInputMedia(ResourcePool pool) {
         return null;
     }
 
