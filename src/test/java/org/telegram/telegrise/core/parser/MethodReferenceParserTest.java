@@ -19,7 +19,7 @@ class MethodReferenceParserTest {
         var instance = new MethodReferenceParserTest();
         GeneratedValue<String> result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", instance.getClass(), node)[0].toGeneratedValue(String.class, node);
 
-        assertEquals("144.0", result.generate(new ResourcePool(new Update(), instance)));
+        assertEquals("144.0", result.generate(new ResourcePool(new Update(), instance, null)));
     }
 
     @SuppressWarnings("unused")
