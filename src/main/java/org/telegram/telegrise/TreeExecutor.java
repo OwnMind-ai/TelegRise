@@ -74,7 +74,7 @@ public final class TreeExecutor {
     public void update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, handlerInstance);
+        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);

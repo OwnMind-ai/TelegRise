@@ -126,7 +126,8 @@ public class UserSession implements Runnable{
     private ResourcePool createResourcePool(Update update) {
         return new ResourcePool(
                 update,
-                this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getHandlerInstance()
+                this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getHandlerInstance(),
+                this.sender
         );
     }
 

@@ -16,6 +16,8 @@ public final class ApplicationNamespace {
     private String updateName = "update";
     @Setter @Getter
     private String handlerName = "handler";   //TODO try to make it "this" by default
+    @Setter @Getter
+    private String senderName = "sender";
 
     public ApplicationNamespace(ClassLoader applicationClassloader) {
         this.applicationClassloader = applicationClassloader;
