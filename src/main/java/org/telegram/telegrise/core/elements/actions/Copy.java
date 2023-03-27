@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
@@ -43,6 +44,9 @@ public class Copy implements ActionElement{
     private Text caption;
     @InnerElement
     private Keyboard keyboard;
+
+    @Attribute(name = "returnConsumer")
+    private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool pool) {

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
@@ -56,6 +57,9 @@ public class Edit implements ActionElement{
     private MediaType media;
     @InnerElement
     private Location location;
+
+    @Attribute(name = "returnConsumer")
+    private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
     public void validate(Node node) {

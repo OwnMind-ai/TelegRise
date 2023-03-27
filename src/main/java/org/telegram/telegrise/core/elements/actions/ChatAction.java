@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
+import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
@@ -20,6 +21,9 @@ public class ChatAction implements ActionElement{
 
     @Attribute(name = "action", nullable = false)
     private GeneratedValue<String> action;
+
+    @Attribute(name = "returnConsumer")
+    private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {

@@ -4,6 +4,8 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.actions.ActionElement;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +22,15 @@ public class UniversalSender {
     public static <T extends Serializable> T execute(DefaultAbsSender sender, PartialBotApiMethod<T> method, Class<T> tClass) throws TelegramApiException {
         return instance.execute(method, sender, tClass);
     }
+
+    public static void execute(DefaultAbsSender sender, ActionElement action, ResourcePool pool) throws TelegramApiException {
+        PartialBotApiMethod<?> method = action.generateMethod(pool);
+        Object result = instance.execute(method, sender, null);
+
+        if (action.getReturnConsumer() != null && result != null)
+            action.getConsumer(pool).consume(result);
+    }
+
 
     private static final String METHOD_NAME = "execute";
     private final Map<String, Method> methods = new HashMap<>();

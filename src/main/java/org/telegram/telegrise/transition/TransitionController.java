@@ -59,7 +59,7 @@ public class TransitionController {
         last.setCurrentBranch(next);
 
         if (transition.isExecute()){
-            TreeExecutor.invokeBranch(next.getToInvoke(), next.getActions(), pool, last.getSender());
+            TreeExecutor.invokeBranch(next.getToInvoke(), next.getActions(), pool,  last.getSender());
         }
     }
 
