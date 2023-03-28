@@ -18,6 +18,8 @@ public final class ApplicationNamespace {
     private String handlerName = "handler";   //TODO try to make it "this" by default
     @Setter @Getter
     private String senderName = "sender";
+    @Setter @Getter
+    private String memoryName = "memory";
 
     public ApplicationNamespace(ClassLoader applicationClassloader) {
         this.applicationClassloader = applicationClassloader;
@@ -33,10 +35,6 @@ public final class ApplicationNamespace {
             name = name.substring(name.lastIndexOf('.'));
 
         return this.importedClasses.get(name);
-    }
-
-    public LocalNamespace localNamespaceForClass(String classname){
-        return new LocalNamespace(this.getClass(classname), this);
     }
 
     public LocalNamespace emptyLocal(){
