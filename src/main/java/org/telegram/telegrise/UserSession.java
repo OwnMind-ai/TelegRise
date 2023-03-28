@@ -87,7 +87,7 @@ public class UserSession implements Runnable{
         Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
 
         if (tree != null){
-            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender);
+            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory);
             this.treeExecutors.add(executor);
             this.sessionMemory.getBranchingElements().add(tree);
 
@@ -115,7 +115,7 @@ public class UserSession implements Runnable{
 
             BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
             if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
-                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender));
+                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory));
 
             this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
         } else {
@@ -127,7 +127,8 @@ public class UserSession implements Runnable{
         return new ResourcePool(
                 update,
                 this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getHandlerInstance(),
-                this.sender
+                this.sender,
+                this.sessionMemory
         );
     }
 

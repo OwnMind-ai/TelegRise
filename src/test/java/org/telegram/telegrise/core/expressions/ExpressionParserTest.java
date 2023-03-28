@@ -21,7 +21,7 @@ public class ExpressionParserTest {
         ExpressionParser parser = new ExpressionParser(ExpressionParser.getTempDirectory());
         String expression = "handler.getData(update.getCallbackQuery())";
         LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader()));
-        ResourcePool resourcePool = new ResourcePool(new Update(), this, null);
+        ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));
 
         assertEquals("data", parser.parse(expression, namespace, String.class, toNode("<tag expression=\"${" + expression + "}\"/>")).generate(resourcePool));

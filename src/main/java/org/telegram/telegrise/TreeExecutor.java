@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class TreeExecutor {
-    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender) {
+    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemory memory) {
         try {
             Object handler = null;
             if (tree.getHandler() != null) {
@@ -26,7 +26,7 @@ public final class TreeExecutor {
                 resourceInjector.injectResources(handler);
             }
 
-            return new TreeExecutor(handler, tree, sender);
+            return new TreeExecutor(memory, handler, tree, sender);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             String startMessage = "Cannot create instance of '" + tree.getHandler().getSimpleName() + "': ";
 
@@ -50,6 +50,8 @@ public final class TreeExecutor {
                     });
     }
 
+    private final SessionMemory memory;
+
     @Getter
     private final Object handlerInstance;
     @Getter
@@ -64,7 +66,8 @@ public final class TreeExecutor {
     @Getter
     private Transition transition;
 
-    public TreeExecutor(Object handlerInstance, Tree tree, DefaultAbsSender sender) {
+    public TreeExecutor(SessionMemory memory, Object handlerInstance, Tree tree, DefaultAbsSender sender) {
+        this.memory = memory;
         this.handlerInstance = handlerInstance;
         this.tree = tree;
         this.sender = sender;
@@ -73,7 +76,7 @@ public final class TreeExecutor {
     public void update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender);
+        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender, this.memory);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);

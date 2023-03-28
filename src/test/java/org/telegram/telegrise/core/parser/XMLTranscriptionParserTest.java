@@ -120,7 +120,7 @@ public class XMLTranscriptionParserTest {
         transcription.setToken("token");
         transcription.setRootMenu(expectedMenu);
 
-        assertElements(transcription, this.transcription, new ResourcePool(update, this, null));
+        assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null));
     }
 
     @Reference

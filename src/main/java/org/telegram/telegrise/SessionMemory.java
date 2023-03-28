@@ -8,6 +8,8 @@ public interface SessionMemory extends Serializable {
 
     void put(String key, Serializable value);
 
+    boolean containsKey(String key);
+
     Serializable get(String key);
 
     <T extends Serializable> T get(String key, Class<T> tClass);

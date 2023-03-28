@@ -44,6 +44,11 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
+    public boolean containsKey(String key) {
+        return this.memory.containsKey(key);
+    }
+
+    @Override
     public Serializable get(String key){
         return this.memory.get(key);
     }

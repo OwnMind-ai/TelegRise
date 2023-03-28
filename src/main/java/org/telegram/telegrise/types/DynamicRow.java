@@ -1,30 +1,35 @@
-package org.telegram.telegrise.core.elements.keyboard;
+package org.telegram.telegrise.types;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.elements.keyboard.Row;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Element(name = "row")
-@Data @NoArgsConstructor
-public class Row implements TranscriptionElement {
-    @InnerElement(nullable = false)
-    private List<Button> buttons;
+@Data
+public class DynamicRow implements Serializable {
 
-    @Attribute(name = "when")
-    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+    public static DynamicRow ofRow(Row row){
+        return new DynamicRow(row.getButtons().stream().map(DynamicButton::ofButton).collect(Collectors.toList()), row.getWhen());
+    }
 
-    public Row(List<Button> buttons){
-        this.buttons = buttons;
+    private final List<DynamicButton> buttons;
+    private GeneratedValue<Boolean> when;
+
+    public DynamicRow(GeneratedValue<Boolean> when) {
+        this.when = when;
+        this.buttons = new ArrayList<>();
+    }
+
+    public DynamicRow(List<DynamicButton> buttons, GeneratedValue<Boolean> when){
+        this.buttons = new ArrayList<>(buttons);
+        this.when = when;
     }
 
     public KeyboardRow createKeyboardRow(ResourcePool pool){

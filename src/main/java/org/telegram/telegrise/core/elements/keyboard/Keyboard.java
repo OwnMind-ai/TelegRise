@@ -5,12 +5,14 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.types.DynamicKeyboard;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -31,6 +33,12 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @Attribute(name = "name")
     private String name;
 
+    @Attribute(name = "dynamic")
+    private boolean dynamic;
+
+    @Attribute(name = "id")
+    private String id;
+
     @Attribute(name = "create")
     private GeneratedValue<ReplyKeyboard> create;
 
@@ -41,6 +49,12 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     public void validate(Node node) {
         if (!((type != null && rows != null) || byName != null || create != null))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
+
+        if (dynamic && (id == null || id.length() < 1))
+            throw new TranscriptionParsingException("Dynamic keyboard must have an id attribute", node);
+
+        if (dynamic && create != null)
+            throw new TranscriptionParsingException("'create' attribute conflicts with dynamic keyboard declaration", node);
     }
 
     @Override
@@ -68,6 +82,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){
+        if (dynamic)
+            return extractDynamic(pool);
+
         if (this.create != null)
             return this.create.generate(pool);
 
@@ -85,4 +102,26 @@ public class Keyboard implements StorableElement, TranscriptionElement {
         }
     }
 
+    public ReplyKeyboard extractDynamic(ResourcePool pool){
+        assert pool.getMemory() != null : "Unable to create dynamic keyboard: session memory is null";
+        SessionMemory memory = pool.getMemory();
+
+        if (memory.containsKey(this.id)){
+            DynamicKeyboard keyboard = memory.get(this.id, DynamicKeyboard.class);
+
+            switch (type.toLowerCase()) {
+                case INLINE:
+                    return keyboard.createInline(pool);
+                case REPLY:
+                    return keyboard.createReply(pool);
+                default:
+                    throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
+            }
+        } else {
+            DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this);
+            memory.put(this.id, keyboard);
+
+            return this.extractDynamic(pool);
+        }
+    }
 }

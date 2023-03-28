@@ -56,8 +56,10 @@ public class UniversalSender {
             Object result = this.methods.get(method.getClass().getName()).invoke(sender, method);
 
             return tClass != null && tClass.isInstance(result) ? tClass.cast(result) : null;
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getTargetException());
         }
     }
 }
