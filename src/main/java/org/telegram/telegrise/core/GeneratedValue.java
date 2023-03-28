@@ -3,6 +3,7 @@ package org.telegram.telegrise.core;
 import java.io.Serializable;
 import java.util.Objects;
 
+@FunctionalInterface
 public interface GeneratedValue<T> extends Serializable {
     String ABSTRACT_METHOD_NAME = "generate";
 

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Row;
+import org.telegram.telegrise.core.elements.keyboard.Switch;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import java.util.stream.Collectors;
 public class DynamicRow implements Serializable {
 
     public static DynamicRow ofRow(Row row){
-        return new DynamicRow(row.getButtons().stream().map(DynamicButton::ofButton).collect(Collectors.toList()), row.getWhen());
+        return new DynamicRow(row.getButtons().stream()
+                .map(button -> button instanceof Switch ? SwitchButton.ofSwitch((Switch) button) : DynamicButton.ofButton(button))
+                .collect(Collectors.toList()), row.getWhen());
     }
 
     private final List<DynamicButton> buttons;
