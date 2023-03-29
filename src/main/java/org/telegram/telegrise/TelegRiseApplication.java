@@ -1,6 +1,7 @@
 package org.telegram.telegrise;
 
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -38,17 +39,7 @@ public final class TelegRiseApplication {
     }
 
     public void start(){
-        //FIXME
-        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)), transcription.getParentFile());
-        elementsParser.load();
-
-        TelegramSessionsController controller;
-        try {
-            XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
-            controller = new TelegramSessionsController(parser.parse());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        TelegramSessionsController controller = this.createController();
 
         TelegramLongPollingBot bot = BotFactory.createLongPooling(controller.getTranscription(), controller::onUpdateReceived);
         controller.setSender(bot);
@@ -59,5 +50,20 @@ public final class TelegRiseApplication {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @NotNull
+    private TelegramSessionsController createController() {
+        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)), transcription.getParentFile());
+        elementsParser.load();
+
+        TelegramSessionsController controller;
+        try {
+            XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
+            controller = new TelegramSessionsController(parser.parse());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return controller;
     }
 }

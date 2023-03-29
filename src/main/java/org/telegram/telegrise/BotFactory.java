@@ -8,12 +8,7 @@ import java.util.function.Consumer;
 
 public class BotFactory {
     public static TelegramLongPollingBot createLongPooling(BotTranscription transcription, Consumer<Update> updateConsumer){
-        return new TelegramLongPollingBot() {
-            @Override
-            public String getBotToken() {
-                return transcription.getToken();
-            }
-
+        return new TelegramLongPollingBot(transcription.getToken()) {
             @Override
             public void onUpdateReceived(Update update) {
                 updateConsumer.accept(update);

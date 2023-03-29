@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.expressions.ExpressionParser;
 import org.telegram.telegrise.core.expressions.MethodReference;
 import org.telegram.telegrise.core.expressions.MethodReferenceParser;
@@ -36,11 +37,25 @@ public class ExpressionFactory {
         }
 
         if (Number.class.isAssignableFrom(type)) {
+            Number parsed;
             try {
-                return GeneratedValue.ofValue(type.cast(NumberFormat.getInstance().parse(text)));
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+                parsed = NumberFormat.getInstance().parse(text);
+            } catch (ParseException e) { throw new RuntimeException(e); }
+
+            if (type.equals(Integer.class))
+                return GeneratedValue.ofValue(type.cast(parsed.intValue()));
+            else if (type.equals(Long.class))
+                return GeneratedValue.ofValue(type.cast(parsed.longValue()));
+            else if (type.equals(Float.class))
+                return GeneratedValue.ofValue(type.cast(parsed.floatValue()));
+            else if (type.equals(Double.class))
+                return GeneratedValue.ofValue(type.cast(parsed.doubleValue()));
+            else if (type.equals(Short.class))
+                return GeneratedValue.ofValue(type.cast(parsed.shortValue()));
+            else if (type.equals(Byte.class))
+                return GeneratedValue.ofValue(type.cast(parsed.byteValue()));
+            else
+                throw new TelegRiseRuntimeException("Unknown field number type");
         } else if (Boolean.class.isAssignableFrom(type)) {
             if (!text.equals("true") && !text.equals("false"))
                 throw new TranscriptionParsingException("Cannot parse boolean value from '" + text + "'", node);
