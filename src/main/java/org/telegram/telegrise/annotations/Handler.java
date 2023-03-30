@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
-public @interface Reference {
+@Target(ElementType.TYPE)
+public @interface Handler {
+    boolean absolute() default false;
 }

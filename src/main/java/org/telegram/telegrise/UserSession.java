@@ -13,6 +13,8 @@ import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.transition.TransitionController;
 
 import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,6 +30,7 @@ public class UserSession implements Runnable{
 
     private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
     private final TransitionController transitionController;
+    private final PrimaryHandlersController primaryHandlersController;
     @Getter
     private boolean running;
 
@@ -38,6 +41,7 @@ public class UserSession implements Runnable{
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
+        this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
     }
 
@@ -53,6 +57,7 @@ public class UserSession implements Runnable{
 
         this.resourceInjector = new ResourceInjector(this.sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
+        this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
     }
 
@@ -77,6 +82,13 @@ public class UserSession implements Runnable{
     }
 
     private void handleUpdate(Update update) {
+        Optional<PrimaryHandler> candidate = this.primaryHandlersController.getApplicableHandler(update);
+        if (candidate.isPresent()){
+            boolean intercept = this.primaryHandlersController.applyHandler(update, candidate.get());
+
+            if (intercept) return;
+        }
+
         if (this.sessionMemory.isOnStack(Menu.class))
             this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
         else if (this.sessionMemory.isOnStack(Tree.class))
@@ -140,5 +152,9 @@ public class UserSession implements Runnable{
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){
+        classes.forEach(this.primaryHandlersController::add);
     }
 }

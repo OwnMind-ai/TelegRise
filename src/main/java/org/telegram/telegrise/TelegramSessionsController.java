@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.elements.BotTranscription;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -20,9 +21,11 @@ public class TelegramSessionsController {
     private final BotTranscription transcription;
     @Setter
     private DefaultAbsSender sender;
+    private final List<Class<? extends PrimaryHandler>> handlersClasses;
 
-    public TelegramSessionsController(BotTranscription transcription) {
+    public TelegramSessionsController(BotTranscription transcription, List<Class<? extends PrimaryHandler>> handlersClasses) {
         this.transcription = transcription;
+        this.handlersClasses = handlersClasses;
     }
 
     public void initialize(){
@@ -75,6 +78,7 @@ public class TelegramSessionsController {
 
     private void createSession(UserIdentifier identifier) {
         UserSession session = new UserSession(identifier, this.transcription, this.sender);
+        session.addHandlersClasses(this.handlersClasses);
         this.sessions.put(identifier, session);
     }
 

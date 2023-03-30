@@ -13,6 +13,8 @@ import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 //TODO webhooks
 //TODO multiple bots
@@ -22,6 +24,8 @@ public final class TelegRiseApplication {
     private File transcription;
     @Setter
     private ClassLoader classLoader = this.getClass().getClassLoader();
+    private final List<Class<? extends PrimaryHandler>> handlersClasses = new LinkedList<>();
+
     private final TelegramBotsApi api;
 
     {
@@ -60,10 +64,14 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
-            controller = new TelegramSessionsController(parser.parse());
+            controller = new TelegramSessionsController(parser.parse(), this.handlersClasses);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return controller;
+    }
+
+    public void addHandler(Class<? extends PrimaryHandler> handlerClass){
+        this.handlersClasses.add(handlerClass);
     }
 }
