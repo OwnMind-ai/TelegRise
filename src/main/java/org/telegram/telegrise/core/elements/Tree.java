@@ -78,11 +78,9 @@ public class Tree implements BranchingElement{
         } else if (this.callbackTriggers != null && update.hasCallbackQuery() && update.getCallbackQuery().getData() != null){
             return Arrays.stream(this.getCallbackTriggers()).anyMatch(c -> c.equals(update.getCallbackQuery().getData()));
         } else if (update.hasMessage() && !MessageUtils.hasMedia(update.getMessage()) && update.getMessage().getText() != null) {
-            boolean isCommand = update.getMessage().getText().startsWith(Syntax.COMMAND_START);
-
-            if (isCommand && this.commands != null)
+            if (MessageUtils.isCommand(update.getMessage().getText()) && this.commands != null)
                 return Arrays.stream(this.commands)
-                        .anyMatch(c -> c.equals(update.getMessage().getText().substring(1)));
+                        .anyMatch(c -> c.equals(MessageUtils.cleanCommand(update.getMessage().getText())));
             else if (this.keys != null)
                 return Arrays.stream(this.keys)
                         .anyMatch(c -> c.equals(update.getMessage().getText()));

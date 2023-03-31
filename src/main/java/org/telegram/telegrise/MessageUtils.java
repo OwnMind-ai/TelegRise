@@ -5,7 +5,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MessageUtils {
+    private static final Pattern COMMAND_PATTERN = Pattern.compile("^/(\\w*)(?>@.+)?$");
+
     public static boolean hasMedia(Message message){
         return message != null &&
                 (message.hasPhoto() || message.hasVideo() || message.hasDocument() || message.hasAudio() || message.hasAnimation());
@@ -38,5 +43,16 @@ public class MessageUtils {
                 : update.hasEditedChannelPost() ? update.getEditedChannelPost().getChat()
                 : update.hasChatJoinRequest() ? update.getChatJoinRequest().getChat()
                 : null;
+    }
+
+    public static boolean isCommand(String raw){
+        return COMMAND_PATTERN.matcher(raw).matches();
+    }
+
+    public static String cleanCommand(String raw){
+        Matcher matcher = COMMAND_PATTERN.matcher(raw);
+        if (!matcher.find()) throw new UnsupportedOperationException();
+
+        return matcher.group(1);
     }
 }
