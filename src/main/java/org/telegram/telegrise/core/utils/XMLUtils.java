@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,10 +24,12 @@ public class XMLUtils {
 
         NodeList childNodes = node.getChildNodes();
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < childNodes.getLength(); i++)
-            result.append(lsSerializer.writeToString(childNodes.item(i)));
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            String element = lsSerializer.writeToString(childNodes.item(i));
+            Arrays.stream(element.split("\n")).map(String::strip).forEach(str -> result.append(str).append("\n"));
+        }
 
-        return result.toString();
+        return result.toString().trim();
     }
 
     public static Node[] getInstructions(Document element){
