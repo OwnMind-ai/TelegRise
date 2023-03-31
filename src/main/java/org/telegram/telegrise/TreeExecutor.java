@@ -113,6 +113,8 @@ public final class TreeExecutor {
     }
 
     private Branch getNextBranch(List<Branch> branches, ResourcePool resourcePool) {
+        if (branches == null) return null;
+
         for (Branch branch : branches) {
             if(branch.getKeys() != null && resourcePool.getUpdate().hasMessage() && !MessageUtils.hasMedia(resourcePool.getUpdate().getMessage())
                     && Arrays.stream(branch.getKeys()).anyMatch(k -> k.equals(resourcePool.getUpdate().getMessage().getText())))
