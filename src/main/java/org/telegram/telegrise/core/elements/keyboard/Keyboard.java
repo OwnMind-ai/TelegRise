@@ -46,7 +46,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     private List<Row> rows;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (!((type != null && rows != null) || byName != null || create != null))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
 

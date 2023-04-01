@@ -6,6 +6,7 @@ import org.telegram.telegrise.core.elements.LinkableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -18,7 +19,7 @@ public class Keyboards implements TranscriptionElement, LinkableElement {
     private List<Keyboard> keyboards;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if(keyboards.stream().noneMatch(k -> k.getName() != null))
             throw new TranscriptionParsingException("Child elements must have a name in order to be linked", node);
     }

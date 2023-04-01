@@ -24,6 +24,7 @@ public final class TranscriptionMemory implements Serializable {
     public TranscriptionElement get(String name) {
         return elements.get(name);
     }
+
     public <T> T get(String name, Class<T> tClass, List<String> possibleTags){
         TranscriptionElement result = elements.get(name);
 
@@ -48,6 +49,10 @@ public final class TranscriptionMemory implements Serializable {
     public void set(String name, TranscriptionElement transcriptionElement){
         if (readOnly) throw new UnsupportedOperationException();
         elements.put(name, transcriptionElement);
+    }
+
+    public boolean containsKey(String key){
+        return this.elements.containsKey(key);
     }
 
     public void setReadOnly(){

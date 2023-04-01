@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.InnerElement;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 
 @Element(name = "frame")
@@ -27,7 +24,7 @@ public class Frame implements TranscriptionElement {
     private Text text;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (!action.equals(EDIT) && !action.equals(SEND))
             throw new TranscriptionParsingException("'action' attribute must either '" + SEND + "' or '" + EDIT + "'", node);
     }

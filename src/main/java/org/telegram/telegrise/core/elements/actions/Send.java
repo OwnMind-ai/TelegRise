@@ -13,10 +13,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.InnerElement;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -57,7 +54,7 @@ public class Send implements ActionElement{
     private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (!this.medias.stream().allMatch(MediaType::isGroupable))
             throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
     }

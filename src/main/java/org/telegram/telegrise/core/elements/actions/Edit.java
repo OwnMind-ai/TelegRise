@@ -14,10 +14,7 @@ import org.telegram.telegrise.core.elements.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.InnerElement;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -62,7 +59,7 @@ public class Edit implements ActionElement{
     private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (keyboard != null && keyboard.getCreate() == null && !keyboard.getType().equals(Keyboard.INLINE))
             throw new TranscriptionParsingException("New keyboard must be type of 'inline'", node);
     }

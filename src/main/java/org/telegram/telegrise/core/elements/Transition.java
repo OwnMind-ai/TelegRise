@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -35,7 +36,7 @@ public class Transition implements TranscriptionElement{
     private boolean execute;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
                 && !direction.equals(LOCAL) && !direction.equals(CALLER))
             throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '"

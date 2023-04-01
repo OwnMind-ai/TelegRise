@@ -43,6 +43,9 @@ public class Tree implements BranchingElement{
     @Attribute(name = "commandScopes")
     private String[] scopes;
 
+    @Attribute(name = "accessLevel")
+    private Integer accessLevel;
+
     private Class<?> handler;
 
     @InnerElement

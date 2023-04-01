@@ -40,7 +40,7 @@ public class Branch implements StorableElement, TranscriptionElement{
     private Transition transition;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (when == null && callbackTriggers == null && keys == null)
             throw new TranscriptionParsingException("Branch is unreachable, missing 'when', 'keys' or 'callbackTriggers' attributes", node);
 

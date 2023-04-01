@@ -19,12 +19,14 @@ public class TelegramSessionsController {
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
+    private final RoleProvider roleProvider;
     @Setter
     private DefaultAbsSender sender;
     private final List<Class<? extends PrimaryHandler>> handlersClasses;
 
-    public TelegramSessionsController(BotTranscription transcription, List<Class<? extends PrimaryHandler>> handlersClasses) {
+    public TelegramSessionsController(BotTranscription transcription, RoleProvider roleProvider, List<Class<? extends PrimaryHandler>> handlersClasses) {
         this.transcription = transcription;
+        this.roleProvider = roleProvider;
         this.handlersClasses = handlersClasses;
     }
 
@@ -78,6 +80,7 @@ public class TelegramSessionsController {
 
     private void createSession(UserIdentifier identifier) {
         UserSession session = new UserSession(identifier, this.transcription, this.sender);
+        session.setRoleProvider(this.roleProvider);
         session.addHandlersClasses(this.handlersClasses);
         this.sessions.put(identifier, session);
     }

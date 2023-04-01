@@ -1,6 +1,7 @@
 package org.telegram.telegrise;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -10,12 +11,10 @@ import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.transition.TransitionController;
 
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,6 +30,8 @@ public class UserSession implements Runnable{
     private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
     private final TransitionController transitionController;
     private final PrimaryHandlersController primaryHandlersController;
+    @Setter
+    private RoleProvider roleProvider;
     @Getter
     private boolean running;
 
@@ -99,17 +100,43 @@ public class UserSession implements Runnable{
         Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
 
         if (tree != null){
-            if (tree.getBranches() != null) {
-                TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory);
-                this.treeExecutors.add(executor);
-                this.sessionMemory.getBranchingElements().add(tree);
-            }
+            if (roleProvider != null && !this.checkForTreeAccessibility(tree, update))
+                return;
 
-            this.executeBranchingElement(tree, update);
+            this.applyTree(update, tree);
         } else if (menu.getDefaultBranch() != null){
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
                     this.createResourcePool(update), sender);
         }
+    }
+
+    private void applyTree(Update update, Tree tree) {
+        if (tree.getBranches() != null) {
+            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory);
+            this.treeExecutors.add(executor);
+            this.sessionMemory.getBranchingElements().add(tree);
+        }
+
+        this.executeBranchingElement(tree, update);
+    }
+
+    private boolean checkForTreeAccessibility(Tree tree, Update update){
+        String roleName = this.roleProvider.getRole(MessageUtils.getFrom(update), this.sessionMemory);
+        if(roleName == null) return false;
+
+        Role role = this.transcription.getMemory().get(roleName, Role.class, List.of("role"));
+
+        if (tree.getAccessLevel() != null && role.getLevel() != null && role.getLevel() >= tree.getAccessLevel())
+            return true;
+        else if (role.getTrees() != null && Arrays.stream(role.getTrees()).anyMatch(t -> t.equals(tree.getName())))
+            return true;
+
+        if (role.getOnDeniedTree() != null){
+            Tree onDenied = this.transcription.getMemory().get(role.getOnDeniedTree(), Tree.class, List.of("tree"));
+            this.applyTree(update, onDenied);
+        }
+
+        return false;
     }
 
     private void updateTree(Update update) {

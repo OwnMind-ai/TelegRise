@@ -100,7 +100,7 @@ public class XMLElementsParser {
                 .forEach(f -> this.parseInnerElement(node, f, instance));
 
         // ORDER MATTERS:
-        instance.validate(node);
+        instance.validate(node, transcriptionMemory);
         instance.load(transcriptionMemory);
         if (instance instanceof StorableElement)
             ((StorableElement) instance).store(transcriptionMemory);
@@ -222,6 +222,7 @@ public class XMLElementsParser {
                     field.getType().equals(GeneratedValue.class) ? ExpressionFactory.createExpression(attribute.getNodeValue(),
                             ReflectionUtils.getRawGenericType(field), node, namespace)
                             : field.getType().equals(boolean.class) || field.getType().equals(Boolean.class) ? Boolean.parseBoolean(attribute.getNodeValue())
+                            : field.getType().equals(int.class) || field.getType().equals(Integer.class) ? Integer.parseInt(attribute.getNodeValue())
                             : attribute.getNodeValue()
             );
     }

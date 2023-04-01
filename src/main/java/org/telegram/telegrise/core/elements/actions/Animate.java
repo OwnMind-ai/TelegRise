@@ -7,10 +7,7 @@ import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.AnimationExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.InnerElement;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -43,7 +40,7 @@ public class Animate implements ActionElement{
     private List<Frame> frames;
 
     @Override
-    public void validate(Node node) {
+    public void validate(Node node, TranscriptionMemory memory) {
         if (frames.size() <= 1)
             throw new TranscriptionParsingException("Must have at least two frames or more", node);
     }

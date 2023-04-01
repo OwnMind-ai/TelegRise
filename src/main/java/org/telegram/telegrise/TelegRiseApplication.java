@@ -26,6 +26,9 @@ public final class TelegRiseApplication {
     private ClassLoader classLoader = this.getClass().getClassLoader();
     private final List<Class<? extends PrimaryHandler>> handlersClasses = new LinkedList<>();
 
+    @Setter
+    private RoleProvider roleProvider;
+
     private final TelegramBotsApi api;
 
     {
@@ -64,7 +67,7 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
-            controller = new TelegramSessionsController(parser.parse(), this.handlersClasses);
+            controller = new TelegramSessionsController(parser.parse(), this.roleProvider, this.handlersClasses);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

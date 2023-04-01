@@ -14,7 +14,7 @@ public interface TranscriptionElement extends Serializable {
         return null;
     }
 
-    default void validate(Node node){}
+    default void validate(Node node, TranscriptionMemory memory){}
     default void load(TranscriptionMemory memory){}
 
     default <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){
