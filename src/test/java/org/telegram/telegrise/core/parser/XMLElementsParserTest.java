@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -163,7 +164,7 @@ public class XMLElementsParserTest {
                 List.of(InlineKeyboardButton.builder().text("URL").url("url").build())
         ));
 
-        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool()));
+        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null))));
     }
 
     public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){

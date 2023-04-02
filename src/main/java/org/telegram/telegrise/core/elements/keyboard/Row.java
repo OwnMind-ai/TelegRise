@@ -38,7 +38,7 @@ public class Row implements TranscriptionElement {
 
     public List<InlineKeyboardButton> createInlineRow(ResourcePool pool){
         return this.buttons.stream()
-                .filter(b -> b.getWhen().generate(pool))
+                .filter(b -> Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
                 .map(b -> b.createInlineButton(pool)).collect(Collectors.toList());
     }
 }
