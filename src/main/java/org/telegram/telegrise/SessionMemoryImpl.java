@@ -1,9 +1,11 @@
 package org.telegram.telegrise;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.transition.JumpPoint;
+import org.telegram.telegrise.types.UserRole;
 
 import java.io.Serializable;
 import java.util.*;
@@ -27,6 +29,9 @@ public class SessionMemoryImpl implements SessionMemory {
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
     @Getter
     private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
+
+    @Getter @Setter
+    private UserRole userRole;
 
     public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier) {
         this.transcriptionHashcode = transcriptionHashcode;

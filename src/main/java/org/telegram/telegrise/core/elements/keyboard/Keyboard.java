@@ -13,6 +13,7 @@ import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.types.DynamicKeyboard;
+import org.telegram.telegrise.types.UserRole;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -23,6 +24,17 @@ import java.util.stream.Collectors;
 public class Keyboard implements StorableElement, TranscriptionElement {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
+
+    public static boolean filterKeyboardElement(GeneratedValue<Boolean> when, Integer accessLevel, ResourcePool pool){
+        UserRole userRole = pool.getMemory().getUserRole();
+
+        if (accessLevel != null)
+            return userRole != null && userRole.getLevel() >= accessLevel;
+        if (when != null)
+            return when.generate(pool);
+
+        return true;
+    }
 
     @Attribute(name = "byName")
     private String byName;
@@ -106,11 +118,11 @@ public class Keyboard implements StorableElement, TranscriptionElement {
         switch (type.toLowerCase()) {
             case INLINE:
                 return new InlineKeyboardMarkup(rows.stream()
-                        .filter(r -> r.getWhen().generate(pool))
+                        .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
                         .map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
             case REPLY:
                 ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup(rows.stream()
-                        .filter(r -> r.getWhen().generate(pool))
+                        .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
                         .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
 
                 keyboard.setIsPersistent(generateNullableProperty(isPersistent, pool));

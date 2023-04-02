@@ -27,7 +27,10 @@ public class Button implements TranscriptionElement {
     private GeneratedValue<String> url;
 
     @Attribute(name = "when")
-    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+    private GeneratedValue<Boolean> when;
+
+    @Attribute(name = "accessLevel")
+    private Integer accessLevel;
 
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){

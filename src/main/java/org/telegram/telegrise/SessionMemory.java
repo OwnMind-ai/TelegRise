@@ -1,5 +1,7 @@
 package org.telegram.telegrise;
 
+import org.telegram.telegrise.types.UserRole;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -17,4 +19,6 @@ public interface SessionMemory extends Serializable {
     String addComponent(Serializable value);
 
     <T extends Serializable> T getComponent(Class<T> tClass);
+
+    UserRole getUserRole();
 }

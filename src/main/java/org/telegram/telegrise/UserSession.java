@@ -13,6 +13,7 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.transition.TransitionController;
+import org.telegram.telegrise.types.UserRole;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -122,9 +123,13 @@ public class UserSession implements Runnable{
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){
         String roleName = this.roleProvider.getRole(MessageUtils.getFrom(update), this.sessionMemory);
-        if(roleName == null) return false;
+        if(roleName == null){
+            this.sessionMemory.setUserRole(null);
+            return false;
+        }
 
         Role role = this.transcription.getMemory().get(roleName, Role.class, List.of("role"));
+        this.sessionMemory.setUserRole(UserRole.ofRole(role));
 
         if (tree.getAccessLevel() != null && role.getLevel() != null && role.getLevel() >= tree.getAccessLevel())
             return true;

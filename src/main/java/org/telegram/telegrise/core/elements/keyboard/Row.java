@@ -7,8 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 
 import java.util.List;
@@ -21,7 +21,10 @@ public class Row implements TranscriptionElement {
     private List<Button> buttons;
 
     @Attribute(name = "when")
-    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+    private GeneratedValue<Boolean> when;
+
+    @Attribute(name = "accessLevel")
+    private Integer accessLevel;
 
     public Row(List<Button> buttons){
         this.buttons = buttons;
@@ -29,7 +32,7 @@ public class Row implements TranscriptionElement {
 
     public KeyboardRow createKeyboardRow(ResourcePool pool){
         return new KeyboardRow(this.buttons.stream()
-                .filter(b -> b.getWhen().generate(pool))
+                .filter(b -> Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
                 .map(b -> b.createKeyboardButton(pool)).collect(Collectors.toList()));
     }
 
