@@ -42,6 +42,21 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @Attribute(name = "create")
     private GeneratedValue<ReplyKeyboard> create;
 
+    @Attribute(name = "isPersistent")
+    private GeneratedValue<Boolean> isPersistent;
+
+    @Attribute(name = "oneTime")
+    private GeneratedValue<Boolean> oneTime;
+
+    @Attribute(name = "resize")
+    private GeneratedValue<Boolean> resize;
+
+    @Attribute(name = "selective")
+    private GeneratedValue<Boolean> selective;
+
+    @Attribute(name = "placeholder")
+    private GeneratedValue<String> placeholder;
+
     @InnerElement
     private List<Row> rows;
 
@@ -82,7 +97,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){
-        if (dynamic)
+        if (this.dynamic)
             return extractDynamic(pool);
 
         if (this.create != null)
@@ -94,9 +109,17 @@ public class Keyboard implements StorableElement, TranscriptionElement {
                         .filter(r -> r.getWhen().generate(pool))
                         .map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
             case REPLY:
-                return new ReplyKeyboardMarkup(rows.stream()
+                ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup(rows.stream()
                         .filter(r -> r.getWhen().generate(pool))
                         .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
+
+                keyboard.setIsPersistent(generateNullableProperty(isPersistent, pool));
+                keyboard.setResizeKeyboard(generateNullableProperty(resize, pool));
+                keyboard.setOneTimeKeyboard(generateNullableProperty(oneTime, pool));
+                keyboard.setInputFieldPlaceholder(generateNullableProperty(placeholder, pool));
+                keyboard.setSelective(generateNullableProperty(selective, pool));
+
+                return keyboard;
             default:
                 throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
         }

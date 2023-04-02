@@ -27,12 +27,23 @@ public final class DynamicKeyboard implements Serializable {
             return dynamicRow;
         }).collect(Collectors.toList()));
 
+        dynamicKeyboard.isPersistent = keyboard.getIsPersistent();
+        dynamicKeyboard.oneTime = keyboard.getOneTime();
+        dynamicKeyboard.resize = keyboard.getResize();
+        dynamicKeyboard.selective = keyboard.getSelective();
+        dynamicKeyboard.placeholder = keyboard.getPlaceholder();
+
         return dynamicKeyboard;
     }
 
     @Getter
     private final List<DynamicRow> rows;
     private final Map<String, SwitchButton> switches = new HashMap<>();
+    private GeneratedValue<Boolean> isPersistent;
+    private GeneratedValue<Boolean> oneTime;
+    private GeneratedValue<Boolean> resize;
+    private GeneratedValue<Boolean> selective;
+    private GeneratedValue<String> placeholder;
 
     public DynamicKeyboard(List<DynamicRow> rows) {
         this.rows = new ArrayList<>(rows);
@@ -49,9 +60,16 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     public ReplyKeyboardMarkup createReply(ResourcePool pool){
-        return new ReplyKeyboardMarkup(rows.stream()
-                .filter(r -> r.getWhen().generate(pool))
-                .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
+        return ReplyKeyboardMarkup.builder()
+                .keyboard(rows.stream()
+                    .filter(r -> r.getWhen().generate(pool))
+                    .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()))
+                .isPersistent(isPersistent != null ? isPersistent.generate(pool) : null)
+                .resizeKeyboard(resize != null ? resize.generate(pool) : null)
+                .selective(selective != null ? selective.generate(pool) : null)
+                .oneTimeKeyboard(oneTime != null ? oneTime.generate(pool) : null)
+                .inputFieldPlaceholder(placeholder != null ? placeholder.generate(pool) : null)
+                .build();
     }
 
     public SwitchButton getSwitch(String key){
