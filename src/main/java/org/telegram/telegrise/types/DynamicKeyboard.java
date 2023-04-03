@@ -56,14 +56,17 @@ public final class DynamicKeyboard implements Serializable {
     public InlineKeyboardMarkup createInline(ResourcePool pool){
         return new InlineKeyboardMarkup(rows.stream()
                 .filter(r -> r.getWhen().generate(pool))
-                .map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
+                .map(r -> r.createInlineRow(pool))
+                .filter(r -> !r.isEmpty())
+                .collect(Collectors.toList()));
     }
 
     public ReplyKeyboardMarkup createReply(ResourcePool pool){
         return ReplyKeyboardMarkup.builder()
                 .keyboard(rows.stream()
                     .filter(r -> r.getWhen().generate(pool))
-                    .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()))
+                    .map(r -> r.createKeyboardRow(pool))
+                    .filter(r -> !r.isEmpty()).collect(Collectors.toList()))
                 .isPersistent(isPersistent != null ? isPersistent.generate(pool) : null)
                 .resizeKeyboard(resize != null ? resize.generate(pool) : null)
                 .selective(selective != null ? selective.generate(pool) : null)

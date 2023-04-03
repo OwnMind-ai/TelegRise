@@ -119,11 +119,15 @@ public class Keyboard implements StorableElement, TranscriptionElement {
             case INLINE:
                 return new InlineKeyboardMarkup(rows.stream()
                         .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
-                        .map(r -> r.createInlineRow(pool)).collect(Collectors.toList()));
+                        .map(r -> r.createInlineRow(pool))
+                        .filter(r -> !r.isEmpty())
+                        .collect(Collectors.toList()));
             case REPLY:
                 ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup(rows.stream()
                         .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
-                        .map(r -> r.createKeyboardRow(pool)).collect(Collectors.toList()));
+                        .map(r -> r.createKeyboardRow(pool))
+                        .filter(r -> !r.isEmpty())
+                        .collect(Collectors.toList()));
 
                 keyboard.setIsPersistent(generateNullableProperty(isPersistent, pool));
                 keyboard.setResizeKeyboard(generateNullableProperty(resize, pool));
