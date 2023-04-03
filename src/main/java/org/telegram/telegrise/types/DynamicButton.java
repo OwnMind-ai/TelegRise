@@ -10,6 +10,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Button;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class DynamicButton implements Serializable {
@@ -18,7 +19,7 @@ public class DynamicButton implements Serializable {
                 button.getText(),
                 button.getCallbackData(),
                 button.getUrl(),
-                button.getWhen()
+                Objects.requireNonNullElse(button.getWhen(), GeneratedValue.ofValue(true))
         );
     }
 
