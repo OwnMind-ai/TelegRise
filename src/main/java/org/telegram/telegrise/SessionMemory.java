@@ -1,5 +1,7 @@
 package org.telegram.telegrise;
 
+import org.jetbrains.annotations.Nullable;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrise.types.UserRole;
 
 import java.io.Serializable;
@@ -21,4 +23,6 @@ public interface SessionMemory extends Serializable {
     <T extends Serializable> T getComponent(Class<T> tClass);
 
     UserRole getUserRole();
+
+    @Nullable Message getLastSentMessage();
 }

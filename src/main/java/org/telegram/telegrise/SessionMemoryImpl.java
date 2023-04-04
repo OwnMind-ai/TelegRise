@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.transition.JumpPoint;
@@ -32,6 +33,8 @@ public class SessionMemoryImpl implements SessionMemory {
 
     @Getter @Setter
     private UserRole userRole;
+    @Getter @Setter
+    private Message lastSentMessage;
 
     public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier) {
         this.transcriptionHashcode = transcriptionHashcode;

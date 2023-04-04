@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class TreeExecutor {
-    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemory memory) {
+    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory) {
         try {
             Object handler = null;
             if (tree.getHandler() != null) {
@@ -50,7 +50,7 @@ public final class TreeExecutor {
                     });
     }
 
-    private final SessionMemory memory;
+    private final SessionMemoryImpl memory;
 
     @Getter
     private final Object handlerInstance;
@@ -66,7 +66,7 @@ public final class TreeExecutor {
     @Getter
     private Transition transition;
 
-    public TreeExecutor(SessionMemory memory, Object handlerInstance, Tree tree, DefaultAbsSender sender) {
+    public TreeExecutor(SessionMemoryImpl memory, Object handlerInstance, Tree tree, DefaultAbsSender sender) {
         this.memory = memory;
         this.handlerInstance = handlerInstance;
         this.tree = tree;
