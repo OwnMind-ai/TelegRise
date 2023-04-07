@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,13 +20,9 @@ public class UniversalSender {
 
     static { instance.load(); }
 
-    public static <T extends Serializable> T execute(DefaultAbsSender sender, PartialBotApiMethod<T> method, Class<T> tClass) throws TelegramApiException {
-        return instance.execute(method, sender, tClass);
-    }
-
     public static void execute(DefaultAbsSender sender, ActionElement action, ResourcePool pool) throws TelegramApiException {
         PartialBotApiMethod<?> method = action.generateMethod(pool);
-        Object result = instance.execute(method, sender, null);
+        Object result = instance.execute(method, sender);
 
         if (result instanceof List<?>) {
             List<?> resultList = (List<?>) result;
@@ -57,16 +52,14 @@ public class UniversalSender {
 
 
 
-    public <T extends Serializable> T execute(PartialBotApiMethod<T> method, DefaultAbsSender sender, Class<T> tClass) throws TelegramApiException {
+    public Object execute(PartialBotApiMethod<?> method, DefaultAbsSender sender) throws TelegramApiException {
         if (method == null) return null;
 
         if (method instanceof BotApiMethod)
-            return sender.execute((BotApiMethod<T>) method);
+            return sender.execute((BotApiMethod<?>) method);
 
         try {
-            Object result = this.methods.get(method.getClass().getName()).invoke(sender, method);
-
-            return tClass != null && tClass.isInstance(result) ? tClass.cast(result) : null;
+            return this.methods.get(method.getClass().getName()).invoke(sender, method);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {

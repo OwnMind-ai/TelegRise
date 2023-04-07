@@ -28,6 +28,8 @@ public final class TranscriptionMemory implements Serializable {
     public <T> T get(String name, Class<T> tClass, List<String> possibleTags){
         TranscriptionElement result = elements.get(name);
 
+        if (result == null) throw new TelegRiseRuntimeException("Element named '" + name + "' does not exist");
+
         if (!tClass.isAssignableFrom(result.getClass()))
             throw new TelegRiseRuntimeException(String.format("Element '%s' represents the <%s> tag, required: %s",
                     name, result.getClass().getAnnotation(Element.class).name(),

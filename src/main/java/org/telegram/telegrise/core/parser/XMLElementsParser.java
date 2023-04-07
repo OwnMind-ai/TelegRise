@@ -143,6 +143,7 @@ public class XMLElementsParser {
 
         if (fieldNodes.isEmpty()){
             if (EmbeddableElement.class.isAssignableFrom(actualType)) {
+                if (nodeList.getLength() == 0) return;
                 //FIXME optimize (use #text node name)
                 if (Arrays.stream(field.getDeclaringClass().getDeclaredFields())
                         .filter(f -> f.isAnnotationPresent(InnerElement.class))

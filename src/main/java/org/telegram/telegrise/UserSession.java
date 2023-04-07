@@ -6,10 +6,7 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.BotTranscription;
-import org.telegram.telegrise.core.elements.BranchingElement;
-import org.telegram.telegrise.core.elements.Menu;
-import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.transition.TransitionController;
@@ -146,14 +143,23 @@ public class UserSession implements Runnable{
 
     private void updateTree(Update update) {
         TreeExecutor executor = this.treeExecutors.getLast();
+        ResourcePool pool = this.createResourcePool(update);
 
         executor.update(update);
         this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
 
         if (executor.isClosed()){
-            if (executor.getTransition() != null) {
-                boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getTransition(), this.createResourcePool(update));
-                executor.clearTransition();
+            if (executor.getLastBranch().getRefresh() != null){
+                Refresh refresh = executor.getLastBranch().getRefresh();
+                this.transitionController.applyUpdate(executor.getTree(), refresh, pool);
+
+                if (refresh.isExecute() && refresh.isTransit())
+                    this.executeBranchingElement(executor.getTree(), update);
+            }
+
+            if (executor.getLastBranch().getTransition() != null) {
+                boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
+                executor.clearLastBranch();
 
                 if (interrupted) return;
             } else

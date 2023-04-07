@@ -9,7 +9,6 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
-import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 
@@ -64,7 +63,7 @@ public final class TreeExecutor {
     private boolean closed;
 
     @Getter
-    private Transition transition;
+    private Branch lastBranch;
 
     public TreeExecutor(SessionMemoryImpl memory, Object handlerInstance, Tree tree, DefaultAbsSender sender) {
         this.memory = memory;
@@ -85,9 +84,7 @@ public final class TreeExecutor {
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
-                if (this.currentBranch.getTransition() != null)
-                    this.transition = this.currentBranch.getTransition();
-
+                this.lastBranch = this.currentBranch;
                 this.close();
             }
         } else if(previous != null && previous.getDefaultBranch() != null) {
@@ -129,7 +126,7 @@ public final class TreeExecutor {
         return null;
     }
 
-    public void clearTransition() {
-        this.transition = null;
+    public void clearLastBranch() {
+        this.lastBranch = null;
     }
 }
