@@ -43,8 +43,8 @@ public final class SwitchButton extends DynamicButton{
         this.name = name;
         this.enabled = enabled;
 
-        this.setText(offState);
-        this.setCallbackData(GeneratedValue.ofValue(this.name + OFF_SUFFIX));
+        this.setText(enabled ? onState : offState);
+        this.setCallbackData(GeneratedValue.ofValue(this.name + (enabled ? ON_SUFFIX : OFF_SUFFIX)));
     }
 
     private String getNextData(boolean state) {
