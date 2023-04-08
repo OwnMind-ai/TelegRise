@@ -4,12 +4,13 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrise.types.CommandData;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MessageUtils {
-    private static final Pattern COMMAND_PATTERN = Pattern.compile("^/(\\w*)(?>@.+)?$");
+    private static final Pattern COMMAND_PATTERN = Pattern.compile("^/(?<name>\\w*)(?>@(?<username>.+))?$");
 
     public static boolean hasMedia(Message message){
         return message != null &&
@@ -45,14 +46,10 @@ public class MessageUtils {
                 : null;
     }
 
-    public static boolean isCommand(String raw){
-        return COMMAND_PATTERN.matcher(raw).matches();
-    }
+    public static CommandData parseCommand(String command){
+        Matcher matcher = COMMAND_PATTERN.matcher(command);
+        if (!matcher.find()) return null;
 
-    public static String cleanCommand(String raw){
-        Matcher matcher = COMMAND_PATTERN.matcher(raw);
-        if (!matcher.find()) throw new UnsupportedOperationException();
-
-        return matcher.group(1);
+        return new CommandData(matcher.group("name"), matcher.group("username"));
     }
 }

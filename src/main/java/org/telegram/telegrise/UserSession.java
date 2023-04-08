@@ -35,7 +35,7 @@ public class UserSession implements Runnable{
 
     public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender) {
         this.userIdentifier.set(userIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier);
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);

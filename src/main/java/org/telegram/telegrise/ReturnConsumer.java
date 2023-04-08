@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+//FIXME looks disgusting, I need more sleep
 public interface ReturnConsumer {
     static ReturnConsumer message(Consumer<Message> consumer){
         return new ReturnConsumer(){

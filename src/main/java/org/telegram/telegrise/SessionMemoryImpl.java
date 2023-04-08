@@ -30,15 +30,18 @@ public class SessionMemoryImpl implements SessionMemory {
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
     @Getter
     private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
+    @Getter
+    private final String botUsername;
 
     @Getter @Setter
     private UserRole userRole;
     @Getter @Setter
     private Message lastSentMessage;
 
-    public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier) {
+    public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier, String botUsername) {
         this.transcriptionHashcode = transcriptionHashcode;
         this.userIdentifier = userIdentifier;
+        this.botUsername = botUsername;
     }
 
     @Override

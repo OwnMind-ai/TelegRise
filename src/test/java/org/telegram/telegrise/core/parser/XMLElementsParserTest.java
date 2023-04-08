@@ -164,7 +164,7 @@ public class XMLElementsParserTest {
                 List.of(InlineKeyboardButton.builder().text("URL").url("url").build())
         ));
 
-        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null))));
+        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, null))));
     }
 
     public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){

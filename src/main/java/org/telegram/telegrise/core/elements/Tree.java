@@ -7,11 +7,15 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.MessageUtils;
-import org.telegram.telegrise.core.*;
+import org.telegram.telegrise.core.ApplicationNamespace;
+import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.LocalNamespace;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.types.CommandData;
 import org.w3c.dom.Node;
 
 import java.util.Arrays;
@@ -81,9 +85,14 @@ public class Tree implements BranchingElement{
         } else if (this.callbackTriggers != null && update.hasCallbackQuery() && update.getCallbackQuery().getData() != null){
             return Arrays.stream(this.getCallbackTriggers()).anyMatch(c -> c.equals(update.getCallbackQuery().getData()));
         } else if (update.hasMessage() && !MessageUtils.hasMedia(update.getMessage()) && update.getMessage().getText() != null) {
-            if (MessageUtils.isCommand(update.getMessage().getText()) && this.commands != null)
+            CommandData command = MessageUtils.parseCommand(update.getMessage().getText());
+            boolean isUserChat = Objects.requireNonNull(MessageUtils.getChat(update)).isUserChat();
+
+            if (command != null && this.commands != null &&
+                    (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername()))
+            )
                 return Arrays.stream(this.commands)
-                        .anyMatch(c -> c.equals(MessageUtils.cleanCommand(update.getMessage().getText())));
+                        .anyMatch(c -> c.equals(command.getName()));
             else if (this.keys != null)
                 return Arrays.stream(this.keys)
                         .anyMatch(c -> c.equals(update.getMessage().getText()));
