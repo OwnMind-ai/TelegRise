@@ -98,6 +98,8 @@ public class Tree implements BranchingElement{
     public boolean canHandleMessage(ResourcePool pool){
         Update update = pool.getUpdate();
 
+        if (!update.hasMessage()) return false;
+
         if (this.commands != null) {
             CommandData command = MessageUtils.parseCommand(update.getMessage().getText());
             boolean isUserChat = Objects.requireNonNull(MessageUtils.getChat(update)).isUserChat();
