@@ -30,6 +30,10 @@ public class Link implements TranscriptionElement {
 
             if (!(result instanceof LinkableElement))
                 throw new TranscriptionParsingException("Unable to link element '" + result.getClass().getAnnotation(Element.class).name() + "' in '" + this.source + "'", node);
+
+            LinkableElement linkableElement = (LinkableElement) result;
+            if (linkableElement.afterParsedTask() != null)
+                memory.getTasks().add(linkableElement.afterParsedTask());
         } catch (IOException e) {
             throw new TranscriptionParsingException("Unable to find source '" + this.source + "'", node);
         } catch (TranscriptionParsingException | TelegRiseRuntimeException e){

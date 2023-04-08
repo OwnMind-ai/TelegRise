@@ -1,16 +1,22 @@
 package org.telegram.telegrise.core.parser;
 
+import lombok.Getter;
 import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TranscriptionMemory implements Serializable {
     private final Map<String, TranscriptionElement> elements = new HashMap<>();
+    @Getter
+    private final List<Consumer<BotTranscription>> tasks = new LinkedList<>();
     private boolean readOnly = false;
 
     public int size() {

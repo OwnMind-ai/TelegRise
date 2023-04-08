@@ -16,6 +16,7 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,5 +83,10 @@ public final class BotTranscription implements TranscriptionElement {
                 .filter(t -> t.isProducesBotCommands(scope, this.rootMenu))
                 .map(Tree::getBotCommands)
                 .flatMap(List::stream).collect(Collectors.toList()), scope, null);  //FIXME add language support
+    }
+
+    public void setRootMenu(Menu rootMenu) {
+        this.rootMenu = rootMenu;
+        rootMenu.setTrees(new ArrayList<>(rootMenu.getTrees()));
     }
 }
