@@ -105,9 +105,9 @@ public class Tree implements BranchingElement{
             if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
                 return Arrays.stream(this.commands)
                         .anyMatch(c -> c.equals(command.getName()));
-            else
-                return false;
-        } else if (this.keys != null)
+        }
+
+        if (this.keys != null)
             return Arrays.stream(this.keys)
                     .anyMatch(c -> c.equals(update.getMessage().getText()));
 
