@@ -96,15 +96,16 @@ public class UserSession implements Runnable{
 
     private void initializeTree(Update update, Menu menu) {
         Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
+        ResourcePool pool = this.createResourcePool(update);
 
         if (tree != null){
             if (roleProvider != null && !this.checkForTreeAccessibility(tree, update))
                 return;
 
             this.applyTree(update, tree);
-        } else if (menu.getDefaultBranch() != null){
+        } else if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
-                    this.createResourcePool(update), sender);
+                    pool, sender);
         }
     }
 

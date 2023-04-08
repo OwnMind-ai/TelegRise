@@ -89,11 +89,12 @@ public final class TreeExecutor {
             }
         } else if(previous != null && previous.getDefaultBranch() != null) {
             DefaultBranch defaultBranch = previous.getDefaultBranch();
-            this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
+            if (defaultBranch.getWhen().generate(resourcePool))
+                this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
 
             this.currentBranch = previous;
         } else if(previous == null) {
-            if (this.tree.getDefaultBranch() != null)
+            if (this.tree.getDefaultBranch() != null && this.tree.getDefaultBranch().getWhen().generate(resourcePool))
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
             this.close();

@@ -16,6 +16,9 @@ public class DefaultBranch implements TranscriptionElement {
     @Attribute(name = "handler")
     private GeneratedValue<Void> toInvoke;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @InnerElement
     private List<ActionElement> actions;
 }
