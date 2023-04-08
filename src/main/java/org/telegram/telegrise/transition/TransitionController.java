@@ -174,6 +174,7 @@ public class TransitionController {
 
     public void removeExecutor(TreeExecutor executor){
         executor.close();
+        executor.beforeRemoving();
         this.treeExecutors.remove(executor);
         this.sessionMemory.getCurrentBranch().set(null);
 

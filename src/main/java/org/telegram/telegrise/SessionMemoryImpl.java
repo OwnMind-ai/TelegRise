@@ -65,6 +65,11 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
+    public Serializable remove(String key) {
+        return this.memory.remove(key);
+    }
+
+    @Override
     public <T extends Serializable> T get(String key, Class<T> tClass){
         return tClass.cast(this.memory.get(key));
     }
@@ -81,6 +86,12 @@ public class SessionMemoryImpl implements SessionMemory {
     public <T extends Serializable> T getComponent(Class<T> tClass){
         return tClass.cast(this.memory.get(tClass.getName()));
     }
+
+    @Override
+    public <T extends Serializable> T removeComponent(Class<T> tClass) {
+        return tClass.cast(this.memory.remove(tClass.getName()));
+    }
+
 
     public boolean isOnStack(Class<?> clazz){
         return !this.branchingElements.isEmpty() && clazz.isInstance(this.branchingElements.getLast());

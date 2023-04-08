@@ -15,6 +15,7 @@ import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class TreeExecutor {
@@ -50,6 +51,7 @@ public final class TreeExecutor {
                     });
     }
 
+    private final List<String> relatedKeyboardIds = new LinkedList<>();
     private final SessionMemoryImpl memory;
 
     @Getter
@@ -76,7 +78,7 @@ public final class TreeExecutor {
     public void update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender, this.memory);
+        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender, this.memory, this);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
@@ -111,6 +113,15 @@ public final class TreeExecutor {
         this.closed = true;
     }
 
+    public void beforeRemoving(){
+        ResourcePool pool = new ResourcePool(null, handlerInstance, this.sender, this.memory, this);
+
+        if (this.getTree().getOnClose() != null)
+            this.getTree().getOnClose().generate(pool);
+
+        this.relatedKeyboardIds.forEach(this.memory::remove);
+    }
+
     private Branch getNextBranch(List<Branch> branches, ResourcePool resourcePool) {
         if (branches == null) return null;
 
@@ -130,5 +141,9 @@ public final class TreeExecutor {
 
     public void clearLastBranch() {
         this.lastBranch = null;
+    }
+
+    public void connectKeyboard(String id){
+        this.relatedKeyboardIds.add(id);
     }
 }

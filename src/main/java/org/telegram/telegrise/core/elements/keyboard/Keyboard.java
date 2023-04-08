@@ -48,6 +48,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @Attribute(name = "dynamic")
     private boolean dynamic;
 
+    @Attribute(name = "autoClosable")
+    private boolean autoClosable = true;
+
     @Attribute(name = "id")
     private String id;
 
@@ -159,6 +162,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
         } else {
             DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);
             memory.put(this.id, keyboard);
+
+            if (pool.getCurrentExecutor() != null && autoClosable)
+                pool.getCurrentExecutor().connectKeyboard(this.id);
 
             return this.extractDynamic(pool);
         }

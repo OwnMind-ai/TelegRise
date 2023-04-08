@@ -111,8 +111,7 @@ public class UserSession implements Runnable{
 
     private void interruptTreeChain(Update update, Tree tree) {
         ResourcePool pool = this.createResourcePool(update);
-        this.treeExecutors.stream().map(TreeExecutor::getTree).filter(t -> t.getOnClose() != null)
-                .forEach(t -> t.getOnClose().generate(pool));
+        this.treeExecutors.forEach(TreeExecutor::beforeRemoving);
 
         this.treeExecutors.clear();
         this.sessionMemory.getCurrentBranch().set(null);
@@ -213,8 +212,6 @@ public class UserSession implements Runnable{
                 if (interrupted) return;
             } else {
                 this.transitionController.removeExecutor(executor);
-                if (executor.getTree().getOnClose() != null)
-                    executor.getTree().getOnClose().generate(pool);
             }
 
             BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
@@ -232,7 +229,8 @@ public class UserSession implements Runnable{
                 update,
                 this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getHandlerInstance(),
                 this.sender,
-                this.sessionMemory
+                this.sessionMemory,
+                this.treeExecutors.peekLast()
         );
     }
 
