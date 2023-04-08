@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 public class Tree implements BranchingElement{
     @Attribute(name = "name", nullable = false)
     private String name;
+    @Attribute(name = "interruptible")
+    private boolean interpretable = true;
 
     @Attribute(name = "commands")
     private String[] commands;
@@ -85,20 +87,27 @@ public class Tree implements BranchingElement{
         } else if (this.callbackTriggers != null && update.hasCallbackQuery() && update.getCallbackQuery().getData() != null){
             return Arrays.stream(this.getCallbackTriggers()).anyMatch(c -> c.equals(update.getCallbackQuery().getData()));
         } else if (update.hasMessage() && !MessageUtils.hasMedia(update.getMessage()) && update.getMessage().getText() != null) {
+            return this.canHandleMessage(pool);
+        }
+
+        return false;
+    }
+
+    public boolean canHandleMessage(ResourcePool pool){
+        Update update = pool.getUpdate();
+
+        if (this.commands != null) {
             CommandData command = MessageUtils.parseCommand(update.getMessage().getText());
             boolean isUserChat = Objects.requireNonNull(MessageUtils.getChat(update)).isUserChat();
 
-            if (command != null && this.commands != null &&
-                    (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername()))
-            )
+            if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
                 return Arrays.stream(this.commands)
                         .anyMatch(c -> c.equals(command.getName()));
-            else if (this.keys != null)
-                return Arrays.stream(this.keys)
-                        .anyMatch(c -> c.equals(update.getMessage().getText()));
-
-            return false;
-        }
+            else
+                return false;
+        } else if (this.keys != null)
+            return Arrays.stream(this.keys)
+                    .anyMatch(c -> c.equals(update.getMessage().getText()));
 
         return false;
     }

@@ -32,6 +32,9 @@ public final class BotTranscription implements TranscriptionElement {
     @Attribute(name = "token", nullable = false)
     private String token;
 
+    @Attribute(name = "interruptions")
+    private boolean interruptions = false;
+
     @Attribute(name = "defaultParseMode")
     private String defaultParseMode = "html";
 
@@ -67,6 +70,11 @@ public final class BotTranscription implements TranscriptionElement {
                         if (!memory.containsKey(tree) || !(memory.get(tree) instanceof Tree))
                             throw new TelegRiseRuntimeException("Role '" + role.getName() + "' gives access to a non-existent tree '" + tree + "'");
                     });
+    }
+
+    @Override
+    public void load(TranscriptionMemory memory) {
+        this.rootMenu.setInterpretable(false);
     }
 
     public SetMyCommands getSetCommands(BotCommandScope scope){

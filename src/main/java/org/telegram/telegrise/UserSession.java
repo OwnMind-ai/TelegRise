@@ -81,6 +81,7 @@ public class UserSession implements Runnable{
     }
 
     private void handleUpdate(Update update) {
+        ResourcePool pool = this.createResourcePool(update);
         Optional<PrimaryHandler> candidate = this.primaryHandlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
             boolean intercept = this.primaryHandlersController.applyHandler(update, candidate.get());
@@ -90,23 +91,59 @@ public class UserSession implements Runnable{
 
         if (this.sessionMemory.isOnStack(Menu.class))
             this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
-        else if (this.sessionMemory.isOnStack(Tree.class))
+
+        else if (this.sessionMemory.isOnStack(Tree.class)) {
+            Tree tree = (Tree) this.sessionMemory.getBranchingElements().getLast();
+            if (this.transcription.isInterruptions() && tree.isInterpretable()){
+                Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
+                        .filter(t -> t.canHandleMessage(pool)).findFirst();
+                if (treeCandidate.isPresent()){
+                    this.interruptTreeChain(update, treeCandidate.get());
+                    return;
+                }
+            }
+
             this.updateTree(update);
+        }
+    }
+
+    private void interruptTreeChain(Update update, Tree tree) {
+        this.treeExecutors.clear();
+        this.sessionMemory.getCurrentBranch().set(null);
+        this.sessionMemory.getJumpPoints().clear();
+
+        this.sessionMemory.getBranchingElements().clear();
+        this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
+        this.initializeTree(update, tree);
     }
 
     private void initializeTree(Update update, Menu menu) {
-        Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
         ResourcePool pool = this.createResourcePool(update);
+        Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
 
-        if (tree != null){
-            if (roleProvider != null && !this.checkForTreeAccessibility(tree, update))
+        if (tree != null) {
+            this.initializeTree(update, tree);
+            return;
+        } else if (menu.isInterpretable()) {
+            Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
+                    .filter(t -> t.canHandleMessage(pool)).findFirst();
+            if (treeCandidate.isPresent()){
+                this.interruptTreeChain(update, treeCandidate.get());
                 return;
+            }
+        }
 
-            this.applyTree(update, tree);
-        } else if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){
+        if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
                     pool, sender);
         }
+    }
+
+    private void initializeTree(Update update, Tree tree) {
+        if (roleProvider != null && !this.checkForTreeAccessibility(tree, update))
+            return;
+
+        this.applyTree(update, tree);
     }
 
     private void applyTree(Update update, Tree tree) {
