@@ -14,7 +14,7 @@ import org.telegram.telegrise.TreeExecutor;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.types.DynamicKeyboard;
+import org.telegram.telegrise.keyboard.DynamicKeyboard;
 
 import java.util.Deque;
 import java.util.Iterator;

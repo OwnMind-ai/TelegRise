@@ -25,7 +25,7 @@ public class Switch extends Button{
     private GeneratedValue<String> offState;
 
     @Attribute(name = "enabled")
-    private boolean enabled;
+    private GeneratedValue<Boolean> enabled = GeneratedValue.ofValue(false);
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);

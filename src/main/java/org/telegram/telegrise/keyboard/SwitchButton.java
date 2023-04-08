@@ -1,4 +1,4 @@
-package org.telegram.telegrise.types;
+package org.telegram.telegrise.keyboard;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +7,12 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Switch;
 
 public final class SwitchButton extends DynamicButton{
-    public static SwitchButton ofSwitch(Switch button){
+    public static SwitchButton ofSwitch(Switch button, ResourcePool pool){
         return new SwitchButton(
                 button.getOnState(),
                 button.getOffState(),
                 button.getName(),
-                button.isEnabled()
+                button.getEnabled().generate(pool)
         );
     }
 

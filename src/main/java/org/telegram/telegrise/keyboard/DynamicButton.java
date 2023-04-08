@@ -1,4 +1,4 @@
-package org.telegram.telegrise.types;
+package org.telegram.telegrise.keyboard;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

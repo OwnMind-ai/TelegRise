@@ -8,8 +8,8 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.types.DynamicKeyboard;
-import org.telegram.telegrise.types.SwitchButton;
+import org.telegram.telegrise.keyboard.DynamicKeyboard;
+import org.telegram.telegrise.keyboard.SwitchButton;
 
 @Element(name = "flip")
 @Data @NoArgsConstructor

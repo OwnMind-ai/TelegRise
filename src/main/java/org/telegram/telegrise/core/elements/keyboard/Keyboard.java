@@ -12,7 +12,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
-import org.telegram.telegrise.types.DynamicKeyboard;
+import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.types.UserRole;
 import org.w3c.dom.Node;
 
@@ -157,7 +157,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
                     throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
             }
         } else {
-            DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this);
+            DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);
             memory.put(this.id, keyboard);
 
             return this.extractDynamic(pool);

@@ -1,4 +1,4 @@
-package org.telegram.telegrise.types;
+package org.telegram.telegrise.keyboard;
 
 import lombok.Data;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 @Data
 public class DynamicRow implements Serializable {
 
-    public static DynamicRow ofRow(Row row){
+    public static DynamicRow ofRow(Row row, ResourcePool pool){
         return new DynamicRow(row.getButtons().stream()
-                .map(button -> button instanceof Switch ? SwitchButton.ofSwitch((Switch) button) : DynamicButton.ofButton(button))
+                .map(button -> button instanceof Switch ? SwitchButton.ofSwitch((Switch) button, pool) : DynamicButton.ofButton(button))
                 .collect(Collectors.toList()),
                     Objects.requireNonNullElse(row.getWhen(), GeneratedValue.ofValue(true)));
     }

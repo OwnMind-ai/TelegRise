@@ -1,4 +1,4 @@
-package org.telegram.telegrise.types;
+package org.telegram.telegrise.keyboard;
 
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class DynamicKeyboard implements Serializable {
-    public static DynamicKeyboard ofKeyboard(Keyboard keyboard){
+    public static DynamicKeyboard ofKeyboard(Keyboard keyboard, ResourcePool pool){
         DynamicKeyboard dynamicKeyboard = new DynamicKeyboard();
 
         dynamicKeyboard.getRows().addAll(keyboard.getRows().stream().map(row -> {
-            DynamicRow dynamicRow = DynamicRow.ofRow(row);
+            DynamicRow dynamicRow = DynamicRow.ofRow(row, pool);
             dynamicRow.getButtons().stream().filter(SwitchButton.class::isInstance)
                     .forEach(s -> dynamicKeyboard.switches.put(((SwitchButton) s).getName(), (SwitchButton) s));
 
