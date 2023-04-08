@@ -11,9 +11,10 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.resources.ResourceFactory;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 //TODO webhooks
@@ -24,7 +25,8 @@ public final class TelegRiseApplication {
     private File transcription;
     @Setter
     private ClassLoader classLoader = this.getClass().getClassLoader();
-    private final List<Class<? extends PrimaryHandler>> handlersClasses = new LinkedList<>();
+    private final List<Class<? extends PrimaryHandler>> handlersClasses = new ArrayList<>();
+    private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
 
     @Setter
     private RoleProvider roleProvider;
@@ -67,7 +69,7 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
-            controller = new TelegramSessionsController(parser.parse(), this.roleProvider, this.handlersClasses);
+            controller = new TelegramSessionsController(parser.parse(), this.roleProvider, resourceFactories, this.handlersClasses);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -76,5 +78,9 @@ public final class TelegRiseApplication {
 
     public void addHandler(Class<? extends PrimaryHandler> handlerClass){
         this.handlersClasses.add(handlerClass);
+    }
+
+    public void addResourceFactory(ResourceFactory<?> factory){
+        this.resourceFactories.add(factory);
     }
 }

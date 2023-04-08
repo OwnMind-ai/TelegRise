@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.resources.ResourceFactory;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,13 +21,15 @@ public class TelegramSessionsController {
     @Getter
     private final BotTranscription transcription;
     private final RoleProvider roleProvider;
+    private final List<ResourceFactory<?>> resourceFactories;
     @Setter
     private DefaultAbsSender sender;
     private final List<Class<? extends PrimaryHandler>> handlersClasses;
 
-    public TelegramSessionsController(BotTranscription transcription, RoleProvider roleProvider, List<Class<? extends PrimaryHandler>> handlersClasses) {
+    public TelegramSessionsController(BotTranscription transcription, RoleProvider roleProvider, List<ResourceFactory<?>> resourceFactories, List<Class<? extends PrimaryHandler>> handlersClasses) {
         this.transcription = transcription;
         this.roleProvider = roleProvider;
+        this.resourceFactories = resourceFactories;
         this.handlersClasses = handlersClasses;
     }
 
@@ -80,6 +83,7 @@ public class TelegramSessionsController {
 
     private void createSession(UserIdentifier identifier) {
         UserSession session = new UserSession(identifier, this.transcription, this.sender);
+        session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
         session.addHandlersClasses(this.handlersClasses);
         this.sessions.put(identifier, session);

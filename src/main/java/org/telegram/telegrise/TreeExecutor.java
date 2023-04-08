@@ -11,6 +11,7 @@ import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

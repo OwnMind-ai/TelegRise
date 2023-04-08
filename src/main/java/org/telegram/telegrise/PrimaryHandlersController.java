@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Handler;
+import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

@@ -9,6 +9,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
+import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 
@@ -21,6 +22,7 @@ public class UserSession implements Runnable{
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
     private final DefaultAbsSender sender;
+    @Getter
     private final ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
@@ -197,6 +199,11 @@ public class UserSession implements Runnable{
 
                 if (refresh.isExecute() && refresh.isTransit())
                     this.executeBranchingElement(executor.getTree(), update);
+
+                if (refresh.isTransit()) {
+                    executor.clearLastBranch();
+                    return;
+                }
             }
 
             if (executor.getLastBranch().getTransition() != null) {
@@ -230,6 +237,8 @@ public class UserSession implements Runnable{
     }
 
     private void executeBranchingElement(BranchingElement element, Update update){
+        if (element.getActions() == null) return;
+
         for (ActionElement actionElement : element.getActions()) {
             try {
                 UniversalSender.execute(sender, actionElement, this.createResourcePool(update));

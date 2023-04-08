@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//FIXME it's literally screaming for refactor
 public class UniversalSender {
     private static final UniversalSender instance = new UniversalSender();
 
