@@ -110,6 +110,7 @@ public class XMLTranscriptionParserTest {
         expectedTree.setBranches(List.of(expectedBranch));
 
         Menu expectedMenu = new Menu();
+        expectedMenu.setInterpretable(false);
         expectedMenu.setName("Main");
         expectedMenu.setActions(null);
         expectedMenu.setTrees(List.of(expectedTree));
