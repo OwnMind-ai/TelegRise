@@ -13,6 +13,7 @@ import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.TreeExecutor;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 
@@ -75,7 +76,7 @@ public class TransitionController {
                 sender.execute(EditMessageCaption.builder()
                         .chatId(target.getChatId())
                         .messageId(target.getMessageId())
-                        .caption(text.getText().generate(pool))
+                        .caption(text.generateText(pool))
                         .captionEntities(text.getEntities() != null ? text.getEntities().generate(pool) : List.of())
                         .parseMode(text.getParseMode() != null ? text.getParseMode().generate(pool) : null)
                         .replyMarkup(markup)
@@ -84,7 +85,7 @@ public class TransitionController {
                 sender.execute(EditMessageText.builder()
                         .chatId(target.getChatId())
                         .messageId(target.getMessageId())
-                        .text(text.getText().generate(pool))
+                        .text(text.generateText(pool))
                         .entities(text.getEntities() != null ? text.getEntities().generate(pool) : List.of())
                         .parseMode(text.getParseMode() != null ? text.getParseMode().generate(pool) : null)
                         .replyMarkup(markup)

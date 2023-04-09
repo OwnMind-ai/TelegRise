@@ -10,7 +10,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;

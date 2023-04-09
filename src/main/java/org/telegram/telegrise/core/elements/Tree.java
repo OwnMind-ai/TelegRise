@@ -12,9 +12,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.types.CommandData;
 import org.w3c.dom.Node;
 
@@ -64,6 +62,12 @@ public class Tree implements BranchingElement{
     private List<Menu> menus;
     @InnerElement
     private DefaultBranch defaultBranch;
+
+    @Override
+    public void validate(Node node, TranscriptionMemory memory) {
+        if(this.handler != null && (this.branches == null || this.branches.isEmpty()))
+            throw new TranscriptionParsingException("Trees with no branches cannot be connected to a handler", node);
+    }
 
     @Attribute(priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractHandler(Node node, LocalNamespace namespace){

@@ -40,7 +40,7 @@ public class MediaGroup implements MediaType{
     private List<InputMedia> applyCaption(List<InputMedia> media, Send parent, ResourcePool pool){
         assert media.size() > 1;
         InputMedia first = media.get(0);
-        first.setCaption(parent.getText() != null ? parent.getText().getText().generate(pool) : null);
+        first.setCaption(parent.getText() != null ? parent.getText().generateText(pool) : null);
         first.setCaptionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), List.of(), pool) : List.of());
         first.setParseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null);
 

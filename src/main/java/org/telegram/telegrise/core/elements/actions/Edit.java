@@ -10,7 +10,7 @@ import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
@@ -131,7 +131,7 @@ public class Edit implements ActionElement{
                 .chatId(this.generateChatId(pool))
                 .messageId(generateNullableProperty(messageId, pool))
                 .inlineMessageId(generateNullableProperty(inlineMessageId, pool))
-                .caption(text.getText().generate(pool))
+                .caption(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .captionEntities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .replyMarkup(createKeyboard(pool))
@@ -146,7 +146,7 @@ public class Edit implements ActionElement{
                 .chatId(this.generateChatId(pool))
                 .messageId(generateNullableProperty(messageId, pool))
                 .inlineMessageId(generateNullableProperty(inlineMessageId, pool))
-                .text(text.getText().generate(pool))
+                .text(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))

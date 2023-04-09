@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.parser.*;
@@ -73,7 +73,7 @@ public class Send implements ActionElement{
             assert first.size() > 0;
 
             if (this.text != null){
-                first.get(0).setCaption(this.text.getText().generate(pool));
+                first.get(0).setCaption(this.text.generateText(pool));
                 first.get(0).setParseMode(generateNullableProperty(text.getParseMode(), pool));
                 first.get(0).setCaptionEntities(generateNullableProperty(text.getEntities(), List.of(), pool));
             }
@@ -98,7 +98,7 @@ public class Send implements ActionElement{
         return SendMessage.builder()
                 .chatId(this.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(messageThreadId, pool))
-                .text(text.getText().generate(pool))
+                .text(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
                 .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))

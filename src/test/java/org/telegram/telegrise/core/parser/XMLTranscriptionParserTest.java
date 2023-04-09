@@ -21,6 +21,7 @@ import org.telegram.telegrise.core.elements.keyboard.Button;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.keyboard.Row;
 import org.telegram.telegrise.core.elements.media.Photo;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;

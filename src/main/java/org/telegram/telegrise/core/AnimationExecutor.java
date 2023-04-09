@@ -85,7 +85,7 @@ public class AnimationExecutor implements Runnable {
             case Frame.SEND:
                 this.messageId = this.sender.execute(SendMessage.builder()
                         .chatId(this.animation.generateChatId(pool))
-                        .text(frame.getText().getText().generate(pool))
+                        .text(frame.getText().generateText(pool))
                         .parseMode(frame.getText().getParseMode() != null ? frame.getText().getParseMode().generate(pool) : null)
                         .entities(frame.getText().getEntities() != null ? frame.getText().getEntities().generate(pool) : List.of())
                         .build()).getMessageId();
@@ -94,7 +94,7 @@ public class AnimationExecutor implements Runnable {
                 this.sender.execute(EditMessageText.builder()
                         .chatId(this.animation.generateChatId(pool))
                         .messageId(this.messageId)
-                        .text(frame.getText().getText().generate(pool))
+                        .text(frame.getText().generateText(pool))
                         .parseMode(frame.getText().getParseMode() != null ? frame.getText().getParseMode().generate(pool) : null)
                         .entities(frame.getText().getEntities() != null ? frame.getText().getEntities().generate(pool) : List.of())
                         .build());

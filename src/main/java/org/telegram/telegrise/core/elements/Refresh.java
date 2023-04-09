@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 

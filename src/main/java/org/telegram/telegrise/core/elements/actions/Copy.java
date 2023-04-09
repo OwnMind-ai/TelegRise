@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.Text;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
@@ -55,7 +55,7 @@ public class Copy implements ActionElement{
                 .messageThreadId( generateNullableProperty(messageThreadId, pool))
                 .fromChatId(fromChat.generate(pool))
                 .messageId(messageId.generate(pool))
-                .caption(this.caption != null ? caption.getText().generate(pool) : null)
+                .caption(this.caption != null ? caption.generateText(pool) : null)
                 .parseMode(this.caption != null ? generateNullableProperty(this.caption.getParseMode(), pool) : null)
                 .captionEntities(this.caption != null ? generateNullableProperty(this.caption.getEntities(), List.of(), pool) : List.of())
                 .disableNotification( generateNullableProperty(disableNotification, pool))
