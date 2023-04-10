@@ -199,7 +199,6 @@ public class UserSession implements Runnable{
             if (executor.getLastBranch().getTransition() != null) {
                 boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
                 execute = executor.getLastBranch().getTransition().isExecute();
-                executor.clearLastBranch();
 
                 if (interrupted) return;
             } else {

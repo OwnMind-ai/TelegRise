@@ -51,6 +51,9 @@ public class Keyboard implements StorableElement, TranscriptionElement {
     @Attribute(name = "autoClosable")
     private boolean autoClosable = true;
 
+    @Attribute(name = "filler")
+    private GeneratedValue<Void> filler;
+
     @Attribute(name = "id")
     private String id;
 
@@ -84,7 +87,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
             throw new TranscriptionParsingException("Dynamic keyboard must have an id attribute", node);
 
         if (dynamic && create != null)
-            throw new TranscriptionParsingException("'create' attribute conflicts with dynamic keyboard declaration", node);
+            throw new TranscriptionParsingException("'create' attribute conflicts with dynamic keyboard declaration, use 'filler' attribute to modify keyboard before action execution", node);
     }
 
     @Override
@@ -162,6 +165,8 @@ public class Keyboard implements StorableElement, TranscriptionElement {
         } else {
             DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);
             memory.put(this.id, keyboard);
+
+            if (filler != null) filler.generate(pool);
 
             if (pool.getCurrentExecutor() != null && autoClosable)
                 pool.getCurrentExecutor().connectKeyboard(this.id);

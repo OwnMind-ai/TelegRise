@@ -102,7 +102,7 @@ public class Tree implements BranchingElement{
     public boolean canHandleMessage(ResourcePool pool){
         Update update = pool.getUpdate();
 
-        if (!update.hasMessage()) return false;
+        if (!update.hasMessage() || update.getMessage().getText() == null) return false;
 
         if (this.commands != null) {
             CommandData command = MessageUtils.parseCommand(update.getMessage().getText());

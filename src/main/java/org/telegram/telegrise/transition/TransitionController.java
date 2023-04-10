@@ -93,6 +93,8 @@ public class TransitionController {
                 return;
         }
 
+        this.treeExecutors.getLast().open();
+
         throw new TelegRiseRuntimeException("Unable to find element called '" + transition.getTarget() + "'");
     }
 

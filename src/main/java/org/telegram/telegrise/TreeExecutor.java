@@ -100,6 +100,7 @@ public final class TreeExecutor {
             if (this.tree.getDefaultBranch() != null && this.tree.getDefaultBranch().getWhen().generate(resourcePool))
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
+            this.lastBranch = previous;
             this.close();
         }
     }
@@ -139,11 +140,11 @@ public final class TreeExecutor {
         return null;
     }
 
-    public void clearLastBranch() {
-        this.lastBranch = null;
-    }
-
     public void connectKeyboard(String id){
         this.relatedKeyboardIds.add(id);
+    }
+
+    public void open() {
+        this.closed = false;
     }
 }
