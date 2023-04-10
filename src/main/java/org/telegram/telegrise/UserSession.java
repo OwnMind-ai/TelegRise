@@ -6,7 +6,10 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.resources.ResourceInjector;
@@ -192,21 +195,10 @@ public class UserSession implements Runnable{
         this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
 
         if (executor.isClosed()){
-            if (executor.getLastBranch().getRefresh() != null){
-                Refresh refresh = executor.getLastBranch().getRefresh();
-                this.transitionController.applyRefresh(executor.getTree(), refresh, pool);
-
-                if (refresh.isExecute() && refresh.isTransit())
-                    this.executeBranchingElement(executor.getTree(), update);
-
-                if (refresh.isTransit()) {
-                    executor.clearLastBranch();
-                    return;
-                }
-            }
-
+            boolean execute = true;
             if (executor.getLastBranch().getTransition() != null) {
                 boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
+                execute = executor.getLastBranch().getTransition().isExecute();
                 executor.clearLastBranch();
 
                 if (interrupted) return;
@@ -218,7 +210,8 @@ public class UserSession implements Runnable{
             if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
                 this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory));
 
-            this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
+            if (execute)
+                this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
         } else {
             this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
         }

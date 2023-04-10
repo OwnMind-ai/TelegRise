@@ -33,7 +33,7 @@ public class Transition implements TranscriptionElement{
     private String type;
 
     @Attribute(name = "execute")
-    private boolean execute;
+    private boolean execute = true;
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {

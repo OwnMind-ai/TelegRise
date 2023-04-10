@@ -1,21 +1,11 @@
 package org.telegram.telegrise.transition;
 
-import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.TreeExecutor;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
-import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.keyboard.DynamicKeyboard;
 
 import java.util.Deque;
 import java.util.Iterator;
@@ -41,74 +31,6 @@ public class TransitionController {
             case Transition.CALLER: this.applyCaller(tree, transition); return false;
             default: throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
         }
-    }
-
-    public void applyRefresh(Tree tree, Refresh refresh, ResourcePool pool) {
-        Message targetMessage = this.extractMessageTarget(refresh, pool);
-
-        try {
-            this.refreshMessage(refresh, targetMessage, pool);
-        } catch (TelegramApiException e) {
-            if (!refresh.isSneaky()) throw new RuntimeException(e);
-        }
-
-        if (refresh.isTransit()) {
-            assert tree.getName().equals(this.treeExecutors.getLast().getTree().getName());
-            this.treeExecutors.getLast().setCurrentBranch(null);
-        }
-    }
-
-    private void refreshMessage(Refresh refresh, Message target, ResourcePool pool) throws TelegramApiException {
-        DefaultAbsSender sender = pool.getSender();
-        InlineKeyboardMarkup markup = refresh.getKeyboardId() != null ?
-                pool.getMemory().get(refresh.getKeyboardId(), DynamicKeyboard.class).createInline(pool)
-                :  refresh.getKeyboard() != null ? (InlineKeyboardMarkup) refresh.getKeyboard().createMarkup(pool) : null;
-
-        if (refresh.getText() == null && markup != null){
-            sender.execute(EditMessageReplyMarkup.builder()
-                            .chatId(target.getChatId())
-                            .messageId(target.getMessageId())
-                            .replyMarkup(markup)
-                            .build());
-        } else if (refresh.getText() != null){
-            Text text = refresh.getText();
-
-            if (MessageUtils.hasMedia(target))
-                sender.execute(EditMessageCaption.builder()
-                        .chatId(target.getChatId())
-                        .messageId(target.getMessageId())
-                        .caption(text.generateText(pool))
-                        .captionEntities(text.getEntities() != null ? text.getEntities().generate(pool) : List.of())
-                        .parseMode(text.getParseMode() != null ? text.getParseMode().generate(pool) : null)
-                        .replyMarkup(markup)
-                        .build());
-            else
-                sender.execute(EditMessageText.builder()
-                        .chatId(target.getChatId())
-                        .messageId(target.getMessageId())
-                        .text(text.generateText(pool))
-                        .entities(text.getEntities() != null ? text.getEntities().generate(pool) : List.of())
-                        .parseMode(text.getParseMode() != null ? text.getParseMode().generate(pool) : null)
-                        .replyMarkup(markup)
-                        .build());
-        } else
-            throw new TelegRiseRuntimeException("Nothing to refresh");
-    }
-
-    private Message extractMessageTarget(Refresh refresh, ResourcePool pool){
-        if (Refresh.LAST.equals(refresh.getType())){
-            if (pool.getMemory().getLastSentMessage() == null)
-                throw new TelegRiseRuntimeException("Unable to apply refresh element: last sent message doesn't exists");
-            
-            return pool.getMemory().getLastSentMessage();
-        } else if (Refresh.CALLBACK.equals(refresh.getType())) {
-            if (pool.getUpdate() == null || !pool.getUpdate().hasCallbackQuery())
-                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed update has no callback query");
-
-            return pool.getUpdate().getCallbackQuery().getMessage();
-        }
-
-        throw new TelegRiseRuntimeException("Unable to apply refresh element: unknown refresh type " + refresh.getType());
     }
 
     private void applyCaller(Tree tree, Transition transition) {

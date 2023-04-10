@@ -39,9 +39,6 @@ public class Branch implements StorableElement, TranscriptionElement{
     @InnerElement
     private Transition transition;
 
-    @InnerElement
-    private Refresh refresh;
-
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
         if (when == null && callbackTriggers == null && keys == null)
@@ -49,9 +46,6 @@ public class Branch implements StorableElement, TranscriptionElement{
 
         if (transition != null && (defaultBranch != null || (branches != null && !branches.isEmpty())))
             throw new TranscriptionParsingException("Branch cannot contain other branches if a transition is defined", node);
-
-        if (refresh != null && transition != null && refresh.isTransit())
-            throw new TranscriptionParsingException("Refresh element with enabled transition conflicts with transition element in the branch", node);
     }
 
     @Override
