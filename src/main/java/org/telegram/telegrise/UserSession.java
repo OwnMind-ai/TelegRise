@@ -194,7 +194,7 @@ public class UserSession implements Runnable{
         if (executor.isClosed()){
             if (executor.getLastBranch().getRefresh() != null){
                 Refresh refresh = executor.getLastBranch().getRefresh();
-                this.transitionController.applyUpdate(executor.getTree(), refresh, pool);
+                this.transitionController.applyRefresh(executor.getTree(), refresh, pool);
 
                 if (refresh.isExecute() && refresh.isTransit())
                     this.executeBranchingElement(executor.getTree(), update);

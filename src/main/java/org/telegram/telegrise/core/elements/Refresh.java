@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
@@ -30,13 +31,19 @@ public class Refresh implements TranscriptionElement{
     @InnerElement
     private Text text;
 
+    @InnerElement
+    private Keyboard keyboard;
+
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
         if (!LAST.equals(type) && !CALLBACK.equals(type))
             throw new TranscriptionParsingException("Invalid refresh type '" + type + "', possible types are: '"
                     + LAST + "' or '" + CALLBACK + "'" , node);
 
-        if (text == null && keyboardId == null)
+        if (text == null && keyboardId == null && keyboard == null)
             throw new TranscriptionParsingException("No keyboard or text specified", node);
+
+        if (keyboard != null && keyboardId != null)
+            throw new TranscriptionParsingException("KeyboardId and keyboard element conflict with each other", node);
     }
 }

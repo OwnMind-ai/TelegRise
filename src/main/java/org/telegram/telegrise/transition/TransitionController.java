@@ -43,7 +43,7 @@ public class TransitionController {
         }
     }
 
-    public void applyUpdate(Tree tree, Refresh refresh, ResourcePool pool) {
+    public void applyRefresh(Tree tree, Refresh refresh, ResourcePool pool) {
         Message targetMessage = this.extractMessageTarget(refresh, pool);
 
         try {
@@ -60,8 +60,9 @@ public class TransitionController {
 
     private void refreshMessage(Refresh refresh, Message target, ResourcePool pool) throws TelegramApiException {
         DefaultAbsSender sender = pool.getSender();
-        InlineKeyboardMarkup markup = refresh.getKeyboardId() == null ? null :
-                pool.getMemory().get(refresh.getKeyboardId(), DynamicKeyboard.class).createInline(pool);
+        InlineKeyboardMarkup markup = refresh.getKeyboardId() != null ?
+                pool.getMemory().get(refresh.getKeyboardId(), DynamicKeyboard.class).createInline(pool)
+                :  refresh.getKeyboard() != null ? (InlineKeyboardMarkup) refresh.getKeyboard().createMarkup(pool) : null;
 
         if (refresh.getText() == null && markup != null){
             sender.execute(EditMessageReplyMarkup.builder()
