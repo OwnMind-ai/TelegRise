@@ -106,7 +106,7 @@ public class XMLTranscriptionParserTest {
         expectedTree.setCallbackTriggers(new String[]{"callback-data"});
         expectedTree.setKeys(new String[]{"first", "second"});
         expectedTree.setCommands(new String[]{"example"});
-        expectedTree.setHandler(this.getClass());
+        expectedTree.setController(this.getClass());
         expectedTree.setActions(List.of(treeSend));
         expectedTree.setBranches(List.of(expectedBranch));
 

@@ -80,7 +80,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
-        if (!((type != null && rows != null) || byName != null || create != null))
+        if (!((type != null && rows != null) || byName != null || create != null || (dynamic && filler != null)))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
 
         if (dynamic && (id == null || id.length() < 1))
@@ -167,6 +167,7 @@ public class Keyboard implements StorableElement, TranscriptionElement {
             memory.put(this.id, keyboard);
 
             if (filler != null) filler.generate(pool);
+            keyboard.reloadSwitches();
 
             if (pool.getCurrentExecutor() != null && autoClosable)
                 pool.getCurrentExecutor().connectKeyboard(this.id);

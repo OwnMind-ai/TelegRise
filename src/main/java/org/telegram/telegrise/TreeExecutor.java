@@ -22,14 +22,14 @@ public final class TreeExecutor {
     public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory) {
         try {
             Object handler = null;
-            if (tree.getHandler() != null) {
-                handler = tree.getHandler().getConstructor().newInstance();
+            if (tree.getController() != null) {
+                handler = tree.getController().getConstructor().newInstance();
                 resourceInjector.injectResources(handler);
             }
 
             return new TreeExecutor(memory, handler, tree, sender);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            String startMessage = "Cannot create instance of '" + tree.getHandler().getSimpleName() + "': ";
+            String startMessage = "Cannot create instance of '" + tree.getController().getSimpleName() + "': ";
 
             if (e instanceof NoSuchMethodException)
                 throw new TelegRiseRuntimeException(startMessage + "class must have constructor with no arguments");
@@ -55,7 +55,7 @@ public final class TreeExecutor {
     private final SessionMemoryImpl memory;
 
     @Getter
-    private final Object handlerInstance;
+    private final Object controllerInstance;
     @Getter
     private final Tree tree;
     @Getter
@@ -68,9 +68,9 @@ public final class TreeExecutor {
     @Getter
     private Branch lastBranch;
 
-    public TreeExecutor(SessionMemoryImpl memory, Object handlerInstance, Tree tree, DefaultAbsSender sender) {
+    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, DefaultAbsSender sender) {
         this.memory = memory;
-        this.handlerInstance = handlerInstance;
+        this.controllerInstance = controllerInstance;
         this.tree = tree;
         this.sender = sender;
     }
@@ -78,7 +78,7 @@ public final class TreeExecutor {
     public void update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, handlerInstance, this.sender, this.memory, this);
+        ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, this);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
@@ -115,7 +115,7 @@ public final class TreeExecutor {
     }
 
     public void beforeRemoving(){
-        ResourcePool pool = new ResourcePool(null, handlerInstance, this.sender, this.memory, this);
+        ResourcePool pool = new ResourcePool(null, controllerInstance, this.sender, this.memory, this);
 
         if (this.getTree().getOnClose() != null)
             this.getTree().getOnClose().generate(pool);

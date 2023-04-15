@@ -19,13 +19,15 @@ public final class DynamicKeyboard implements Serializable {
     public static DynamicKeyboard ofKeyboard(Keyboard keyboard, ResourcePool pool){
         DynamicKeyboard dynamicKeyboard = new DynamicKeyboard();
 
-        dynamicKeyboard.getRows().addAll(keyboard.getRows().stream().map(row -> {
-            DynamicRow dynamicRow = DynamicRow.ofRow(row, pool);
-            dynamicRow.getButtons().stream().filter(SwitchButton.class::isInstance)
-                    .forEach(s -> dynamicKeyboard.switches.put(((SwitchButton) s).getName(), (SwitchButton) s));
+        if (keyboard.getRows() != null) {
+            dynamicKeyboard.getRows().addAll(keyboard.getRows().stream().map(row -> {
+                DynamicRow dynamicRow = DynamicRow.ofRow(row, pool);
+                dynamicRow.getButtons().stream().filter(SwitchButton.class::isInstance)
+                        .forEach(s -> dynamicKeyboard.switches.put(((SwitchButton) s).getName(), (SwitchButton) s));
 
-            return dynamicRow;
-        }).collect(Collectors.toList()));
+                return dynamicRow;
+            }).collect(Collectors.toList()));
+        }
 
         dynamicKeyboard.isPersistent = keyboard.getIsPersistent();
         dynamicKeyboard.oneTime = keyboard.getOneTime();
@@ -88,6 +90,14 @@ public final class DynamicKeyboard implements Serializable {
         }
 
         return null;
+    }
+
+
+    public void reloadSwitches(){
+        switches.clear();
+        this.rows.stream().map(DynamicRow::getButtons).flatMap(List::stream)
+                .filter(SwitchButton.class::isInstance)
+                .forEach(s -> this.switches.put(((SwitchButton) s).getName(), (SwitchButton) s));
     }
 
     public SwitchButton getSwitch(CallbackQuery query){

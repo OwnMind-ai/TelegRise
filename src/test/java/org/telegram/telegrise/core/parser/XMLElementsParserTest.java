@@ -103,7 +103,7 @@ public class XMLElementsParserTest {
         parser.load();
 
         Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
-                "              handler=\"XMLElementsParserTest\" type=\"reply\">\n" +
+                "              controller=\"XMLElementsParserTest\" type=\"reply\">\n" +
                 "            <send chat=\"-1\">\n" +
                 "               <text parseMode=\"markdown\">Text</text>\n" +
                 "            </send>" +
@@ -135,7 +135,7 @@ public class XMLElementsParserTest {
         expected.setCallbackTriggers(new String[]{"callback-data"});
         expected.setKeys(new String[]{"first", "second"});
         expected.setCommands(new String[]{"example"});
-        expected.setHandler(this.getClass());
+        expected.setController(this.getClass());
         expected.setActions(List.of(treeSend));
         expected.setBranches(List.of(expectedBranch));
 
@@ -149,9 +149,9 @@ public class XMLElementsParserTest {
 
         Node node = toNode("<keyboard name=\"name\" type=\"inline\">\n" +
                 "                    <row>\n" +
-                "                        <button callbackData=\"first\">First</button>\n" +
-                "                        <button callbackData=\"second\">Second</button>\n" +
-                "                        <button callbackData=\"third\" when=\"${false}\">Third</button>\n" +
+                "                        <button data=\"first\">First</button>\n" +
+                "                        <button data=\"second\">Second</button>\n" +
+                "                        <button data=\"third\" when=\"${false}\">Third</button>\n" +
                 "                    </row>\n" +
                 "                    <row><button url=\"url\">URL</button></row>\n" +
                 "                </keyboard>");

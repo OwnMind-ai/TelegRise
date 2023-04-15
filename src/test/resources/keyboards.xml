@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <keyboards>
     <keyboard name="first" type="inline">
-        <row><button callbackData="first">First</button></row>
-        <row><button callbackData="second">Second</button></row>
+        <row><button data="first">First</button></row>
+        <row><button data="second">Second</button></row>
     </keyboard>
     <keyboard name="second" type="inline">
-        <row><button callbackData="first">First</button></row>
-        <row><button callbackData="second">Second</button></row>
+        <row><button data="first">First</button></row>
+        <row><button data="second">Second</button></row>
     </keyboard>
 </keyboards>

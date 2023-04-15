@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 public class Button implements TranscriptionElement {
     private GeneratedValue<String> text;
 
-    @Attribute(name = "callbackData")
+    @Attribute(name = "data")
     private GeneratedValue<String> callbackData;
 
     @Attribute(name = "url")

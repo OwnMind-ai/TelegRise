@@ -6,7 +6,7 @@
     </head>
     <menu name="Main" type="reply">
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
-              handler="XMLTranscriptionParserTest" type="reply">
+              controller="XMLTranscriptionParserTest" type="reply">
             <send>
                 <text parseMode="markdown">Text</text>
             </send>

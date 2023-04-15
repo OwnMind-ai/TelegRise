@@ -52,7 +52,7 @@ public class Tree implements BranchingElement{
     @Attribute(name = "accessLevel")
     private Integer accessLevel;
 
-    private Class<?> handler;
+    private Class<?> controller;
 
     @InnerElement
     private List<ActionElement> actions;
@@ -65,21 +65,21 @@ public class Tree implements BranchingElement{
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
-        if(this.handler != null && (this.branches == null || this.branches.isEmpty()))
-            throw new TranscriptionParsingException("Trees with no branches cannot be connected to a handler", node);
+        if(this.controller != null && (this.branches == null || this.branches.isEmpty()))
+            throw new TranscriptionParsingException("Trees with no branches cannot be connected to a controller", node);
     }
 
     @Attribute(priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractHandler(Node node, LocalNamespace namespace){
-        if (node.getAttributes().getNamedItem("handler") != null)
-            this.handler = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("handler").getNodeValue());
+        if (node.getAttributes().getNamedItem("controller") != null)
+            this.controller = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("controller").getNodeValue());
 
         return this.createNamespace(namespace.getApplicationNamespace());
     }
 
     @Override
     public LocalNamespace createNamespace(ApplicationNamespace global) {
-        return handler == null ? null : new LocalNamespace(handler, global);
+        return controller == null ? null : new LocalNamespace(controller, global);
     }
 
     public boolean canHandle(ResourcePool pool, List<String> chatTypes){
