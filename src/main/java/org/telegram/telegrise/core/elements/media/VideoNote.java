@@ -35,6 +35,9 @@ public class VideoNote implements MediaType{
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         return SendVideoNote.builder()

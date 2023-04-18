@@ -55,7 +55,7 @@ public class Send implements ActionElement{
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
-        if (!this.medias.stream().allMatch(MediaType::isGroupable))
+        if (this.medias.size() > 1 && !this.medias.stream().allMatch(MediaType::isGroupable))
             throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
     }
 
@@ -64,12 +64,20 @@ public class Send implements ActionElement{
         return this.keyboard != null ? this.keyboard.createMarkup(pool) : null;
     }
 
+    private List<MediaType> getReadyMedias(ResourcePool pool){
+        if (this.medias.isEmpty()) return this.medias;
+
+        return this.medias.stream().filter(m -> m.getWhen().generate(pool)).collect(Collectors.toList());
+    }
+
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool pool) {
-        if (medias.size() == 1){
-            return this.medias.get(0).createSender(this, pool);
-        } else if (medias.size() > 1) {
-            List<InputMedia> first = this.medias.get(0).createInputMedia(pool);
+        List<MediaType> readyMedias = this.getReadyMedias(pool);
+
+        if (readyMedias.size() == 1){
+            return readyMedias.get(0).createSender(this, pool);
+        } else if (readyMedias.size() > 1) {
+            List<InputMedia> first = readyMedias.get(0).createInputMedia(pool);
             assert first.size() > 0;
 
             if (this.text != null){
@@ -84,7 +92,7 @@ public class Send implements ActionElement{
                     .medias(
                             Stream.concat(
                                     first.stream(),
-                                    this.medias.subList(1, this.medias.size()).stream()
+                                    readyMedias.subList(1, readyMedias.size()).stream()
                                             .flatMap(m -> m.createInputMedia(pool).stream())
                             ).collect(Collectors.toList())
                     )

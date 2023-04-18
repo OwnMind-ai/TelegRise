@@ -29,6 +29,9 @@ public class Voice implements MediaType{
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         return SendVoice.builder()

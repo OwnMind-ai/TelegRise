@@ -44,6 +44,9 @@ public class Video implements MediaType, TranscriptionElement {
     @Attribute(name = "supportsStreaming")
     private GeneratedValue<Boolean> supportsStreaming;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);

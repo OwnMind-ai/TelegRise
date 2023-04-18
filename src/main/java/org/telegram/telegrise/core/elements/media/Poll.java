@@ -42,6 +42,8 @@ public class Poll implements MediaType {
     private GeneratedValue<Integer> closeDate;
     @Attribute(name = "isClosed")
     private GeneratedValue<Boolean> isClosed;
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {

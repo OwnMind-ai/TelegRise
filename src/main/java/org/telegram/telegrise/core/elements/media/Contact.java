@@ -29,6 +29,9 @@ public class Contact implements MediaType {
     @Attribute(name = "vcard")
     private GeneratedValue<String> vcard;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         return SendContact.builder()

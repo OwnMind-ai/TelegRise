@@ -14,6 +14,7 @@ import java.util.List;
 public interface MediaType extends TranscriptionElement {
     PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool);
     List<InputMedia> createInputMedia(ResourcePool pool);
+    GeneratedValue<Boolean> getWhen();
 
     default boolean isGroupable() {
         return true;

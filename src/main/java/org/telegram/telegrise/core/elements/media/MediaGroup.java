@@ -21,6 +21,9 @@ public class MediaGroup implements MediaType{
     @Attribute(name = "inputMedia", nullable = false)
     private GeneratedValue<List<InputMedia>> inputMedia;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         List<InputMedia> media = inputMedia.generate(pool);

@@ -34,7 +34,8 @@ public class Venue implements MediaType{
     private GeneratedValue<String> googlePlaceId;
     @Attribute(name = "googlePlaceType")
     private GeneratedValue<String> googlePlaceType;
-
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {

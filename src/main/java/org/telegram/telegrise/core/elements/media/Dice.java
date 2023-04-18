@@ -20,6 +20,9 @@ public class Dice implements MediaType{
     @Attribute(name = "emoji")
     private GeneratedValue<String> emoji;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
+
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         return SendDice.builder()

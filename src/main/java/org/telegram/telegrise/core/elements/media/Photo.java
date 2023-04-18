@@ -32,7 +32,8 @@ public class Photo implements MediaType{
     @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
-
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {

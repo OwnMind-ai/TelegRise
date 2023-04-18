@@ -30,6 +30,8 @@ public class Location implements MediaType{
     @Attribute(name = "proximityAlertRadius")
     private GeneratedValue<Integer> proximityAlertRadius;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {

@@ -12,6 +12,7 @@ import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
+import java.util.Collections;
 import java.util.List;
 
 @Element(name = "media")
@@ -21,7 +22,10 @@ public class Media implements MediaType{
     private GeneratedValue<PartialBotApiMethod<?>> sendMethod;
 
     @Attribute(name = "inputMedia")
-    private GeneratedValue<List<InputMedia>> inputMedia;
+    private GeneratedValue<InputMedia> inputMedia;
+
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
@@ -33,7 +37,7 @@ public class Media implements MediaType{
 
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
-        return inputMedia.generate(pool);
+        return Collections.singletonList(inputMedia.generate(pool));
     }
 
     @Override
