@@ -1,7 +1,7 @@
 package org.telegram.telegrise.core.expressions;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 
 public final class MethodReference implements Serializable {
     private transient Method method;
@@ -39,13 +40,15 @@ public final class MethodReference implements Serializable {
     }
 
     public Object invokeSingle(ResourcePool pool) throws InvocationTargetException, IllegalAccessException {
-        if (method.getParameterTypes().length == 0)
-            return this.method.invoke(pool.getHandler());
-        else if (Arrays.equals(method.getParameterTypes(), new Class[]{Update.class})) {
-            return this.method.invoke(pool.getHandler(), pool.getUpdate());
-        } else {
-            throw new UnsupportedOperationException();
-        }
+        Map<Class<?>, Object> components = pool.getComponents();
+
+        if (!Arrays.stream(method.getParameterTypes()).allMatch(components::containsKey))
+            throw new TelegRiseRuntimeException("Illegal parameters in method '" + this.method.getName() + "'");
+
+        Object[] parameters = Arrays.stream(method.getParameterTypes())
+                .map(components::get).toArray();
+
+        return this.method.invoke(pool.getHandler(), parameters);
     }
 
     private Object invokeWithNext(Object instance, Object parameter) throws InvocationTargetException, IllegalAccessException {

@@ -32,6 +32,7 @@ public class Media implements MediaType{
         if (sendMethod == null)
             throw new TelegRiseRuntimeException("Unable to send media: send method is null");
 
+        pool.addComponent(parent);
         return sendMethod.generate(pool);
     }
 

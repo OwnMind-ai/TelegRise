@@ -50,9 +50,8 @@ public class ExpressionParser {
     public GeneratedValue<?> parse(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         int hashcode = this.calculateHashcode(expression, namespace);
 
-        if (isExpressionExists(hashcode)) {
+        if (this.isExpressionExists(hashcode))
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
-        }
 
         JavaClassSource source;
         try {
@@ -62,7 +61,7 @@ public class ExpressionParser {
         }
 
         File sourceFile = this.createSourceFile(source, hashcode);
-        compileSourceFile(sourceFile, node);
+        this.compileSourceFile(sourceFile, node);
 
         return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
     }
