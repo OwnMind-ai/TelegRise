@@ -13,29 +13,17 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.resources.ResourceInjector;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public final class TreeExecutor {
     public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory) {
-        try {
-            Object handler = null;
-            if (tree.getController() != null) {
-                handler = tree.getController().getConstructor().newInstance();
-                resourceInjector.injectResources(handler);
-            }
+        Object handler = null;
+        if (tree.getController() != null)
+            handler = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
 
-            return new TreeExecutor(memory, handler, tree, sender);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            String startMessage = "Cannot create instance of '" + tree.getController().getSimpleName() + "': ";
-
-            if (e instanceof NoSuchMethodException)
-                throw new TelegRiseRuntimeException(startMessage + "class must have constructor with no arguments");
-            else
-                throw new TelegRiseRuntimeException(startMessage + e.getMessage());
-        }
+        return new TreeExecutor(memory, handler, tree, sender);
     }
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, DefaultAbsSender sender){
