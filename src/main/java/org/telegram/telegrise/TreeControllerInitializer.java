@@ -28,8 +28,10 @@ public class TreeControllerInitializer {
         if (onCreateMethod.isPresent()) {
             try {
                 onCreateMethod.get().invoke(instance);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e.getTargetException());
             }
         }
 

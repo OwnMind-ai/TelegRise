@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.annotations.OnClose;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
@@ -13,9 +14,12 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.resources.ResourceInjector;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public final class TreeExecutor {
     public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory) {
@@ -103,12 +107,23 @@ public final class TreeExecutor {
     }
 
     public void beforeRemoving(){
-        ResourcePool pool = new ResourcePool(null, controllerInstance, this.sender, this.memory, this);
-
-        if (this.getTree().getOnClose() != null)
-            this.getTree().getOnClose().generate(pool);
-
+        this.executeOnCloseMethod();
         this.relatedKeyboardIds.forEach(this.memory::remove);
+    }
+
+    private void executeOnCloseMethod() {
+        Optional<Method> onCloseMethod = Arrays.stream(this.controllerInstance.getClass().getMethods())
+                .filter(m -> m.isAnnotationPresent(OnClose.class)).findFirst();
+
+        if (onCloseMethod.isPresent()) {
+            try {
+                onCloseMethod.get().invoke(this.controllerInstance);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e.getTargetException());
+            }
+        }
     }
 
     private Branch getNextBranch(List<Branch> branches, ResourcePool resourcePool) {
