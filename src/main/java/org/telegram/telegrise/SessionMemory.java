@@ -29,4 +29,5 @@ public interface SessionMemory extends Serializable {
     @Nullable Message getLastSentMessage();
 
     String getBotUsername();
+    UserIdentifier getUserIdentifier();
 }
