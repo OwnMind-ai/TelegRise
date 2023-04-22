@@ -99,7 +99,7 @@ public class UserSession implements Runnable{
 
         else if (this.sessionMemory.isOnStack(Tree.class)) {
             Tree tree = (Tree) this.sessionMemory.getBranchingElements().getLast();
-            if (this.transcription.isInterruptions() && tree.isInterpretable() && pool.getUpdate().hasMessage()){
+            if (this.transcription.isInterruptions() && tree.isInterruptible() && pool.getUpdate().hasMessage()){
                 Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
                         .filter(t -> t.canHandleMessage(pool)).findFirst();
                 if (treeCandidate.isPresent()){

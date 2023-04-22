@@ -28,7 +28,7 @@ public class Tree implements BranchingElement{
     @Attribute(name = "name", nullable = false)
     private String name;
     @Attribute(name = "interruptible")
-    private boolean interpretable = true;
+    private boolean interruptible = true;
 
     @Attribute(name = "commands")
     private String[] commands;

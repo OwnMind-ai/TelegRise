@@ -12,6 +12,7 @@ import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.telegram.telegrise.resources.ResourceFactory;
+import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public final class TelegRiseApplication {
     private ClassLoader classLoader = this.getClass().getClassLoader();
     private final List<Class<? extends PrimaryHandler>> handlersClasses = new ArrayList<>();
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
+    private final ServiceManager serviceManager = new ServiceManager();
 
     @Setter
     private RoleProvider roleProvider;
@@ -53,6 +55,9 @@ public final class TelegRiseApplication {
         TelegramLongPollingBot bot = BotFactory.createLongPooling(controller.getTranscription(), controller::onUpdateReceived);
         controller.setSender(bot);
         controller.initialize();
+
+        serviceManager.setInjector(new ResourceInjector(this.resourceFactories, bot));
+        serviceManager.startServices();
 
         try {
             api.registerBot(bot);
@@ -82,5 +87,9 @@ public final class TelegRiseApplication {
 
     public void addResourceFactory(ResourceFactory<?> factory){
         this.resourceFactories.add(factory);
+    }
+
+    public void addService(Service service){
+        this.serviceManager.add(service);
     }
 }
