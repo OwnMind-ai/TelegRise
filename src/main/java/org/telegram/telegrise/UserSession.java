@@ -19,6 +19,7 @@ import org.telegram.telegrise.types.UserRole;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
@@ -33,17 +34,17 @@ public class UserSession implements Runnable{
     private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
     private final TransitionController transitionController;
     private final PrimaryHandlersController primaryHandlersController;
+    private final MediaCollector mediaCollector = new MediaCollector(this.updateQueue);
     @Setter
     private RoleProvider roleProvider;
-    @Getter
-    private boolean running;
+    private final AtomicBoolean running = new AtomicBoolean();
 
     public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender) {
         this.userIdentifier.set(userIdentifier);
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -59,7 +60,7 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.resourceInjector = new ResourceInjector(this.sessionMemory);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory());
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -73,15 +74,21 @@ public class UserSession implements Runnable{
         this.updateQueue.add(update);
     }
 
+    public boolean isRunning(){
+        return this.running.get();
+    }
+
     @Override
     public void run() {
-        try {
-            this.running = true;
+        if (this.running.get()) return;
 
+        this.running.set(true);
+
+        try {
             while (!this.updateQueue.isEmpty())
                 this.handleUpdate(this.updateQueue.remove());
         } finally {
-            this.running = false;
+            this.running.set(false);
         }
     }
 
@@ -113,7 +120,6 @@ public class UserSession implements Runnable{
     }
 
     private void interruptTreeChain(Update update, Tree tree) {
-        ResourcePool pool = this.createResourcePool(update);
         this.treeExecutors.forEach(TreeExecutor::beforeRemoving);
 
         this.treeExecutors.clear();

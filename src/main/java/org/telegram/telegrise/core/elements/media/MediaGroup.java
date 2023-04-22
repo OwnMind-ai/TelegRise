@@ -29,9 +29,14 @@ public class MediaGroup implements MediaType{
         List<InputMedia> media = inputMedia.generate(pool);
 
         if (media.size() <= 1 || media.size() > 10)
-            throw new TelegRiseRuntimeException("Number of media should be between 2 and 10");
+            throw new TelegRiseRuntimeException("Number of media must be between 2 and 10");
 
         return SendMediaGroup.builder().medias(this.applyCaption(media, parent, pool))
+                .chatId(parent.generateChatId(pool))
+                .allowSendingWithoutReply(generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
+                .disableNotification(generateNullableProperty(parent.getDisableNotification(), pool))
+                .protectContent(generateNullableProperty(parent.getProtectContent(), pool))
+                .replyToMessageId(generateNullableProperty(parent.getReplyTo(), pool))
                 .build();
     }
 
