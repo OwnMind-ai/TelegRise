@@ -1,9 +1,7 @@
 package org.telegram.telegrise;
 
-import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.media.*;
 import org.telegram.telegrise.types.CommandData;
 
 import java.util.regex.Matcher;
@@ -51,5 +49,54 @@ public class MessageUtils {
         if (!matcher.find()) return null;
 
         return new CommandData(matcher.group("name"), matcher.group("username"));
+    }
+
+    public static InputMedia toInputMedia(Message message){
+        if (!hasMedia(message)) return null;
+
+        InputMedia result;
+
+        if (message.hasPhoto()){
+            result = InputMediaPhoto.builder()
+                    .media(message.getPhoto().get(0).getFileId())
+                    .hasSpoiler(message.getHasMediaSpoiler())
+                    .build();
+        } else if (message.hasVideo()) {
+            result = InputMediaVideo.builder()
+                    .media(message.getVideo().getFileId())
+                    .width(message.getVideo().getWidth())
+                    .height(message.getVideo().getHeight())
+                    .duration(message.getVideo().getDuration())
+                    .thumb(new InputFile(message.getVideo().getThumb().getFileId()))
+                    .hasSpoiler(message.getHasMediaSpoiler())
+                    .build();
+        } else if (message.hasAudio()) {
+            result = InputMediaAudio.builder()
+                    .media(message.getAudio().getFileId())
+                    .duration(message.getAudio().getDuration())
+                    .performer(message.getAudio().getPerformer())
+                    .title(message.getAudio().getTitle())
+                    .thumb(new InputFile(message.getAudio().getThumb().getFileId()))
+                    .build();
+        } else if (message.hasDocument()) {
+            result = InputMediaDocument.builder()
+                    .media(message.getDocument().getFileId())
+                    .thumb(new InputFile(message.getDocument().getThumb().getFileId()))
+                    .build();
+        } else if (message.hasAnimation()) {
+            result = InputMediaAnimation.builder()
+                    .media(message.getAnimation().getFileId())
+                    .width(message.getAnimation().getWidth())
+                    .height(message.getAnimation().getHeight())
+                    .duration(message.getAnimation().getDuration())
+                    .thumb(new InputFile(message.getAnimation().getThumb().getFileId()))
+                    .build();
+        } else
+            return null;
+
+        result.setCaption(message.getCaption());
+        result.setCaptionEntities(message.getCaptionEntities());
+
+        return result;
     }
 }
