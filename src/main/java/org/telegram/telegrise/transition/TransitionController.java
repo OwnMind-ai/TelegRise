@@ -54,8 +54,14 @@ public class TransitionController {
                 }
             });
 
-        if (point.getNextTransition() != null)
+        if (point.getNextTransition() != null) {
+            if(this.treeExecutors.getLast().getTree().getName().equals(tree.getName())) {
+                this.treeExecutors.getLast().close();
+                this.treeExecutors.removeLast();
+            }
+
             return this.applyTransition(tree, point.getNextTransition(), pool);
+        }
 
         this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false, null, null));
 
