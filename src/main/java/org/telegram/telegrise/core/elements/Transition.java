@@ -3,10 +3,8 @@ package org.telegram.telegrise.core.elements;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrise.core.parser.Attribute;
-import org.telegram.telegrise.core.parser.Element;
-import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -35,12 +33,21 @@ public class Transition implements TranscriptionElement{
     @Attribute(name = "execute")
     private boolean execute = true;
 
+    @InnerElement
+    private List<ActionElement> actions;
+
+    @InnerElement
+    private Transition nextTransition;
+
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
         if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
                 && !direction.equals(LOCAL) && !direction.equals(CALLER))
             throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '"
                     + NEXT + "', '" + PREVIOUS + "', '" + LOCAL + "' or '" + JUMP + "'" , node);
+
+        if (!JUMP.equals(this.direction) && (this.nextTransition != null || this.actions != null))
+            throw new TranscriptionParsingException("Transitions with direction other then '" + JUMP + "' cannot contain next transition or actions", node);
 
         if (type != null && !TYPE_LIST.contains(this.type))
             throw new TranscriptionParsingException("Invalid type '" + type + "', possible types are: " + String.join(", ", TYPE_LIST), node);

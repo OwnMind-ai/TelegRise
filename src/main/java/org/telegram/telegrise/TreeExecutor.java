@@ -112,6 +112,8 @@ public final class TreeExecutor {
     }
 
     private void executeOnCloseMethod() {
+        if (this.controllerInstance == null) return;
+
         Optional<Method> onCloseMethod = Arrays.stream(this.controllerInstance.getClass().getMethods())
                 .filter(m -> m.isAnnotationPresent(OnClose.class)).findFirst();
 

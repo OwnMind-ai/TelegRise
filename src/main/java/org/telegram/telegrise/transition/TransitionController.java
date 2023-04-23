@@ -1,8 +1,11 @@
 package org.telegram.telegrise.transition;
 
+import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.TreeExecutor;
+import org.telegram.telegrise.UniversalSender;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -15,11 +18,13 @@ public class TransitionController {
     public final SessionMemoryImpl sessionMemory;
     public final Deque<TreeExecutor> treeExecutors;
     public final TranscriptionMemory transcriptionMemory;
+    private final DefaultAbsSender sender;
 
-    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory) {
+    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory, DefaultAbsSender sender) {
         this.sessionMemory = sessionMemory;
         this.treeExecutors = treeExecutors;
         this.transcriptionMemory = transcriptionMemory;
+        this.sender = sender;
     }
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
@@ -28,27 +33,41 @@ public class TransitionController {
             case Transition.PREVIOUS: this.applyPrevious(transition); return false;
             case Transition.JUMP: this.applyJump(tree, transition); return false;
             case Transition.LOCAL: this.applyLocal(tree, transition, pool); return true;   // INTERRUPTING
-            case Transition.CALLER: this.applyCaller(tree, transition); return false;
+            case Transition.CALLER: return this.applyCaller(tree, transition, pool);
             default: throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
         }
     }
 
-    private void applyCaller(Tree tree, Transition transition) {
+    private boolean applyCaller(Tree tree, Transition transition, ResourcePool pool) {
         this.sessionMemory.updateJumpPoints();
         JumpPoint point = this.sessionMemory.getJumpPoints().peekLast();
 
         if (point == null)
             throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'");
 
-        this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false));
+        if (point.getActions() != null)
+            point.getActions().forEach(action -> {
+                try {
+                    UniversalSender.execute(sender, action, pool);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        if (point.getNextTransition() != null)
+            return this.applyTransition(tree, point.getNextTransition(), pool);
+
+        this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false, null, null));
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
         if (transition.getType().equals(Transition.MENU_TYPE)){
             for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
-                if (it.next() instanceof Menu) return;
+                if (it.next() instanceof Menu) break;
                 this.sessionMemory.getBranchingElements().removeLast();
             }
         }
+
+        return false;
     }
 
     private void applyLocal(Tree tree, Transition transition, ResourcePool pool) {
@@ -67,7 +86,7 @@ public class TransitionController {
         if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + transition.getTarget() + "'");
 
         this.sessionMemory.getBranchingElements().add(requested);
-        this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested));
+        this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
     }
 
     private void applyNext(Tree tree, Transition transition) {
