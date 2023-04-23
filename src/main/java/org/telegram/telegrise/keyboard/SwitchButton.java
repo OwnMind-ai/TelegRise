@@ -1,7 +1,6 @@
 package org.telegram.telegrise.keyboard;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Switch;
@@ -25,7 +24,7 @@ public final class SwitchButton extends DynamicButton{
     private final GeneratedValue<String> offState;
     @Getter
     private final String name;
-    @Getter @Setter
+    @Getter
     private boolean enabled;
 
     public SwitchButton(GeneratedValue<String> onState, GeneratedValue<String> offState, String name) {
@@ -53,6 +52,12 @@ public final class SwitchButton extends DynamicButton{
 
     public void flip(ResourcePool pool){
         this.enabled = !enabled;
+        this.setCallbackData(GeneratedValue.ofValue(this.getNextData(this.enabled)));
+        this.setText(GeneratedValue.ofValue(this.enabled ? this.onState.generate(pool) : this.offState.generate(pool)));
+    }
+
+    public void setEnabled(boolean state, ResourcePool pool){
+        this.enabled = state;
         this.setCallbackData(GeneratedValue.ofValue(this.getNextData(this.enabled)));
         this.setText(GeneratedValue.ofValue(this.enabled ? this.onState.generate(pool) : this.offState.generate(pool)));
     }

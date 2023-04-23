@@ -45,14 +45,21 @@ public class TransitionController {
         if (point == null)
             throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'");
 
-        if (point.getActions() != null)
+        if (point.getActions() != null) {
+            TreeExecutor pointExecutor = this.treeExecutors.stream()
+                    .filter(t -> t.getTree().getName().equals(point.getFrom().getName()))
+                    .findFirst().orElseThrow();
+            ResourcePool resourcePool = new ResourcePool(pool.getUpdate(), pointExecutor.getControllerInstance(),
+                    pool.getSender(), pool.getMemory(), pointExecutor);
+
             point.getActions().forEach(action -> {
                 try {
-                    UniversalSender.execute(sender, action, pool);
+                    UniversalSender.execute(sender, action, resourcePool);
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
             });
+        }
 
         if (point.getNextTransition() != null) {
             if(this.treeExecutors.getLast().getTree().getName().equals(tree.getName())) {
@@ -60,7 +67,7 @@ public class TransitionController {
                 this.treeExecutors.removeLast();
             }
 
-            return this.applyTransition(tree, point.getNextTransition(), pool);
+            return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
         }
 
         this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false, null, null));
