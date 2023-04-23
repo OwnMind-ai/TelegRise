@@ -66,7 +66,7 @@ public final class MethodReference implements Serializable {
         Method last = this.getLast();
         Class<?> actualReturnType = last.getReturnType();
         if (!tClass.isAssignableFrom(actualReturnType) && !(actualReturnType.equals(void.class))
-                && !(ClassUtils.wrapperToPrimitive(tClass).equals(actualReturnType)))
+                && !(actualReturnType.equals(ClassUtils.wrapperToPrimitive(tClass))))
             throw new TranscriptionParsingException(String.format("Return type '%s' of method '%s' cannot be casted to type '%s'",
                     actualReturnType.getSimpleName(), last.getName(), tClass.getSimpleName()) , node);
 
