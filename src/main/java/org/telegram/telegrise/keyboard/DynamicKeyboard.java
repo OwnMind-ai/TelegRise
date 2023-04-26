@@ -9,10 +9,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class DynamicKeyboard implements Serializable {
@@ -101,7 +98,11 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     public SwitchButton getSwitch(CallbackQuery query){
-        return this.switches.get(query.getData());
+        return this.getSwitch(query.getData());
+    }
+
+    public List<SwitchButton> getSwitches(){
+        return List.copyOf(this.switches.values());
     }
 
     public DynamicButton get(int row, int column){
