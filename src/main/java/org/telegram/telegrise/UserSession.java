@@ -35,6 +35,7 @@ public class UserSession implements Runnable{
     private final TransitionController transitionController;
     private final PrimaryHandlersController primaryHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updateQueue);
+    private final UniversalSender universalSender;
     @Setter
     private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
@@ -48,6 +49,7 @@ public class UserSession implements Runnable{
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
+        this.universalSender = new UniversalSender(sender);
     }
 
     public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender) {
@@ -64,6 +66,7 @@ public class UserSession implements Runnable{
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
+        this.universalSender = new UniversalSender(sender);
     }
 
     private void initialize(){
@@ -237,7 +240,7 @@ public class UserSession implements Runnable{
 
         for (ActionElement actionElement : element.getActions()) {
             try {
-                UniversalSender.execute(sender, actionElement, this.createResourcePool(update));
+                this.universalSender.execute(actionElement, this.createResourcePool(update));
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }

@@ -8,22 +8,65 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-//FIXME it's literally screaming for refactor
 public class UniversalSender {
-    private static final UniversalSender instance = new UniversalSender();
 
-    static { instance.load(); }
+    private static final Map<String, Method> methods = new HashMap<>();
+    private static final String METHOD_NAME = "execute";
 
-    public static void execute(DefaultAbsSender sender, ActionElement action, ResourcePool pool) throws TelegramApiException {
+    static {
+        Arrays.stream(DefaultAbsSender.class.getMethods())
+                .filter(method -> Objects.equals(method.getName(), METHOD_NAME)
+                        && method.getParameterTypes().length == 1 && PartialBotApiMethod.class.isAssignableFrom(method.getParameterTypes()[0]))
+                .forEach(m -> methods.put(m.getParameterTypes()[0].getName(), m));
+    }
+
+    private final DefaultAbsSender sender;
+
+    public UniversalSender(DefaultAbsSender sender){
+        this.sender = sender;
+    }
+
+    public Serializable execute(PartialBotApiMethod<? extends Serializable> method) throws TelegramApiException{
+        if (method == null) return null;
+
+        if (method instanceof BotApiMethod)
+            return sender.execute((BotApiMethod<?>) method);
+
+        try {
+            return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getTargetException());
+        }
+    }
+
+    public <T extends Serializable> T execute(Class<T> resultClass, PartialBotApiMethod<T> method) throws TelegramApiException {
+        if (method == null) return null;
+
+        if (method instanceof BotApiMethod)
+            return sender.execute((BotApiMethod<T>) method);
+
+        try {
+            Object result = methods.get(method.getClass().getName()).invoke(sender, method);
+
+            return resultClass.isInstance(result) ? resultClass.cast(result) : null;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getTargetException());
+        }
+    }
+
+    //TODO Move to package-private class
+    public void execute(ActionElement action, ResourcePool pool) throws TelegramApiException {
         PartialBotApiMethod<?> method = action.generateMethod(pool);
-        Object result = instance.execute(method, sender);
+        Object result = this.execute(method);
 
         if (result instanceof List<?>) {
             List<?> resultList = (List<?>) result;
@@ -36,35 +79,5 @@ public class UniversalSender {
 
         if (action.getReturnConsumer() != null && result != null)
             action.getConsumer(pool).consume(result);
-    }
-
-
-    private static final String METHOD_NAME = "execute";
-    private final Map<String, Method> methods = new HashMap<>();
-
-    private UniversalSender(){}
-
-    public void load(){
-        Arrays.stream(DefaultAbsSender.class.getMethods())
-                .filter(method -> method.getName().equals(METHOD_NAME)
-                        && method.getParameterTypes().length == 1 && PartialBotApiMethod.class.isAssignableFrom(method.getParameterTypes()[0]))
-                .forEach(m -> this.methods.put(m.getParameterTypes()[0].getName(), m));
-    }
-
-
-
-    public Object execute(PartialBotApiMethod<?> method, DefaultAbsSender sender) throws TelegramApiException {
-        if (method == null) return null;
-
-        if (method instanceof BotApiMethod)
-            return sender.execute((BotApiMethod<?>) method);
-
-        try {
-            return this.methods.get(method.getClass().getName()).invoke(sender, method);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getTargetException());
-        }
     }
 }

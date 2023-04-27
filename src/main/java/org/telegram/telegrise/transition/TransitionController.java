@@ -18,13 +18,14 @@ public class TransitionController {
     public final SessionMemoryImpl sessionMemory;
     public final Deque<TreeExecutor> treeExecutors;
     public final TranscriptionMemory transcriptionMemory;
-    private final DefaultAbsSender sender;
+    private final UniversalSender sender;
+
 
     public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory, DefaultAbsSender sender) {
         this.sessionMemory = sessionMemory;
         this.treeExecutors = treeExecutors;
         this.transcriptionMemory = transcriptionMemory;
-        this.sender = sender;
+        this.sender = new UniversalSender(sender);
     }
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
@@ -54,7 +55,7 @@ public class TransitionController {
 
             point.getActions().forEach(action -> {
                 try {
-                    UniversalSender.execute(sender, action, resourcePool);
+                    this.sender.execute(action, resourcePool);
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
