@@ -7,6 +7,7 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.core.utils.XMLUtils;
@@ -18,9 +19,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Text implements TranscriptionElement, EmbeddableElement {
+public class Text implements TranscriptionElement, EmbeddableElement, StorableElement {
     @Getter(value = AccessLevel.NONE)
     private GeneratedValue<String> text;
+
+    @Attribute(name = "name")
+    private String name;
+
+    @Attribute(name = "byName")
+    private String byName;
 
     @Attribute(name = "parseMode")
     private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
@@ -38,6 +45,18 @@ public class Text implements TranscriptionElement, EmbeddableElement {
     public void validate(Node node, TranscriptionMemory memory) {
         if (conditional && (textConditionalElements == null || textConditionalElements.isEmpty()))
             throw new TranscriptionParsingException("Conditional text has no conditional elements such as <if> or <else>", node);
+    }
+
+    @Override
+    public void load(TranscriptionMemory memory) {
+        if (this.byName == null) return;
+
+        Text original = memory.get(byName, Text.class, List.of("text"));
+        this.parseMode = original.parseMode;
+        this.entities = original.entities;
+        this.conditional = original.conditional;
+        this.textConditionalElements = original.textConditionalElements;
+        this.byName = null;
     }
 
     public Text(String text, String parseMode){
@@ -61,12 +80,18 @@ public class Text implements TranscriptionElement, EmbeddableElement {
 
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        if (!this.conditional)
+        if (!this.conditional && this.byName == null)
             this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }
 
     @Override
     public void parse(Node parent, LocalNamespace namespace) {
         this.parseText(parent, namespace);
+    }
+
+    @Override
+    public void store(TranscriptionMemory memory) {
+        if (name != null)
+            memory.put(name, this);
     }
 }
