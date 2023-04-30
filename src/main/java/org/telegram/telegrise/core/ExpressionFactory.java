@@ -21,6 +21,10 @@ public class ExpressionFactory {
 
     public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
         if(MethodReferenceParser.isMethodReference(text)){
+            if (namespace.getHandlerClass() == null){  //TODO and it is not a static reference
+                throw new TranscriptionParsingException("Unable to parse method '" + text + "': no controller class is assigned", node);
+            }
+
             MethodReference[] references = MethodReferenceParser.parse(text, namespace.getHandlerClass(), node);
             return MethodReferenceParser.concat(references, type, node);
         }

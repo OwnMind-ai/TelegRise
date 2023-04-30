@@ -77,7 +77,7 @@ public class Tree implements BranchingElement{
 
     @Override
     public LocalNamespace createNamespace(ApplicationNamespace global) {
-        return controller == null ? null : new LocalNamespace(controller, global);
+        return new LocalNamespace(controller, global);
     }
 
     public boolean canHandle(ResourcePool pool, List<String> chatTypes){
