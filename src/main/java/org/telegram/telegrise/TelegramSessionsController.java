@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -12,11 +13,12 @@ import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.resources.ResourceFactory;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 public class TelegramSessionsController {
-    private final ThreadGroup threadGroup = new ThreadGroup(this.getClass().getSimpleName());
+    private static final int DEFAULT_THREAD_POOL_SIZE = 128;
+
+    private final ExecutorService poolExecutor;
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
@@ -31,6 +33,16 @@ public class TelegramSessionsController {
         this.roleProvider = roleProvider;
         this.resourceFactories = resourceFactories;
         this.handlersClasses = handlersClasses;
+        this.poolExecutor = this.createExecutorService();
+    }
+
+    private ExecutorService createExecutorService(){
+        String property = System.getProperty("telegrise.threadPoolSize");
+
+        if(NumberUtils.isDigits(property))
+            return Executors.newFixedThreadPool(Integer.parseInt(property));
+
+        return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
     }
 
     public void initialize(){
@@ -93,6 +105,6 @@ public class TelegramSessionsController {
         session.update(update);
 
         if (!session.isRunning())
-            new Thread(this.threadGroup, session).start();
+            poolExecutor.submit(session);
     }
 }
