@@ -52,6 +52,7 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
         if (this.byName == null) return;
 
         Text original = memory.get(byName, Text.class, List.of("text"));
+        this.text = original.text;
         this.parseMode = original.parseMode;
         this.entities = original.entities;
         this.conditional = original.conditional;

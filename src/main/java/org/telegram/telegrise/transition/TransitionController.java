@@ -64,6 +64,7 @@ public class TransitionController {
 
         if (point.getNextTransition() != null) {
             if(this.treeExecutors.getLast().getTree().getName().equals(tree.getName())) {
+                this.sessionMemory.getBranchingElements().removeLast();
                 this.treeExecutors.getLast().close();
                 this.treeExecutors.removeLast();
             }
