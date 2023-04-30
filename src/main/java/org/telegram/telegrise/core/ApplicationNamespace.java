@@ -2,6 +2,7 @@ package org.telegram.telegrise.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.telegram.telegrise.TelegRiseRuntimeException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,10 +32,19 @@ public final class ApplicationNamespace {
     }
 
     public Class<?> getClass(String name){
-        if (name.contains("."))
-            name = name.substring(name.lastIndexOf('.'));
+        String className = name;
+        if (className.contains("."))
+            className = className.substring(className.lastIndexOf('.'));
 
-        return this.importedClasses.get(name);
+        if (this.importedClasses.containsKey(className))
+            return this.importedClasses.get(className);
+        else {
+            try {
+                return Class.forName(name, true, this.applicationClassloader);
+            } catch (ClassNotFoundException e) {
+                throw new TelegRiseRuntimeException("Unable to find class '" + name + "'");
+            }
+        }
     }
 
     public LocalNamespace emptyLocal(){
