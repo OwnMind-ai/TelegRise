@@ -7,12 +7,15 @@ import org.telegram.telegrise.core.elements.keyboard.Switch;
 
 public final class SwitchButton extends DynamicButton{
     public static SwitchButton ofSwitch(Switch button, ResourcePool pool){
-        return new SwitchButton(
+        SwitchButton switchButton = new SwitchButton(
                 button.getOnState(),
                 button.getOffState(),
                 button.getName(),
                 button.getEnabled().generate(pool)
         );
+
+        switchButton.setWhen(button.getWhen());
+        return switchButton;
     }
 
     public static final String OFF_SUFFIX = "-off";
