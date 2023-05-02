@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -9,19 +10,22 @@ import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.InteractiveElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
+import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.UserRole;
 import org.w3c.dom.Node;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Element(name = "keyboard")
 @Data @NoArgsConstructor
-public class Keyboard implements StorableElement, TranscriptionElement {
+public class Keyboard implements StorableElement, TranscriptionElement, InteractiveElement<KeyboardMarkup> {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
 
@@ -174,5 +178,10 @@ public class Keyboard implements StorableElement, TranscriptionElement {
 
             return this.extractDynamic(pool);
         }
+    }
+
+    @Override
+    public KeyboardMarkup createIneractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
+        return new KeyboardMarkup(this, resourcePoolFunction);
     }
 }
