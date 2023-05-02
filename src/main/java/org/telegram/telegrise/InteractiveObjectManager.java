@@ -5,6 +5,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.InteractiveElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;
 
 import java.io.Serializable;
@@ -25,7 +26,7 @@ public class InteractiveObjectManager {
         TranscriptionMemory memory = transcription.getMemory();
         objects.putAll(memory.getElements().entrySet().stream().parallel()
                 .filter(e -> e.getValue() instanceof InteractiveElement)
-                .map(e -> Map.entry(e.getKey(), ((InteractiveElement<?>) e.getValue()).createIneractiveObject(this.resourcePoolProducer)))
+                .map(e -> Map.entry(e.getKey(), ((InteractiveElement<?>) e.getValue()).createInteractiveObject(this.resourcePoolProducer)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
     }
@@ -41,11 +42,25 @@ public class InteractiveObjectManager {
             throw new TelegRiseRuntimeException("Element named '" + name + "' does not inherit type '" + type.getSimpleName() + "'");
     }
 
+    public <T extends Serializable> T get(String name, Class<T> tClass){
+        checkName(name);
+        checkType(name, tClass);
+
+        return tClass.cast(this.objects.get(name));
+    }
+
     public TextBlock getTextBlock(String name){
         checkName(name);
         checkType(name, TextBlock.class);
 
         return (TextBlock) this.objects.get(name);
+    }
+
+    private KeyboardMarkup getKeyboardMarkup(String name){
+        checkName(name);
+        checkType(name, KeyboardMarkup.class);
+
+        return (KeyboardMarkup) this.objects.get(name);
     }
 
     //TODO getTextBlock(name, lang)

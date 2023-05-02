@@ -7,5 +7,5 @@ import java.io.Serializable;
 import java.util.function.Function;
 
 public interface InteractiveElement <T extends Serializable> extends StorableElement {
-    T createIneractiveObject(Function<Update, ResourcePool> resourcePoolFunction);
+    T createInteractiveObject(Function<Update, ResourcePool> resourcePoolFunction);
 }

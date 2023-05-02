@@ -101,7 +101,7 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     }
 
     @Override
-    public TextBlock createIneractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
+    public TextBlock createInteractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
         return new TextBlock(this, resourcePoolFunction);
     }
 }

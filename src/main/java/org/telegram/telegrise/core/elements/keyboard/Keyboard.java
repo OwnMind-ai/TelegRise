@@ -181,7 +181,7 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     }
 
     @Override
-    public KeyboardMarkup createIneractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
+    public KeyboardMarkup createInteractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
         return new KeyboardMarkup(this, resourcePoolFunction);
     }
 }

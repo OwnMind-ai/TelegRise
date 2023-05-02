@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
@@ -80,23 +81,6 @@ public class Tree implements BranchingElement{
         return new LocalNamespace(controller, global);
     }
 
-    public boolean canHandle(ResourcePool pool, List<String> chatTypes){
-        Update update = pool.getUpdate();
-
-        if(!ChatTypes.isApplicable(this.chatTypes == null ? chatTypes : List.of(this.chatTypes), MessageUtils.getChat(update)))
-            return false;
-
-        if (this.predicate != null && this.predicate.generate(pool)) {
-            return true;
-        } else if (this.callbackTriggers != null && update.hasCallbackQuery() && update.getCallbackQuery().getData() != null){
-            return Arrays.stream(this.getCallbackTriggers()).anyMatch(c -> c.equals(update.getCallbackQuery().getData()));
-        } else if (update.hasMessage() && !MessageUtils.hasMedia(update.getMessage()) && update.getMessage().getText() != null) {
-            return this.canHandleMessage(pool);
-        }
-
-        return false;
-    }
-
     public boolean canHandleMessage(ResourcePool pool){
         Update update = pool.getUpdate();
 
@@ -128,5 +112,9 @@ public class Tree implements BranchingElement{
     public List<BotCommand> getBotCommands(){
         assert description != null;
         return Arrays.stream(this.commands).map(c -> new BotCommand(c, description)).collect(Collectors.toList());
+    }
+
+    public boolean isChatApplicable(List<String> chatTypes, Chat chat) {
+        return ChatTypes.isApplicable(this.chatTypes == null ? chatTypes : List.of(this.chatTypes), chat);
     }
 }
