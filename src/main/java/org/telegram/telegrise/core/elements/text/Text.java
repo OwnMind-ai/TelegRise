@@ -2,24 +2,28 @@ package org.telegram.telegrise.core.elements.text;
 
 import lombok.*;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.InteractiveElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.types.TextBlock;
 import org.w3c.dom.Node;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Element(name = "text")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Text implements TranscriptionElement, EmbeddableElement, StorableElement {
+public class Text implements TranscriptionElement, EmbeddableElement, StorableElement, InteractiveElement<TextBlock> {
     @Getter(value = AccessLevel.NONE)
     private GeneratedValue<String> text;
 
@@ -94,5 +98,10 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     public void store(TranscriptionMemory memory) {
         if (name != null)
             memory.put(name, this);
+    }
+
+    @Override
+    public TextBlock createIneractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
+        return new TextBlock(this, resourcePoolFunction);
     }
 }

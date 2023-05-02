@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TranscriptionMemory implements Serializable {
+    @Getter
     private final Map<String, TranscriptionElement> elements = new HashMap<>();
     @Getter
     private final List<Consumer<BotTranscription>> tasks = new LinkedList<>();

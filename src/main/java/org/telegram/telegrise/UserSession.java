@@ -36,6 +36,7 @@ public class UserSession implements Runnable{
     private final PrimaryHandlersController primaryHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updateQueue);
     private final UniversalSender universalSender;
+    private final InteractiveObjectManager interactiveObjectManager = new InteractiveObjectManager(this::createResourcePool);
     @Setter
     private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
@@ -45,7 +46,8 @@ public class UserSession implements Runnable{
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector);
+        this.interactiveObjectManager.load(transcription);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.interactiveObjectManager);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -62,7 +64,8 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector);
+        this.interactiveObjectManager.load(transcription);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.interactiveObjectManager);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
