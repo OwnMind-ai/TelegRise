@@ -3,7 +3,10 @@ package org.telegram.telegrise.annotations;
 import java.lang.annotation.*;
 
 /**
- * Points to the method that will be called after the tree is closed
+ * Indicates that an annotated method will be called after the tree is closed.
+ * 
+ * @see org.telegram.telegrise.TreeController
+ * @since 0.4
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
