@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * Indicates that an annotated method will be called after the tree is closed.
  * 
- * @see org.telegram.telegrise.TreeController
+ * @see TreeController
  * @since 0.4
  */
 @Documented

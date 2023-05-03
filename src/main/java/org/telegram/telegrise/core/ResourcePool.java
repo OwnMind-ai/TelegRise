@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TreeExecutor;
 
@@ -42,6 +43,7 @@ public final class ResourcePool {
     public Map<Class<?>, Object> getComponents(){
         if (update != null) this.addComponent(update);
         if (sender != null) this.addComponent(sender);
+        if (memory != null) this.components.put(SessionMemory.class, memory);
 
         return this.components;
     }

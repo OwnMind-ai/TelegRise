@@ -40,7 +40,7 @@ public class Menu implements BranchingElement{
 
         Tree founded = trees.stream()
                 .filter(t -> t.isChatApplicable(chatTypes, chat))
-                .filter(t -> t.canHandleMessage(pool)).findFirst().orElse(null);
+                .filter(t -> t.canHandleMessage(pool, chat)).findFirst().orElse(null);
 
         if (founded == null){
             for (Tree tree : trees) {

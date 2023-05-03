@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
@@ -113,16 +114,22 @@ public class UserSession implements Runnable{
         else if (this.sessionMemory.isOnStack(Tree.class)) {
             Tree tree = (Tree) this.sessionMemory.getBranchingElements().getLast();
             if (this.transcription.isInterruptions() && tree.isInterruptible() && pool.getUpdate().hasMessage()){
-                Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
-                        .filter(t -> t.canHandleMessage(pool)).findFirst();
-                if (treeCandidate.isPresent()){
-                    this.interruptTreeChain(update, treeCandidate.get());
-                    return;
-                }
+                if (checkForInterruption(update, pool)) return;
             }
 
             this.updateTree(update);
         }
+    }
+
+    private boolean checkForInterruption(Update update, ResourcePool pool) {
+        Chat chat = MessageUtils.getChat(update);
+        Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
+                .filter(t -> t.canHandleMessage(pool, chat)).findFirst();
+        if (treeCandidate.isPresent()){
+            this.interruptTreeChain(update, treeCandidate.get());
+            return true;
+        }
+        return false;
     }
 
     private void interruptTreeChain(Update update, Tree tree) {
@@ -145,12 +152,7 @@ public class UserSession implements Runnable{
             this.initializeTree(update, tree);
             return;
         } else if (menu.isInterpretable() && update.hasMessage()) {
-            Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
-                    .filter(t -> t.canHandleMessage(pool)).findFirst();
-            if (treeCandidate.isPresent()){
-                this.interruptTreeChain(update, treeCandidate.get());
-                return;
-            }
+            if (checkForInterruption(update, pool)) return;
         }
 
         if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){

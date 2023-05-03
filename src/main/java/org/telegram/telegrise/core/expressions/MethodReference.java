@@ -20,11 +20,13 @@ public final class MethodReference implements Serializable {
     private transient Method method;
     private final @NotNull Class<?> declaringClass;
     private final @NotNull MethodGetter methodGetter;
+    private final boolean isStatic;
 
     private MethodReference next;
 
-    public MethodReference(Method method) {
+    public MethodReference(Method method, boolean isStatic) {
         this.method = method;
+        this.isStatic = isStatic;
         this.method.setAccessible(true);
         this.declaringClass = this.method.getDeclaringClass();
 
@@ -72,7 +74,7 @@ public final class MethodReference implements Serializable {
 
         return pool -> {
             try {
-                assert pool.getHandler() != null : "Unable to invoke method reference: handler object in ResourcePool is null";
+                assert isStatic || pool.getHandler() != null : "Unable to invoke method reference: handler object in ResourcePool is null";
                 Object result = invoke(pool);
                 return tClass.equals(Void.class) ? null : tClass.cast(result);
             } catch (InvocationTargetException | IllegalAccessException e) {

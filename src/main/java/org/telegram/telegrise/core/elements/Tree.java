@@ -81,14 +81,14 @@ public class Tree implements BranchingElement{
         return new LocalNamespace(controller, global);
     }
 
-    public boolean canHandleMessage(ResourcePool pool){
+    public boolean canHandleMessage(ResourcePool pool, Chat chat){
         Update update = pool.getUpdate();
 
         if (!update.hasMessage() || update.getMessage().getText() == null) return false;
 
         if (this.commands != null) {
             CommandData command = MessageUtils.parseCommand(update.getMessage().getText());
-            boolean isUserChat = Objects.requireNonNull(MessageUtils.getChat(update)).isUserChat();
+            boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
 
             if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
                 return Arrays.stream(this.commands)

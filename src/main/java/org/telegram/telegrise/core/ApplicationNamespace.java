@@ -2,6 +2,7 @@ package org.telegram.telegrise.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 
 import java.util.Collection;
@@ -31,7 +32,7 @@ public final class ApplicationNamespace {
         importedClasses.put(loaded.getSimpleName(), loaded);
     }
 
-    public Class<?> getClass(String name){
+    public @NotNull Class<?> getClass(String name){
         String className = name;
         if (className.contains("."))
             className = className.substring(className.lastIndexOf('.'));
