@@ -2,10 +2,12 @@ package org.telegram.telegrise;
 
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.reflections.Reflections;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
@@ -17,6 +19,8 @@ import org.telegram.telegrise.resources.ResourceInjector;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 //TODO webhooks
 //TODO multiple bots
@@ -26,9 +30,10 @@ public final class TelegRiseApplication {
     private File transcription;
     @Setter
     private ClassLoader classLoader = this.getClass().getClassLoader();
-    private final List<Class<? extends PrimaryHandler>> handlersClasses = new ArrayList<>();
+    private List<Class<? extends PrimaryHandler>> handlersClasses = new ArrayList<>();
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
     private final ServiceManager serviceManager = new ServiceManager();
+    private final Class<?> mainClass;
 
     @Setter
     private RoleProvider roleProvider;
@@ -43,13 +48,17 @@ public final class TelegRiseApplication {
         }
     }
 
-    public TelegRiseApplication() {}
+    public TelegRiseApplication(Class<?> mainClass) {
+        this.mainClass = mainClass;
+    }
 
-    public TelegRiseApplication(File transcription)  {
+    public TelegRiseApplication(File transcription, Class<?> mainClass)  {
         this.transcription = transcription;
+        this.mainClass = mainClass;
     }
 
     public void start(){
+        this.handlersClasses = this.loadPrimaryHandlers();
         TelegramSessionsController controller = this.createController();
 
         TelegramLongPollingBot bot = BotFactory.createLongPooling(controller.getTranscription(), controller::onUpdateReceived);
@@ -81,8 +90,14 @@ public final class TelegRiseApplication {
         return controller;
     }
 
-    public void addHandler(Class<? extends PrimaryHandler> handlerClass){
-        this.handlersClasses.add(handlerClass);
+    private List<Class<? extends PrimaryHandler>> loadPrimaryHandlers(){
+        Set<Class<?>> handlerCandidates = new Reflections(this.mainClass.getPackageName()).getTypesAnnotatedWith(Handler.class);
+
+        for (Class<?> clazz : handlerCandidates)
+            if (!PrimaryHandler.class.isAssignableFrom(clazz))
+                throw new TelegRiseRuntimeException("Handler class '" + clazz.getName() + "' doesn't implement PrimaryHandler interface");
+
+        return handlerCandidates.stream().map(c -> (Class<? extends PrimaryHandler>)c).collect(Collectors.toList());
     }
 
     public void addResourceFactory(ResourceFactory<?> factory){
