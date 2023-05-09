@@ -14,4 +14,5 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface Handler {
     boolean absolute() default false;
+    boolean independent() default false;
 }

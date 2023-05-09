@@ -56,7 +56,7 @@ public class InteractiveObjectManager {
         return (TextBlock) this.objects.get(name);
     }
 
-    private KeyboardMarkup getKeyboardMarkup(String name){
+    public KeyboardMarkup getKeyboardMarkup(String name){
         checkName(name);
         checkType(name, KeyboardMarkup.class);
 

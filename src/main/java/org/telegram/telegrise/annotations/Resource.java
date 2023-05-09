@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * Custom resources can be added by implementing <a href="#{@link}">{@link org.telegram.telegrise.resources.ResourceFactory ResourceFactory}</a> interface.
  * 
  * @since 0.4
- * @see ResourceFactory
+ * @see org.telegram.telegrise.resources.ResourceFactory
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

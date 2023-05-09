@@ -9,11 +9,18 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.resources.ResourceFactory;
+import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class TelegramSessionsController {
     private static final int DEFAULT_THREAD_POOL_SIZE = 128;
@@ -26,14 +33,16 @@ public class TelegramSessionsController {
     private final List<ResourceFactory<?>> resourceFactories;
     @Setter
     private DefaultAbsSender sender;
-    private final List<Class<? extends PrimaryHandler>> handlersClasses;
+    private List<Class<? extends PrimaryHandler>> userHandlersClasses;
+    private PrimaryHandlersController handlersController;
 
     public TelegramSessionsController(BotTranscription transcription, RoleProvider roleProvider, List<ResourceFactory<?>> resourceFactories, List<Class<? extends PrimaryHandler>> handlersClasses) {
         this.transcription = transcription;
         this.roleProvider = roleProvider;
         this.resourceFactories = resourceFactories;
-        this.handlersClasses = handlersClasses;
         this.poolExecutor = this.createExecutorService();
+        this.handlersController = new PrimaryHandlersController(null);
+        this.userHandlersClasses = handlersClasses;
     }
 
     private ExecutorService createExecutorService(){
@@ -47,6 +56,13 @@ public class TelegramSessionsController {
 
     public void initialize(){
         assert sender != null;
+
+        var splitHandlers = userHandlersClasses.stream()
+                .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
+        this.userHandlersClasses = splitHandlers.get(false);
+
+        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender));
+        splitHandlers.get(true).forEach(this.handlersController::add);
 
         if(this.transcription.getRootMenu().getChatTypes() == null)
             this.transcription.getRootMenu().setChatTypes(new String[]{ChatTypes.ALL});
@@ -70,6 +86,13 @@ public class TelegramSessionsController {
     }
 
     public void onUpdateReceived(Update update){
+        Optional<PrimaryHandler> candidate = this.handlersController.getApplicableHandler(update);
+        if (candidate.isPresent()){
+            boolean intercept = this.handlersController.applyHandler(update, candidate.get());
+
+            if (intercept) return;
+        }
+
         User from = MessageUtils.getFrom(update);
 
         if (from != null && !from.getIsBot()){
@@ -97,7 +120,7 @@ public class TelegramSessionsController {
         UserSession session = new UserSession(identifier, this.transcription, this.sender);
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
-        session.addHandlersClasses(this.handlersClasses);
+        session.addHandlersClasses(this.userHandlersClasses);
         this.sessions.put(identifier, session);
     }
 
