@@ -30,10 +30,11 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     public static final String REPLY = "reply";
 
     public static boolean filterKeyboardElement(GeneratedValue<Boolean> when, Integer accessLevel, ResourcePool pool){
-        UserRole userRole = pool.getMemory().getUserRole();
-
-        if (accessLevel != null)
+        if (accessLevel != null) {
+            UserRole userRole = pool.getMemory().getUserRole();
             return userRole != null && userRole.getLevel() >= accessLevel;
+        }
+
         if (when != null)
             return when.generate(pool);
 

@@ -94,6 +94,8 @@ public class UserSession implements Runnable{
         try {
             while (!this.updateQueue.isEmpty())
                 this.handleUpdate(this.updateQueue.remove());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             this.running.set(false);
         }

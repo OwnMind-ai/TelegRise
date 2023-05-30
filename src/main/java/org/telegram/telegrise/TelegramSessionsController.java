@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.Handler;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
@@ -61,7 +62,10 @@ public class TelegramSessionsController {
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
-        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender));
+        InteractiveObjectManager objectManager =  new InteractiveObjectManager(u -> new ResourcePool(u, null, sender, null));
+        objectManager.load(transcription);
+
+        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if(this.transcription.getRootMenu().getChatTypes() == null)

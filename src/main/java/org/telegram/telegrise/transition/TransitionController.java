@@ -65,6 +65,7 @@ public class TransitionController {
         if (point.getNextTransition() != null) {
             if(this.treeExecutors.getLast().getTree().getName().equals(tree.getName())) {
                 this.sessionMemory.getBranchingElements().removeLast();
+                this.treeExecutors.getLast().beforeRemoving();
                 this.treeExecutors.getLast().close();
                 this.treeExecutors.removeLast();
             }
@@ -120,6 +121,7 @@ public class TransitionController {
 
                 if (element instanceof Tree){
                     assert this.treeExecutors.getLast().getTree().getName().equals(element.getName());
+                    this.treeExecutors.getLast().beforeRemoving();
                     this.treeExecutors.getLast().close();
                     this.treeExecutors.removeLast();
                 }
