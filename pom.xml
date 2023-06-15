@@ -6,7 +6,7 @@
 
     <groupId>org.telegram</groupId>
     <artifactId>telegrise</artifactId>
-    <version>0.4.5-PREVIEW</version>
+    <version>0.4.6-PREVIEW</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>6.5.0</version>
+            <version>6.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -13,10 +13,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class XMLUtils {
     public static String innerXML(Node node){
@@ -33,10 +31,11 @@ public class XMLUtils {
         String result = builder.toString();
         String[] lines = result.split("\n");
 
-        result = Arrays.stream(lines)
-                .map(String::trim)
-                .map(s -> " " + s)
-                .collect(Collectors.joining());
+        for (int i = 0, splitLength = lines.length; i < splitLength; i++) {
+            lines[i] = lines[i].trim();
+        }
+
+        result = String.join("", lines);
 
         return applyHTMLTextDecorators(result);
     }

@@ -84,6 +84,16 @@ public class Tree implements BranchingElement{
     public boolean canHandleMessage(ResourcePool pool, Chat chat){
         Update update = pool.getUpdate();
 
+        if (update.hasCallbackQuery() && this.callbackTriggers != null){
+            for(String trigger : callbackTriggers){
+                if(trigger.equals(update.getCallbackQuery().getData())){
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         if (!update.hasMessage() || update.getMessage().getText() == null) return false;
 
         if (this.commands != null) {
