@@ -40,7 +40,7 @@ public final class DynamicKeyboard implements Serializable {
             }).collect(Collectors.toList()));
         }
 
-        dynamicKeyboard.isPersistent = keyboard.getIsPersistent();
+        dynamicKeyboard.isPersistent = keyboard.getPersistent();
         dynamicKeyboard.oneTime = keyboard.getOneTime();
         dynamicKeyboard.resize = keyboard.getResize();
         dynamicKeyboard.selective = keyboard.getSelective();

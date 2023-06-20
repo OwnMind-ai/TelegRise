@@ -66,7 +66,7 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     private GeneratedValue<ReplyKeyboard> create;
 
     @Attribute(name = "isPersistent")
-    private GeneratedValue<Boolean> isPersistent;
+    private GeneratedValue<Boolean> persistent;
 
     @Attribute(name = "oneTime")
     private GeneratedValue<Boolean> oneTime;
@@ -109,6 +109,14 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
             Keyboard original = (Keyboard) element;
             this.name = original.getName();
             this.type = original.getType();
+            this.dynamic = original.isDynamic();
+            this.id = original.getId();
+            this.create = original.getCreate();
+            this.persistent = original.getPersistent();
+            this.oneTime = original.getOneTime();
+            this.resize = original.getResize();
+            this.selective = original.getSelective();
+            this.placeholder = original.getPlaceholder();
             this.rows = original.getRows();
         }
     }
@@ -140,7 +148,7 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
                         .filter(r -> !r.isEmpty())
                         .collect(Collectors.toList()));
 
-                keyboard.setIsPersistent(generateNullableProperty(isPersistent, pool));
+                keyboard.setIsPersistent(generateNullableProperty(persistent, pool));
                 keyboard.setResizeKeyboard(generateNullableProperty(resize, pool));
                 keyboard.setOneTimeKeyboard(generateNullableProperty(oneTime, pool));
                 keyboard.setInputFieldPlaceholder(generateNullableProperty(placeholder, pool));

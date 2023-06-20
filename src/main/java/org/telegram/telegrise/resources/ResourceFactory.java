@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ResourceFactory<T> {
     static <U> ResourceFactory<U> ofInstance(U instance, Class<U> uClass){
-        return new ResourceFactory<U>() {
+        return new ResourceFactory<>() {
             @Override
             public @NotNull Class<U> gerResourceClass() {
                 return uClass;
