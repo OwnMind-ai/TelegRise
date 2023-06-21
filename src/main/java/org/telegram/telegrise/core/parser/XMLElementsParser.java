@@ -74,10 +74,10 @@ public class XMLElementsParser {
         );
 
         Stream.concat(
-                Arrays.stream(element.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Attribute.class))
-                        .map(m -> Map.<Attribute, Object>entry(m.getAnnotation(Attribute.class), m)),
                 Arrays.stream(element.getDeclaredFields()).filter(m -> m.isAnnotationPresent(Attribute.class))
-                        .map(f -> Map.<Attribute, Object>entry(f.getAnnotation(Attribute.class), f))
+                        .map(f -> Map.<Attribute, Object>entry(f.getAnnotation(Attribute.class), f)),
+                Arrays.stream(element.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(Attribute.class))
+                        .map(m -> Map.<Attribute, Object>entry(m.getAnnotation(Attribute.class), m))
             )
             .sorted(Comparator.<Map.Entry<Attribute, Object>>comparingDouble(e -> e.getKey().priority()).reversed())
             .forEach(entry -> {

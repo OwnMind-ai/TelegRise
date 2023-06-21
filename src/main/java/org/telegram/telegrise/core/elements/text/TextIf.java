@@ -17,11 +17,18 @@ public class TextIf implements TextConditionalElement {
     @Attribute(name = "condition", nullable = false)
     private GeneratedValue<Boolean> condition;
 
+    @Attribute(name = "textblock", priority = 1)
+    private boolean textblock;
+
     private GeneratedValue<String> text;
 
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+        if (this.textblock) {
+            this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);
+        } else {
+            this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+        }
     }
 
     @Override

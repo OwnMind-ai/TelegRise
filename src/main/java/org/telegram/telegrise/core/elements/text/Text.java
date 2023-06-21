@@ -39,6 +39,9 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     @Attribute(name = "entities")
     private GeneratedValue<List<MessageEntity>> entities;
 
+    @Attribute(name = "textblock", priority = 1)
+    private boolean textblock;
+
     @Attribute(name = "conditional", priority = 1)
     private boolean conditional;
 
@@ -85,8 +88,13 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
 
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        if (!this.conditional && this.byName == null)
-            this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+        if (!this.conditional && this.byName == null) {
+            if (this.textblock) {
+                this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);
+            } else {
+                this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+            }
+        }
     }
 
     @Override

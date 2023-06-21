@@ -15,11 +15,18 @@ import org.w3c.dom.Node;
 @Data
 @NoArgsConstructor
 public class TextElse implements TextConditionalElement {
+    @Attribute(name = "textblock", priority = 1)
+    private boolean textblock;
+
     private GeneratedValue<String> text;
 
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+        if (this.textblock) {
+            this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);
+        } else {
+            this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
+        }
     }
 
     @Override

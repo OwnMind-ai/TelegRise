@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.utils;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -13,14 +14,21 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class XMLUtils {
-    public static String innerXML(Node node){
+    @NotNull
+    private static LSSerializer getLsSerializer(Node node) {
         DOMImplementationLS ls = (DOMImplementationLS) node.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
         LSSerializer lsSerializer = ls.createLSSerializer();
         lsSerializer.getDomConfig().setParameter("xml-declaration", false);
+        return lsSerializer;
+    }
+
+    public static String innerXML(Node node) {
+        LSSerializer lsSerializer = getLsSerializer(node);
 
         NodeList childNodes = node.getChildNodes();
         StringBuilder builder = new StringBuilder();
@@ -38,6 +46,21 @@ public class XMLUtils {
         result = String.join("", lines);
 
         return applyHTMLTextDecorators(result);
+    }
+
+    public static String innerXMLTextBlock(Node node){
+        LSSerializer lsSerializer = getLsSerializer(node);
+
+        NodeList childNodes = node.getChildNodes();
+        StringBuilder rawBuilder = new StringBuilder();
+        for (int i = 0; i < childNodes.getLength(); i++)
+            rawBuilder.append(lsSerializer.writeToString(childNodes.item(i)));
+
+        String raw = rawBuilder.toString().trim();
+        StringBuilder result = new StringBuilder();
+        Arrays.stream(raw.split("\n")).map(String::strip).forEach(str -> result.append(str).append("\n"));
+
+        return applyHTMLTextDecorators(result.toString().trim());
     }
 
     public static String applyHTMLTextDecorators(String string){
