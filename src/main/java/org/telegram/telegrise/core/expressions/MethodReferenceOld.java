@@ -16,15 +16,16 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
-public final class MethodReference implements Serializable {
+@Deprecated
+public final class MethodReferenceOld implements Serializable {
     private transient Method method;
     private final @NotNull Class<?> declaringClass;
     private final @NotNull MethodGetter methodGetter;
     private final boolean isStatic;
 
-    private MethodReference next;
+    private MethodReferenceOld next;
 
-    public MethodReference(Method method, boolean isStatic) {
+    public MethodReferenceOld(Method method, boolean isStatic) {
         this.method = method;
         this.isStatic = isStatic;
         this.method.setAccessible(true);
@@ -83,7 +84,7 @@ public final class MethodReference implements Serializable {
         };
     }
 
-    public void andThen(MethodReference reference){
+    public void andThen(MethodReferenceOld reference){
         assert reference.method.getParameterTypes().length == 1 &&
                 reference.method.getParameterTypes()[0].isAssignableFrom(this.method.getReturnType());
 

@@ -17,7 +17,7 @@ public final class ApplicationNamespace {
     @Setter @Getter
     private String updateName = "update";
     @Setter @Getter
-    private String handlerName = "controller";   //TODO try to make it "this" by default
+    private String controllerName = "controller";
     @Setter @Getter
     private String senderName = "sender";
     @Setter @Getter

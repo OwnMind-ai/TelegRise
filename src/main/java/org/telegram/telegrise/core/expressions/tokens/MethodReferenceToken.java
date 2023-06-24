@@ -8,8 +8,18 @@ import java.util.List;
 
 @Data @AllArgsConstructor @NoArgsConstructor
 public class MethodReferenceToken implements Token {
+    private String className;
     private String method;
     private List<String> params;
+
+    public MethodReferenceToken(String method, List<String> params){
+        this.method = method;
+        this.params = params;
+    }
+
+    public boolean isStatic(){
+        return className != null;
+    }
 
     @Override
     public TokenTypes getTokenType() {

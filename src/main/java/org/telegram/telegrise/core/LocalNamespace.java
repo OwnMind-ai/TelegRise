@@ -20,7 +20,7 @@ public class LocalNamespace {
                         "%s %s = %s.getSender();\n" +
                         "%s %s = %s.getMemory();\n",
                 Update.class.getName(), applicationNamespace.getUpdateName(), poolName,
-                handlerClassName, applicationNamespace.getHandlerName(), handlerClassName, poolName,
+                handlerClassName, applicationNamespace.getControllerName(), handlerClassName, poolName,
                 DefaultAbsSender.class.getName(), applicationNamespace.getSenderName(), poolName,
                 SessionMemory.class.getName(), applicationNamespace.getMemoryName(), poolName
         );

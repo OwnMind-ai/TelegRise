@@ -130,21 +130,21 @@ public final class Lexer {
     }
 
     private class ReferenceReader{
-        private String className, methodName;
         private final List<String> params = new LinkedList<>();
 
         private ReferenceReader() {
         }
 
         public Token read(){
+            String className = null;
             if (!Syntax.METHOD_REFERENCE_START.equals(String.valueOf(charsStream.peek()))){
-                this.className = readWhile(Pattern.compile("[.\\w_]").asPredicate());
+                className = readWhile(Pattern.compile("[.\\w_]").asPredicate());
             }
 
             // Skip '#'
             if (!Syntax.METHOD_REFERENCE_START.equals(String.valueOf(charsStream.next()))) return null;
 
-            this.methodName = readWhile(Pattern.compile("[\\w_]").asPredicate());
+            String methodName = readWhile(Pattern.compile("[\\w_]").asPredicate());
 
             if (Syntax.PARENTHESES_START.equals(String.valueOf(charsStream.peek()))){
                 boolean success = this.readParameters();
@@ -154,7 +154,7 @@ public final class Lexer {
                 }
             }
 
-            return this.produce();
+            return new MethodReferenceToken(className, methodName, params.isEmpty() ? null : params);
         }
 
         private boolean readParameters() {
@@ -199,14 +199,6 @@ public final class Lexer {
             }
 
             return opened == closed;
-        }
-
-        private Token produce() {
-            if (this.className != null){
-                return new StaticMethodReferenceToken(className, methodName, params.isEmpty() ? null : params);
-            } else {
-                return new MethodReferenceToken(methodName, params.isEmpty() ? null : params);
-            }
         }
     }
 }

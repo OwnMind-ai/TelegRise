@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.core.expressions.tokens.MethodReferenceToken;
-import org.telegram.telegrise.core.expressions.tokens.StaticMethodReferenceToken;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ class LexerTest {
         assertEquals(new MethodReferenceToken("method", null), lexer.next());
 
         lexer = new Lexer(new CharsStream("Class#method"));
-        assertEquals(new StaticMethodReferenceToken("Class", "method", null), lexer.next());
+        assertEquals(new MethodReferenceToken("Class", "method", null), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method(\"string 1\", 123)"));
         assertEquals(new MethodReferenceToken("method", List.of("\"string 1\"", "123")), lexer.next());

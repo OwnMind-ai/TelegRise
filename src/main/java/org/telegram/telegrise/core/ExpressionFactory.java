@@ -1,9 +1,10 @@
 package org.telegram.telegrise.core;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.expressions.ExpressionParser;
-import org.telegram.telegrise.core.expressions.MethodReference;
+import org.telegram.telegrise.core.expressions.MethodReferenceOld;
 import org.telegram.telegrise.core.expressions.MethodReferenceParser;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ExpressionFactory {
+    @Getter
     private static final ExpressionParser expressionParser = new ExpressionParser(ExpressionParser.getTempDirectory());
 
     public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
@@ -24,7 +26,7 @@ public class ExpressionFactory {
             if (namespace.getHandlerClass() == null && MethodReferenceParser.isContainsInstanceMethodReference(text))
                 throw new TranscriptionParsingException("Unable to parse method '" + text + "': no controller class is assigned", node);
 
-            MethodReference[] references = MethodReferenceParser.parse(text, namespace, node);
+            MethodReferenceOld[] references = MethodReferenceParser.parse(text, namespace, node);
             return MethodReferenceParser.concat(references, type, node);
         }
 

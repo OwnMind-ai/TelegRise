@@ -21,21 +21,21 @@ public final class MethodReferenceParser {
     private static final Pattern STATIC_REFERENCE_PATTERN = Pattern.compile("[.\\w_]+#[\\w_]+");
     private static final Pattern INSTANCE_REFERENCE_PATTERN = Pattern.compile("(^|\\W)#[\\w_]+");
 
-    public static MethodReference[] parse(String text, LocalNamespace namespace, Node node){
+    public static MethodReferenceOld[] parse(String text, LocalNamespace namespace, Node node){
         return new MethodReferenceParser(namespace, node, text).parse();
     }
 
-    public static <T> GeneratedValue<T> concat(MethodReference[] references, Class<T> returnType, Node node){
+    public static <T> GeneratedValue<T> concat(MethodReferenceOld[] references, Class<T> returnType, Node node){
         assert references.length > 0;
-        MethodReference toBeReturned = references[0];
-        List<MethodReference> rest = references.length == 1 ? List.of() : List.of(references).subList(1, references.length);
+        MethodReferenceOld toBeReturned = references[0];
+        List<MethodReferenceOld> rest = references.length == 1 ? List.of() : List.of(references).subList(1, references.length);
 
         GeneratedValue<T> generatedValue = toBeReturned.toGeneratedValue(returnType, node);
         return (pool) -> {
             T result = generatedValue.generate(pool);
-            rest.forEach(methodReference -> {
+            rest.forEach(methodReferenceOld -> {
                 try {
-                    methodReference.invoke(pool);
+                    methodReferenceOld.invoke(pool);
                 } catch (InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -68,7 +68,7 @@ public final class MethodReferenceParser {
         this.source = source;
     }
 
-    private MethodReference parseSingle(@NotNull String part){
+    private MethodReferenceOld parseSingle(@NotNull String part){
         if (!part.trim().startsWith(Syntax.METHOD_REFERENCE_START))
             return this.parseStatic(part);
 
@@ -80,10 +80,10 @@ public final class MethodReferenceParser {
         else if (found.length > 1)
             throw new TranscriptionParsingException("More than one method called '" + name + "' are decelerated in class '" + this.handlerClass.getName() + "'", this.node);
         else
-            return new MethodReference(found[0], false);
+            return new MethodReferenceOld(found[0], false);
     }
 
-    private MethodReference parseStatic(String expression) {
+    private MethodReferenceOld parseStatic(String expression) {
         if (!STATIC_REFERENCE_PATTERN.matcher(expression).matches())
             throw new TranscriptionParsingException("Invalid syntax for method reference: '" + expression + "'", this.node);
 
@@ -103,25 +103,25 @@ public final class MethodReferenceParser {
         else if (found.length > 1)
             throw new TranscriptionParsingException("More than one method called '" + methodName + "' are decelerated in class '" + actualClass.getName() + "'", this.node);
         else
-            return new MethodReference(found[0], true);
+            return new MethodReferenceOld(found[0], true);
     }
 
-    private MethodReference[] parse(){
+    private MethodReferenceOld[] parse(){
         String[][] raw = Arrays.stream(source.trim().split(Syntax.PARALLEL_SEPARATOR))
                 .map(l -> l.trim().split(Syntax.CHAIN_SEPARATOR)).toArray(String[][]::new);
-        List<MethodReference> references = new LinkedList<>();
+        List<MethodReferenceOld> references = new LinkedList<>();
 
         for (String[] chain : raw){
             if (chain.length == 0)
                 throw new TranscriptionParsingException("Invalid syntax for method reference, unexpected ';'", this.node);
 
-            MethodReference first = this.parseSingle(chain[0].trim());
+            MethodReferenceOld first = this.parseSingle(chain[0].trim());
 
             if (chain.length > 1){
-                MethodReference last = first;
+                MethodReferenceOld last = first;
 
                 for (int i = 1; i < chain.length; i++){
-                    MethodReference next = this.parseSingle(chain[i].trim());
+                    MethodReferenceOld next = this.parseSingle(chain[i].trim());
 
                     last.andThen(next);
                     last = next;
@@ -131,6 +131,6 @@ public final class MethodReferenceParser {
             references.add(first);
         }
 
-        return references.toArray(new MethodReference[0]);
+        return references.toArray(new MethodReferenceOld[0]);
     }
 }

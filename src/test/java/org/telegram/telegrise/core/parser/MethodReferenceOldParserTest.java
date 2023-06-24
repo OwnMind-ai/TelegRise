@@ -11,13 +11,13 @@ import org.w3c.dom.Node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MethodReferenceParserTest {
+class MethodReferenceOldParserTest {
 
     @Test
     void parseInstanceReference() {
         Node node = XMLElementsParserTest.toNode("<tag methods=\"#first -> #second -> #third ; #another\"/>");
 
-        var instance = new MethodReferenceParserTest();
+        var instance = new MethodReferenceOldParserTest();
         GeneratedValue<String> result = MethodReferenceParser.parse("#first -> #second -> #third ; #another", new LocalNamespace(instance.getClass(), null), node)[0].toGeneratedValue(String.class, node);
 
         assertEquals("144.0", result.generate(new ResourcePool(new Update(), instance, null, null)));
@@ -25,14 +25,14 @@ class MethodReferenceParserTest {
 
     @SuppressWarnings("unused")
     @Reference
-    private int first(){
-        return 12;
+    private boolean first(){
+        return true;
     }
 
     @SuppressWarnings("unused")
     @Reference
-    private double second(int value){
-        return Math.pow(value, 2);
+    private double second(boolean value){
+        return Math.pow(12, 2);
     }
 
     @SuppressWarnings("unused")
