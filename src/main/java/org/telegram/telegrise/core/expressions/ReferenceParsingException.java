@@ -15,6 +15,6 @@ public class ReferenceParsingException extends Exception{
 
     @Override
     public String toString() {
-        return "Error occurred while parsing method reference:" + this.errorCode.getMessage();
+        return "Error occurred while parsing method reference: " + this.errorCode.getMessage();
     }
 }

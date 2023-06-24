@@ -30,14 +30,14 @@ public class OperationReference<L, R> implements ReferenceExpression{
     @Override
     public Object invoke(Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
         ExpressionSupplier<L> leftSupplier = (overrideArgs) ->
-                this.invokeSide(this.left, instance, overrideArgs.length == 0 ? args : overrideArgs,overrideArgs.length != 0);
+                this.invokeSide(this.left, instance, overrideArgs.length == 0 ? args : overrideArgs);
         ExpressionSupplier<R> rightSupplier = (overrideArgs) ->
-                this.invokeSide(this.right, instance, overrideArgs.length == 0 ? args : overrideArgs, overrideArgs.length != 0);
+                this.invokeSide(this.right, instance, overrideArgs.length == 0 ? args : overrideArgs);
 
         return operation.apply(leftSupplier, rightSupplier);
     }
 
-    private <K> K invokeSide(ReferenceExpression reference, Object instance, Object[] args, boolean literalParams) throws InvocationTargetException, IllegalAccessException {
+    private <K> K invokeSide(ReferenceExpression reference, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
         Map<Class<?>, Object> components = Arrays.stream(args).collect(Collectors.toMap(Object::getClass, o -> o));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)
@@ -45,8 +45,8 @@ public class OperationReference<L, R> implements ReferenceExpression{
             throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(reference.parameterTypes())
                     .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
-        Object[] parameters = literalParams ? args : Arrays.stream(reference.parameterTypes())
-                .map(components::get).toArray();
+        Object[] parameters = ClassUtils.isAssignable(reference.parameterTypes(), Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)) ? args
+                : Arrays.stream(reference.parameterTypes()).map(components::get).toArray();
 
         return (K) reference.invoke(instance, parameters);
     }

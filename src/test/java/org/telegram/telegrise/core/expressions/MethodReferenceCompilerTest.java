@@ -47,6 +47,26 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("#first OR #third")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#first OR #third) -> #not")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#first OR #third) -> (#second ; #second)")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#first OR #third) -> (#second -> #second)")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("IF #first DO MethodReferenceCompilerTest#getOne")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("IF (#first -> #not) DO MethodReferenceCompilerTest#getOne ELSE MethodReferenceCompilerTest#getTwo")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(2, expression.toGeneratedValue(Integer.class, node).generate(pool));
     }
 
     @Reference
@@ -67,5 +87,10 @@ public class MethodReferenceCompilerTest {
     @Reference
     public static int getOne(){
         return 1;
+    }
+
+    @Reference
+    public static int getTwo(){
+        return 2;
     }
 }

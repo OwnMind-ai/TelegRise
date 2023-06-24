@@ -49,7 +49,9 @@ public class Parser {
         if (this.isPassiveToken(result.getPredicate()))
             throw new ReferenceParsingException(ILLEGAL_IF_ARGUMENT, this.lexer.getPosition());
 
-        if (!IF_DO_TOKEN.equals(this.lexer.next())) throw new ReferenceParsingException(MISSING_DO_STATEMENT, this.lexer.getPosition());
+        if (!IF_DO_TOKEN.equals(this.lexer.next())) {
+            throw new ReferenceParsingException(MISSING_DO_STATEMENT, this.lexer.getPosition());
+        }
 
         result.setDoAction(this.parseToken());
 

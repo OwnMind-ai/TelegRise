@@ -58,4 +58,21 @@ public class MethodReference implements ReferenceExpression{
     private interface MethodGetter extends Serializable {
         Method get(Class<?> clazz) throws NoSuchMethodException;
     }
+
+    public static final ReferenceExpression NOT = new ReferenceExpression(){
+        @Override
+        public Object invoke(Object instance, Object... args) {
+            return !((Boolean) args[0]);
+        }
+
+        @Override
+        public @NotNull Class<?>[] parameterTypes() {
+            return new Class[]{boolean.class};
+        }
+
+        @Override
+        public @NotNull Class<?> returnType() {
+            return boolean.class;
+        }
+    };
 }

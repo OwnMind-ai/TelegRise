@@ -7,13 +7,11 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.core.expressions.references.OperationReference;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
-import org.telegram.telegrise.core.expressions.tokens.ExpressionToken;
-import org.telegram.telegrise.core.expressions.tokens.MethodReferenceToken;
-import org.telegram.telegrise.core.expressions.tokens.Token;
-import org.telegram.telegrise.core.expressions.tokens.TokenTypes;
+import org.telegram.telegrise.core.expressions.tokens.*;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -31,13 +29,32 @@ public class MethodReferenceCompiler {
             return this.compileExpression((ExpressionToken) rootToken, namespace, returnType, node);
         }
 
+        if (rootToken.getTokenType() == TokenTypes.IF_CONSTRUCTION){
+            return this.compileIf((IfToken) rootToken, namespace, returnType, node);
+        }
+
         return null;
+    }
+
+    private ReferenceExpression compileIf(IfToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
+        ReferenceExpression predicate = this.compile(token.getPredicate(), namespace, Boolean.class, node);
+        if (!ClassUtils.isAssignable(Boolean.class, predicate.returnType()))
+            throw new TranscriptionParsingException("Unable to parse IF statement: if condition returns '" + predicate.returnType().getSimpleName() + "' type, not boolean type", node);
+
+        ReferenceExpression doAction = this.compile(token.getDoAction(), namespace, returnType, node);
+        ReferenceExpression elseAction = token.getElseAction() == null ? null : this.compile(token.getElseAction(), namespace, returnType, node);
+
+        if (elseAction != null && !ClassUtils.isAssignable(doAction.returnType(), elseAction.returnType()))
+            throw new TranscriptionParsingException("Unable to parse IF statement: DO and ELSE statements returns different types '"
+                    + doAction.returnType().getSimpleName() + "' and '" + elseAction.returnType().getSimpleName() + "'", node);
+
+        return new IfReference(predicate, doAction, elseAction);
     }
 
     private ReferenceExpression compileExpression(ExpressionToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
         if(token.getOperatorToken().getOperator().equals(Syntax.AND_OPERATOR) || token.getOperatorToken().getOperator().equals(Syntax.OR_OPERATOR)){
-            ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
-            ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
+            ReferenceExpression left = this.compile(token.getLeft(), namespace, Boolean.class, node);
+            ReferenceExpression right = this.compile(token.getRight(), namespace,  Boolean.class, node);
 
             if (!Boolean.class.isAssignableFrom(left.returnType()) && !boolean.class.isAssignableFrom(left.returnType())){
                 throw new TranscriptionParsingException(
@@ -103,6 +120,9 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
+        if (token.getClassName() == null && token.getParams() == null && token.getMethod().equals(Syntax.NOT_REFERENCE))
+            return MethodReference.NOT;
+
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
 
         Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
