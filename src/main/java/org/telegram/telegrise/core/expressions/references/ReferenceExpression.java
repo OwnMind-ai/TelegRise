@@ -20,8 +20,7 @@ public interface ReferenceExpression extends Serializable {
     @NotNull Class<?> returnType();
 
     default <U> GeneratedValue<U> toGeneratedValue(Class<U> type, Node node){
-        if (!type.isAssignableFrom(this.returnType()) && !(this.returnType().equals(void.class))
-                && !(this.returnType().equals(ClassUtils.wrapperToPrimitive(type))))
+        if (!ClassUtils.isAssignable(this.returnType(), type) && !ClassUtils.isAssignable(type, Void.class))
             throw new TranscriptionParsingException(String.format("Return type '%s' cannot be casted to type '%s'",
                     this.returnType().getSimpleName(), type.getSimpleName()) , node);
 
@@ -37,7 +36,7 @@ public interface ReferenceExpression extends Serializable {
 
             try {
                 Object result = this.invoke(pool.getHandler(), parameters);
-                return type.equals(Void.class) ? null : (U) result;
+                return ClassUtils.isAssignable(type, Void.class) ? null : (U) result;
             } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e.getCause());
             }

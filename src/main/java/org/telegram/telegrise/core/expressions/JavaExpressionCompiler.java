@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ExpressionParser {
+public class JavaExpressionCompiler {
     public static String getTempDirectory(){
         return Objects.requireNonNullElse(
                 System.getProperty("telegrise.tempDirectory"),
@@ -38,7 +38,7 @@ public class ExpressionParser {
     private final File tempDirectoryPath;
     private final URLClassLoader classLoader;
 
-    public ExpressionParser(String tempDirectoryPath) {
+    public JavaExpressionCompiler(String tempDirectoryPath) {
         this.tempDirectoryPath = new File(tempDirectoryPath);
         try {
             this.classLoader = URLClassLoader.newInstance(new URL[]{this.tempDirectoryPath.toURI().toURL()});
@@ -47,7 +47,7 @@ public class ExpressionParser {
         }
     }
 
-    public GeneratedValue<?> parse(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
+    public GeneratedValue<?> compile(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         int hashcode = this.calculateHashcode(expression, namespace);
 
         if (this.isExpressionExists(hashcode))

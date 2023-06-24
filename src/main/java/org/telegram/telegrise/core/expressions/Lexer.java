@@ -66,7 +66,7 @@ public final class Lexer {
 
         Optional<KeywordToken> result = Syntax.KEYWORDS.stream()
                 .map(String::toUpperCase)
-                .filter(candidateString::startsWith)
+                .filter(prefix -> candidateString.startsWith(prefix + " "))
                 .map(KeywordToken::new)
                 .findFirst();
 
@@ -93,7 +93,7 @@ public final class Lexer {
 
         Optional<OperatorToken> result = Syntax.OPERATORS.stream()
                 .map(String::toUpperCase)
-                .filter(candidateString::startsWith)
+                .filter(prefix -> candidateString.startsWith(prefix + " "))
                 .map(OperatorToken::new)
                 .findFirst();
 

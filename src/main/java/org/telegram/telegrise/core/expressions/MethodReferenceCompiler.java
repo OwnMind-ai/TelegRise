@@ -38,13 +38,13 @@ public class MethodReferenceCompiler {
 
     private ReferenceExpression compileIf(IfToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
         ReferenceExpression predicate = this.compile(token.getPredicate(), namespace, Boolean.class, node);
-        if (!ClassUtils.isAssignable(Boolean.class, predicate.returnType()))
+        if (!ClassUtils.isAssignable(predicate.returnType(), Boolean.class))
             throw new TranscriptionParsingException("Unable to parse IF statement: if condition returns '" + predicate.returnType().getSimpleName() + "' type, not boolean type", node);
 
         ReferenceExpression doAction = this.compile(token.getDoAction(), namespace, returnType, node);
         ReferenceExpression elseAction = token.getElseAction() == null ? null : this.compile(token.getElseAction(), namespace, returnType, node);
 
-        if (elseAction != null && !ClassUtils.isAssignable(doAction.returnType(), elseAction.returnType()))
+        if (elseAction != null && !ClassUtils.isAssignable(elseAction.returnType(), doAction.returnType()))
             throw new TranscriptionParsingException("Unable to parse IF statement: DO and ELSE statements returns different types '"
                     + doAction.returnType().getSimpleName() + "' and '" + elseAction.returnType().getSimpleName() + "'", node);
 
@@ -123,6 +123,9 @@ public class MethodReferenceCompiler {
         if (token.getClassName() == null && token.getParams() == null && token.getMethod().equals(Syntax.NOT_REFERENCE))
             return MethodReference.NOT;
 
+        if (!token.isStatic() && namespace.getHandlerClass() == null)
+            throw new TranscriptionParsingException("Unable to parse method '" + token.getMethod() + "': no controller class is assigned", node);
+
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
 
         Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
@@ -148,7 +151,7 @@ public class MethodReferenceCompiler {
         String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", token.getParams()));
 
         try {
-            GeneratedValue<?> result = ExpressionFactory.getExpressionParser().parse(expression, namespace, returnType, node);
+            GeneratedValue<?> result = ExpressionFactory.getJavaExpressionCompiler().compile(expression, namespace, returnType, node);
 
             return new ReferenceExpression(){
                 @Override

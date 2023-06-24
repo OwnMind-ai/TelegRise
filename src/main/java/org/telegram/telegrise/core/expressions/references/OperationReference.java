@@ -45,7 +45,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
             throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(reference.parameterTypes())
                     .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
-        Object[] parameters = ClassUtils.isAssignable(reference.parameterTypes(), Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)) ? args
+        Object[] parameters = ClassUtils.isAssignable(Arrays.stream(args).map(Object::getClass).toArray(Class[]::new), reference.parameterTypes()) ? args
                 : Arrays.stream(reference.parameterTypes()).map(components::get).toArray();
 
         return (K) reference.invoke(instance, parameters);

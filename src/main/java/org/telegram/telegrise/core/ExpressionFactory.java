@@ -1,11 +1,11 @@
 package org.telegram.telegrise.core;
 
 import lombok.Getter;
+import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.TelegRiseRuntimeException;
-import org.telegram.telegrise.core.expressions.ExpressionParser;
-import org.telegram.telegrise.core.expressions.MethodReferenceOld;
-import org.telegram.telegrise.core.expressions.MethodReferenceParser;
+import org.telegram.telegrise.core.expressions.*;
+import org.telegram.telegrise.core.expressions.tokens.Token;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -19,29 +19,39 @@ import java.util.stream.Collectors;
 
 public class ExpressionFactory {
     @Getter
-    private static final ExpressionParser expressionParser = new ExpressionParser(ExpressionParser.getTempDirectory());
+    private static final JavaExpressionCompiler javaExpressionCompiler = new JavaExpressionCompiler(JavaExpressionCompiler.getTempDirectory());
+    private static final MethodReferenceCompiler methodReferenceCompiler = new MethodReferenceCompiler();
 
     public static @NotNull <T> GeneratedValue<T> createExpression(String text, Class<T> type, Node node, LocalNamespace namespace) {
-        if(MethodReferenceParser.isMethodReference(text)){
-            if (namespace.getHandlerClass() == null && MethodReferenceParser.isContainsInstanceMethodReference(text))
-                throw new TranscriptionParsingException("Unable to parse method '" + text + "': no controller class is assigned", node);
+        Parser parser = new Parser(new Lexer(new CharsStream(text)));
 
-            MethodReferenceOld[] references = MethodReferenceParser.parse(text, namespace, node);
-            return MethodReferenceParser.concat(references, type, node);
+        try {
+            Token rootToken = parser.parse();
+            return methodReferenceCompiler.compile(rootToken, namespace, type, node).toGeneratedValue(type, node);
+        } catch (ReferenceParsingException e) {
+            if (type.equals(String.class))
+                return parseFormattedString(text, type, node, namespace);
+
+            if (text.trim().startsWith(Syntax.EXPRESSION_START) && text.trim().endsWith(Syntax.EXPRESSION_END)) {
+                String expression = text.trim().substring(Syntax.EXPRESSION_START.length(), text.trim().length() - Syntax.EXPRESSION_END.length());
+                try {
+                    GeneratedValue<?> raw = javaExpressionCompiler.compile(expression, namespace, type, node);
+                    return p -> type.cast(raw.generate(p));
+                } catch (Exception exception) {
+                    throw new RuntimeException(exception);
+                }
+            }
+
+            if (e.getErrorCode() == ErrorCodes.UNDEFINED_TOKEN)
+                return parsePrimitive(text, type, node);
+            else
+                throw new TranscriptionParsingException(e.getMessage(), node);
         }
+    }
 
-        if (type.equals(String.class))
-            return parseFormattedString(text, type, node, namespace);
-
-        if (text.trim().startsWith(Syntax.EXPRESSION_START) && text.trim().endsWith(Syntax.EXPRESSION_END)){
-            String expression = text.trim().substring(Syntax.EXPRESSION_START.length(), text.trim().length() - Syntax.EXPRESSION_END.length());
-            try {
-                GeneratedValue<?> raw =  expressionParser.parse(expression, namespace, type, node);
-                return p -> type.cast(raw.generate(p));
-            } catch (Exception e) { throw new RuntimeException(e); }
-        }
-
-        if (Number.class.isAssignableFrom(type)) {
+    @NotNull
+    private static <T> GeneratedValue<T> parsePrimitive(String text, Class<T> type, Node node) {
+        if (ClassUtils.isAssignable(type, Number.class)) {
             Number parsed;
             try {
                 parsed = NumberFormat.getInstance().parse(text);
@@ -61,7 +71,7 @@ public class ExpressionFactory {
                 return GeneratedValue.ofValue(type.cast(parsed.byteValue()));
             else
                 throw new TelegRiseRuntimeException("Unknown field number type");
-        } else if (Boolean.class.isAssignableFrom(type)) {
+        } else if (ClassUtils.isAssignable(type, Boolean.class)) {
             if (!text.equals("true") && !text.equals("false"))
                 throw new TranscriptionParsingException("Cannot parse boolean value from '" + text + "'", node);
             return GeneratedValue.ofValue(type.cast(Boolean.parseBoolean(text)));
@@ -127,8 +137,20 @@ public class ExpressionFactory {
             String expression = left.substring(0, left.indexOf(Syntax.EXPRESSION_END));
             pointer += expression.length() + Syntax.EXPRESSION_END.length();
 
-            GeneratedValue<?> raw = expressionParser.parse(expression, namespace, String.class, node);
-            return (pool) -> String.valueOf(raw.generate(pool));
+            Parser parser = new Parser(new Lexer(new CharsStream(expression)));
+
+            try {
+                Token rootToken = parser.parse();
+                GeneratedValue<?> raw = methodReferenceCompiler.compile(rootToken, namespace, Object.class, node).toGeneratedValue(Object.class, node);
+                return (pool) -> String.valueOf(raw.generate(pool));
+            } catch (ReferenceParsingException e) {
+                if (e.getErrorCode() == ErrorCodes.UNDEFINED_TOKEN){
+                    GeneratedValue<?> raw = javaExpressionCompiler.compile(expression, namespace, String.class, node);
+                    return (pool) -> String.valueOf(raw.generate(pool));
+                } else {
+                    throw new TranscriptionParsingException(e.getMessage(), node);
+                }
+            }
         }
     }
 }

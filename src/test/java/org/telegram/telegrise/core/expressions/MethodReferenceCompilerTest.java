@@ -45,8 +45,8 @@ public class MethodReferenceCompilerTest {
         assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));
 
         parser = new Parser(new Lexer(new CharsStream("#first OR #third")));
-        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
-        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+        expression = compiler.compile(parser.parse(), namespace, Object.class, node);
+        assertEquals(true, expression.toGeneratedValue(Object.class, node).generate(pool));
 
         parser = new Parser(new Lexer(new CharsStream("(#first OR #third) -> #not")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);

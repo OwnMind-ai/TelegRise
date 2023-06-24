@@ -26,6 +26,8 @@ public class CharsStream {
     }
 
     public char next() {
+        if (eof()) return 0;
+
         return this.text.charAt(this.position++);
     }
 

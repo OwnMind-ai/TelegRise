@@ -16,6 +16,12 @@ class LexerTest {
         lexer = new Lexer(new CharsStream("Class#method"));
         assertEquals(new MethodReferenceToken("Class", "method", null), lexer.next());
 
+        lexer = new Lexer(new CharsStream("org.Class#method"));
+        assertEquals(new MethodReferenceToken("org.Class", "method", null), lexer.next());
+
+        lexer = new Lexer(new CharsStream("if_ignore.Class#method"));  // Must read as whole, not as "IF _ignore.Class#method"
+        assertEquals(new MethodReferenceToken("if_ignore.Class", "method", null), lexer.next());
+
         lexer = new Lexer(new CharsStream("#method(\"string 1\", 123)"));
         assertEquals(new MethodReferenceToken("method", List.of("\"string 1\"", "123")), lexer.next());
 
