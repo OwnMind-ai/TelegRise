@@ -42,10 +42,14 @@ public class AnimationExecutor implements Runnable {
         currentFrame++;
 
         int maxLoops = this.animation.getLoops().generate(lockedPool);
-        while((this.animation.getUntil() != null && this.animation.getUntil().generate(lockedPool))
-                || maxLoops >= loops)
-        {
+        boolean interruptedByPredicate = false;
+        while(!interruptedByPredicate && maxLoops >= this.loops){
             for (int i = 0; i < this.animation.getFrames().size(); i++) {
+                if (this.animation.getUntil() != null && this.animation.getUntil().generate(lockedPool)){
+                    interruptedByPredicate = true;
+                    break;
+                }
+
                 try {
                     this.iteration(lockedPool);
                 } catch (TelegramApiException | InterruptedException e) {
@@ -53,7 +57,7 @@ public class AnimationExecutor implements Runnable {
                 }
             }
 
-            loops++;
+            this.loops++;
         }
 
         if (this.animation.getAfter() != null)
