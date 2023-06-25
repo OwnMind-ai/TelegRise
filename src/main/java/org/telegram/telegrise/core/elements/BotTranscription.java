@@ -73,11 +73,6 @@ public final class BotTranscription implements TranscriptionElement {
                     });
     }
 
-    @Override
-    public void load(TranscriptionMemory memory) {
-        this.rootMenu.setInterpretable(false);
-    }
-
     public SetMyCommands getSetCommands(BotCommandScope scope){
         return new SetMyCommands(this.rootMenu.getTrees().stream()
                 .filter(t -> t.isProducesBotCommands(scope, this.rootMenu))

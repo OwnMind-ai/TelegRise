@@ -13,7 +13,10 @@ import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.Branch;
+import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.elements.head.Link;
@@ -111,7 +114,6 @@ public class XMLTranscriptionParserTest {
         expectedTree.setBranches(List.of(expectedBranch));
 
         Menu expectedMenu = new Menu();
-        expectedMenu.setInterpretable(false);
         expectedMenu.setName("Main");
         expectedMenu.setActions(null);
         expectedMenu.setTrees(List.of(expectedTree));

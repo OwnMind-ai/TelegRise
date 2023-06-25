@@ -132,6 +132,12 @@ public class TelegramSessionsController {
         session.update(update);
 
         if (!session.isRunning())
-            poolExecutor.submit(session);
+            poolExecutor.submit(() -> {
+                try{
+                    session.run();
+                } catch (Exception e){
+                    System.err.println(e.getMessage());  //TODO fix exceptions
+                }
+            });
     }
 }

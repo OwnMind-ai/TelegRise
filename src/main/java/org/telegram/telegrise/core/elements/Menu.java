@@ -19,8 +19,6 @@ import java.util.List;
 public class Menu implements BranchingElement{
     @Attribute(name = "name", nullable = false)
     private String name;
-    @Attribute(name = "interruptible")
-    private boolean interpretable = true;
 
     @Attribute(name = "chats")
     private String[] chatTypes;

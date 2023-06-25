@@ -27,10 +27,26 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class Tree implements BranchingElement{
+    public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
+    public static final String INTERRUPT_BY_KEYS = "keys";
+    public static final String INTERRUPT_BY_COMMANDS = "commands";
+    public static final String INTERRUPT_BY_PREDICATES = "predicates";
+    public static final String INTERRUPT_BY_ALL = "all";
+    public static final String INTERRUPT_BY_NONE = "none";
+
+    public static boolean improperInterruptionScopes(String[] scopes){
+        List<String> scopesList = List.of(scopes);
+        if (scopesList.contains(INTERRUPT_BY_NONE))
+            return scopes.length != 1;
+
+        return !scopesList.stream().allMatch(s -> s.equals(INTERRUPT_BY_CALLBACKS) || s.equals(INTERRUPT_BY_KEYS)
+                || s.equals(INTERRUPT_BY_COMMANDS) || s.equals(INTERRUPT_BY_PREDICATES) || s.equals(INTERRUPT_BY_ALL));
+    }
+
     @Attribute(name = "name", nullable = false)
     private String name;
-    @Attribute(name = "interruptible")
-    private boolean interruptible = true;
+    @Attribute(name = "allowedInterruptions")
+    private String[] allowedInterruptions = {INTERRUPT_BY_CALLBACKS, INTERRUPT_BY_KEYS, INTERRUPT_BY_COMMANDS};
 
     @Attribute(name = "commands")
     private String[] commands;
@@ -69,6 +85,9 @@ public class Tree implements BranchingElement{
     public void validate(Node node, TranscriptionMemory memory) {
         if(this.controller != null && (this.branches == null || this.branches.isEmpty()))
             throw new TranscriptionParsingException("Trees with no branches cannot be connected to a controller", node);
+
+        if (improperInterruptionScopes(this.allowedInterruptions))
+            throw new TranscriptionParsingException("Undefined interruption scopes", node);
     }
 
     @Attribute(priority = Double.POSITIVE_INFINITY)
@@ -100,12 +119,9 @@ public class Tree implements BranchingElement{
         if (!update.hasMessage() || update.getMessage().getText() == null) return false;
 
         if (this.commands != null) {
-            CommandData command = MessageUtils.parseCommand(update.getMessage().getText());
-            boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
-
-            if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
-                return Arrays.stream(this.commands)
-                        .anyMatch(c -> c.equals(command.getName()));
+            if (isApplicableCommand(update.getMessage().getText(), chat, pool)){
+                return true;
+            }
         }
 
         if (this.keys != null)
@@ -115,11 +131,22 @@ public class Tree implements BranchingElement{
         return false;
     }
 
+    public boolean isApplicableCommand(String text, Chat chat, ResourcePool pool){
+        CommandData command = MessageUtils.parseCommand(text);
+        boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
+
+        if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
+            return Arrays.stream(this.commands)
+                    .anyMatch(c -> c.equals(command.getName()));
+
+        return false;
+    }
+
     public boolean isProducesBotCommands(BotCommandScope scope, Menu rootMenu){
         List<String> scopes = this.scopes != null ? List.of(this.scopes) :
                 ChatTypes.chatTypesToScopes(Objects.requireNonNullElse(this.chatTypes ,rootMenu.getChatTypes()));
 
-        return this.description != null && ChatTypes.isApplicable(scopes, scope);
+        return this.description != null && this.commands != null && ChatTypes.isApplicable(scopes, scope);
     }
 
     public List<BotCommand> getBotCommands(){

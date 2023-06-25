@@ -9,12 +9,17 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 
+import static org.telegram.telegrise.core.elements.Tree.*;
+
 @Element(name = "branch")
 @Data
 @NoArgsConstructor
 public class Branch implements StorableElement, TranscriptionElement{
     @Attribute(name = "name")
     private String name;
+
+    @Attribute(name = "allowedInterruptions")
+    private String[] allowedInterruptions = {INTERRUPT_BY_CALLBACKS, INTERRUPT_BY_KEYS, INTERRUPT_BY_COMMANDS};
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
@@ -46,6 +51,9 @@ public class Branch implements StorableElement, TranscriptionElement{
 
         if (transition != null && (defaultBranch != null || (branches != null && !branches.isEmpty())))
             throw new TranscriptionParsingException("Branch cannot contain other branches if a transition is defined", node);
+
+        if (improperInterruptionScopes(this.allowedInterruptions))
+            throw new TranscriptionParsingException("Undefined interruption scopes", node);
     }
 
     @Override

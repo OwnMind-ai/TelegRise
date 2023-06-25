@@ -101,6 +101,11 @@ public final class TreeExecutor {
         invokeBranch(toInvoke, actions, pool, this.sender);
     }
 
+    public List<String> getCurrentInterruptionScopes(){
+        return this.currentBranch != null ? List.of(this.currentBranch.getAllowedInterruptions())
+                : List.of(this.tree.getAllowedInterruptions());
+    }
+
     public void close(){
         this.currentBranch = null;
         this.closed = true;

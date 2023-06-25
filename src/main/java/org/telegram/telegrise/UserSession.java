@@ -21,6 +21,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
+import static org.telegram.telegrise.core.elements.Tree.*;
 
 public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
@@ -103,9 +106,9 @@ public class UserSession implements Runnable{
 
     private void handleUpdate(Update update) {
         ResourcePool pool = this.createResourcePool(update);
-        Optional<PrimaryHandler> candidate = this.primaryHandlersController.getApplicableHandler(update);
-        if (candidate.isPresent()){
-            boolean intercept = this.primaryHandlersController.applyHandler(update, candidate.get());
+        Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableHandler(update);
+        if (handlerCandidate.isPresent()){
+            boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
 
             if (intercept) return;
         }
@@ -114,24 +117,69 @@ public class UserSession implements Runnable{
             this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
 
         else if (this.sessionMemory.isOnStack(Tree.class)) {
-            Tree tree = (Tree) this.sessionMemory.getBranchingElements().getLast();
-            if (this.transcription.isInterruptions() && tree.isInterruptible() && pool.getUpdate().hasMessage()){
-                if (checkForInterruption(update, pool)) return;
+            if (this.transcription.isInterruptions()){
+                TreeExecutor executor = this.treeExecutors.getLast();
+                Optional<Tree> treeCandidate = this.getInterruptionCandidate(update, pool, executor);
+
+                if (treeCandidate.isPresent()){
+                    this.interruptTreeChain(update, treeCandidate.get());
+                    return;
+                }
             }
 
             this.updateTree(update);
         }
     }
 
-    private boolean checkForInterruption(Update update, ResourcePool pool) {
+    private Optional<Tree> getInterruptionCandidate(Update update, ResourcePool pool, TreeExecutor executor) {
+        List<String> scopes = executor.getCurrentInterruptionScopes();
+
+        if(scopes.contains(INTERRUPT_BY_NONE))
+            return Optional.empty();
+
         Chat chat = MessageUtils.getChat(update);
-        Optional<Tree> treeCandidate = this.transcription.getRootMenu().getTrees().stream()
-                .filter(t -> t.canHandleMessage(pool, chat)).findFirst();
-        if (treeCandidate.isPresent()){
-            this.interruptTreeChain(update, treeCandidate.get());
-            return true;
+        boolean containAll = scopes.contains(INTERRUPT_BY_ALL);
+        List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
+        List<Tree> trees = this.transcription.getRootMenu().getTrees().stream()
+                .filter(t -> t.isChatApplicable(lastScopes, chat))
+                .collect(Collectors.toList());
+
+        if (update.hasCallbackQuery() && (containAll || scopes.contains(INTERRUPT_BY_CALLBACKS))){
+            Optional<Tree> candidate = trees.stream()
+                    .filter(t -> t.getCallbackTriggers() != null)
+                    .filter(t -> List.of(t.getCallbackTriggers()).contains(update.getCallbackQuery().getData()))
+                    .findFirst();
+
+            if (candidate.isPresent()) return candidate;
         }
-        return false;
+
+        if (update.hasMessage() && update.getMessage().hasText() && (containAll || scopes.contains(INTERRUPT_BY_COMMANDS))){
+            Optional<Tree> candidate = trees.stream()
+                    .filter(t -> t.getCommands() != null)
+                    .filter(t -> t.isApplicableCommand(update.getMessage().getText(), chat, pool))
+                    .findFirst();
+
+            if (candidate.isPresent()) return candidate;
+        }
+
+        if (update.hasMessage() && update.getMessage().hasText() && (containAll || scopes.contains(INTERRUPT_BY_KEYS))){
+            Optional<Tree> candidate = trees.stream()
+                    .filter(t -> t.getKeys() != null)
+                    .filter(t -> List.of(t.getKeys()).contains(update.getMessage().getText()))
+                    .findFirst();
+
+            if (candidate.isPresent()) return candidate;
+        }
+
+        if (containAll || scopes.contains(INTERRUPT_BY_PREDICATES)){
+            for (Tree tree : trees) {
+                if (tree.getPredicate() != null && tree.getPredicate().generate(pool)) {
+                    return Optional.of(tree);
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     private void interruptTreeChain(Update update, Tree tree) {
@@ -153,8 +201,6 @@ public class UserSession implements Runnable{
         if (tree != null) {
             this.initializeTree(update, tree);
             return;
-        } else if (menu.isInterpretable() && update.hasMessage()) {
-            if (checkForInterruption(update, pool)) return;
         }
 
         if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){
