@@ -56,6 +56,8 @@ public final class TreeExecutor {
     private Branch currentBranch;
     @Getter
     private boolean closed;
+    @Getter
+    private boolean naturalyClosed;
 
     @Getter
     private Branch lastBranch;
@@ -80,6 +82,7 @@ public final class TreeExecutor {
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
                 this.lastBranch = this.currentBranch;
+                this.naturalyClosed = true;
                 this.close();
             }
         } else if(previous != null && previous.getDefaultBranch() != null) {
@@ -88,11 +91,12 @@ public final class TreeExecutor {
                 this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
 
             this.currentBranch = previous;
-        } else if(previous == null) {
-            if (this.tree.getDefaultBranch() != null && this.tree.getDefaultBranch().getWhen().generate(resourcePool))
+        } else if(previous == null && this.tree.getDefaultBranch() != null) {
+            if (this.tree.getDefaultBranch().getWhen().generate(resourcePool))
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
             this.lastBranch = previous;
+            this.naturalyClosed = false;
             this.close();
         }
     }
@@ -102,8 +106,8 @@ public final class TreeExecutor {
     }
 
     public List<String> getCurrentInterruptionScopes(){
-        return this.currentBranch != null ? List.of(this.currentBranch.getAllowedInterruptions())
-                : List.of(this.tree.getAllowedInterruptions());
+        return this.currentBranch == null && this.lastBranch == null ? List.of(this.tree.getAllowedInterruptions())
+                : this.currentBranch != null ? List.of(this.currentBranch.getAllowedInterruptions()) : List.of(this.lastBranch.getAllowedInterruptions());
     }
 
     public void close(){

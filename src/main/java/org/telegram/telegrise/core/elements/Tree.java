@@ -46,7 +46,7 @@ public class Tree implements BranchingElement{
     @Attribute(name = "name", nullable = false)
     private String name;
     @Attribute(name = "allowedInterruptions")
-    private String[] allowedInterruptions = {INTERRUPT_BY_CALLBACKS, INTERRUPT_BY_KEYS, INTERRUPT_BY_COMMANDS};
+    private String[] allowedInterruptions = {INTERRUPT_BY_ALL};
 
     @Attribute(name = "commands")
     private String[] commands;

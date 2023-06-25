@@ -171,14 +171,6 @@ public class UserSession implements Runnable{
             if (candidate.isPresent()) return candidate;
         }
 
-        if (containAll || scopes.contains(INTERRUPT_BY_PREDICATES)){
-            for (Tree tree : trees) {
-                if (tree.getPredicate() != null && tree.getPredicate().generate(pool)) {
-                    return Optional.of(tree);
-                }
-            }
-        }
-
         return Optional.empty();
     }
 
@@ -258,13 +250,26 @@ public class UserSession implements Runnable{
 
         if (executor.isClosed()){
             boolean execute = true;
-            if (executor.getLastBranch().getTransition() != null) {
+            if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
                 boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
                 execute = executor.getLastBranch().getTransition().isExecute();
 
                 if (interrupted) return;
             } else {
                 this.transitionController.removeExecutor(executor);
+
+                Chat chat = MessageUtils.getChat(update);
+                List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
+                if (!executor.isNaturalyClosed() && (executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
+                    || executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_PREDICATES)))
+                {
+                    for (Tree tree : this.transcription.getRootMenu().getTrees()) {
+                        if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
+                            this.interruptTreeChain(update, tree);
+                            return;
+                        }
+                    }
+                }
             }
 
             BranchingElement last = this.sessionMemory.getBranchingElements().getLast();

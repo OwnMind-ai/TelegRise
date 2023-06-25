@@ -9,7 +9,8 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 
-import static org.telegram.telegrise.core.elements.Tree.*;
+import static org.telegram.telegrise.core.elements.Tree.INTERRUPT_BY_ALL;
+import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScopes;
 
 @Element(name = "branch")
 @Data
@@ -19,7 +20,7 @@ public class Branch implements StorableElement, TranscriptionElement{
     private String name;
 
     @Attribute(name = "allowedInterruptions")
-    private String[] allowedInterruptions = {INTERRUPT_BY_CALLBACKS, INTERRUPT_BY_KEYS, INTERRUPT_BY_COMMANDS};
+    private String[] allowedInterruptions = {INTERRUPT_BY_ALL};
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
