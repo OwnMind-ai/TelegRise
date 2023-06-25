@@ -41,9 +41,11 @@ public class AnimationExecutor implements Runnable {
         } catch (TelegramApiException | InterruptedException e) { throw new RuntimeException(e); }
         currentFrame++;
 
-        int maxLoops = this.animation.getLoops().generate(lockedPool);
+        int maxLoops = this.animation.getLoops() != null ? this.animation.getLoops().generate(lockedPool)
+                : this.animation.getUntil() != null ? Integer.MAX_VALUE : 1;
+
         boolean interruptedByPredicate = false;
-        while(!interruptedByPredicate && maxLoops >= this.loops){
+        while(!interruptedByPredicate && maxLoops > this.loops){
             for (int i = 0; i < this.animation.getFrames().size(); i++) {
                 if (this.animation.getUntil() != null && this.animation.getUntil().generate(lockedPool)){
                     interruptedByPredicate = true;

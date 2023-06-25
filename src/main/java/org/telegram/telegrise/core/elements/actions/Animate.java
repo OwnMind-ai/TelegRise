@@ -31,7 +31,7 @@ public class Animate implements ActionElement{
     private GeneratedValue<Boolean> until;
 
     @Attribute(name = "loops")
-    private GeneratedValue<Integer> loops = GeneratedValue.ofValue(1);
+    private GeneratedValue<Integer> loops;
 
     @Attribute(name = "deleteAfter")
     private boolean deleteAfter = true;
