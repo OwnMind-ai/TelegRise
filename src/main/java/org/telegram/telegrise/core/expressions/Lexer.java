@@ -62,7 +62,7 @@ public final class Lexer {
     }
 
     private Optional<KeywordToken> readKeyword() {
-        String candidateString = this.charsStream.peek(Syntax.MAX_KEYWORDS_LENGTH).toUpperCase();
+        String candidateString = this.charsStream.peek(Syntax.MAX_KEYWORDS_LENGTH + 1).toUpperCase();
 
         Optional<KeywordToken> result = Syntax.KEYWORDS.stream()
                 .map(String::toUpperCase)
@@ -89,7 +89,7 @@ public final class Lexer {
     }
 
     private Optional<OperatorToken> readOperator() {
-        String candidateString = this.charsStream.peek(Syntax.MAX_OPERATORS_LENGTH).toUpperCase();
+        String candidateString = this.charsStream.peek(Syntax.MAX_OPERATORS_LENGTH + 1).toUpperCase();
 
         Optional<OperatorToken> result = Syntax.OPERATORS.stream()
                 .map(String::toUpperCase)

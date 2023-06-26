@@ -67,7 +67,7 @@ public class MessageUtils {
                     .width(message.getVideo().getWidth())
                     .height(message.getVideo().getHeight())
                     .duration(message.getVideo().getDuration())
-                    .thumb(new InputFile(message.getVideo().getThumb().getFileId()))
+                    .thumbnail(message.getVideo().getThumbnail() != null ? new InputFile(message.getVideo().getThumbnail().getFileId()) : null)
                     .hasSpoiler(message.getHasMediaSpoiler())
                     .build();
         } else if (message.hasAudio()) {
@@ -76,12 +76,12 @@ public class MessageUtils {
                     .duration(message.getAudio().getDuration())
                     .performer(message.getAudio().getPerformer())
                     .title(message.getAudio().getTitle())
-                    .thumb(new InputFile(message.getAudio().getThumb().getFileId()))
+                    .thumbnail(message.getAudio().getThumbnail() != null ? new InputFile(message.getAudio().getThumbnail().getFileId()) : null)
                     .build();
         } else if (message.hasDocument()) {
             result = InputMediaDocument.builder()
                     .media(message.getDocument().getFileId())
-                    .thumb(new InputFile(message.getDocument().getThumb().getFileId()))
+                    .thumbnail(message.getDocument().getThumbnail() != null ? new InputFile(message.getDocument().getThumbnail().getFileId()) : null)
                     .build();
         } else if (message.hasAnimation()) {
             result = InputMediaAnimation.builder()
@@ -89,7 +89,7 @@ public class MessageUtils {
                     .width(message.getAnimation().getWidth())
                     .height(message.getAnimation().getHeight())
                     .duration(message.getAnimation().getDuration())
-                    .thumb(new InputFile(message.getAnimation().getThumb().getFileId()))
+                    .thumbnail(message.getAnimation().getThumbnail() != null ? new InputFile(message.getAnimation().getThumbnail().getFileId()) : null)
                     .build();
         } else
             return null;
