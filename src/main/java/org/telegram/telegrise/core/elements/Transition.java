@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.w3c.dom.Node;
@@ -25,7 +26,7 @@ public class Transition implements TranscriptionElement{
     private String direction;
 
     @Attribute(name = "target")
-    private String target;
+    private GeneratedValue<String> target;
 
     @Attribute(name = "type")
     private String type;

@@ -9,7 +9,6 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 
-import static org.telegram.telegrise.core.elements.Tree.INTERRUPT_BY_ALL;
 import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScopes;
 
 @Element(name = "branch")
@@ -20,7 +19,7 @@ public class Branch implements StorableElement, TranscriptionElement{
     private String name;
 
     @Attribute(name = "allowedInterruptions")
-    private String[] allowedInterruptions = {INTERRUPT_BY_ALL};
+    private String[] allowedInterruptions;
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
@@ -53,7 +52,7 @@ public class Branch implements StorableElement, TranscriptionElement{
         if (transition != null && (defaultBranch != null || (branches != null && !branches.isEmpty())))
             throw new TranscriptionParsingException("Branch cannot contain other branches if a transition is defined", node);
 
-        if (improperInterruptionScopes(this.allowedInterruptions))
+        if (this.allowedInterruptions != null && improperInterruptionScopes(this.allowedInterruptions))
             throw new TranscriptionParsingException("Undefined interruption scopes", node);
     }
 

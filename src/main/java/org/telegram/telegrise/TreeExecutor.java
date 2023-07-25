@@ -106,8 +106,12 @@ public final class TreeExecutor {
     }
 
     public List<String> getCurrentInterruptionScopes(){
-        return this.currentBranch == null && this.lastBranch == null ? List.of(this.tree.getAllowedInterruptions())
-                : this.currentBranch != null ? List.of(this.currentBranch.getAllowedInterruptions()) : List.of(this.lastBranch.getAllowedInterruptions());
+        return !hasInterruptions(this.currentBranch) && !hasInterruptions(this.lastBranch) ? List.of(this.tree.getAllowedInterruptions())
+                : hasInterruptions(this.currentBranch) ? List.of(this.currentBranch.getAllowedInterruptions()) : List.of(this.lastBranch.getAllowedInterruptions());
+    }
+
+    private boolean hasInterruptions(Branch branch){
+        return branch != null && branch.getAllowedInterruptions() != null;
     }
 
     public void close(){

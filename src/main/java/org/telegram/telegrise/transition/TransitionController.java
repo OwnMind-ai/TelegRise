@@ -6,6 +6,7 @@ import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.TreeExecutor;
 import org.telegram.telegrise.UniversalSender;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -30,9 +31,9 @@ public class TransitionController {
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
         switch (transition.getDirection()){
-            case Transition.NEXT: this.applyNext(tree, transition); return false;
-            case Transition.PREVIOUS: this.applyPrevious(transition); return false;
-            case Transition.JUMP: this.applyJump(tree, transition); return false;
+            case Transition.NEXT: this.applyNext(tree, transition, pool); return false;
+            case Transition.PREVIOUS: this.applyPrevious(transition, pool); return false;
+            case Transition.JUMP: this.applyJump(tree, transition, pool); return false;
             case Transition.LOCAL: this.applyLocal(tree, transition, pool); return true;   // INTERRUPTING
             case Transition.CALLER: return this.applyCaller(tree, transition, pool);
             default: throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
@@ -73,7 +74,7 @@ public class TransitionController {
             return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
         }
 
-        this.applyPrevious(new Transition(Transition.PREVIOUS, point.getFrom().getName(), null, false, null, null));
+        this.applyPrevious(new Transition(Transition.PREVIOUS, GeneratedValue.ofValue(point.getFrom().getName()), null, false, null, null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
         if (transition.getType().equals(Transition.MENU_TYPE)){
@@ -90,33 +91,33 @@ public class TransitionController {
         TreeExecutor last = this.treeExecutors.getLast();
         assert last.getTree().getName().equals(tree.getName());
 
-        Branch next = this.transcriptionMemory.get(transition.getTarget(), Branch.class, List.of("branch"));
+        Branch next = this.transcriptionMemory.get(transition.getTarget().generate(pool), Branch.class, List.of("branch"));
         last.setCurrentBranch(next);
 
         if (transition.isExecute())
             TreeExecutor.invokeBranch(next.getToInvoke(), next.getActions(), pool,  last.getSender());
     }
 
-    private void applyJump(Tree tree, Transition transition) {
-        BranchingElement requested = this.transcriptionMemory.get(transition.getTarget(), BranchingElement.class, Transition.TYPE_LIST);
+    private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
+        BranchingElement requested = this.transcriptionMemory.get(transition.getTarget().generate(pool), BranchingElement.class, Transition.TYPE_LIST);
         if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + transition.getTarget() + "'");
 
         this.sessionMemory.getBranchingElements().add(requested);
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
     }
 
-    private void applyNext(Tree tree, Transition transition) {
-        Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(transition.getTarget())).findFirst()
+    private void applyNext(Tree tree, Transition transition, ResourcePool pool) {
+        Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(transition.getTarget().generate(pool))).findFirst()
                 .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + transition.getTarget() + "' in tree '" + tree.getName() + "'"));
 
         this.sessionMemory.getBranchingElements().add(next);
     }
 
-    private void applyPrevious(Transition transition){
+    private void applyPrevious(Transition transition, ResourcePool pool){
         for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
             BranchingElement element = it.next();
 
-            if (!element.getName().equals(transition.getTarget())) {
+            if (!element.getName().equals(transition.getTarget().generate(pool))) {
                 this.sessionMemory.getBranchingElements().remove(element);
 
                 if (element instanceof Tree){
