@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 import org.w3c.dom.Node;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,12 +42,12 @@ public class OperationReference<L, R> implements ReferenceExpression{
         Map<Class<?>, Object> components = Arrays.stream(args).collect(Collectors.toMap(Object::getClass, o -> o));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)
-                .allMatch(components::containsKey))
+                .allMatch(p -> ResourcePool.extractComponent(components, p) != null))
             throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(reference.parameterTypes())
                     .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
         Object[] parameters = ClassUtils.isAssignable(Arrays.stream(args).map(Object::getClass).toArray(Class[]::new), reference.parameterTypes()) ? args
-                : Arrays.stream(reference.parameterTypes()).map(components::get).toArray();
+                : Arrays.stream(reference.parameterTypes()).map(p -> ResourcePool.extractComponent(components, p)).toArray();
 
         return (K) reference.invoke(instance, parameters);
     }

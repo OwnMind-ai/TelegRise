@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -27,12 +28,12 @@ public interface ReferenceExpression extends Serializable {
         return pool -> {
             Map<Class<?>, Object> components = pool.getComponents();
 
-            if (!Arrays.stream(parameterTypes()).allMatch(components::containsKey))
+            if (!Arrays.stream(parameterTypes()).allMatch(p -> ResourcePool.extractComponent(components, p) != null))
                 throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(parameterTypes())
                         .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
             Object[] parameters = Arrays.stream(parameterTypes())
-                    .map(components::get).toArray();
+                    .map(p -> ResourcePool.extractComponent(components, p)).toArray();
 
             try {
                 Object result = this.invoke(pool.getHandler(), parameters);

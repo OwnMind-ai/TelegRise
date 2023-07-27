@@ -3,6 +3,7 @@ package org.telegram.telegrise.core;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Contract;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,6 +17,14 @@ import java.util.Map;
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public final class ResourcePool {
+    public static Object extractComponent(Map<Class<?>, Object> components, Class<?> target){
+        if (components.containsKey(target)) return components.get(target);
+
+        return components.keySet().stream().filter(k -> ClassUtils.isAssignable(k, target))
+                .map(components::get)
+                .findFirst().orElse(null);
+    }
+
     private Update update;
     private Object handler;
 
