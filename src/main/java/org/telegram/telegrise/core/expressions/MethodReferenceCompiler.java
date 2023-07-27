@@ -3,10 +3,7 @@ package org.telegram.telegrise.core.expressions;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.annotations.Reference;
-import org.telegram.telegrise.core.ExpressionFactory;
-import org.telegram.telegrise.core.GeneratedValue;
-import org.telegram.telegrise.core.LocalNamespace;
-import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.core.expressions.references.OperationReference;
@@ -156,12 +153,12 @@ public class MethodReferenceCompiler {
             return new ReferenceExpression(){
                 @Override
                 public Object invoke(Object instance, Object... args) {
-                    throw new UnsupportedOperationException();
+                    return result.generate((ResourcePool) args[0]);
                 }
 
                 @Override
                 public @NotNull Class<?>[] parameterTypes() {
-                    return new Class[0];
+                    return new Class[]{ResourcePool.class};
                 }
 
                 @Override

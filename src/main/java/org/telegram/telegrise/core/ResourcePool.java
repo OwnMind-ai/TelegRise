@@ -34,7 +34,7 @@ public final class ResourcePool {
 
     private TreeExecutor currentExecutor;
 
-    private final Map<Class<?>, Object> components = new HashMap<>();
+    private final Map<Class<?>, Object> components = new HashMap<>(Map.of(ResourcePool.class,this));
 
     public ResourcePool(Update update, Object handler, DefaultAbsSender sender, SessionMemoryImpl memory) {
         this.update = update;
