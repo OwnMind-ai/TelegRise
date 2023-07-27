@@ -20,14 +20,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 
 public final class TreeExecutor {
-    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory) {
+    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory, BlockingQueue<Update> updatesQueue) {
         Object handler = null;
         if (tree.getController() != null)
             handler = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
 
-        return new TreeExecutor(memory, handler, tree, sender);
+        return new TreeExecutor(memory, handler, tree, sender, updatesQueue);
     }
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, DefaultAbsSender sender){
@@ -52,6 +53,8 @@ public final class TreeExecutor {
     private final Tree tree;
     @Getter
     private final DefaultAbsSender sender;
+    @Getter
+    private final BlockingQueue<Update> updatesQueue;
     @Getter @Setter
     private Branch currentBranch;
     @Getter
@@ -62,17 +65,18 @@ public final class TreeExecutor {
     @Getter
     private Branch lastBranch;
 
-    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, DefaultAbsSender sender) {
+    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, DefaultAbsSender sender, BlockingQueue<Update> updatesQueue) {
         this.memory = memory;
         this.controllerInstance = controllerInstance;
         this.tree = tree;
         this.sender = sender;
+        this.updatesQueue = updatesQueue;
     }
 
     public void update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, this);
+        ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, this, updatesQueue);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);

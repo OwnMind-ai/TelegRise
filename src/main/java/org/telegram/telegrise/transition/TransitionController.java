@@ -52,7 +52,7 @@ public class TransitionController {
                     .filter(t -> t.getTree().getName().equals(point.getFrom().getName()))
                     .findFirst().orElseThrow();
             ResourcePool resourcePool = new ResourcePool(pool.getUpdate(), pointExecutor.getControllerInstance(),
-                    pool.getSender(), pool.getMemory(), pointExecutor);
+                    pool.getSender(), pool.getMemory(), pointExecutor, pool.getUpdates());
 
             point.getActions().forEach(action -> {
                 try {

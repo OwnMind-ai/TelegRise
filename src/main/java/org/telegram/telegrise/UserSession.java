@@ -17,9 +17,13 @@ import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -35,10 +39,10 @@ public class UserSession implements Runnable{
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
 
-    private final Queue<Update> updateQueue = new ConcurrentLinkedQueue<>();
+    private final BlockingQueue<Update> updatesQueue = new LinkedBlockingQueue<>();
     private final TransitionController transitionController;
     private final PrimaryHandlersController primaryHandlersController;
-    private final MediaCollector mediaCollector = new MediaCollector(this.updateQueue);
+    private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     private final UniversalSender universalSender;
     private final InteractiveObjectManager interactiveObjectManager = new InteractiveObjectManager(this::createResourcePool);
     @Setter
@@ -81,7 +85,7 @@ public class UserSession implements Runnable{
     }
 
     public void update(Update update){
-        this.updateQueue.add(update);
+        this.updatesQueue.add(update);
     }
 
     public boolean isRunning(){
@@ -95,8 +99,8 @@ public class UserSession implements Runnable{
         this.running.set(true);
 
         try {
-            while (!this.updateQueue.isEmpty())
-                this.handleUpdate(this.updateQueue.remove());
+            while (!this.updatesQueue.isEmpty())
+                this.handleUpdate(this.updatesQueue.remove());
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -210,7 +214,7 @@ public class UserSession implements Runnable{
 
     private void applyTree(Update update, Tree tree) {
         if (tree.getBranches() != null) {
-            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory);
+            TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue);
             this.treeExecutors.add(executor);
             this.sessionMemory.getBranchingElements().add(tree);
         }
@@ -274,7 +278,7 @@ public class UserSession implements Runnable{
 
             BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
             if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
-                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory));
+                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
 
             if (execute)
                 this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
@@ -289,7 +293,8 @@ public class UserSession implements Runnable{
                 this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getControllerInstance(),
                 this.sender,
                 this.sessionMemory,
-                this.treeExecutors.peekLast()
+                this.treeExecutors.peekLast(),
+                this.updatesQueue
         );
     }
 

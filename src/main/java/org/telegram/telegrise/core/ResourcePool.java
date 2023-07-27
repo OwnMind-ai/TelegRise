@@ -13,6 +13,7 @@ import org.telegram.telegrise.TreeExecutor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 @Data
 @NoArgsConstructor @AllArgsConstructor
@@ -33,6 +34,7 @@ public final class ResourcePool {
     private SessionMemoryImpl memory;
 
     private TreeExecutor currentExecutor;
+    private BlockingQueue<Update> updates;
 
     private final Map<Class<?>, Object> components = new HashMap<>(Map.of(ResourcePool.class,this));
 
