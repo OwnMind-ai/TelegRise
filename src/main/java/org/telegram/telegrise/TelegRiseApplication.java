@@ -37,6 +37,8 @@ public final class TelegRiseApplication {
 
     @Setter
     private RoleProvider roleProvider;
+    @Setter
+    private SessionInitializer sessionInitializer;
 
     private final TelegramBotsApi api;
 
@@ -65,8 +67,12 @@ public final class TelegRiseApplication {
         controller.setSender(bot);
         controller.initialize();
 
-        serviceManager.setInjector(new ResourceInjector(this.resourceFactories, bot));
+        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, bot);
+
+        serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();
+
+        resourceInjector.injectResources(this.sessionInitializer);
 
         try {
             api.registerBot(bot);
@@ -83,7 +89,9 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
-            controller = new TelegramSessionsController(parser.parse(), this.roleProvider, resourceFactories, this.handlersClasses);
+            controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
+            controller.setRoleProvider(this.roleProvider);
+            controller.setSessionInitializer(this.sessionInitializer);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -24,22 +24,24 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class TelegramSessionsController {
-    private static final int DEFAULT_THREAD_POOL_SIZE = 128;
+    private static final int DEFAULT_THREAD_POOL_SIZE = 64;
 
     private final ExecutorService poolExecutor;
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
-    private final RoleProvider roleProvider;
+    @Setter
+    private RoleProvider roleProvider;
+    @Setter
+    private SessionInitializer sessionInitializer;
     private final List<ResourceFactory<?>> resourceFactories;
     @Setter
     private DefaultAbsSender sender;
     private List<Class<? extends PrimaryHandler>> userHandlersClasses;
     private PrimaryHandlersController handlersController;
 
-    public TelegramSessionsController(BotTranscription transcription, RoleProvider roleProvider, List<ResourceFactory<?>> resourceFactories, List<Class<? extends PrimaryHandler>> handlersClasses) {
+    public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends PrimaryHandler>> handlersClasses) {
         this.transcription = transcription;
-        this.roleProvider = roleProvider;
         this.resourceFactories = resourceFactories;
         this.poolExecutor = this.createExecutorService();
         this.handlersController = new PrimaryHandlersController(null);
@@ -125,6 +127,11 @@ public class TelegramSessionsController {
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
         session.addHandlersClasses(this.userHandlersClasses);
+
+        if (this.sessionInitializer != null){
+            this.sessionInitializer.initialize(session.getSessionMemory());
+        }
+
         this.sessions.put(identifier, session);
     }
 

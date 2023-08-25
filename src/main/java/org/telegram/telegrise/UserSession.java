@@ -31,6 +31,7 @@ import static org.telegram.telegrise.core.elements.Tree.*;
 
 public class UserSession implements Runnable{
     private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
+    @Getter
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
     private final DefaultAbsSender sender;

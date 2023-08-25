@@ -6,7 +6,7 @@
 
     <groupId>org.telegram</groupId>
     <artifactId>telegrise</artifactId>
-    <version>0.5.7-PREVIEW</version>
+    <version>0.5.8-PREVIEW</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
