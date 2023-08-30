@@ -45,7 +45,7 @@ public class UserSession implements Runnable{
     private final PrimaryHandlersController primaryHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     private final UniversalSender universalSender;
-    private final InteractiveObjectManager interactiveObjectManager = new InteractiveObjectManager(this::createResourcePool);
+    private final TranscriptionManager transcriptionManager;
     @Setter
     private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
@@ -55,8 +55,9 @@ public class UserSession implements Runnable{
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
-        this.interactiveObjectManager.load(transcription);
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.interactiveObjectManager);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, sessionMemory, this::createResourcePool);
+        this.transcriptionManager.load(transcription);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -73,8 +74,9 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.interactiveObjectManager.load(transcription);
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.interactiveObjectManager);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this.sessionMemory, this::createResourcePool);
+        this.transcriptionManager.load(transcription);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -127,7 +129,7 @@ public class UserSession implements Runnable{
                 Optional<Tree> treeCandidate = this.getInterruptionCandidate(update, pool, executor);
 
                 if (treeCandidate.isPresent()){
-                    this.interruptTreeChain(update, treeCandidate.get());
+                    this.interruptTreeChain(update, treeCandidate.get(), true);
                     return;
                 }
             }
@@ -179,7 +181,7 @@ public class UserSession implements Runnable{
         return Optional.empty();
     }
 
-    private void interruptTreeChain(Update update, Tree tree) {
+    private void interruptTreeChain(Update update, Tree tree, boolean execute) {
         this.treeExecutors.forEach(TreeExecutor::beforeRemoving);
 
         this.treeExecutors.clear();
@@ -188,7 +190,7 @@ public class UserSession implements Runnable{
 
         this.sessionMemory.getBranchingElements().clear();
         this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
-        this.initializeTree(update, tree);
+        this.initializeTree(update, tree, execute);
     }
 
     private void initializeTree(Update update, Menu menu) {
@@ -196,7 +198,7 @@ public class UserSession implements Runnable{
         Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
 
         if (tree != null) {
-            this.initializeTree(update, tree);
+            this.initializeTree(update, tree, true);
             return;
         }
 
@@ -206,21 +208,22 @@ public class UserSession implements Runnable{
         }
     }
 
-    private void initializeTree(Update update, Tree tree) {
-        if (roleProvider != null && !this.checkForTreeAccessibility(tree, update))
+    private void initializeTree(Update update, Tree tree, boolean execute) {
+        if (roleProvider != null && update != null && !this.checkForTreeAccessibility(tree, update))
             return;
 
-        this.applyTree(update, tree);
+        this.applyTree(update, tree, execute);
     }
 
-    private void applyTree(Update update, Tree tree) {
+    private void applyTree(Update update, Tree tree, boolean execute) {
         if (tree.getBranches() != null) {
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue);
             this.treeExecutors.add(executor);
             this.sessionMemory.getBranchingElements().add(tree);
         }
 
-        this.executeBranchingElement(tree, update);
+        if (execute)
+            this.executeBranchingElement(tree, update);
     }
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){
@@ -240,7 +243,7 @@ public class UserSession implements Runnable{
 
         if (role.getOnDeniedTree() != null){
             Tree onDenied = this.transcription.getMemory().get(role.getOnDeniedTree(), Tree.class, List.of("tree"));
-            this.applyTree(update, onDenied);
+            this.applyTree(update, onDenied, true);
         }
 
         return false;
@@ -270,7 +273,7 @@ public class UserSession implements Runnable{
                 {
                     for (Tree tree : this.transcription.getRootMenu().getTrees()) {
                         if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
-                            this.interruptTreeChain(update, tree);
+                            this.interruptTreeChain(update, tree, true);
                             return;
                         }
                     }
@@ -313,5 +316,10 @@ public class UserSession implements Runnable{
 
     public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){
         classes.forEach(this.primaryHandlersController::add);
+    }
+
+    @FunctionalInterface
+    public interface TranscriptionInterruptor{
+        void transit(Update update, Tree tree, boolean execute);
     }
 }

@@ -20,18 +20,18 @@ public class JavaExpressionCompilerTest {
     @Test
     void parse() throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         JavaExpressionCompiler parser = new JavaExpressionCompiler(JavaExpressionCompiler.getTempDirectory());
-        String expression = "handler.getData(update.getCallbackQuery())";
+        String expression = "controller.getData(update.getCallbackQuery())";
         LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader()));
         ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));
 
         assertEquals("data", parser.compile(expression, namespace, String.class, toNode("<tag expression=\"${" + expression + "}\"/>")).generate(resourcePool));
 
-        expression = "handler.getData(update.getCallbackQuery()) + #reference";
+        expression = "controller.getData(update.getCallbackQuery()) + #reference";
         String finalExpression = expression;
         assertThrows(TranscriptionParsingException.class, () -> parser.compile(finalExpression, namespace, String.class, toNode("<tag expression=\"${" + finalExpression + "}\"/>")).generate(resourcePool));
 
-        expression = "handler(update.getCallbackQuery())";
+        expression = "controller(update.getCallbackQuery())";
         String finalExpression1 = expression;
         assertThrows(TranscriptionParsingException.class, () -> parser.compile(finalExpression1, namespace, String.class, toNode("<tag expression=\"${" + finalExpression1 + "}\"/>")).generate(resourcePool));
     }
