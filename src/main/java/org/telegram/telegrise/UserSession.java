@@ -55,10 +55,10 @@ public class UserSession implements Runnable{
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, sessionMemory, this::createResourcePool);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, this::createResourcePool);
         this.transcriptionManager.load(transcription);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
         this.universalSender = new UniversalSender(sender);
@@ -74,11 +74,12 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this.sessionMemory, this::createResourcePool);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, this::createResourcePool);
         this.transcriptionManager.load(transcription);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
+
         this.initialize();
         this.universalSender = new UniversalSender(sender);
     }

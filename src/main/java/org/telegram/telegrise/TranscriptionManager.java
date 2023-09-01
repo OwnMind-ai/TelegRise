@@ -1,9 +1,11 @@
 package org.telegram.telegrise;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;
 
@@ -11,6 +13,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,13 +21,17 @@ public class TranscriptionManager {
     private final Map<String, Serializable> objects = new HashMap<>();
     private final UserSession.TranscriptionInterruptor interruptor;
     private final SessionMemoryImpl sessionMemory;
+    private final TransitionController transitionController;
+    private final BiConsumer<BranchingElement, Update> elementExecutor;
     private BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
-    public TranscriptionManager(UserSession.TranscriptionInterruptor interruptor, SessionMemoryImpl sessionMemory, Function<Update, ResourcePool> resourcePoolProducer) {
+    public TranscriptionManager(UserSession.TranscriptionInterruptor interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
+        this.transitionController = transitionController;
         this.resourcePoolProducer = resourcePoolProducer;
+        this.elementExecutor = elementExecutor;
     }
 
     public void load(BotTranscription transcription){
@@ -57,6 +64,27 @@ public class TranscriptionManager {
         }
 
         return null;
+    }
+
+    public void transitPrevious(String element){
+        this.transitPrevious(null, element, false);
+    }
+
+    public void transitPrevious(Update update, String element, boolean execute){
+        if (update == null && execute)
+            throw new IllegalArgumentException("Targeted element '" + element + "' can not be execute without update");
+
+        checkSessionMemory();
+
+        Transition transition = new Transition();
+        transition.setDirection(Transition.PREVIOUS);
+        transition.setTarget(GeneratedValue.ofValue(element));
+        transition.setExecute(execute);
+
+        this.transitionController.applyTransition(null, transition, this.resourcePoolProducer.apply(update));
+
+        if (execute)
+            this.elementExecutor.accept(sessionMemory.getBranchingElements().getLast(), update);
     }
 
     public void transit(String treeName){

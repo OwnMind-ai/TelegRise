@@ -64,7 +64,7 @@ public class TelegramSessionsController {
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
-        TranscriptionManager objectManager =  new TranscriptionManager(null, null, u -> new ResourcePool(u, null, sender, null));
+        TranscriptionManager objectManager =  new TranscriptionManager(null, null, null, null, u -> new ResourcePool(u, null, sender, null));
         objectManager.load(transcription);
 
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, objectManager));
