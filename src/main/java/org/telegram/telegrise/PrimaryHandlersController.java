@@ -7,6 +7,7 @@ import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,11 +21,10 @@ public class PrimaryHandlersController {
     }
 
     public Optional<PrimaryHandler> getApplicableHandler(Update update){
-        for (PrimaryHandler handler : this.handlers)
-            if (handler.canHandle(update))
-                return Optional.of(handler);
-
-        return Optional.empty();
+        return this.handlers.stream()
+                .sorted(Comparator.comparingInt(h -> h.getClass().getAnnotation(Handler.class).priority()))
+                .filter(h -> h.canHandle(update))
+                .findFirst();
     }
 
     public boolean applyHandler(Update update, PrimaryHandler handler){

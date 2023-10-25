@@ -72,7 +72,8 @@ public final class TelegRiseApplication {
         serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();
 
-        resourceInjector.injectResources(this.sessionInitializer);
+        if (this.sessionInitializer != null)
+            resourceInjector.injectResources(this.sessionInitializer);
 
         try {
             api.registerBot(bot);
