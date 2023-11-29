@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 
 public class TranscriptionManager {
     private final Map<String, Serializable> objects = new HashMap<>();
-    private final UserSession.TranscriptionInterruptor interruptor;
+    private final UserSession.TranscriptionInterrupter interruptor;
     private final SessionMemoryImpl sessionMemory;
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
     private BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
-    public TranscriptionManager(UserSession.TranscriptionInterruptor interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<Update, ResourcePool> resourcePoolProducer) {
+    public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;

@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -114,6 +115,10 @@ public class UserSession implements Runnable{
 
     private void handleUpdate(Update update) {
         ResourcePool pool = this.createResourcePool(update);
+
+        if (this.roleProvider != null && this.sessionMemory.getUserRole() == null)
+            this.updateRole(update);
+
         Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableHandler(update);
         if (handlerCandidate.isPresent()){
             boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
@@ -228,14 +233,8 @@ public class UserSession implements Runnable{
     }
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){
-        String roleName = this.roleProvider.getRole(MessageUtils.getFrom(update), this.sessionMemory);
-        if(roleName == null){
-            this.sessionMemory.setUserRole(null);
-            return false;
-        }
-
-        Role role = this.transcription.getMemory().get(roleName, Role.class, List.of("role"));
-        this.sessionMemory.setUserRole(UserRole.ofRole(role));
+        Role role = updateRole(update);
+        if (role == null) return false;
 
         if (tree.getAccessLevel() != null && role.getLevel() != null && role.getLevel() >= tree.getAccessLevel())
             return true;
@@ -250,6 +249,19 @@ public class UserSession implements Runnable{
         return false;
     }
 
+    @Nullable
+    private Role updateRole(Update update) {
+        String roleName = this.roleProvider.getRole(MessageUtils.getFrom(update), this.sessionMemory);
+        if(roleName == null){
+            this.sessionMemory.setUserRole(null);
+            return null;
+        }
+
+        Role role = this.transcription.getMemory().get(roleName, Role.class, List.of("role"));
+        this.sessionMemory.setUserRole(UserRole.ofRole(role));
+        return role;
+    }
+
     private void updateTree(Update update) {
         TreeExecutor executor = this.treeExecutors.getLast();
         ResourcePool pool = this.createResourcePool(update);
@@ -257,30 +269,42 @@ public class UserSession implements Runnable{
         executor.update(update);
         this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
 
+        // There are 4 cases when executor is closed:
+        // 1. Transition is declared — performs transition
+        // 2. Unrecognized (no branch responded) update, but predicate interrupter found — performs interruption
+        // 3. Unrecognized update, no interrupter — ignores update (TODO: sends warning)
+        // 4. Naturally closed (branch or tree has no continuation) — goes back to the previous branch element (and executes)
         if (executor.isClosed()){
             boolean execute = true;
             if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
+                // Transition case
                 boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
                 execute = executor.getLastBranch().getTransition().isExecute();
 
                 if (interrupted) return;
-            } else {
-                this.transitionController.removeExecutor(executor);
-
+            } else if(!executor.isNaturallyClosed()){
                 Chat chat = MessageUtils.getChat(update);
                 List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
-                if (!executor.isNaturalyClosed() && (executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
+                if ((executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
                     || executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_PREDICATES)))
                 {
                     for (Tree tree : this.transcription.getRootMenu().getTrees()) {
                         if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
+                            // Interrupter found case
                             this.interruptTreeChain(update, tree, true);
                             return;
                         }
                     }
                 }
+
+                // Unrecognized update case
+                executor.open();
+                return;
             }
 
+            // Naturally closed case
+            if (executor.getLastBranch() == null || executor.getLastBranch().getTransition() == null)  // This condition prevents interfering with transition case
+                this.transitionController.removeExecutor(executor);
             BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
             if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
                 this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
@@ -320,7 +344,7 @@ public class UserSession implements Runnable{
     }
 
     @FunctionalInterface
-    public interface TranscriptionInterruptor{
+    public interface TranscriptionInterrupter {
         void transit(Update update, Tree tree, boolean execute);
     }
 }

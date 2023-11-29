@@ -60,7 +60,7 @@ public final class TreeExecutor {
     @Getter
     private boolean closed;
     @Getter
-    private boolean naturalyClosed;
+    private boolean naturallyClosed;
 
     @Getter
     private Branch lastBranch;
@@ -86,7 +86,7 @@ public final class TreeExecutor {
 
             if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
                 this.lastBranch = this.currentBranch;
-                this.naturalyClosed = true;
+                this.naturallyClosed = true;
                 this.close();
             }
         } else if(previous != null && previous.getDefaultBranch() != null) {
@@ -100,7 +100,7 @@ public final class TreeExecutor {
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
             this.lastBranch = previous;
-            this.naturalyClosed = false;
+            this.naturallyClosed = false;
             this.close();
         }
     }
@@ -168,5 +168,6 @@ public final class TreeExecutor {
 
     public void open() {
         this.closed = false;
+        this.naturallyClosed = false;
     }
 }

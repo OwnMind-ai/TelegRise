@@ -22,7 +22,7 @@ public class PrimaryHandlersController {
 
     public Optional<PrimaryHandler> getApplicableHandler(Update update){
         return this.handlers.stream()
-                .sorted(Comparator.comparingInt(h -> h.getClass().getAnnotation(Handler.class).priority()))
+                .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
                 .filter(h -> h.canHandle(update))
                 .findFirst();
     }
