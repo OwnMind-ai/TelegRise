@@ -26,6 +26,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.telegram.telegrise.core.elements.Tree.*;
@@ -46,18 +47,20 @@ public class UserSession implements Runnable{
     private final PrimaryHandlersController primaryHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     private final UniversalSender universalSender;
+    @Getter
     private final TranscriptionManager transcriptionManager;
     @Setter
     private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
+    private long lastUpdateRecievedAt = 0;
 
-    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender) {
+    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
         this.sender = sender;
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, this::createResourcePool);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
@@ -65,7 +68,7 @@ public class UserSession implements Runnable{
         this.universalSender = new UniversalSender(sender);
     }
 
-    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender) {
+    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
         this.sender = sender;
 
@@ -76,7 +79,7 @@ public class UserSession implements Runnable{
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, this::createResourcePool);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
@@ -90,7 +93,13 @@ public class UserSession implements Runnable{
     }
 
     public void update(Update update){
+        if (transcription.getThrottlingTime() != null &&
+                transcription.getThrottlingTime() > Math.abs(lastUpdateRecievedAt - System.currentTimeMillis())){
+            return;   // Ignores update
+        }
+
         this.updatesQueue.add(update);
+        lastUpdateRecievedAt = System.currentTimeMillis();
     }
 
     public boolean isRunning(){
@@ -212,6 +221,9 @@ public class UserSession implements Runnable{
             TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
                     pool, sender);
         }
+
+        Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
+        handlerCandidate.ifPresent(primaryHandler -> this.primaryHandlersController.applyHandler(update, primaryHandler));
     }
 
     private void initializeTree(Update update, Tree tree, boolean execute) {
@@ -290,11 +302,19 @@ public class UserSession implements Runnable{
                 {
                     for (Tree tree : this.transcription.getRootMenu().getTrees()) {
                         if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
-                            // Interrupter found case
+                            // Interrupter found case (tree)
                             this.interruptTreeChain(update, tree, true);
                             return;
                         }
                     }
+                }
+
+                Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
+                // Interrupter found case (handler where Handler.afterTress() is true)
+                if (handlerCandidate.isPresent()){
+                    boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
+
+                    if (intercept) return;
                 }
 
                 // Unrecognized update case
@@ -341,6 +361,10 @@ public class UserSession implements Runnable{
 
     public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){
         classes.forEach(this.primaryHandlersController::add);
+    }
+
+    public void setStandardLanguage(String code){
+        this.sessionMemory.setLanguageCode(code);
     }
 
     @FunctionalInterface

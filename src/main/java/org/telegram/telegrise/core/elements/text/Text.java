@@ -39,6 +39,9 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     @Attribute(name = "entities")
     private GeneratedValue<List<MessageEntity>> entities;
 
+    @Attribute(name = "transformer")
+    private GeneratedValue<String> transformer;
+
     @Attribute(name = "textblock", priority = 1)
     private boolean textblock;
 
@@ -47,6 +50,9 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
 
     @InnerElement
     private List<TextConditionalElement> textConditionalElements;
+
+    @Attribute(name = "lang")
+    private String lang;
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
@@ -73,6 +79,17 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     }
 
     public String generateText(ResourcePool pool){
+        String result = generateString(pool);
+
+        if (this.transformer != null){
+            pool.addComponent(result);
+            result = transformer.generate(pool);
+        }
+
+        return result;
+    }
+
+    private String generateString(ResourcePool pool) {
         if (!conditional) return text.generate(pool);
 
         for (TextConditionalElement element : this.textConditionalElements)

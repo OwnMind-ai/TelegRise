@@ -204,7 +204,7 @@ public class XMLElementsParser {
 
         if(elementData.isTextContext())
             field.set(instance, node.getTextContent());
-        else if (!elementData.name().equals("")) {
+        else if (!elementData.name().isEmpty()) {
             this.setField(node, elementData, instance, field);
         }
     }

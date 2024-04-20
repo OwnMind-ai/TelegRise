@@ -84,7 +84,11 @@ public final class TreeExecutor {
         if (this.currentBranch != null){
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
-            if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
+            if (this.currentBranch == null) {
+                this.lastBranch = previous;
+                this.naturallyClosed = false;
+                this.close();
+            } else if ( this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
                 this.lastBranch = this.currentBranch;
                 this.naturallyClosed = true;
                 this.close();

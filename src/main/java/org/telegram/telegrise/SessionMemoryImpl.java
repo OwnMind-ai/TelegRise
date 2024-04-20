@@ -36,6 +36,8 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter @Setter
     private UserRole userRole;
     @Getter @Setter
+    private String languageCode;
+    @Getter @Setter
     private Message lastSentMessage;
 
     public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier, String botUsername) {
@@ -90,6 +92,11 @@ public class SessionMemoryImpl implements SessionMemory {
     @Override
     public <T extends Serializable> T removeComponent(Class<T> tClass) {
         return tClass.cast(this.memory.remove(tClass.getName()));
+    }
+
+    @Override
+    public <T extends Serializable> boolean containsComponent(Class<T> tClass) {
+        return this.memory.containsKey(tClass.getName());
     }
 
 

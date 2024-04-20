@@ -64,7 +64,7 @@ public class TelegramSessionsController {
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
-        TranscriptionManager objectManager =  new TranscriptionManager(null, null, null, null, u -> new ResourcePool(u, null, sender, null));
+        TranscriptionManager objectManager =  new TranscriptionManager(null, null, null, null, this::getTranscriptionManager, u -> new ResourcePool(u, null, sender, null));
         objectManager.load(transcription);
 
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, objectManager));
@@ -89,6 +89,10 @@ public class TelegramSessionsController {
                 }
             });
         }
+    }
+
+    public void initializeSessions() {
+        this.sessionInitializer.getInitializionList().forEach(this::createSession);
     }
 
     public void onUpdateReceived(Update update){
@@ -117,13 +121,14 @@ public class TelegramSessionsController {
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
         SessionMemoryImpl sessionMemory = (SessionMemoryImpl) memory;
-        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, sender);
+        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, sender, this::getTranscriptionManager);
 
         this.sessions.put(sessionMemory.getUserIdentifier(), session);
     }
 
     private void createSession(UserIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.sender);
+        UserSession session = new UserSession(identifier, this.transcription, this.sender, this::getTranscriptionManager);
+        session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
         session.addHandlersClasses(this.userHandlersClasses);
@@ -146,5 +151,10 @@ public class TelegramSessionsController {
                     System.err.println(e.getMessage());  //TODO fix exceptions
                 }
             });
+    }
+
+    public TranscriptionManager getTranscriptionManager(UserIdentifier identifier){
+        UserSession session = this.sessions.get(identifier);
+        return session == null ? null : session.getTranscriptionManager();
     }
 }

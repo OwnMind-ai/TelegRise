@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.expressions;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.forge.roaster.ParserException;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -10,17 +11,19 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+import javax.tools.JavaCompiler;
+import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Objects;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JavaExpressionCompiler {
@@ -41,7 +44,7 @@ public class JavaExpressionCompiler {
     public JavaExpressionCompiler(String tempDirectoryPath) {
         this.tempDirectoryPath = new File(tempDirectoryPath);
         try {
-            this.classLoader = URLClassLoader.newInstance(new URL[]{this.tempDirectoryPath.toURI().toURL()});
+            this.classLoader = URLClassLoader.newInstance(new URL[]{this.tempDirectoryPath.toURI().toURL()}, this.getClass().getClassLoader());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -54,14 +57,17 @@ public class JavaExpressionCompiler {
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
 
         JavaClassSource source;
+        List<Class<?>> imported;
         try {
-            source = this.createSource(expression, hashcode, returnType, namespace);
+            Pair<JavaClassSource, List<Class<?>>> pair = this.createSource(expression, hashcode, returnType, namespace);
+            source = pair.getKey();
+            imported = pair.getValue();
         } catch (ParserException e) {
             throw new TranscriptionParsingException("Syntax error in expression: " + e.getProblems().get(0).getMessage(), node);
         }
 
         File sourceFile = this.createSourceFile(source, hashcode);
-        this.compileSourceFile(sourceFile, node);
+        this.compileSourceFile(sourceFile, node, imported);
 
         return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
     }
@@ -75,12 +81,27 @@ public class JavaExpressionCompiler {
         return Class.forName(className(hashcode), true, this.classLoader);
     }
 
-    private void compileSourceFile(File source, Node node) throws IOException {
-        try (ByteArrayOutputStream err = new ByteArrayOutputStream()){
-            ToolProvider.getSystemJavaCompiler().run(null, null, err, source.getPath());
+    private void compileSourceFile(File source, Node node, List<Class<?>> imported) throws IOException {
+        List<String> optionList = new ArrayList<>(Arrays.asList(
+                "-d", this.tempDirectoryPath.getAbsolutePath()
+        ));
+
+        if (System.getProperty("jdk.module.path") != null){
+            optionList.addAll(Arrays.asList("--module-path", System.getProperty("jdk.module.path"),
+                    "--add-modules", String.join(",", imported.stream().map(Class::getModule)
+                            .map(Module::getName).filter(Objects::nonNull)
+                            .map(String::strip).collect(Collectors.toSet()))));
+        }
+
+        try (StringWriter err = new StringWriter()){
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+
+            compiler.getTask(err, fileManager, null, optionList, null,
+                    fileManager.getJavaFileObjectsFromFiles(Collections.singletonList(source))).call();
             Files.delete(source.toPath());
 
-            if (err.size() > 0)
+            if (!err.toString().isEmpty())
                 throw new TranscriptionParsingException("An error occurred while compiling the expression:\n" + err, node);
         }
     }
@@ -94,7 +115,7 @@ public class JavaExpressionCompiler {
         return result;
     }
 
-    private JavaClassSource createSource(String expression, int hashcode, Class<?> returnType, LocalNamespace namespace){
+    private Pair<JavaClassSource, List<Class<?>>> createSource(String expression, int hashcode, Class<?> returnType, LocalNamespace namespace){
         JavaClassSource source = Roaster.create(JavaClassSource.class);
         source.setName(className(hashcode));
         source.addImport(GeneratedValue.class);
@@ -117,13 +138,17 @@ public class JavaExpressionCompiler {
                 .setParameters(ResourcePool.class.getSimpleName() + " pool")
                 .setBody(builder.toString());
 
-        for (Class<?> imported : namespace.getApplicationNamespace().getImportedClasses())
-            if (source.requiresImport(imported))
+        List<Class<?>> resources = new ArrayList<>(Arrays.asList(GeneratedValue.class, ResourcePool.class, returnType));
+        for (Class<?> imported : namespace.getApplicationNamespace().getImportedClasses()) {
+            if (source.requiresImport(imported)) {
                 source.addImport(imported);
+                resources.add(imported);
+            }
+        }
 
         method.setReturnType(returnType);
 
-        return source;
+        return Pair.of(source, resources);
     }
 
     private int calculateHashcode(String expression, LocalNamespace namespace){

@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,13 +24,15 @@ public class TranscriptionManager {
     private final SessionMemoryImpl sessionMemory;
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
+    private final Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter;
     private BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
-    public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<Update, ResourcePool> resourcePoolProducer) {
+    public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter, Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
+        this.transcriptionManagerGetter = transcriptionManagerGetter;
         this.resourcePoolProducer = resourcePoolProducer;
         this.elementExecutor = elementExecutor;
     }
@@ -42,6 +45,18 @@ public class TranscriptionManager {
                 .map(e -> Map.entry(e.getKey(), ((InteractiveElement<?>) e.getValue()).createInteractiveObject(this.resourcePoolProducer)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
+    }
+
+    public TranscriptionManager getTranscriptionManager(UserIdentifier userIdentifier){
+        return this.transcriptionManagerGetter.apply(userIdentifier);
+    }
+
+    public SessionMemory getSessionMemory(){
+        return this.sessionMemory;
+    }
+
+    public <T> T getCurrentTreeController(Class<T> tClass){
+        return transitionController.getTreeExecutors().isEmpty() ? null : tClass.cast(transitionController.getTreeExecutors().getLast().getControllerInstance());
     }
 
     public Tree getCurrentTree(){
@@ -80,6 +95,10 @@ public class TranscriptionManager {
         transition.setDirection(Transition.PREVIOUS);
         transition.setTarget(GeneratedValue.ofValue(element));
         transition.setExecute(execute);
+
+        // Simulates naturally closed tree
+        if (!this.transitionController.getTreeExecutors().isEmpty())
+            this.transitionController.getTreeExecutors().getLast().close();
 
         this.transitionController.applyTransition(null, transition, this.resourcePoolProducer.apply(update));
 

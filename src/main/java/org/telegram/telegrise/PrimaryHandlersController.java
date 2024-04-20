@@ -22,6 +22,15 @@ public class PrimaryHandlersController {
 
     public Optional<PrimaryHandler> getApplicableHandler(Update update){
         return this.handlers.stream()
+                .filter(h -> !h.getClass().getAnnotation(Handler.class).afterTrees())
+                .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
+                .filter(h -> h.canHandle(update))
+                .findFirst();
+    }
+
+    public Optional<PrimaryHandler> getApplicableAfterTreesHandler(Update update){
+        return this.handlers.stream()
+                .filter(h -> h.getClass().getAnnotation(Handler.class).afterTrees())
                 .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
                 .filter(h -> h.canHandle(update))
                 .findFirst();

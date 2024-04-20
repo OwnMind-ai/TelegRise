@@ -1,5 +1,6 @@
 package org.telegram.telegrise.transition;
 
+import lombok.Getter;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
@@ -16,9 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TransitionController {
-    public final SessionMemoryImpl sessionMemory;
-    public final Deque<TreeExecutor> treeExecutors;
-    public final TranscriptionMemory transcriptionMemory;
+    private final SessionMemoryImpl sessionMemory;
+    @Getter
+    private final Deque<TreeExecutor> treeExecutors;
+    private final TranscriptionMemory transcriptionMemory;
     private final UniversalSender sender;
 
 
@@ -117,7 +119,8 @@ public class TransitionController {
         for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
             BranchingElement element = it.next();
 
-            if (!element.getName().equals(transition.getTarget().generate(pool))) {
+            String s = transition.getTarget().generate(pool);
+            if (!element.getName().equals(s)) {
                 this.sessionMemory.getBranchingElements().remove(element);
 
                 if (element instanceof Tree){
@@ -126,11 +129,12 @@ public class TransitionController {
                     this.treeExecutors.getLast().close();
                     this.treeExecutors.removeLast();
                 }
-            } else
+            } else {
+                if (!this.treeExecutors.isEmpty())
+                    this.treeExecutors.getLast().open();
                 return;
+            }
         }
-
-        this.treeExecutors.getLast().open();
 
         throw new TelegRiseRuntimeException("Unable to find element called '" + transition.getTarget() + "'");
     }

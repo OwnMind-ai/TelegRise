@@ -15,5 +15,6 @@ import java.lang.annotation.*;
 public @interface Handler {
     boolean absolute() default false;
     boolean independent() default false;
+    boolean afterTrees() default false;
     int priority() default 0;
 }

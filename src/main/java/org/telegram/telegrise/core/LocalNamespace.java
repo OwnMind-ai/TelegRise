@@ -16,11 +16,11 @@ public class LocalNamespace {
         String handlerClassName = handlerClass != null ? handlerClass.getName() : "Object";
 
         return String.format("%s %s = %s.getUpdate();\n" +
-                        "%s %s = (%s) %s.getHandler();\n" +
+                        "%s %s = %s.getHandler() instanceof %s ? (%s) %s.getHandler() : null;\n" +
                         "%s %s = %s.getSender();\n" +
                         "%s %s = %s.getMemory();\n",
                 Update.class.getName(), applicationNamespace.getUpdateName(), poolName,
-                handlerClassName, applicationNamespace.getControllerName(), handlerClassName, poolName,
+                handlerClassName, applicationNamespace.getControllerName(), poolName, handlerClassName, handlerClassName, poolName,
                 DefaultAbsSender.class.getName(), applicationNamespace.getSenderName(), poolName,
                 SessionMemory.class.getName(), applicationNamespace.getMemoryName(), poolName
         );

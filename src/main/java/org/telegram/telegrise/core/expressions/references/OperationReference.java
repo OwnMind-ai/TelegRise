@@ -39,6 +39,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
     }
 
     private <K> K invokeSide(ReferenceExpression reference, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
+        //TODO fails if args contain null value
         Map<Class<?>, Object> components = Arrays.stream(args).collect(Collectors.toMap(Object::getClass, o -> o));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)

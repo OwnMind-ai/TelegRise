@@ -23,6 +23,7 @@ public interface SessionMemory extends Serializable {
 
     <T extends Serializable> T getComponent(Class<T> tClass);
     <T extends Serializable> T removeComponent(Class<T> tClass);
+    <T extends Serializable> boolean containsComponent(Class<T> tClass);
 
     UserRole getUserRole();
 
@@ -30,4 +31,7 @@ public interface SessionMemory extends Serializable {
 
     String getBotUsername();
     UserIdentifier getUserIdentifier();
+
+    String getLanguageCode();
+    void setLanguageCode(String code);
 }

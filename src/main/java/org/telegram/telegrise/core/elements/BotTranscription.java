@@ -42,6 +42,9 @@ public final class BotTranscription implements TranscriptionElement {
     @Attribute(name = "autoCommands")
     private String autoCommands;
 
+    @Attribute(name = "throttlingTime")  // ms
+    private Integer throttlingTime;
+
     @InnerElement(priority = 10)
     private HeadBlock head;
 
