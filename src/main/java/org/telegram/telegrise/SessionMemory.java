@@ -7,6 +7,7 @@ import org.telegram.telegrise.types.UserRole;
 import java.io.Serializable;
 import java.util.Map;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface SessionMemory extends Serializable {
     Map<String, Serializable> getMemoryMap();
 
@@ -34,4 +35,7 @@ public interface SessionMemory extends Serializable {
 
     String getLanguageCode();
     void setLanguageCode(String code);
+
+    long getUserId();
+    long getChatId();
 }

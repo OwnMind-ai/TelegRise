@@ -1,6 +1,5 @@
 package org.telegram.telegrise;
 
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -29,7 +28,7 @@ public class SimpleController {
     public void initialize() {
         System.out.println("Someone pressed '/start'");
         try {
-            sender.execute(SendMessage.builder().chatId(memory.getUserIdentifier().getId()).text("text").build());
+            sender.execute(SendMessage.builder().chatId(memory.getChatId()).text("text").build());
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }

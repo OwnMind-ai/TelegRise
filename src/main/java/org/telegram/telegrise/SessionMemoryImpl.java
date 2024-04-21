@@ -17,7 +17,7 @@ public class SessionMemoryImpl implements SessionMemory {
     private static final long serialVersionUID = -8011212970107619938L;
 
     /*
-        NOTE: In order to keep compatibly with Redis database, SessionMemory and all their elements should be serializable.
+        NOTE: To keep compatibly with the caching databases, SessionMemory and all their elements should be serializable.
      */
     private final Map<String, Serializable> memory = Collections.synchronizedMap(new HashMap<>());
     @Getter
@@ -97,6 +97,16 @@ public class SessionMemoryImpl implements SessionMemory {
     @Override
     public <T extends Serializable> boolean containsComponent(Class<T> tClass) {
         return this.memory.containsKey(tClass.getName());
+    }
+
+    @Override
+    public long getUserId() {
+        return this.userIdentifier.getId();
+    }
+
+    @Override
+    public long getChatId() {
+        return getUserId();  //TODO add chat sessions
     }
 
 
