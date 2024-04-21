@@ -64,10 +64,13 @@ public class TelegramSessionsController {
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
-        TranscriptionManager objectManager =  new TranscriptionManager(null, null, null, null, this::getTranscriptionManager, u -> new ResourcePool(u, null, sender, null));
+        BotSender botSender = new BotSender(sender, null);
+        TranscriptionManager objectManager =  new TranscriptionManager(null, null,
+                null, null, this::getTranscriptionManager,
+                u -> new ResourcePool(u, null, botSender, null));
         objectManager.load(transcription);
 
-        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, objectManager));
+        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if(this.transcription.getRootMenu().getChatTypes() == null)

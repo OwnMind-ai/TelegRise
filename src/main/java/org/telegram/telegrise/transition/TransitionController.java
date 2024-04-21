@@ -1,12 +1,8 @@
 package org.telegram.telegrise.transition;
 
 import lombok.Getter;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.SessionMemoryImpl;
-import org.telegram.telegrise.TelegRiseRuntimeException;
-import org.telegram.telegrise.TreeExecutor;
-import org.telegram.telegrise.UniversalSender;
+import org.telegram.telegrise.*;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
@@ -24,7 +20,7 @@ public class TransitionController {
     private final UniversalSender sender;
 
 
-    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory, DefaultAbsSender sender) {
+    public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory, BotSender sender) {
         this.sessionMemory = sessionMemory;
         this.treeExecutors = treeExecutors;
         this.transcriptionMemory = transcriptionMemory;

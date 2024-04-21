@@ -1,10 +1,10 @@
 package org.telegram.telegrise.core;
 
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.BotSender;
 import org.telegram.telegrise.core.elements.actions.Animate;
 import org.telegram.telegrise.core.elements.actions.Frame;
 
@@ -12,14 +12,14 @@ import java.util.List;
 
 public class AnimationExecutor implements Runnable {
     private final Animate animation;
-    private final DefaultAbsSender sender;
+    private final BotSender sender;
     private final ResourcePool lockedPool;
     private int messageId = -1;
     private int currentFrame = 0;
 
     private int loops = 0;
 
-    public AnimationExecutor(Animate animation, DefaultAbsSender sender, ResourcePool lockedPool) {
+    public AnimationExecutor(Animate animation, BotSender sender, ResourcePool lockedPool) {
         this.animation = animation;
         this.sender = sender;
         this.lockedPool = lockedPool;

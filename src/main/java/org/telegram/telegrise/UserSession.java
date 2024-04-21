@@ -36,7 +36,7 @@ public class UserSession implements Runnable{
     @Getter
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
-    private final DefaultAbsSender sender;
+    private final BotSender sender;
     @Getter
     private final ResourceInjector resourceInjector;
     @Getter
@@ -52,25 +52,24 @@ public class UserSession implements Runnable{
     @Setter
     private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
-    private long lastUpdateRecievedAt = 0;
+    private long lastUpdateReceivedAt = 0;
 
     public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
-        this.sender = sender;
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
+        this.sender = new BotSender(sender, sessionMemory);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
-        this.universalSender = new UniversalSender(sender);
+        this.universalSender = new UniversalSender(this.sender);
     }
 
     public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
-        this.sender = sender;
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
             this.sessionMemory = sessionMemory;
@@ -78,14 +77,15 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), sender);
+        this.sender = new BotSender(sender, sessionMemory);
+        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
 
         this.initialize();
-        this.universalSender = new UniversalSender(sender);
+        this.universalSender = new UniversalSender(this.sender);
     }
 
     private void initialize(){
@@ -94,12 +94,12 @@ public class UserSession implements Runnable{
 
     public void update(Update update){
         if (transcription.getThrottlingTime() != null &&
-                transcription.getThrottlingTime() > Math.abs(lastUpdateRecievedAt - System.currentTimeMillis())){
+                transcription.getThrottlingTime() > Math.abs(lastUpdateReceivedAt - System.currentTimeMillis())){
             return;   // Ignores update
         }
 
         this.updatesQueue.add(update);
-        lastUpdateRecievedAt = System.currentTimeMillis();
+        lastUpdateReceivedAt = System.currentTimeMillis();
     }
 
     public boolean isRunning(){

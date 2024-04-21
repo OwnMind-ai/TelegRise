@@ -33,8 +33,9 @@ public class ResourceInjector {
                 field.setAccessible(true);
 
                 Class<?> type = field.getType();
-                Object resource = resources.stream().filter(r -> type.isAssignableFrom(r.getClass()))
-                        .findFirst().orElse(null);
+                Object resource = resources.stream().filter(r -> r.equals(type))
+                        .findFirst().orElseGet(() -> resources.stream().filter(r -> type.isAssignableFrom(r.getClass()))
+                                .findFirst().orElse(null));
 
                 if (resource == null){
                     ResourceFactory<?> factory = resourceFactoryMap.get(type.getName());

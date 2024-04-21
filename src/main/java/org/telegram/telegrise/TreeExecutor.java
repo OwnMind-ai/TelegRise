@@ -2,7 +2,6 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.OnClose;
@@ -23,7 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 public final class TreeExecutor {
-    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, DefaultAbsSender sender, SessionMemoryImpl memory, BlockingQueue<Update> updatesQueue) {
+    public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, BotSender sender, SessionMemoryImpl memory, BlockingQueue<Update> updatesQueue) {
         Object handler = null;
         if (tree.getController() != null)
             handler = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
@@ -31,7 +30,7 @@ public final class TreeExecutor {
         return new TreeExecutor(memory, handler, tree, sender, updatesQueue);
     }
 
-    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, DefaultAbsSender sender){
+    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender){
         if (toInvoke != null) toInvoke.generate(pool);
 
         if (actions != null)
@@ -52,7 +51,7 @@ public final class TreeExecutor {
     @Getter
     private final Tree tree;
     @Getter
-    private final DefaultAbsSender sender;
+    private final BotSender sender;
     @Getter
     private final BlockingQueue<Update> updatesQueue;
     @Getter @Setter
@@ -65,7 +64,7 @@ public final class TreeExecutor {
     @Getter
     private Branch lastBranch;
 
-    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, DefaultAbsSender sender, BlockingQueue<Update> updatesQueue) {
+    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, BotSender sender, BlockingQueue<Update> updatesQueue) {
         this.memory = memory;
         this.controllerInstance = controllerInstance;
         this.tree = tree;

@@ -1,6 +1,5 @@
 package org.telegram.telegrise;
 
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -19,15 +18,15 @@ public class UniversalSender {
     private static final String METHOD_NAME = "execute";
 
     static {
-        Arrays.stream(DefaultAbsSender.class.getMethods())
+        Arrays.stream(BotSender.class.getMethods())
                 .filter(method -> Objects.equals(method.getName(), METHOD_NAME)
                         && method.getParameterTypes().length == 1 && PartialBotApiMethod.class.isAssignableFrom(method.getParameterTypes()[0]))
                 .forEach(m -> methods.put(m.getParameterTypes()[0].getName(), m));
     }
 
-    private final DefaultAbsSender sender;
+    private final BotSender sender;
 
-    public UniversalSender(DefaultAbsSender sender){
+    public UniversalSender(BotSender sender){
         this.sender = sender;
     }
 
@@ -39,23 +38,6 @@ public class UniversalSender {
 
         try {
             return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getTargetException());
-        }
-    }
-
-    public <T extends Serializable> T execute(Class<T> resultClass, PartialBotApiMethod<T> method) throws TelegramApiException {
-        if (method == null) return null;
-
-        if (method instanceof BotApiMethod)
-            return sender.execute((BotApiMethod<T>) method);
-
-        try {
-            Object result = methods.get(method.getClass().getName()).invoke(sender, method);
-
-            return resultClass.isInstance(result) ? resultClass.cast(result) : null;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {

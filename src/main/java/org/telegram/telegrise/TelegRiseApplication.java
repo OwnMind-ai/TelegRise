@@ -67,7 +67,7 @@ public final class TelegRiseApplication {
         controller.setSender(bot);
         controller.initialize();
 
-        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, bot);
+        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, bot, new BotSender(bot, null));
 
         serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();

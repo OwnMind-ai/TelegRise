@@ -2,11 +2,11 @@
 Java framework that simplifies the process of creating Telegram bots and provides a more comfortable experience for developers.
 
 ### IMPORTANT
-This project is on the developing stage and **do not** ment to be used in production. If you do so, a lot competability problems may occure from version to version.
+This project is on the developing stage and **do not** intend to be used in production. If you do so, a lot of compatibility problems may occur from version to version.
 
 ## Quickstart
 
-Firsly, create your first transcription .xml file. Here is an example of one (index.xml):
+Firstly, create your first transcription .xml file. Here is an example of one (index.xml):
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -16,7 +16,7 @@ Firsly, create your first transcription .xml file. Here is an example of one (in
 
 <bot username="SimpleBot" token="bot's token">
     <head>
-        <link src="..."/>  <!-- List your other trascriptions here -->
+        <link src="..."/>  <!-- List your other transcriptions here -->
     </head>
 
     <menu name="RootMenu">
@@ -34,7 +34,7 @@ Firsly, create your first transcription .xml file. Here is an example of one (in
             
             <!-- Executes if user pressed the inline button that return a callback query
                  with 'say-hello' data (see keyboard tag above),
-                 invokes "logResponce" method in SimpleController instance-->
+                 invokes "logResponse" method in SimpleController instance-->
             <branch callbackTriggers="say-hello" invoke="#logResponce">
                 <edit>Bye, ${update.getCallbackQuery().getFrom().getFirstName()}</edit>
             </branch>
@@ -55,7 +55,7 @@ Then, if you need to include logic to your tree, you need to create a **Tree Con
 ```java
 @TreeController
 public class SimpleController {
-    @Resource  // Injects resource into created instanc, customizable
+    @Resource  // Injects resource into created instance, customizable
     private SessionMemory memory;
 
     @OnCreate
@@ -64,8 +64,8 @@ public class SimpleController {
     }
 
     @Reference  // Indicates that method can't be referenced at transcription by using '#' sign
-    public void logResponce(Update update) {
-        this.memory.put("responce", update);
+    public void logResponse(Update update) {
+        this.memory.put("response", update);
     }
 
     @Reference
@@ -89,8 +89,8 @@ public class Main {
         
         // Optional:
         application.addResourceFactory(...); // Your custom resources here
-        application.addService(...); // Your cutom services here
-        apprication.setRoleProvider(...);  // Your role provider
+        application.addService(...); // Your custom services here
+        application.setRoleProvider(...);  // Your role provider
         
         application.start();
     }
