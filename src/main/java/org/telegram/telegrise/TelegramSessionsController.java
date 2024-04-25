@@ -19,14 +19,12 @@ import org.telegram.telegrise.senders.BotSender;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class TelegramSessionsController {
-    private static final int DEFAULT_THREAD_POOL_SIZE = 64;
+    private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 200;
+    private static final int DEFAULT_CORE_THREAD_POOL_SIZE = 32;
 
     private final ExecutorService poolExecutor;
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
@@ -51,12 +49,19 @@ public class TelegramSessionsController {
     }
 
     private ExecutorService createExecutorService(){
-        String property = System.getProperty("telegrise.threadPoolSize");
+        int core = DEFAULT_CORE_THREAD_POOL_SIZE;
+        int max = DEFAULT_MAX_THREAD_POOL_SIZE;
 
-        if(NumberUtils.isDigits(property))
-            return Executors.newFixedThreadPool(Integer.parseInt(property));
+        String coreValue = System.getProperty("telegrise.coreThreadPoolSize");
+        String maxValue = System.getProperty("telegrise.coreThreadPoolSize");
 
-        return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+        if(NumberUtils.isDigits(coreValue))
+            core = Integer.parseInt(coreValue);
+
+        if(NumberUtils.isDigits(maxValue))
+            max = Integer.parseInt(maxValue);
+
+        return new Executor(core, max);
     }
 
     public void initialize(){
@@ -149,17 +154,42 @@ public class TelegramSessionsController {
         session.update(update);
 
         if (!session.isRunning())
-            poolExecutor.submit(() -> {
-                try{
-                    session.run();
-                } catch (Exception e){
-                    System.err.println(e.getMessage());  //TODO fix exceptions
-                }
-            });
+            poolExecutor.submit(session);
     }
 
     public TranscriptionManager getTranscriptionManager(UserIdentifier identifier){
         UserSession session = this.sessions.get(identifier);
         return session == null ? null : session.getTranscriptionManager();
+    }
+
+    private static class Executor extends ThreadPoolExecutor{
+        public Executor(int corePoolSize, int maximumPoolSize) {
+            super(corePoolSize, maximumPoolSize, 0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>());
+        }
+
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            if (t == null && r instanceof Future<?>) {
+                try {
+                    Future<?> future = (Future<?>) r;
+                    if (future.isDone()) {
+                        future.get();
+                    }
+                } catch (CancellationException ce) {
+                    t = ce;
+                } catch (ExecutionException ee) {
+                    t = ee.getCause();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            if (t != null) {
+                if (t instanceof RuntimeException)
+                    throw (RuntimeException) t;
+                else
+                    throw new RuntimeException(t);
+            }
+        }
     }
 }
