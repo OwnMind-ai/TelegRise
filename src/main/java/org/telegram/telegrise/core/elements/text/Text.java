@@ -57,6 +57,9 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
+        if (text == null && !conditional)
+            throw new TranscriptionParsingException("Text is empty", node);
+
         if (conditional && (textConditionalElements == null || textConditionalElements.isEmpty()))
             throw new TranscriptionParsingException("Conditional text has no conditional elements such as <if> or <else>", node);
     }
@@ -107,11 +110,12 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     @Attribute(nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         if (!this.conditional && this.byName == null) {
-            if (this.textblock) {
-                this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);
-            } else {
-                this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
-            }
+            String raw;
+            if (this.textblock) raw = XMLUtils.innerXMLTextBlock(node);
+            else raw = XMLUtils.innerXML(node);
+
+            if (raw == null) return;
+            this.text = ExpressionFactory.createExpression(raw, String.class, node, namespace);
         }
     }
 

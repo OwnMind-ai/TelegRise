@@ -28,15 +28,9 @@ public class XMLUtils {
     }
 
     public static String innerXML(Node node) {
-        LSSerializer lsSerializer = getLsSerializer(node);
+        String result = extractRawInnerXML(node).trim();
+        if (result.isEmpty()) return null;
 
-        NodeList childNodes = node.getChildNodes();
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < childNodes.getLength(); i++)
-            builder.append(lsSerializer.writeToString(childNodes.item(i)));
-
-        String result = builder.toString();
         String[] lines = result.split("\n");
 
         for (int i = 0, splitLength = lines.length; i < splitLength; i++) {
@@ -48,15 +42,27 @@ public class XMLUtils {
         return applyHTMLTextDecorators(result);
     }
 
-    public static String innerXMLTextBlock(Node node){
+    private static String extractRawInnerXML(Node node) {
         LSSerializer lsSerializer = getLsSerializer(node);
 
         NodeList childNodes = node.getChildNodes();
-        StringBuilder rawBuilder = new StringBuilder();
-        for (int i = 0; i < childNodes.getLength(); i++)
-            rawBuilder.append(lsSerializer.writeToString(childNodes.item(i)));
+        StringBuilder builder = new StringBuilder();
 
-        String raw = rawBuilder.toString().trim();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            if (childNodes.item(i).getNodeName().equals("#comment"))
+                continue;  // Skips comments
+
+            builder.append(lsSerializer.writeToString(childNodes.item(i)));
+        }
+
+        return builder.toString();
+    }
+
+    public static String innerXMLTextBlock(Node node){
+        String raw = extractRawInnerXML(node).trim();
+
+        if (raw.isEmpty()) return null;
+
         StringBuilder result = new StringBuilder();
         Arrays.stream(raw.split("\n")).map(String::strip).forEach(str -> result.append(str).append("\n"));
 

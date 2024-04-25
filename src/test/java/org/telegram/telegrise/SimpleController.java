@@ -10,8 +10,8 @@ import org.telegram.telegrise.annotations.TreeController;
 import org.telegram.telegrise.senders.BotSender;
 
 import java.io.File;
-import java.util.Objects;
 
+@SuppressWarnings("unused")
 @TreeController
 public class SimpleController {
     public static void main(String[] args) {
@@ -34,7 +34,6 @@ public class SimpleController {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
-        throw new RuntimeException();
     }
 
     @Reference  // Indicates that method can't be referenced at transcription by using '#' sign

@@ -101,17 +101,21 @@ public class XMLElementsParser {
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
                 .forEach(f -> this.parseInnerElement(node, f, instance));
 
-        // ORDER MATTERS:
-        instance.validate(node, transcriptionMemory);
-        instance.load(transcriptionMemory);
-        if (instance instanceof StorableElement)
-            ((StorableElement) instance).store(transcriptionMemory);
+        finishElement(instance, node);
 
         LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
         if (newNamespace != null)
             this.namespace = newNamespace;
 
         return instance;
+    }
+
+    private void finishElement(TranscriptionElement instance, @NotNull Node node) {
+        // ORDER MATTERS:
+        instance.validate(node, transcriptionMemory);
+        instance.load(transcriptionMemory);
+        if (instance instanceof StorableElement)
+            ((StorableElement) instance).store(transcriptionMemory);
     }
 
     private void parseMethod(TranscriptionElement instance, Map<Class<?>, Object> resourcesMap, Method method) throws IllegalAccessException, InvocationTargetException {
@@ -169,6 +173,8 @@ public class XMLElementsParser {
                 try {
                     EmbeddableElement object = (EmbeddableElement) actualType.getConstructor().newInstance();
                     object.parse(node, this.namespace);
+
+                    finishElement(object, node);
 
                     PropertyUtils.setSimpleProperty(instance, field.getName(), object);
                     return;
