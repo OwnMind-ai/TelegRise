@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -39,7 +39,7 @@ public class Document implements MediaType{
                 .chatId(parent.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .document(this.createInputFile(pool))
-                .thumb(generateNullableProperty(thumbnail, pool))
+                .thumbnail(generateNullableProperty(thumbnail, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -53,8 +53,8 @@ public class Document implements MediaType{
 
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
-        InputMediaDocument mediaDocument = new InputMediaDocument();
-        mediaDocument.setThumb(generateNullableProperty(thumbnail, pool));
+        InputMediaDocument mediaDocument = new InputMediaDocument("");
+        mediaDocument.setThumbnail(generateNullableProperty(thumbnail, pool));
 
         return List.of(this.createInputMedia(mediaDocument, pool));
     }

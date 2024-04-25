@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.elements.keyboard;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
@@ -36,9 +37,9 @@ public class Row implements TranscriptionElement {
                 .map(b -> b.createKeyboardButton(pool)).collect(Collectors.toList()));
     }
 
-    public List<InlineKeyboardButton> createInlineRow(ResourcePool pool){
-        return this.buttons.stream()
+    public InlineKeyboardRow createInlineRow(ResourcePool pool){
+        return new InlineKeyboardRow(this.buttons.stream()
                 .filter(b -> Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
-                .map(b -> b.createInlineButton(pool)).collect(Collectors.toList());
+                .map(b -> b.createInlineButton(pool)).collect(Collectors.toList()));
     }
 }

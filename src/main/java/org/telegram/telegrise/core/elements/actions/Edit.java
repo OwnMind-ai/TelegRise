@@ -2,9 +2,10 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrise.MessageUtils;
@@ -99,7 +100,12 @@ public class Edit implements ActionElement{
             if (pool.getUpdate() == null || !pool.getUpdate().hasCallbackQuery())
                 throw new TelegRiseRuntimeException("Unable to apply refresh element: passed update has no callback query");
 
-            return pool.getUpdate().getCallbackQuery().getMessage();
+            MaybeInaccessibleMessage maybeInaccessibleMessage = pool.getUpdate().getCallbackQuery().getMessage();
+
+            if (!(maybeInaccessibleMessage instanceof Message))
+                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed callback query refers to inaccessible message");
+
+            return (Message) maybeInaccessibleMessage;
         }
 
         throw new TelegRiseRuntimeException("Unable to apply refresh element: unknown refresh type " + this.getType());

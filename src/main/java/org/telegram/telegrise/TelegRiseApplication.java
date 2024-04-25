@@ -3,10 +3,11 @@ package org.telegram.telegrise;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
+import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -15,6 +16,7 @@ import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,15 +42,7 @@ public final class TelegRiseApplication {
     @Setter
     private SessionInitializer sessionInitializer;
 
-    private final TelegramBotsApi api;
-
-    {
-        try {
-            api = new TelegramBotsApi(DefaultBotSession.class);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private final TelegramBotsLongPollingApplication api = new TelegramBotsLongPollingApplication();
 
     public TelegRiseApplication(Class<?> mainClass) {
         this.mainClass = mainClass;
@@ -62,12 +56,14 @@ public final class TelegRiseApplication {
     public void start(){
         this.handlersClasses = this.loadPrimaryHandlers();
         TelegramSessionsController controller = this.createController();
+        final String token = controller.getTranscription().getToken();
 
-        TelegramLongPollingBot bot = BotFactory.createLongPooling(controller.getTranscription(), controller::onUpdateReceived);
-        controller.setSender(bot);
+        LongPollingUpdateConsumer bot = BotFactory.createLongPooling(controller);
+        TelegramClient client = new OkHttpTelegramClient(token);
+        controller.setClient(client);
         controller.initialize();
 
-        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, bot, new BotSender(bot, null));
+        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null));
 
         serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();
@@ -78,7 +74,7 @@ public final class TelegRiseApplication {
         }
 
         try {
-            api.registerBot(bot);
+            api.registerBot(token, bot);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -111,10 +107,12 @@ public final class TelegRiseApplication {
         return handlerCandidates.stream().map(c -> (Class<? extends PrimaryHandler>)c).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unused")
     public void addResourceFactory(ResourceFactory<?> factory){
         this.resourceFactories.add(factory);
     }
 
+    @SuppressWarnings("unused")
     public void addService(Service service){
         this.serviceManager.add(service);
     }

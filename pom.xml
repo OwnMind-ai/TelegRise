@@ -33,10 +33,17 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- Long polling bot -->
         <dependency>
             <groupId>org.telegram</groupId>
-            <artifactId>telegrambots</artifactId>
-            <version>6.8.0</version>
+            <artifactId>telegrambots-longpolling</artifactId>
+            <version>7.2.1</version>
+        </dependency>
+        <!-- OkHttp client implementation -->
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-client</artifactId>
+            <version>7.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

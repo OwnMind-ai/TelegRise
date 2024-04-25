@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.media.*;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.types.CommandData;
 
 import java.util.regex.Matcher;

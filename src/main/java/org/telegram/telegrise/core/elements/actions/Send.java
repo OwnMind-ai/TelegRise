@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -78,7 +78,7 @@ public class Send implements ActionElement{
             return readyMedias.get(0).createSender(this, pool);
         } else if (readyMedias.size() > 1) {
             List<InputMedia> first = readyMedias.get(0).createInputMedia(pool);
-            assert first.size() > 0;
+            assert !first.isEmpty();
 
             if (this.text != null){
                 first.get(0).setCaption(this.text.generateText(pool));

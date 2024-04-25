@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -58,7 +58,7 @@ public class Video implements MediaType, TranscriptionElement {
                 .duration(generateNullableProperty(duration, pool))
                 .width(size != null ? size.getWidth() : null)
                 .height(size != null ? size.getHeight() : null)
-                .thumb(generateNullableProperty(thumbnail, pool))
+                .thumbnail(generateNullableProperty(thumbnail, pool))
                 .supportsStreaming(generateNullableProperty(this.supportsStreaming, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
@@ -75,11 +75,11 @@ public class Video implements MediaType, TranscriptionElement {
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
-        InputMediaVideo mediaVideo = new InputMediaVideo();
+        InputMediaVideo mediaVideo = new InputMediaVideo("");
         mediaVideo.setDuration(generateNullableProperty(duration, pool));
         mediaVideo.setWidth(size != null ? size.getWidth() : null);
         mediaVideo.setHeight(size != null ? size.getHeight() : null);
-        mediaVideo.setThumb(generateNullableProperty(thumbnail, pool));
+        mediaVideo.setThumbnail(generateNullableProperty(thumbnail, pool));
         mediaVideo.setSupportsStreaming(generateNullableProperty(this.supportsStreaming, pool));
         mediaVideo.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);
 

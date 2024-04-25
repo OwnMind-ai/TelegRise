@@ -1,8 +1,8 @@
-package org.telegram.telegrise;
+package org.telegram.telegrise.senders;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
@@ -34,7 +34,7 @@ public class UniversalSender {
         if (method == null) return null;
 
         if (method instanceof BotApiMethod)
-            return sender.execute((BotApiMethod<?>) method);
+            return sender.execute((BotApiMethod<? extends Serializable>) method);
 
         try {
             return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);

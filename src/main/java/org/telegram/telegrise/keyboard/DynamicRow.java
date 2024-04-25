@@ -1,7 +1,7 @@
 package org.telegram.telegrise.keyboard;
 
 import lombok.Data;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a dynamic buttons row that used in <a href="#{@link}">{@link org.telegram.telegrise.keyboard.DynamicKeyboard DynamicKeyboard}</a>.
- * Dynamic rows can be dynamically disabled or enabled based on specified conditions that can be setted using <code>setWhen</code> method.
+ * Dynamic rows can be dynamically disabled or enabled based on specified conditions that can be set using <code>setWhen</code> method.
  * 
  * @see DynamicButton
  * @see DynamicKeyboard
@@ -28,7 +28,7 @@ public class DynamicRow implements Serializable {
     * Creates a dynamic row from a <a href="#{@link}">{@link org.telegram.telegrise.core.elements.keyboard.Row Row}</a> object.
     * 
     * @param row The Row object to create a dynamic row from.
-    * @param pool The ResourcePool required to create the <code>SwitchButton</code>.
+    * @param pool The ResourcePool that required to create the <code>SwitchButton</code>.
     * @return The created DynamicRow object.
     */
     public static DynamicRow ofRow(Row row, ResourcePool pool){
@@ -73,9 +73,9 @@ public class DynamicRow implements Serializable {
     * @return The created list of InlineKeyboardButton objects.
     * @see org.telegram.telegrise.core.ResourcePool
     */
-    public List<InlineKeyboardButton> createInlineRow(ResourcePool pool){
-        return this.buttons.stream()
+    public InlineKeyboardRow createInlineRow(ResourcePool pool){
+        return new InlineKeyboardRow(this.buttons.stream()
                 .filter(b -> b.getWhen().generate(pool))
-                .map(b -> b.createInlineButton(pool)).collect(Collectors.toList());
+                .map(b -> b.createInlineButton(pool)).collect(Collectors.toList()));
     }
 }

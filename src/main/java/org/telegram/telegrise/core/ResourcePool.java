@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrise.BotSender;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TreeExecutor;
@@ -53,7 +53,7 @@ public final class ResourcePool {
         if (update != null) this.addComponent(update);
         if (sender != null) {
             this.addComponent(sender);
-            this.components.put(DefaultAbsSender.class, sender.getClient());
+            this.components.put(TelegramClient.class, sender.getClient());
         }
         if (memory != null) this.components.put(SessionMemory.class, memory);
 

@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideoNote;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -46,7 +46,7 @@ public class VideoNote implements MediaType{
                 .videoNote(this.createInputFile(pool))
                 .duration(generateNullableProperty(duration, pool))
                 .length(generateNullableProperty(length, pool))
-                .thumb(generateNullableProperty(thumbnail, pool))
+                .thumbnail(generateNullableProperty(thumbnail, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))

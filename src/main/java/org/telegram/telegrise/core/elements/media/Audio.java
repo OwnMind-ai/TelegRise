@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -46,7 +46,7 @@ public class Audio implements MediaType{
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .audio(this.createInputFile(pool))
                 .duration(generateNullableProperty(duration, pool))
-                .thumb(generateNullableProperty(thumbnail, pool))
+                .thumbnail(generateNullableProperty(thumbnail, pool))
                 .title(generateNullableProperty(title, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
@@ -61,9 +61,9 @@ public class Audio implements MediaType{
 
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
-        InputMediaAudio mediaAudio = new InputMediaAudio();
+        InputMediaAudio mediaAudio = new InputMediaAudio("");
         mediaAudio.setDuration(generateNullableProperty(duration, pool));
-        mediaAudio.setThumb(generateNullableProperty(thumbnail, pool));
+        mediaAudio.setThumbnail(generateNullableProperty(thumbnail, pool));
         mediaAudio.setTitle(generateNullableProperty(title, pool));
 
         return List.of(this.createInputMedia(mediaAudio, pool));

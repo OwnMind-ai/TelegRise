@@ -1,22 +1,24 @@
-package org.telegram.telegrise;
+package org.telegram.telegrise.senders;
 
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.methods.stickers.AddStickerToSet;
 import org.telegram.telegrambots.meta.api.methods.stickers.CreateNewStickerSet;
-import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumb;
+import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumbnail;
 import org.telegram.telegrambots.meta.api.methods.stickers.UploadStickerFile;
+import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.File;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.updateshandlers.DownloadFileCallback;
-import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrise.SessionMemoryImpl;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -25,12 +27,13 @@ import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
 public class BotSender {
-    private final DefaultAbsSender sender;
+    @Getter
+    private final TelegramClient client;
     private final SessionMemoryImpl memory;
     private boolean isSneaky;
 
-    public BotSender(DefaultAbsSender sender, SessionMemoryImpl memory) {
-        this.sender = sender;
+    public BotSender(TelegramClient client, SessionMemoryImpl memory) {
+        this.client = client;
         this.memory = memory;
     }
 
@@ -48,235 +51,200 @@ public class BotSender {
     }
 
     public final java.io.File downloadFile(String filePath) throws TelegramApiException {
-        return sender.downloadFile(filePath);
+        return client.downloadFile(filePath);
     }
 
     public final java.io.File downloadFile(File file) throws TelegramApiException {
-        return sender.downloadFile(file);
+        return client.downloadFile(file);
     }
 
-    public final java.io.File downloadFile(File file, java.io.File outputFile) throws TelegramApiException {
-        return sender.downloadFile(file, outputFile);
+    public InputStream downloadFileAsStream(File file) throws TelegramApiException{
+        return this.client.downloadFileAsStream(file);
     }
 
-    public final java.io.File downloadFile(String filePath, java.io.File outputFile) throws TelegramApiException {
-        return sender.downloadFile(filePath, outputFile);
-    }
-
-    public final void downloadFileAsync(String filePath, DownloadFileCallback<String> callback) throws TelegramApiException {
-        sender.downloadFileAsync(filePath, callback);
-    }
-
-    public final void downloadFileAsync(File file, DownloadFileCallback<File> callback) throws TelegramApiException {
-        sender.downloadFileAsync(file, callback);
-    }
-
-    public final InputStream downloadFileAsStream(String filePath) throws TelegramApiException {
-        return sender.downloadFileAsStream(filePath);
-    }
-
-    public final InputStream downloadFileAsStream(File file) throws TelegramApiException {
-        return sender.downloadFileAsStream(file);
-    }
-
-    public <T extends Serializable, Method extends BotApiMethod<T>, Callback extends SentCallback<T>> void executeAsync(Method method, Callback callback) throws TelegramApiException {
-        this.sender.executeAsync(method, callback);
-        this.finish(null);
+    public InputStream downloadFileAsStream(String filePath) throws TelegramApiException {
+        return this.client.downloadFileAsStream(filePath);
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> executeAsync(Method method) throws TelegramApiException {
-        CompletableFuture<T> future = this.sender.executeAsync(method);
+        CompletableFuture<T> future = this.client.executeAsync(method);
         this.finish(null);
         return future;
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> T execute(Method method) throws TelegramApiException {
-        T result = this.sender.execute(method);
+        T result = this.client.execute(method);
         this.finish(null);
         return result;
     }
 
     public final User getMe() throws TelegramApiException {
         this.finish(null);
-        return this.sender.getMe();
+        return this.client.execute(new GetMe());
     }
 
     public final WebhookInfo getWebhookInfo() throws TelegramApiException {
         this.finish(null);
-        return this.sender.getWebhookInfo();
+        return this.client.execute(new GetWebhookInfo());
     }
 
-    public final CompletableFuture<User> getMeAsync() {
+    public final CompletableFuture<User> getMeAsync() throws TelegramApiException {
         this.finish(null);
-        return this.sender.getMeAsync();
+        return this.client.executeAsync(new GetMe());
     }
 
-    public final CompletableFuture<WebhookInfo> getWebhookInfoAsync() {
+    public final CompletableFuture<WebhookInfo> getWebhookInfoAsync() throws TelegramApiException {
         this.finish(null);
-        return this.sender.getWebhookInfoAsync();
-    }
-
-    public final void getMeAsync(SentCallback<User> sentCallback) throws TelegramApiException {
-        this.finish(null);
-        this.sender.getMeAsync(sentCallback);
-    }
-
-    public final void getWebhookInfoAsync(SentCallback<WebhookInfo> sentCallback) throws TelegramApiException {
-        this.finish(null);
-        this.sender.getWebhookInfoAsync(sentCallback);
+        return this.client.executeAsync(new GetWebhookInfo());
     }
 
     public Message execute(SendDocument method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendPhoto method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVideo method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVideoNote method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendSticker method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendAudio method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVoice method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public List<Message> execute(SendMediaGroup method) throws TelegramApiException {
-        List<Message> message = this.sender.execute(method);
+        List<Message> message = this.client.execute(method);
         this.finish(message.get(0));
         return message;
     }
 
     public Boolean execute(SetChatPhoto method) throws TelegramApiException {
-        Boolean b = this.sender.execute(method);
+        Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public Boolean execute(AddStickerToSet method) throws TelegramApiException {
-        Boolean b = this.sender.execute(method);
+        Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
-    public Boolean execute(SetStickerSetThumb method) throws TelegramApiException {
-        Boolean b = this.sender.execute(method);
+    public Boolean execute(SetStickerSetThumbnail method) throws TelegramApiException {
+        Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public Boolean execute(CreateNewStickerSet method) throws TelegramApiException {
-        Boolean b = this.sender.execute(method);
+        Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public File execute(UploadStickerFile method) throws TelegramApiException {
-        File file = this.sender.execute(method);
+        File file = this.client.execute(method);
         this.finish(null);
         return file;
     }
 
     public Serializable execute(EditMessageMedia method) throws TelegramApiException {
-        Serializable s = this.sender.execute(method);
+        Serializable s = this.client.execute(method);
         this.finish(null);
         return s;
     }
 
     public Message execute(SendAnimation method) throws TelegramApiException {
-        Message message = this.sender.execute(method);
+        Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public CompletableFuture<Message> executeAsync(SendDocument method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendPhoto method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendVideo method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendVideoNote method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendSticker method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendAudio method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendVoice method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<List<Message>> executeAsync(SendMediaGroup method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Boolean> executeAsync(SetChatPhoto method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Boolean> executeAsync(AddStickerToSet method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
-    public CompletableFuture<Boolean> executeAsync(SetStickerSetThumb method) {
-        return this.sender.executeAsync(method);
+    public CompletableFuture<Boolean> executeAsync(SetStickerSetThumbnail method) {
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Boolean> executeAsync(CreateNewStickerSet method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<File> executeAsync(UploadStickerFile method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Serializable> executeAsync(EditMessageMedia method) {
-        return this.sender.executeAsync(method);
+        return this.client.executeAsync(method);
     }
 
     public CompletableFuture<Message> executeAsync(SendAnimation method) {
-        return this.sender.executeAsync(method);
-    }
-
-    public DefaultAbsSender getClient() {
-        return this.sender;
+        return this.client.executeAsync(method);
     }
 }

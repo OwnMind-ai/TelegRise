@@ -7,6 +7,7 @@ import org.telegram.telegrise.annotations.OnCreate;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.Resource;
 import org.telegram.telegrise.annotations.TreeController;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.io.File;
 

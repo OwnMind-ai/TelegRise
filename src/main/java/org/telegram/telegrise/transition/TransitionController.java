@@ -7,6 +7,8 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.senders.BotSender;
+import org.telegram.telegrise.senders.UniversalSender;
 
 import java.util.Deque;
 import java.util.Iterator;

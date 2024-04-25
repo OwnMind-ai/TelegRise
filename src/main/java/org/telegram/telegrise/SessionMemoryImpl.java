@@ -2,7 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.transition.JumpPoint;

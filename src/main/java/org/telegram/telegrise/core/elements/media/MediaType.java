@@ -1,6 +1,6 @@
 package org.telegram.telegrise.core.elements.media;
 
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrise.TelegRiseRuntimeException;
@@ -42,6 +42,10 @@ public interface MediaType extends TranscriptionElement {
 
     default <T extends InputMedia> T createInputMedia(T instance, ResourcePool pool){
         InputFile inputFile = generateNullableProperty(getInputFile(), pool);
+
+        // A workaround for required-args-constructor since 7.*
+        instance.setMedia(null);
+
         if (inputFile != null) {
             instance.setMediaName(inputFile.getMediaName());
             instance.setMedia(inputFile.getNewMediaFile(), inputFile.getMediaName());

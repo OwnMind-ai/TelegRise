@@ -3,17 +3,18 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class TelegramSessionsController {
     private SessionInitializer sessionInitializer;
     private final List<ResourceFactory<?>> resourceFactories;
     @Setter
-    private DefaultAbsSender sender;
+    private TelegramClient client;
     private List<Class<? extends PrimaryHandler>> userHandlersClasses;
     private PrimaryHandlersController handlersController;
 
@@ -58,19 +59,19 @@ public class TelegramSessionsController {
     }
 
     public void initialize(){
-        assert sender != null;
+        assert client != null;
 
         var splitHandlers = userHandlersClasses.stream()
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
-        BotSender botSender = new BotSender(sender, null);
+        BotSender botSender = new BotSender(client, null);
         TranscriptionManager objectManager =  new TranscriptionManager(null, null,
                 null, null, this::getTranscriptionManager,
                 u -> new ResourcePool(u, null, botSender, null));
         objectManager.load(transcription);
 
-        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, sender, botSender, objectManager));
+        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if(this.transcription.getRootMenu().getChatTypes() == null)
@@ -78,7 +79,7 @@ public class TelegramSessionsController {
 
         if (Boolean.parseBoolean(this.transcription.getAutoCommands())) {
             try {
-                this.sender.execute(new DeleteMyCommands());
+                this.client.execute(new DeleteMyCommands());
             } catch (TelegramApiException e) { throw new RuntimeException(e); }
 
             ChatTypes.GENERAL_SCOPES_LIST.forEach(l -> {
@@ -86,7 +87,7 @@ public class TelegramSessionsController {
 
                 try {
                     if (!setMyCommands.getCommands().isEmpty())
-                        this.sender.execute(setMyCommands);
+                        this.client.execute(setMyCommands);
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
@@ -124,13 +125,13 @@ public class TelegramSessionsController {
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
         SessionMemoryImpl sessionMemory = (SessionMemoryImpl) memory;
-        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, sender, this::getTranscriptionManager);
+        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager);
 
         this.sessions.put(sessionMemory.getUserIdentifier(), session);
     }
 
     private void createSession(UserIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.sender, this::getTranscriptionManager);
+        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);

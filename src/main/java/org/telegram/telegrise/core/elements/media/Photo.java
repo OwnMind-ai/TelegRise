@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements.media;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -55,7 +55,7 @@ public class Photo implements MediaType{
 
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
-        InputMediaPhoto mediaPhoto = new InputMediaPhoto();
+        InputMediaPhoto mediaPhoto = new InputMediaPhoto("");
         mediaPhoto.setHasSpoiler(generateNullableProperty(this.spoiler, pool));
 
         return List.of(this.createInputMedia(mediaPhoto, pool));

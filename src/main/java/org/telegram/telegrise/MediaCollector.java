@@ -1,7 +1,7 @@
 package org.telegram.telegrise;
 
 import lombok.Setter;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.Duration;

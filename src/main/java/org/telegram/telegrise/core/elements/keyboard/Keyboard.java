@@ -88,7 +88,7 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
         if (!((type != null && rows != null) || byName != null || create != null || (dynamic && filler != null)))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
 
-        if (dynamic && (id == null || id.length() < 1))
+        if (dynamic && (id == null || id.isEmpty()))
             throw new TranscriptionParsingException("Dynamic keyboard must have an id attribute", node);
 
         if (dynamic && create != null)

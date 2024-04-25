@@ -3,10 +3,10 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.BranchingElement;
@@ -15,6 +15,8 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.resources.ResourceInjector;
+import org.telegram.telegrise.senders.BotSender;
+import org.telegram.telegrise.senders.UniversalSender;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 
@@ -54,11 +56,11 @@ public class UserSession implements Runnable{
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, DefaultAbsSender sender, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
+    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
         this.transcription = transcription;
-        this.sender = new BotSender(sender, sessionMemory);
+        this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);
@@ -68,7 +70,7 @@ public class UserSession implements Runnable{
         this.universalSender = new UniversalSender(this.sender);
     }
 
-    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, DefaultAbsSender sender,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
+    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
@@ -77,7 +79,7 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
-        this.sender = new BotSender(sender, sessionMemory);
+        this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
         this.transcriptionManager.load(transcription);

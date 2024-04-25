@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.BotSender;
+import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.core.elements.actions.Animate;
 import org.telegram.telegrise.core.elements.actions.Frame;
 

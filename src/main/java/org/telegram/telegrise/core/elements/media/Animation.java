@@ -2,7 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -54,7 +54,7 @@ public class Animation implements MediaType{
                 .duration(generateNullableProperty(duration, pool))
                 .width(size != null ? size.getWidth() : null)
                 .height(size != null ? size.getHeight() : null)
-                .thumb(generateNullableProperty(thumbnail, pool))
+                .thumbnail(generateNullableProperty(thumbnail, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
                 .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
@@ -70,11 +70,13 @@ public class Animation implements MediaType{
     @Override
     public List<InputMedia> createInputMedia(ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
-        InputMediaAnimation mediaAnimation = new InputMediaAnimation();
+
+        InputMediaAnimation mediaAnimation = new InputMediaAnimation("will be replaced");
+
         mediaAnimation.setDuration(generateNullableProperty(duration, pool));
         mediaAnimation.setWidth(size != null ? size.getWidth() : null);
         mediaAnimation.setHeight(size != null ? size.getHeight() : null);
-        mediaAnimation.setThumb(generateNullableProperty(thumbnail, pool));
+        mediaAnimation.setThumbnail(generateNullableProperty(thumbnail, pool));
         mediaAnimation.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);
 
         return List.of(this.createInputMedia(mediaAnimation, pool));
