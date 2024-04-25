@@ -3,10 +3,11 @@ package org.telegram.telegrise.core;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.expressions.*;
 import org.telegram.telegrise.core.expressions.tokens.Token;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class ExpressionFactory {
             Number parsed;
             try {
                 parsed = NumberFormat.getInstance().parse(text);
-            } catch (ParseException e) { throw new RuntimeException(e); }
+            } catch (ParseException e) { throw new TelegRiseInternalException(e); }
 
             if (type.equals(Integer.class))
                 return GeneratedValue.ofValue(type.cast(parsed.intValue()));
@@ -116,7 +117,7 @@ public class ExpressionFactory {
                         parts.add(parseExpression());
                     } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
                              InstantiationException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                        throw new TelegRiseInternalException(e);
                     }
 
                     currentPart = new StringBuilder();

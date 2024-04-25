@@ -4,6 +4,7 @@ import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

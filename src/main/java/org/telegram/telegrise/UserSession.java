@@ -14,6 +14,8 @@ import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
@@ -117,8 +119,8 @@ public class UserSession implements Runnable{
         try {
             while (!this.updatesQueue.isEmpty())
                 this.handleUpdate(this.updatesQueue.remove());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Throwable e) {
+            throw TelegRiseRuntimeException.unfold(e);
         } finally {
             this.running.set(false);
         }
@@ -356,7 +358,7 @@ public class UserSession implements Runnable{
             try {
                 this.universalSender.execute(actionElement, this.createResourcePool(update));
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                throw new TelegRiseInternalException(e);
             }
         }
     }

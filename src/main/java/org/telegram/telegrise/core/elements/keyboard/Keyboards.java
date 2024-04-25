@@ -7,7 +7,7 @@ import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.util.List;

@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;

@@ -15,6 +15,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboards;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.types.CommandData;
 import org.w3c.dom.Node;
 

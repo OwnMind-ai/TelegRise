@@ -12,6 +12,8 @@ import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -88,9 +90,9 @@ public class XMLElementsParser {
                         this.parseField((Field) entry.getValue(), node, instance);
                     }
                 } catch (IllegalAccessException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+                    throw new TelegRiseInternalException(e);
                 } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e.getTargetException());
+                    throw new TelegRiseInternalException(e.getTargetException());
                 }
             });
 
@@ -172,7 +174,7 @@ public class XMLElementsParser {
                     return;
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+                    throw new TelegRiseInternalException(e);
                 }
             }
             else if (fieldData.nullable()) return;
@@ -183,7 +185,7 @@ public class XMLElementsParser {
             if (List.class.isAssignableFrom(field.getType())) {
                 PropertyUtils.setSimpleProperty(instance, field.getName(), fieldNodes.stream()
                         .map(n -> {
-                            try { return parse(n); } catch (Exception e) { throw new RuntimeException(e); }
+                            try { return parse(n); } catch (Exception e) { throw new TelegRiseInternalException(e); }
                         }).collect(Collectors.toUnmodifiableList())
                 );
             } else {
@@ -194,7 +196,7 @@ public class XMLElementsParser {
                             "Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" has more than one definition", node);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TelegRiseInternalException(e);
         }
     }
 

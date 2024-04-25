@@ -14,6 +14,7 @@ import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -55,6 +56,9 @@ public class Send implements ActionElement{
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
+        if (this.text == null && medias.isEmpty())
+            throw new TranscriptionParsingException("Requires text and/or media to send", node);
+
         if (this.medias.size() > 1 && !this.medias.stream().allMatch(MediaType::isGroupable))
             throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
     }

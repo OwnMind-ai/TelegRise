@@ -7,13 +7,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrise.SessionMemory;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.InteractiveElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.UserRole;

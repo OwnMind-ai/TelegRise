@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrise.MessageUtils;
 import org.telegram.telegrise.ReturnConsumer;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
@@ -18,6 +18,7 @@ import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.w3c.dom.Node;
 

@@ -7,6 +7,8 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
 
@@ -58,7 +60,7 @@ public class TransitionController {
                 try {
                     this.sender.execute(action, resourcePool);
                 } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
+                    throw new TelegRiseInternalException(e);
                 }
             });
         }

@@ -11,6 +11,8 @@ import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
@@ -40,7 +42,7 @@ public final class TreeExecutor {
                         try {
                             new UniversalSender(sender).execute(action, pool);
                         } catch (TelegramApiException e) {
-                            throw new RuntimeException(e);
+                            throw new TelegRiseInternalException(e);
                         }
                     });
     }
@@ -143,9 +145,9 @@ public final class TreeExecutor {
             try {
                 onCloseMethod.get().invoke(this.controllerInstance);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new TelegRiseRuntimeException("Unable to access OnClose method");
             } catch (InvocationTargetException e) {
-                throw new RuntimeException(e.getTargetException());
+                throw new TelegRiseRuntimeException("An exception occurred while closing the tree controller", e.getTargetException(), true);
             }
         }
     }

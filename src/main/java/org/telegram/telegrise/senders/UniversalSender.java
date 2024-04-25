@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -39,9 +40,9 @@ public class UniversalSender {
         try {
             return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new TelegRiseInternalException(e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getTargetException());
+            throw new TelegRiseInternalException(e.getTargetException());
         }
     }
 

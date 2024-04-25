@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;

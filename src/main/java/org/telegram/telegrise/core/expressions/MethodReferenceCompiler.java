@@ -9,7 +9,8 @@ import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.core.expressions.references.OperationReference;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
 import org.telegram.telegrise.core.expressions.tokens.*;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.lang.reflect.Method;
@@ -171,6 +172,6 @@ public class MethodReferenceCompiler {
                     return pool -> type.cast(result.generate(pool));
                 }
             };
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch (Exception e) { throw new TelegRiseInternalException(e); }
     }
 }

@@ -3,11 +3,12 @@ package org.telegram.telegrise.core.elements.head;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.elements.LinkableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

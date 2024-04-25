@@ -3,6 +3,8 @@ package org.telegram.telegrise;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Handler;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
@@ -53,9 +55,9 @@ public class PrimaryHandlersController {
         try {
              instance = handlerClass.getConstructor().newInstance();
         } catch (InstantiationException e) {
-            throw new RuntimeException(e);
+            throw new TelegRiseInternalException(e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getTargetException());
+            throw new TelegRiseInternalException(e.getTargetException());
         } catch (NoSuchMethodException | IllegalAccessException  e) {
             throw new TelegRiseRuntimeException("Primary handler '" + handlerClass.getSimpleName() + "' must have a public constructor with no arguments");
         }

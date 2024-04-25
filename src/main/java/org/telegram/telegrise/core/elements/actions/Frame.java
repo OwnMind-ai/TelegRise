@@ -6,6 +6,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 @Element(name = "frame")

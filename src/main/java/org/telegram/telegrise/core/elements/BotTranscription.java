@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.core.elements.security.Roles;

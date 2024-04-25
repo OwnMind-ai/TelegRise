@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.time.Duration;
 import java.util.Collections;

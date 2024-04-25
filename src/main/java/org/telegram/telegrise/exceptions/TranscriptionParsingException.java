@@ -1,4 +1,4 @@
-package org.telegram.telegrise.core.parser;
+package org.telegram.telegrise.exceptions;
 
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
@@ -8,6 +8,7 @@ public class TranscriptionParsingException extends RuntimeException{
     private final Node problematicNode;
 
     public TranscriptionParsingException(String message, @NotNull Node problematicNode) {
+        super(null, null, false, false);
         this.message = message;
         this.problematicNode = problematicNode;
     }

@@ -8,7 +8,8 @@ import org.jboss.forge.roaster.model.source.MethodSource;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import javax.tools.JavaCompiler;
@@ -25,6 +26,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JavaExpressionCompiler {
+    // Change to force recompilation of expressions when incompatible changes introduced
+    public static final String VERSION = "1.1";
+
     public static String getTempDirectory(){
         return Objects.requireNonNullElse(
                 System.getProperty("telegrise.tempDirectory"),
@@ -44,7 +48,7 @@ public class JavaExpressionCompiler {
         try {
             this.classLoader = URLClassLoader.newInstance(new URL[]{this.tempDirectoryPath.toURI().toURL()}, this.getClass().getClassLoader());
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new TelegRiseInternalException(e);
         }
     }
 
@@ -151,7 +155,7 @@ public class JavaExpressionCompiler {
 
     private int calculateHashcode(String expression, LocalNamespace namespace){
         return Math.abs((
-                        expression +
+                        expression + VERSION +
                         (namespace.getHandlerClass() != null ? namespace.getHandlerClass().getName() : "") +
                         namespace.getApplicationNamespace().getImportedClasses().stream().map(Class::getName).sorted().collect(Collectors.joining())
                 ).hashCode());

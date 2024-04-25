@@ -6,7 +6,7 @@ import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 @Element(name = "role")

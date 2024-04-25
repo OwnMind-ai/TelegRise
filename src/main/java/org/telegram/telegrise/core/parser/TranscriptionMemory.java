@@ -1,7 +1,7 @@
 package org.telegram.telegrise.core.parser;
 
 import lombok.Getter;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 

@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.annotations.Resource;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
 

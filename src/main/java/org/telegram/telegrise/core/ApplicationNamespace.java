@@ -3,7 +3,7 @@ package org.telegram.telegrise.core;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.Collection;
 import java.util.HashMap;

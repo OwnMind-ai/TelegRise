@@ -1,7 +1,8 @@
 package org.telegram.telegrise.resources;
 
 import lombok.Getter;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.annotations.Resource;
 
 import java.lang.reflect.Field;
@@ -48,7 +49,7 @@ public class ResourceInjector {
                 try {
                     field.set(target, resource);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    throw new TelegRiseRuntimeException(String.format("No access to the field %s in %s requiring injection", field.getName(), target.getClass().getName()));
                 }
             }
         }

@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

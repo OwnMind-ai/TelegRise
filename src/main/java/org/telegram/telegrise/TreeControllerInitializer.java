@@ -1,6 +1,7 @@
 package org.telegram.telegrise;
 
 import org.telegram.telegrise.annotations.OnCreate;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,9 +30,9 @@ public class TreeControllerInitializer {
             try {
                 onCreateMethod.get().invoke(instance);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new TelegRiseRuntimeException("Unable to access OnCreate method");
             } catch (InvocationTargetException e) {
-                throw new RuntimeException(e.getTargetException());
+                throw new TelegRiseRuntimeException("An exception occurred while creating the tree controller", e.getTargetException(), true);
             }
         }
 

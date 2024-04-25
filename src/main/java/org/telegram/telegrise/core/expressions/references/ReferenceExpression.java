@@ -2,10 +2,10 @@ package org.telegram.telegrise.core.expressions.references;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.parser.TranscriptionParsingException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.io.Serializable;

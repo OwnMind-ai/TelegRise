@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements.media;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrise.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.TranscriptionElement;

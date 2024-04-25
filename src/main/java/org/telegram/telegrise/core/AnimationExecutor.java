@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.core.elements.actions.Animate;
 import org.telegram.telegrise.core.elements.actions.Frame;
@@ -38,7 +39,7 @@ public class AnimationExecutor implements Runnable {
         try {
             this.executeFrame(initial, Frame.SEND, lockedPool);
             this.sleep(initial, lockedPool);
-        } catch (TelegramApiException | InterruptedException e) { throw new RuntimeException(e); }
+        } catch (TelegramApiException | InterruptedException e) { throw new TelegRiseInternalException(e); }
         currentFrame++;
 
         int maxLoops = this.animation.getLoops() != null ? this.animation.getLoops().generate(lockedPool)
@@ -55,7 +56,7 @@ public class AnimationExecutor implements Runnable {
                 try {
                     this.iteration(lockedPool);
                 } catch (TelegramApiException | InterruptedException e) {
-                    throw new RuntimeException(e);
+                    throw new TelegRiseInternalException(e);
                 }
             }
 
@@ -69,7 +70,7 @@ public class AnimationExecutor implements Runnable {
             try {
                 this.sender.execute(DeleteMessage.builder().chatId(this.animation.generateChatId(lockedPool)).messageId(messageId).build());
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                throw new TelegRiseInternalException(e);
             }
         }
     }
