@@ -32,7 +32,7 @@ Firstly, create your first transcription .xml file. Here is an example of one (i
                 </keyboard>
             </send>
             
-            <!-- Executes if user pressed the inline button that return a callback query
+            <!-- Executes if user pressed the inline button that returns a callback query
                  with 'say-hello' data (see keyboard tag above),
                  invokes "logResponse" method in SimpleController instance-->
             <branch callbackTriggers="say-hello" invoke="#logResponce">
@@ -41,7 +41,7 @@ Firstly, create your first transcription .xml file. Here is an example of one (i
             
             <!-- Executes default branch if no valid branch was found and if
                  'messageSent' method in SimpleController instance returns 'true' and
-                 message text is not "Hello!"-->
+                 the message text is not "Hello!"-->
             <default when="#messageSent AND #messageText(update, &quot;Hello!&quot;) -> #not">
                 <send>Unrecognized command. Say what?</send>
             </default>
