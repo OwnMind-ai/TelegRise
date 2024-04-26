@@ -20,7 +20,8 @@ import java.util.List;
 
 public class XMLUtils {
     @NotNull
-    private static LSSerializer getLsSerializer(Node node) {
+    public static LSSerializer getLsSerializer(Node node) {
+
         DOMImplementationLS ls = (DOMImplementationLS) node.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
         LSSerializer lsSerializer = ls.createLSSerializer();
         lsSerializer.getDomConfig().setParameter("xml-declaration", false);
@@ -84,8 +85,8 @@ public class XMLUtils {
         return result.toArray(new Node[0]);
     }
 
-    public static Document loadDocument(File file) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    public static Document loadDocument(File file) throws IOException, SAXException, ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         document.getDocumentElement().normalize();
