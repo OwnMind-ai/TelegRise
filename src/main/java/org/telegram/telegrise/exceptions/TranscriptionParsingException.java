@@ -23,10 +23,15 @@ public class TranscriptionParsingException extends RuntimeException{
 
     private String nodeTag() {
         StringBuilder builder = new StringBuilder();
-        try {
-            builder.append(new URI(node.getOwnerDocument().getDocumentURI()).toURL().getFile()).append(": ");
-        } catch (MalformedURLException | URISyntaxException e) {
-            builder.append(node.getOwnerDocument().getDocumentURI()).append(": ");
+
+        if (node.getOwnerDocument().getDocumentURI() == null){
+            builder.append("<unknown source>: ");
+        } else {
+            try {
+                builder.append(new URI(node.getOwnerDocument().getDocumentURI()).toURL().getFile()).append(": ");
+            } catch (MalformedURLException | URISyntaxException e) {
+                builder.append(node.getOwnerDocument().getDocumentURI()).append(": ");
+            }
         }
 
         List<String> path = new ArrayList<>();

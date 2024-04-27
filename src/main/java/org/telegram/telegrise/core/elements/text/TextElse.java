@@ -11,7 +11,7 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
-@Element(name = "else")
+@Element(name = "else", checkInner = false)
 @Data
 @NoArgsConstructor
 public class TextElse implements TextConditionalElement {
@@ -20,7 +20,7 @@ public class TextElse implements TextConditionalElement {
 
     private GeneratedValue<String> text;
 
-    @Attribute(nullable = false)
+    @Attribute(name = "", nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         if (this.textblock) {
             this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);

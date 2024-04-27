@@ -31,6 +31,7 @@ public class ReflectionUtils {
         enhancer.setSuperclass(tClass);
         enhancer.setCallback(new GetOnlyMethodInterceptor());
 
+        //noinspection unchecked
         return (T) enhancer.create();
     }
 

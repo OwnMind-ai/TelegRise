@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 import java.util.List;
 import java.util.function.Function;
 
-@Element(name = "text")
+@Element(name = "text", checkInner = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -107,7 +107,7 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
         return this.entities == null ? this.parseMode : null;
     }
 
-    @Attribute(nullable = false)
+    @Attribute(name = "", nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         if (!this.conditional && this.byName == null) {
             String raw;

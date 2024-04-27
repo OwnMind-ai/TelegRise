@@ -16,6 +16,7 @@ import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -32,8 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class XMLElementsParserTest {
     public static Node toNode(String node){
@@ -49,9 +49,9 @@ public class XMLElementsParserTest {
     void parseText() throws Exception {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
         parser.load();
-        Node node = toNode("<text parseMode=\"html\" entities=\"${java.util.Collections.singletonList(null)}\">val</text>");
+        Node node = toNode("<text parseMode=\"html\" entities=\"${java.util.Collections.singletonList(null)}\">val<br/>val</text>");
 
-        Text text = new Text("val", "html");
+        Text text = new Text("val\nval", "html");
         text.setEntities(GeneratedValue.ofValue(java.util.Collections.singletonList(null)));
         Assertions.assertNull(text.getParseMode());
         assertElements(text, parser.parse(node), new ResourcePool());
@@ -104,7 +104,7 @@ public class XMLElementsParserTest {
         parser.load();
 
         Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
-                "              controller=\"XMLElementsParserTest\" type=\"reply\">\n" +
+                "              controller=\"XMLElementsParserTest\">\n" +
                 "            <send chat=\"-1\">\n" +
                 "               <text parseMode=\"markdown\">Text</text>\n" +
                 "            </send>" +
@@ -167,6 +167,28 @@ public class XMLElementsParserTest {
 
         assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, null))));
     }
+
+    @Test
+    void parseUnrecognized() {
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
+        parser.load();
+
+        Node node = toNode("<send chat=\"-1\" disableWebPagePreview=\"true\">\n" +
+                "                    <text>Text</text>\n" +
+                "                    <unrecognized/>"+
+                "                </send>");
+
+        Node finalNode = node;
+        assertThrows(TranscriptionParsingException.class, () -> parser.parse(finalNode));
+
+        node = toNode("<send chat=\"-1\" unrecognized=\"\" disableWebPagePreview=\"true\">\n" +
+                "                    <text>Text</text>\n" +
+                "                </send>");
+
+        Node finalNode1 = node;
+        assertThrows(TranscriptionParsingException.class, () -> parser.parse(finalNode1));
+    }
+
 
     public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){
         if (expected == actual)

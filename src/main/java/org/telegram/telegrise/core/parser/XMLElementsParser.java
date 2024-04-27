@@ -14,6 +14,7 @@ import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -75,6 +76,11 @@ public class XMLElementsParser {
                 XMLElementsParser.class, this
         );
 
+        Set<String> expected = new HashSet<>();
+        NamedNodeMap attributes = node.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++)
+            expected.add(attributes.item(i).getNodeName());
+
         Stream.concat(
                 Arrays.stream(element.getDeclaredFields()).filter(m -> m.isAnnotationPresent(Attribute.class))
                         .map(f -> Map.<Attribute, Object>entry(f.getAnnotation(Attribute.class), f)),
@@ -89,6 +95,8 @@ public class XMLElementsParser {
                     else if (entry.getValue() instanceof Field) {
                         this.parseField((Field) entry.getValue(), node, instance);
                     }
+
+                    expected.remove(entry.getKey().name());  // Records attribute as processed
                 } catch (IllegalAccessException | NoSuchMethodException e) {
                     throw new TelegRiseInternalException(e);
                 } catch (InvocationTargetException e) {
@@ -96,10 +104,24 @@ public class XMLElementsParser {
                 }
             });
 
+        if (!expected.isEmpty())
+            throw new TranscriptionParsingException("Unrecognized attributes: " + String.join(", ", expected), node);
+
+        if (element.getAnnotation(Element.class).checkInner()){
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                Node item = node.getChildNodes().item(i);
+                if (item.getNodeType() == Node.ELEMENT_NODE)
+                    expected.add(item.getNodeName());
+            }
+        }
+
         Arrays.stream(element.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(InnerElement.class))
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
-                .forEach(f -> this.parseInnerElement(node, f, instance));
+                .forEach(f -> this.parseInnerElement(node, f, instance, expected));
+
+        if (!expected.isEmpty())
+            throw new TranscriptionParsingException("Unrecognized elements: " + String.join(", ", expected), node);
 
         finishElement(instance, node);
 
@@ -128,7 +150,7 @@ public class XMLElementsParser {
             this.namespace = (LocalNamespace) result;
     }
 
-    private void parseInnerElement(Node node, Field field, TranscriptionElement instance){
+    private void parseInnerElement(Node node, Field field, TranscriptionElement instance, Set<String> expected){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
         Class<?> actualType = ReflectionUtils.getRawGenericType(field);
@@ -141,8 +163,10 @@ public class XMLElementsParser {
             // Node name equals Element.name() or Element type is inherited
             if ((innerElementData != null && nodeList.item(i).getNodeName().equals(innerElementData.name()))
                     || (elements.containsKey(nodeList.item(i).getNodeName())
-                    && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName()))))
+                    && actualType.isAssignableFrom(elements.get(nodeList.item(i).getNodeName())))) {
                 fieldNodes.add(nodeList.item(i));
+                expected.remove(nodeList.item(i).getNodeName());
+            }
 
             nodeNames.add(nodeList.item(i).getNodeName());
         }

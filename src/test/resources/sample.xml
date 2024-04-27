@@ -4,9 +4,9 @@
     <head>
         <link src="keyboards.xml"/>
     </head>
-    <menu name="Main" type="reply">
+    <menu name="Main">
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
-              controller="XMLTranscriptionParserTest" type="reply">
+              controller="XMLTranscriptionParserTest">
             <send>
                 <text parseMode="markdown">Text</text>
             </send>

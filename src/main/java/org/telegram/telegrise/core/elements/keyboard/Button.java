@@ -14,7 +14,7 @@ import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
-@Element(name = "button")
+@Element(name = "button", checkInner = false)
 @Data
 @NoArgsConstructor
 public class Button implements TranscriptionElement {
@@ -32,7 +32,7 @@ public class Button implements TranscriptionElement {
     @Attribute(name = "accessLevel")
     private Integer accessLevel;
 
-    @Attribute(nullable = false)
+    @Attribute(name = "", nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
         this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
     }

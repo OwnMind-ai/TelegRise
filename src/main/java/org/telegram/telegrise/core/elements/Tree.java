@@ -91,7 +91,7 @@ public class Tree implements BranchingElement{
             throw new TranscriptionParsingException("Undefined interruption scopes", node);
     }
 
-    @Attribute(priority = Double.POSITIVE_INFINITY)
+    @Attribute(name = "controller", priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractHandler(Node node, LocalNamespace namespace){
         if (node.getAttributes().getNamedItem("controller") != null)
             this.controller = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("controller").getNodeValue());
