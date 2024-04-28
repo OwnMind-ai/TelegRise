@@ -1,4 +1,4 @@
-package org.telegram.telegrise.actions;
+package org.telegram.telegrise.senders.actions;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
@@ -12,24 +12,26 @@ import org.telegram.telegrise.senders.BotSender;
 
 import java.util.List;
 
+//TODO add media support
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class MessageActionBuilder {
-    private final Message message;
-    private final BotSender sender;
+    protected final Message message;
+    protected final BotSender sender;
 
-    private final String chatId;
-    private final Integer messageThreadId;
-    private String text;
-    private String parseMode = BotSender.DEFAULT_PARSE_MODE;
-    private Boolean disableWebPagePreview;
-    private Boolean disableNotification;
-    private Integer replyToMessageId;
-    private ReplyKeyboard replyMarkup;
-    private List<MessageEntity> entities;
-    private Boolean allowSendingWithoutReply;
-    private Boolean protectContent;
-    private LinkPreviewOptions linkPreviewOptions;
-    private ReplyParameters replyParameters;
-    private String businessConnectionId;
+    protected final String chatId;
+    protected final Integer messageThreadId;
+    protected String text;
+    protected String parseMode = BotSender.DEFAULT_PARSE_MODE;
+    protected Boolean disableWebPagePreview;
+    protected Boolean disableNotification;
+    protected Integer replyToMessageId;
+    protected ReplyKeyboard replyMarkup;
+    protected List<MessageEntity> entities;
+    protected Boolean allowSendingWithoutReply;
+    protected Boolean protectContent;
+    protected LinkPreviewOptions linkPreviewOptions;
+    protected ReplyParameters replyParameters;
+    protected String businessConnectionId;
 
     public MessageActionBuilder(BotSender sender, Message message) {
         this.message = message;

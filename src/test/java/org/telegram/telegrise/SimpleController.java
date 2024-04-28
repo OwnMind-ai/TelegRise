@@ -1,11 +1,10 @@
 package org.telegram.telegrise;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.OnCreate;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.Resource;
@@ -36,12 +35,16 @@ public class SimpleController {
     }
 
     @Reference
-    public void respond(Update update){
-        sender.of(update.getMessage())
+    public void respond(Update update) throws InterruptedException {
+        Message result = sender.of(update.getMessage())
                 .replyMarkup(new InlineKeyboardMarkup(List.of(new InlineKeyboardRow(InlineKeyboardButton.builder().text("a").callbackData("a").build()))))
                 .disableNotification(true)
                 .disableWebPagePreview(true)
-                .reply("response https://google.com");
+                .reply("response");
+
+        Thread.sleep(1000);
+
+        sender.ofEditable(result).edit("edited", InlineKeyboardMarkup.builder().clearKeyboard().build());
     }
 
     @Reference  // Indicates that method can be referenced at transcription by using '#' sign
