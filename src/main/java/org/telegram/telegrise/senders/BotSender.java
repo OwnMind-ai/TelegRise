@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.SessionMemoryImpl;
+import org.telegram.telegrise.actions.MessageActionBuilder;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -27,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
 public class BotSender {
+    public static String DEFAULT_PARSE_MODE = "html";
+
     @Getter
     private final TelegramClient client;
     private final SessionMemoryImpl memory;
@@ -35,6 +38,10 @@ public class BotSender {
     public BotSender(TelegramClient client, SessionMemoryImpl memory) {
         this.client = client;
         this.memory = memory;
+    }
+
+    public MessageActionBuilder of(Message message){
+        return new MessageActionBuilder(this, message);
     }
 
     private void finish(@Nullable Message message) {

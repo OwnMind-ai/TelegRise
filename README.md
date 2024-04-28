@@ -63,7 +63,7 @@ public class SimpleController {
         System.out.println("Someone pressed '/start'");
     }
 
-    @Reference  // Indicates that method can't be referenced at transcription by using '#' sign
+    @Reference  // Indicates that method can be referenced in transcription by using '#' sign
     public void logResponse(Update update) {
         this.memory.put("response", update);
     }

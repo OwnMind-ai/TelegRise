@@ -2,6 +2,9 @@ package org.telegram.telegrise;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.OnCreate;
 import org.telegram.telegrise.annotations.Reference;
@@ -10,6 +13,7 @@ import org.telegram.telegrise.annotations.TreeController;
 import org.telegram.telegrise.senders.BotSender;
 
 import java.io.File;
+import java.util.List;
 
 @SuppressWarnings("unused")
 @TreeController
@@ -29,14 +33,18 @@ public class SimpleController {
     @OnCreate
     public void initialize() {
         System.out.println("Someone pressed '/start'");
-        try {
-            sender.execute(SendMessage.builder().chatId(memory.getChatId()).text("text").build());
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
     }
 
-    @Reference  // Indicates that method can't be referenced at transcription by using '#' sign
+    @Reference
+    public void respond(Update update){
+        sender.of(update.getMessage())
+                .replyMarkup(new InlineKeyboardMarkup(List.of(new InlineKeyboardRow(InlineKeyboardButton.builder().text("a").callbackData("a").build()))))
+                .disableNotification(true)
+                .disableWebPagePreview(true)
+                .reply("response https://google.com");
+    }
+
+    @Reference  // Indicates that method can be referenced at transcription by using '#' sign
     public void logResponse(Update update) {
         this.memory.put("response", update);
     }
