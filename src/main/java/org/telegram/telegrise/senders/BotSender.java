@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumbnai
 import org.telegram.telegrambots.meta.api.methods.stickers.UploadStickerFile;
 import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
@@ -19,6 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.SessionMemoryImpl;
+import org.telegram.telegrise.senders.actions.CallbackQueryActionBuilder;
 import org.telegram.telegrise.senders.actions.EditableMessageActionBuilder;
 import org.telegram.telegrise.senders.actions.MessageActionBuilder;
 
@@ -47,6 +49,10 @@ public class BotSender {
 
     public EditableMessageActionBuilder ofEditable(Message message){
         return new EditableMessageActionBuilder(this, message);
+    }
+
+    public CallbackQueryActionBuilder of(CallbackQuery callbackQuery) {
+        return new CallbackQueryActionBuilder(this, callbackQuery);
     }
 
     private void finish(@Nullable Message message) {

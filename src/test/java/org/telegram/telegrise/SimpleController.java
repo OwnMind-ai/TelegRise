@@ -50,6 +50,7 @@ public class SimpleController {
     @Reference  // Indicates that method can be referenced at transcription by using '#' sign
     public void logResponse(Update update) {
         this.memory.put("response", update);
+        sender.of(update.getCallbackQuery()).answer("Ok");
     }
 
     @Reference
