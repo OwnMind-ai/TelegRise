@@ -63,7 +63,8 @@ public class SimpleController {
         return text.equals(update.getMessage().getText());
     }
 
-    public Object getNull(){
+    @Reference
+    public String getNull(){
         return null;
     }
 }

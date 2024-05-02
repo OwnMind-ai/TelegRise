@@ -110,7 +110,7 @@ public class ExpressionFactory {
                     pointer += 2;
                 } else if (ch == Syntax.EXPRESSION_START.charAt(0) && this.source.substring(pointer).startsWith(Syntax.EXPRESSION_START)){
                     String current = currentPart.toString();
-                    parts.add(pool -> current);
+                    parts.add(GeneratedValue.ofValue(current));
                     pointer += Syntax.EXPRESSION_START.length();
 
                     try {
@@ -128,7 +128,17 @@ public class ExpressionFactory {
             }
 
             String current = currentPart.toString();
-            parts.add(pool -> current);
+            parts.add(GeneratedValue.ofValue(current));
+
+            return normalized(parts, tClass);
+        }
+
+        private <T> GeneratedValue<T> normalized(List<GeneratedValue<String>> parts, Class<T> tClass) {
+            if (parts.stream().allMatch(GeneratedValue.StaticValue.class::isInstance)){
+                String value = parts.stream().map(i -> tClass.cast(i.generate(null)).toString()).collect(Collectors.joining(""));
+
+                return GeneratedValue.ofValue(tClass.cast(value));
+            }
 
             return (pool) -> tClass.cast(parts.stream().map(i -> tClass.cast(i.generate(pool)).toString()).collect(Collectors.joining("")));
         }

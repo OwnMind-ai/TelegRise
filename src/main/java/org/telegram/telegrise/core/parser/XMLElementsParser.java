@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.parser;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrise.core.ExpressionFactory;
@@ -134,7 +135,11 @@ public class XMLElementsParser {
 
     private void finishElement(TranscriptionElement instance, @NotNull Node node) {
         // ORDER MATTERS:
-        instance.validate(node, transcriptionMemory);
+        if(instance.getClass().getAnnotation(Element.class).validateAfterParsing())
+            this.transcriptionMemory.getPendingValidation().add(Pair.of(instance, node));
+        else
+            instance.validate(node, transcriptionMemory);
+
         instance.load(transcriptionMemory);
         if (instance instanceof StorableElement)
             ((StorableElement) instance).store(transcriptionMemory);

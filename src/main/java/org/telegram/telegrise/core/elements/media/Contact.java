@@ -58,6 +58,11 @@ public class Contact implements MediaType {
     }
 
     @Override
+    public boolean isMediaRequired() {
+        return false;
+    }
+
+    @Override
     public GeneratedValue<String> getFileId() {
         return null;
     }

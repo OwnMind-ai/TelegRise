@@ -13,7 +13,7 @@ import java.util.List;
 @Element(name = "default")
 @Data @NoArgsConstructor
 public class DefaultBranch implements TranscriptionElement {
-    @Attribute(name = "handler")
+    @Attribute(name = "invoke")
     private GeneratedValue<Void> toInvoke;
 
     @Attribute(name = "when")

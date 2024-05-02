@@ -5,9 +5,11 @@ import org.telegram.telegrambots.meta.api.objects.media.*;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.types.CommandData;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 public class MessageUtils {
     private static final Pattern COMMAND_PATTERN = Pattern.compile("^/(?<name>\\w*)(?>@(?<username>.+))?$");
 
@@ -99,5 +101,16 @@ public class MessageUtils {
         result.setCaptionEntities(message.getCaptionEntities());
 
         return result;
+    }
+
+    public static Optional<Integer> getMessageId(Update update) {
+        return update.hasMessage() ? Optional.of(update.getMessage().getMessageId())
+                : update.hasCallbackQuery() ? Optional.of(update.getCallbackQuery().getMessage().getMessageId())
+                : update.hasEditedMessage() ? Optional.of(update.getEditedMessage().getMessageId())
+                : update.hasChannelPost() ? Optional.of(update.getChannelPost().getMessageId())
+                : update.hasEditedChannelPost() ? Optional.of(update.getEditedChannelPost().getMessageId())
+                : update.hasBusinessMessage() ? Optional.of(update.getBusinessMessage().getMessageId())
+                : update.hasEditedBusinessMessage() ? Optional.of(update.getEditedBuinessMessage().getMessageId())
+                : Optional.empty();
     }
 }

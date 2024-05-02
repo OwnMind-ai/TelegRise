@@ -74,4 +74,9 @@ public class Location implements MediaType{
     public GeneratedValue<InputFile> getInputFile() {
         return null;
     }
+
+    @Override
+    public boolean isMediaRequired() {
+        return false;
+    }
 }

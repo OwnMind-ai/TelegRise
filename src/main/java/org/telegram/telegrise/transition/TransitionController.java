@@ -101,26 +101,29 @@ public class TransitionController {
     }
 
     private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
-        BranchingElement requested = this.transcriptionMemory.get(transition.getTarget().generate(pool), BranchingElement.class, Transition.TYPE_LIST);
-        if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + transition.getTarget() + "'");
+        String target = transition.getTarget().generate(pool);
+        BranchingElement requested = this.transcriptionMemory.get(target, BranchingElement.class, Transition.TYPE_LIST);
+        if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + target + "'");
 
         this.sessionMemory.getBranchingElements().add(requested);
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
     }
 
     private void applyNext(Tree tree, Transition transition, ResourcePool pool) {
-        Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(transition.getTarget().generate(pool))).findFirst()
-                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + transition.getTarget() + "' in tree '" + tree.getName() + "'"));
+        final String target = transition.getTarget().generate(pool);
+        Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(target)).findFirst()
+                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + target + "' in tree '" + tree.getName() + "'"));
 
         this.sessionMemory.getBranchingElements().add(next);
     }
 
     private void applyPrevious(Transition transition, ResourcePool pool){
+        String target = transition.getTarget().generate(pool);
+
         for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
             BranchingElement element = it.next();
 
-            String s = transition.getTarget().generate(pool);
-            if (!element.getName().equals(s)) {
+            if (!element.getName().equals(target)) {
                 this.sessionMemory.getBranchingElements().remove(element);
 
                 if (element instanceof Tree){
@@ -136,7 +139,7 @@ public class TransitionController {
             }
         }
 
-        throw new TelegRiseRuntimeException("Unable to find element called '" + transition.getTarget() + "'");
+        throw new TelegRiseRuntimeException("Unable to find element called '" + target + "'");
     }
 
     public void removeExecutor(TreeExecutor executor){

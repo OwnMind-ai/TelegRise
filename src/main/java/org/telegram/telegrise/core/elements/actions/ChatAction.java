@@ -9,10 +9,19 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
+import org.w3c.dom.Node;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Element(name = "chatAction")
 @Data @NoArgsConstructor
 public class ChatAction implements ActionElement{
+    private static final Set<String> ACTIONS = Set.of("typing", "upload_photo", "record_video", "upload_video",
+            "record_voice", "upload_voice", "upload_document", "choose_sticker", "find_location", "record_video_note", "upload_video_note");
+
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
@@ -24,6 +33,13 @@ public class ChatAction implements ActionElement{
 
     @Attribute(name = "returnConsumer")
     private GeneratedValue<ReturnConsumer> returnConsumer;
+
+    @Override
+    public void validate(Node node, TranscriptionMemory memory) {
+        if (!action.validate(ACTIONS::contains))
+            throw new TranscriptionParsingException("Unrecognized chat action. Chat action could be one of following: " +
+                    ACTIONS.stream().sorted().collect(Collectors.joining(", ")), node);
+    }
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {

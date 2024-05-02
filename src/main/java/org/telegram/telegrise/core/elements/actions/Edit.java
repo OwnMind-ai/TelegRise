@@ -23,6 +23,7 @@ import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.w3c.dom.Node;
 
 import java.util.List;
+import java.util.Set;
 
 @Element(name = "edit")
 @Data @NoArgsConstructor
@@ -32,6 +33,7 @@ public class Edit implements ActionElement{
     public static final String EDIT_MEDIA = "media";
     public static final String EDIT_LIVE_LOCATION = "location";
     public static final String EDIT_MARKUP = "markup";
+    public static final Set<String> TYPES = Set.of(EDIT_LIVE_LOCATION, EDIT_TEXT, EDIT_CAPTION, EDIT_MEDIA, EDIT_MARKUP);
 
     public static final String CALLBACK = "callback";
     public static final String LAST = "last";
@@ -74,6 +76,10 @@ public class Edit implements ActionElement{
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
+        if (type != null && !type.validate(TYPES::contains))
+            throw new TranscriptionParsingException("Unrecognized type. Type could be one of the following: " +
+                    String.join(", ", TYPES), node);
+
         if (keyboard != null && keyboard.getCreate() == null && !keyboard.getType().equals(Keyboard.INLINE))
             throw new TranscriptionParsingException("New keyboard must be type of 'inline'", node);
 

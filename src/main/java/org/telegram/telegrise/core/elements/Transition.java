@@ -9,9 +9,11 @@ import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
-@Element(name = "transition")
+@Element(name = "transition", validateAfterParsing = true)
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Transition implements TranscriptionElement{
     public static final String NEXT = "next";
@@ -59,5 +61,32 @@ public class Transition implements TranscriptionElement{
 
         if (type == null && CALLER.equals(this.direction))
             throw new TranscriptionParsingException("Caller type for direction '" + CALLER + "' is not specified", node);
+
+        validateTarget(node, memory);
+    }
+
+    private void validateTarget(Node node, TranscriptionMemory memory) {
+        if (CALLER.equals(this.direction)) return;
+
+        // Code fragment 'this.target.generate(null)' is allowed in the code bellow because if tests fail,
+        // then this.target is for sure an instance of StaticValue class
+
+        if (LOCAL.equals(direction) && !this.target.validate(createValidationFor(memory, Branch.class)))
+            throw new TranscriptionParsingException("Unable to find branch named '" + this.target.generate(null) + "'" , node);
+
+        if ((JUMP.equals(direction) || NEXT.equals(direction) || PREVIOUS.equals(direction)) && !this.target.validate(createValidationFor(memory, Tree.class, Menu.class)))
+            throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'", node);
+
+
+    }
+
+    @SafeVarargs
+    private Predicate<String> createValidationFor(TranscriptionMemory memory, Class<? extends TranscriptionElement>... classes) {
+        return s -> {
+            if (s == null) return false;
+            TranscriptionElement element = memory.get(s);
+
+            return Arrays.stream(classes).anyMatch(c -> c.isInstance(element));
+        };
     }
 }
