@@ -1,11 +1,13 @@
-package org.telegram.telegrise;
+package org.telegram.telegrise.utils;
 
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.media.*;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.types.CommandData;
 
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,14 +105,44 @@ public class MessageUtils {
         return result;
     }
 
-    public static Optional<Integer> getMessageId(Update update) {
-        return update.hasMessage() ? Optional.of(update.getMessage().getMessageId())
-                : update.hasCallbackQuery() ? Optional.of(update.getCallbackQuery().getMessage().getMessageId())
-                : update.hasEditedMessage() ? Optional.of(update.getEditedMessage().getMessageId())
-                : update.hasChannelPost() ? Optional.of(update.getChannelPost().getMessageId())
-                : update.hasEditedChannelPost() ? Optional.of(update.getEditedChannelPost().getMessageId())
-                : update.hasBusinessMessage() ? Optional.of(update.getBusinessMessage().getMessageId())
-                : update.hasEditedBusinessMessage() ? Optional.of(update.getEditedBuinessMessage().getMessageId())
-                : Optional.empty();
+    public static Integer getMessageId(Update update) {
+        return update.hasMessage() ? (update.getMessage().getMessageId())
+                : update.hasCallbackQuery() ? (update.getCallbackQuery().getMessage().getMessageId())
+                : update.hasEditedMessage() ? (update.getEditedMessage().getMessageId())
+                : update.hasChannelPost() ? (update.getChannelPost().getMessageId())
+                : update.hasEditedChannelPost() ? (update.getEditedChannelPost().getMessageId())
+                : update.hasBusinessMessage() ? (update.getBusinessMessage().getMessageId())
+                : update.hasEditedBusinessMessage() ? (update.getEditedBuinessMessage().getMessageId())
+                : null;
+    }
+
+    @Reference
+    public static boolean hasMessage(Update update){
+        return update.hasMessage();
+    }
+
+    @Reference
+    public static boolean hasTextMessage(Update update){
+        return update.hasMessage() && update.getMessage().hasText();
+    }
+
+    @Reference
+    public static boolean hasCallback(Update update){
+        return update.hasCallbackQuery();
+    }
+
+    @Reference
+    public static boolean key(Update update, String key){
+        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals(key.trim());
+    }
+
+    @Reference
+    public static boolean callbackData(Update update, String key){
+        return update.hasCallbackQuery() && update.getCallbackQuery().getData().equals(key.trim());
+    }
+
+    @Reference
+    public static ReplyKeyboard keyboardRemove(){
+        return new ReplyKeyboardRemove(true);
     }
 }

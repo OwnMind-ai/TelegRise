@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrise.MessageUtils;
+import org.telegram.telegrise.utils.MessageUtils;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;

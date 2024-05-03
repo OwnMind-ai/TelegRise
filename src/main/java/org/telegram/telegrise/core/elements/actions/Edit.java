@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessa
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrise.MessageUtils;
+import org.telegram.telegrise.utils.MessageUtils;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;

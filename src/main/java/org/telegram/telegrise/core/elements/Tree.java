@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.ChatTypes;
-import org.telegram.telegrise.MessageUtils;
+import org.telegram.telegrise.utils.MessageUtils;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;

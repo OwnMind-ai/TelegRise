@@ -16,6 +16,7 @@ import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
+import org.telegram.telegrise.utils.MessageUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
