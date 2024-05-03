@@ -42,7 +42,7 @@ Firstly, create your first transcription .xml file. Here is an example of one (i
             <!-- Executes default branch if no valid branch was found and if
                  'messageSent' method in SimpleController instance returns 'true' and
                  the message text is not "Hello!"-->
-            <default when="#messageSent AND #messageText(update, &quot;Hello!&quot;) -> #not">
+            <default when="#messageSent AND #messageText(update, ''Hello!'') -> #not">
                 <send>Unrecognized command. Say what?</send>
             </default>
         </tree>
