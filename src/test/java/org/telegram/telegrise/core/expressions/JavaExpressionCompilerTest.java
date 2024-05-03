@@ -20,12 +20,12 @@ public class JavaExpressionCompilerTest {
     @Test
     void parse() throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         JavaExpressionCompiler parser = new JavaExpressionCompiler(JavaExpressionCompiler.getTempDirectory());
-        String expression = "controller.getData(update.getCallbackQuery())";
+        String expression = "controller.getData(update.getCallbackQuery(), '' and done'')";
         LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader()));
         ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));
 
-        assertEquals("data", parser.compile(expression, namespace, String.class, toNode("<tag expression=\"${" + expression + "}\"/>")).generate(resourcePool));
+        assertEquals("data and done", parser.compile(expression, namespace, String.class, toNode("<tag expression=\"${" + expression + "}\"/>")).generate(resourcePool));
 
         expression = "controller.getData(update.getCallbackQuery()) + #reference";
         String finalExpression = expression;
@@ -37,7 +37,7 @@ public class JavaExpressionCompilerTest {
     }
 
     @SuppressWarnings("unused")
-    public String getData(CallbackQuery query){
-        return query.getData();
+    public String getData(CallbackQuery query, String s){
+        return query.getData() + s;
     }
 }
