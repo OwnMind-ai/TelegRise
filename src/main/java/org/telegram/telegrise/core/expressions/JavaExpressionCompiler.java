@@ -42,7 +42,6 @@ public class JavaExpressionCompiler {
 
     private final File tempDirectoryPath;
     private final URLClassLoader classLoader;
-    private final JavaExpressionPreprocessor preprocessor = new JavaExpressionPreprocessor();
 
     public JavaExpressionCompiler(String tempDirectoryPath) {
         this.tempDirectoryPath = new File(tempDirectoryPath);
@@ -58,8 +57,6 @@ public class JavaExpressionCompiler {
 
         if (this.isExpressionExists(hashcode))
             return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
-
-        expression = preprocessor.process(expression);
 
         JavaClassSource source;
         List<Class<?>> imported;
