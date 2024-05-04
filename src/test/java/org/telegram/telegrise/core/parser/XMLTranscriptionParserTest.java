@@ -128,7 +128,7 @@ public class XMLTranscriptionParserTest {
     }
 
     @Reference
-    private boolean predicate(Update update){
+    public boolean predicate(Update update){
         return true;
     }
 }
