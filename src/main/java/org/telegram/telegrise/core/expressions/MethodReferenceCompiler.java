@@ -14,6 +14,7 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 public class MethodReferenceCompiler {
@@ -136,6 +137,9 @@ public class MethodReferenceCompiler {
             throw new TranscriptionParsingException("More than one method called '" + token.getMethod() + "' are decelerated in class '" + parentClass.getName() + "'", node);
 
         Method method = found[0];
+
+        if ((method.getModifiers() & Modifier.PUBLIC) == 0)
+            throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);
 
         if (token.getParams() == null) {
             return new MethodReference(method, token.isStatic());
