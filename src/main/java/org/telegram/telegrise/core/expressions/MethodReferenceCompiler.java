@@ -50,68 +50,69 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileExpression(ExpressionToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
-        if(token.getOperatorToken().getOperator().equals(Syntax.AND_OPERATOR) || token.getOperatorToken().getOperator().equals(Syntax.OR_OPERATOR)){
-            ReferenceExpression left = this.compile(token.getLeft(), namespace, Boolean.class, node);
-            ReferenceExpression right = this.compile(token.getRight(), namespace,  Boolean.class, node);
+        switch (token.getOperatorToken().getOperator()) {
+            case Syntax.AND_OPERATOR:
+            case Syntax.OR_OPERATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, Boolean.class, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, Boolean.class, node);
 
-            if (!Boolean.class.isAssignableFrom(left.returnType()) && !boolean.class.isAssignableFrom(left.returnType())){
-                throw new TranscriptionParsingException(
-                        "Unable to apply '" + token.getOperatorToken().getOperator() + "' operator: left side returns non-boolean value", node);
+                if (!Boolean.class.isAssignableFrom(left.returnType()) && !boolean.class.isAssignableFrom(left.returnType())) {
+                    throw new TranscriptionParsingException(
+                            "Unable to apply '" + token.getOperatorToken().getOperator() + "' operator: left side returns non-boolean value", node);
+                }
+
+                if (!Boolean.class.isAssignableFrom(right.returnType()) && !boolean.class.isAssignableFrom(right.returnType())) {
+                    throw new TranscriptionParsingException(
+                            "Unable to apply '" + token.getOperatorToken().getOperator() + "' operator: right side returns non-boolean value", node);
+                }
+
+                OperationReference<Boolean, Boolean> reference = new OperationReference<>(Boolean.class);
+                reference.setLeft(left);
+                reference.setRight(right);
+
+                if (token.getOperatorToken().getOperator().equals(Syntax.AND_OPERATOR)) {
+                    reference.setOperation((l, r) -> l.invoke() && r.invoke());
+                } else {
+                    reference.setOperation((l, r) -> l.invoke() || r.invoke());
+                }
+
+                return reference;
             }
+            case Syntax.CHAIN_SEPARATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
 
-            if (!Boolean.class.isAssignableFrom(right.returnType()) && !boolean.class.isAssignableFrom(right.returnType())){
-                throw new TranscriptionParsingException(
-                        "Unable to apply '" + token.getOperatorToken().getOperator() + "' operator: right side returns non-boolean value", node);
+                if (right.parameterTypes().length != 1 || !(right.parameterTypes()[0].isAssignableFrom(left.returnType())
+                        || ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(left.returnType()))) {
+                    throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type than right side consumes", node);
+                }
+
+                OperationReference<?, ?> reference = new OperationReference<>(right.returnType());
+                reference.setLeft(left);
+                reference.setRight(right);
+                reference.setOperation((l, r) -> r.invoke(l.invoke()));
+                reference.setParameters(left.parameterTypes());
+                reference.setComposeRight(false);
+
+                return reference;
             }
+            case Syntax.PARALLEL_SEPARATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
 
-            OperationReference<Boolean, Boolean> reference = new OperationReference<>(Boolean.class);
-            reference.setLeft(left);
-            reference.setRight(right);
+                OperationReference<?, ?> reference = new OperationReference<>(left.returnType());
+                reference.setLeft(left);
+                reference.setRight(right);
+                reference.setOperation((l, r) -> {
+                    Object result = l.invoke();
+                    r.invoke();
 
-            if (token.getOperatorToken().getOperator().equals(Syntax.AND_OPERATOR)){
-                reference.setOperation((l, r) -> l.invoke() && r.invoke());
-            } else {
-                reference.setOperation((l, r) -> l.invoke() || r.invoke());
+                    return result;
+                });
+                reference.setParameters(left.parameterTypes());
+
+                return reference;
             }
-
-            return reference;
-        }
-
-        if (token.getOperatorToken().getOperator().equals(Syntax.CHAIN_SEPARATOR)){
-            ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
-            ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
-
-            if (right.parameterTypes().length != 1 || !(right.parameterTypes()[0].isAssignableFrom(left.returnType())
-                || ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(left.returnType())))
-            {
-                throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type than right side consumes", node);
-            }
-
-            OperationReference<?, ?> reference = new OperationReference<>(right.returnType());
-            reference.setLeft(left);
-            reference.setRight(right);
-            reference.setOperation((l, r) -> r.invoke(l.invoke()));
-            reference.setParameters(left.parameterTypes());
-
-            return reference;
-        }
-
-        if (token.getOperatorToken().getOperator().equals(Syntax.PARALLEL_SEPARATOR)){
-            ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
-            ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
-
-            OperationReference<?, ?> reference = new OperationReference<>(left.returnType());
-            reference.setLeft(left);
-            reference.setRight(right);
-            reference.setOperation((l, r) -> {
-                Object result = l.invoke();
-                r.invoke();
-
-                return result;
-            });
-            reference.setParameters(left.parameterTypes());
-
-            return reference;
         }
 
         throw new IllegalArgumentException();
