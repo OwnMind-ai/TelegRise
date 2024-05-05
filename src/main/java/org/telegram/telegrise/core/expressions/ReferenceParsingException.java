@@ -2,10 +2,9 @@ package org.telegram.telegrise.core.expressions;
 
 import lombok.Getter;
 
+@Getter
 public class ReferenceParsingException extends Exception{
-    @Getter
     private final ErrorCodes errorCode;
-    @Getter
     private final int position;
 
     public ReferenceParsingException(ErrorCodes errorCode, int position) {

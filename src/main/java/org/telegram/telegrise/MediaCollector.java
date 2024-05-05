@@ -1,8 +1,8 @@
 package org.telegram.telegrise;
 
 import lombok.Setter;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.time.Duration;
@@ -23,14 +23,14 @@ public class MediaCollector {
 
     public List<Message> collect(Update first){
         if (!first.hasMessage() )
-            throw new TelegRiseRuntimeException("Unable to collect mediagroup: first update does not store message");
+            throw new TelegRiseRuntimeException("Unable to collect media group: first update does not store message");
 
         return this.collect(first.getMessage());
     }
 
     public List<Message> collect(Message first){
         if (first.getMediaGroupId() == null)
-            throw new TelegRiseRuntimeException("Unable to collect mediagroup: first message doesn't have mediagroupID");
+            throw new TelegRiseRuntimeException("Unable to collect media group: first message doesn't have mediagroupID");
 
         String mediagroupId = first.getMediaGroupId();
         List<Message> result = new LinkedList<>();

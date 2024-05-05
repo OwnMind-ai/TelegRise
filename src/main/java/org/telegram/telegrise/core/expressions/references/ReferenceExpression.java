@@ -2,9 +2,9 @@ package org.telegram.telegrise.core.expressions.references;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -37,7 +37,7 @@ public interface ReferenceExpression extends Serializable {
 
             try {
                 Object result = this.invoke(pool, pool.getHandler(), parameters);
-                return ClassUtils.isAssignable(type, Void.class) ? null : (U) result;
+                return ClassUtils.isAssignable(type, Void.class) ? null : type.cast(result);
             } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e.getCause());
             }

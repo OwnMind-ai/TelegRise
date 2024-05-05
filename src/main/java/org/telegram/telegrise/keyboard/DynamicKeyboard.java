@@ -9,23 +9,29 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Represents a dynamic keyboard object.
- * DynamicKeyboard contains list of DynamicRows and attributes needed for ReplyKeyboardMarkup.
+ * DynamicKeyboard contains a list of DynamicRows and attributes needed for ReplyKeyboardMarkup.
  * <p>
- * Dynamic keyboard can be declared in transcription using following code (replace square brackets with corresponding values): 
+ * Dynamic keyboard can be declared in transcription using the following code
+ * (replace square brackets with corresponding values):
  * <pre>
  * &lt;keyboard type="[inline/reply] dynamic="true" id="[YourKeyboardID]"&gt;...&lt;/keyboard&gt;
  * </pre>
- * Once a dynamic keyboard has been created, it will be placed in <code>SessionMemory</code> with the ID provided as a key v. * 
+ * Once a dynamic keyboard has been created,
+ * it will be placed in <code>SessionMemory</code> with the ID provided as a key v. *
  * 
  * @see DynamicButton
  * @see DynamicRow
  * @since 0.4
  */
+@SuppressWarnings("unused")
 public final class DynamicKeyboard implements Serializable {
     public static DynamicKeyboard ofKeyboard(Keyboard keyboard, ResourcePool pool){
         DynamicKeyboard dynamicKeyboard = new DynamicKeyboard();
@@ -37,7 +43,7 @@ public final class DynamicKeyboard implements Serializable {
                         .forEach(s -> dynamicKeyboard.switches.put(((SwitchButton) s).getName(), (SwitchButton) s));
 
                 return dynamicRow;
-            }).collect(Collectors.toList()));
+            }).toList());
         }
 
         dynamicKeyboard.isPersistent = keyboard.getPersistent();
@@ -103,7 +109,7 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     /**
-     * Finds a switch button object with given key. 
+     * Finds a switch button object with a given key.
      * Provided key can be a name of switch button or a callback data it produces, such as <code>"[name]-on"</code> or <code>"[name]-off"</code>.
      * 
      * @param key Key related to the target switch
@@ -135,7 +141,7 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     /**
-     * Finds a switch button object with given query. 
+     * Finds a switch button object with a given query.
      * 
      * @param query callback query of pressed switch
      * @return Switch button object or null if none found
@@ -146,7 +152,7 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     /**
-    * Returns an immutable copy of switches list.
+    * Returns an immutable copy of the switches list.
     * 
     * @return list of SwitchButton objects
     * @see SwitchButton
@@ -156,7 +162,7 @@ public final class DynamicKeyboard implements Serializable {
     }
 
     /**
-     * Retuns a DynamicButton that contained at given row and column.
+     * Returns a DynamicButton that contained at given row and column.
      * 
      * @param row keyboard's row where to take a button from
      * @param column row's column where to take a button from

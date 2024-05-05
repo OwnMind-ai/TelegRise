@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class XMLElementsParser {
@@ -221,7 +220,7 @@ public class XMLElementsParser {
                 PropertyUtils.setSimpleProperty(instance, field.getName(), fieldNodes.stream()
                         .map(n -> {
                             try { return parse(n); } catch (Exception e) { throw new TelegRiseInternalException(e); }
-                        }).collect(Collectors.toUnmodifiableList())
+                        }).toList()
                 );
             } else {
                 if (fieldNodes.size() == 1)

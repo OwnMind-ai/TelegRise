@@ -4,22 +4,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
+import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
-import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrise.utils.MessageUtils;
 import org.telegram.telegrise.ReturnConsumer;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.elements.text.Text;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
+import org.telegram.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -128,14 +131,14 @@ public class Edit implements ActionElement{
 
         String type = this.type != null ? this.type.generate(resourcePool) : this.getTypeFromMessage(message);
 
-        switch (type){
-            case EDIT_TEXT: return this.editText(resourcePool, messageId);
-            case EDIT_CAPTION: return this.editCaption(resourcePool, messageId);
-            case EDIT_MEDIA: return this.editMedia(resourcePool, messageId);
-            case EDIT_MARKUP: return this.editMarkup(resourcePool, messageId);
-            case EDIT_LIVE_LOCATION: return this.editLocation(resourcePool, messageId);
-            default: throw new RuntimeException();
-        }
+        return switch (type) {
+            case EDIT_TEXT -> this.editText(resourcePool, messageId);
+            case EDIT_CAPTION -> this.editCaption(resourcePool, messageId);
+            case EDIT_MEDIA -> this.editMedia(resourcePool, messageId);
+            case EDIT_MARKUP -> this.editMarkup(resourcePool, messageId);
+            case EDIT_LIVE_LOCATION -> this.editLocation(resourcePool, messageId);
+            default -> throw new RuntimeException();
+        };
     }
 
     private String getTypeFromMessage(Message message) {

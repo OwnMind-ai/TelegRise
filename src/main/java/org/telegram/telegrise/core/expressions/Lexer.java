@@ -190,7 +190,7 @@ public final class Lexer {
                     parameter.append(charsStream.next());
                     if (opened == closed) {
                         String last = parameter.toString();
-                        this.params.add(last.substring(0, last.length() - 1));  // Removes redundant ')' at the end
+                        this.params.add(last.substring(0, last.length() - 1));  // Removes redundant ")" at the end
                         break;
                     }
                 } else {

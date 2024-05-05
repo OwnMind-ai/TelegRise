@@ -128,10 +128,9 @@ public class TelegramSessionsController {
 
     //TODO custom session loader
     public void loadSession(SessionMemory memory){
-        if (!(memory instanceof SessionMemoryImpl))
+        if (!(memory instanceof SessionMemoryImpl sessionMemory))
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
-        SessionMemoryImpl sessionMemory = (SessionMemoryImpl) memory;
         UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager);
 
         this.sessions.put(sessionMemory.getUserIdentifier(), session);

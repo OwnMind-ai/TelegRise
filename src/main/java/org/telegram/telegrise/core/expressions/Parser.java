@@ -96,12 +96,13 @@ public class Parser {
     }
 
     private int getPrecedence(@NotNull String operator) throws ReferenceParsingException {
-        switch (operator.toUpperCase()){
-            case PARALLEL_SEPARATOR: return 1;
-            case OR_OPERATOR: return 4;
-            case AND_OPERATOR: return 5;
-            case CHAIN_SEPARATOR : return 11;
-            default: throw new ReferenceParsingException(ErrorCodes.UNDEFINED_OPERATOR, this.lexer.getPosition() - operator.length());
-        }
+        return switch (operator.toUpperCase()) {
+            case PARALLEL_SEPARATOR -> 1;
+            case OR_OPERATOR -> 4;
+            case AND_OPERATOR -> 5;
+            case CHAIN_SEPARATOR -> 11;
+            default ->
+                    throw new ReferenceParsingException(ErrorCodes.UNDEFINED_OPERATOR, this.lexer.getPosition() - operator.length());
+        };
     }
 }

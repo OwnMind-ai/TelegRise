@@ -11,11 +11,11 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -62,9 +62,10 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
         parser.load();
 
-        Node node = toNode("<send chat=\"-1\" disableWebPagePreview=\"true\">\n" +
-                "                    <text>Text</text>\n" +
-                "                </send>");
+        Node node = toNode("""
+                <send chat="-1" disableWebPagePreview="true">
+                                    <text>Text</text>
+                                </send>""");
 
         Send expected = new Send();
         expected.setText(new Text("Text", "html"));
@@ -79,11 +80,12 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
         parser.load();
 
-        Node node = toNode("<branch when=\"true\">\n" +
-                "                <send chat=\"-1\">\n" +
-                "                    <text>Text</text>\n" +
-                "                </send>\n" +
-                "            </branch>");
+        Node node = toNode("""
+                <branch when="true">
+                                <send chat="-1">
+                                    <text>Text</text>
+                                </send>
+                            </branch>""");
 
         Send expectedSend = new Send();
         expectedSend.setText(new Text("Text", "html"));
@@ -103,20 +105,21 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(this.getClass(), namespace), null);
         parser.load();
 
-        Node node = toNode("<tree name=\"name\" predicate=\"true\" callbackTriggers=\"callback-data\" keys=\"first; second\" commands=\"example\"\n" +
-                "              controller=\"XMLElementsParserTest\">\n" +
-                "            <send chat=\"-1\">\n" +
-                "               <text parseMode=\"markdown\">Text</text>\n" +
-                "            </send>" +
-                "            <branch when=\"true\">\n" +
-                "                <send chat=\"-1\">\n" +
-                "                    <text>Text</text>\n" +
-                "                </send>\n" +
-                "                <send chat=\"-1\">\n" +
-                "                    <text>Text</text>\n" +
-                "                </send>\n"+
-                "            </branch>" +
-                "       </tree>");
+        Node node = toNode("""
+                <tree name="name" predicate="true" callbackTriggers="callback-data" keys="first; second" commands="example"
+                              controller="XMLElementsParserTest">
+                            <send chat="-1">
+                               <text parseMode="markdown">Text</text>
+                            </send>\
+                            <branch when="true">
+                                <send chat="-1">
+                                    <text>Text</text>
+                                </send>
+                                <send chat="-1">
+                                    <text>Text</text>
+                                </send>
+                            </branch>\
+                       </tree>""");
 
         Send expectedSend = new Send();
         expectedSend.setText(new Text("Text", "html"));
@@ -148,14 +151,15 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
         parser.load();
 
-        Node node = toNode("<keyboard name=\"name\" type=\"inline\">\n" +
-                "                    <row>\n" +
-                "                        <button data=\"first\">First</button>\n" +
-                "                        <button data=\"second\">Second</button>\n" +
-                "                        <button data=\"third\" when=\"${false}\">Third</button>\n" +
-                "                    </row>\n" +
-                "                    <row><button url=\"url\">URL</button></row>\n" +
-                "                </keyboard>");
+        Node node = toNode("""
+                <keyboard name="name" type="inline">
+                                    <row>
+                                        <button data="first">First</button>
+                                        <button data="second">Second</button>
+                                        <button data="third" when="${false}">Third</button>
+                                    </row>
+                                    <row><button url="url">URL</button></row>
+                                </keyboard>""");
 
         InlineKeyboardMarkup expected = new InlineKeyboardMarkup(List.of(
                 new InlineKeyboardRow(
@@ -173,17 +177,19 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), null);
         parser.load();
 
-        Node node = toNode("<send chat=\"-1\" disableWebPagePreview=\"true\">\n" +
-                "                    <text>Text</text>\n" +
-                "                    <unrecognized/>"+
-                "                </send>");
+        Node node = toNode("""
+                <send chat="-1" disableWebPagePreview="true">
+                                    <text>Text</text>
+                                    <unrecognized/>\
+                                </send>""");
 
         Node finalNode = node;
         assertThrows(TranscriptionParsingException.class, () -> parser.parse(finalNode));
 
-        node = toNode("<send chat=\"-1\" unrecognized=\"\" disableWebPagePreview=\"true\">\n" +
-                "                    <text>Text</text>\n" +
-                "                </send>");
+        node = toNode("""
+                <send chat="-1" unrecognized="" disableWebPagePreview="true">
+                                    <text>Text</text>
+                                </send>""");
 
         Node finalNode1 = node;
         assertThrows(TranscriptionParsingException.class, () -> parser.parse(finalNode1));

@@ -12,12 +12,14 @@ import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SessionMemoryImpl implements SessionMemory {
+    @Serial
     private static final long serialVersionUID = -8011212970107619938L;
 
     /*

@@ -37,16 +37,14 @@ public class MethodReferenceCache{
     }
 
     private CacheContext extractContext(ResourcePool pool) {
-        switch (this.strategy){
-            case UPDATE:
-                return pool.getUpdate() != null ? new CacheContext(pool.getUpdate()) : CacheContext.INVALID;
-            case TREE:
-                return pool.getMemory().isOnStack(Tree.class) ? new CacheContext(pool.getMemory().getFromStack(Tree.class)) : CacheContext.INVALID;
-            case BRANCH:
-                return pool.getMemory().getCurrentBranch().get() != null ? new CacheContext(pool.getMemory().getCurrentBranch().get()) : CacheContext.INVALID;
-            default:
-                throw new IllegalStateException();
-        }
+        return switch (this.strategy) {
+            case UPDATE -> pool.getUpdate() != null ? new CacheContext(pool.getUpdate()) : CacheContext.INVALID;
+            case TREE ->
+                    pool.getMemory().isOnStack(Tree.class) ? new CacheContext(pool.getMemory().getFromStack(Tree.class)) : CacheContext.INVALID;
+            case BRANCH ->
+                    pool.getMemory().getCurrentBranch().get() != null ? new CacheContext(pool.getMemory().getCurrentBranch().get()) : CacheContext.INVALID;
+            default -> throw new IllegalStateException();
+        };
     }
 
     public boolean isCacheApplicable(ResourcePool pool) {

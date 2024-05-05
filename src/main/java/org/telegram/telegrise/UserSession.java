@@ -10,7 +10,10 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
@@ -22,13 +25,15 @@ import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 import org.telegram.telegrise.utils.MessageUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.telegram.telegrise.core.elements.Tree.*;
 
@@ -165,7 +170,7 @@ public class UserSession implements Runnable{
         List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
         List<Tree> trees = this.transcription.getRootMenu().getTrees().stream()
                 .filter(t -> t.isChatApplicable(lastScopes, chat))
-                .collect(Collectors.toList());
+                .toList();
 
         if (update.hasCallbackQuery() && (containAll || scopes.contains(INTERRUPT_BY_CALLBACKS))){
             Optional<Tree> candidate = trees.stream()

@@ -51,8 +51,7 @@ public class UniversalSender {
         PartialBotApiMethod<?> method = action.generateMethod(pool);
         Object result = this.execute(method);
 
-        if (result instanceof List<?>) {
-            List<?> resultList = (List<?>) result;
+        if (result instanceof List<?> resultList) {
             if (!resultList.isEmpty() && resultList.get(0) instanceof Message)
                 pool.getMemory().setLastSentMessage((Message) resultList.get(0));
 

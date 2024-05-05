@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.SessionMemory;
+import org.telegram.telegrise.senders.BotSender;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class LocalNamespace {
@@ -15,10 +15,12 @@ public class LocalNamespace {
     public String getResourceInitializationCode(String poolName){
         String handlerClassName = handlerClass != null ? handlerClass.getName() : "Object";
 
-        return String.format("%s %s = %s.getUpdate();\n" +
-                        "%s %s = %s.getHandler() instanceof %s ? (%s) %s.getHandler() : null;\n" +
-                        "%s %s = %s.getSender();\n" +
-                        "%s %s = %s.getMemory();\n",
+        return String.format("""
+                        %s %s = %s.getUpdate();
+                        %s %s = %s.getHandler() instanceof %s ? (%s) %s.getHandler() : null;
+                        %s %s = %s.getSender();
+                        %s %s = %s.getMemory();
+                        """,
                 Update.class.getName(), applicationNamespace.getUpdateName(), poolName,
                 handlerClassName, applicationNamespace.getControllerName(), poolName, handlerClassName, handlerClassName, poolName,
                 BotSender.class.getName(), applicationNamespace.getSenderName(), poolName,

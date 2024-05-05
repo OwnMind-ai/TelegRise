@@ -3,9 +3,9 @@ package org.telegram.telegrise.core.expressions.references;
 import lombok.Setter;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.w3c.dom.Node;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,8 +47,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
         Object[] parameters = flexible ? composeParameters(reference, args) : args;
 
         // for cases like #getNull -> (#first OPERATOR #second)
-        if (!flexible && reference instanceof OperationReference){
-            OperationReference<?, ?> r = (OperationReference<?, ?>) reference;
+        if (!flexible && reference instanceof OperationReference<?, ?> r){
             r.setComposeRight(false);
             r.setComposeLeft(false);
         }

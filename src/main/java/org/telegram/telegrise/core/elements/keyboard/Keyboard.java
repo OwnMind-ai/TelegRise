@@ -7,13 +7,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrise.SessionMemory;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.InteractiveElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.types.KeyboardMarkup;
@@ -168,14 +171,11 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
         if (memory.containsKey(this.id)){
             DynamicKeyboard keyboard = memory.get(this.id, DynamicKeyboard.class);
 
-            switch (type.toLowerCase()) {
-                case INLINE:
-                    return keyboard.createInline(pool);
-                case REPLY:
-                    return keyboard.createReply(pool);
-                default:
-                    throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
-            }
+            return switch (type.toLowerCase()) {
+                case INLINE -> keyboard.createInline(pool);
+                case REPLY -> keyboard.createReply(pool);
+                default -> throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
+            };
         } else {
             DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);
             memory.put(this.id, keyboard);

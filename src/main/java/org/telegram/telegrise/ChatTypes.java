@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public final class ChatTypes {
     public static final String ALL = "all";
     public static final String PRIVATE = "private";
@@ -31,14 +32,11 @@ public final class ChatTypes {
     }
 
     public static List<String> chatTypesToScopes(String[] chatTypes){
-        return Arrays.stream(chatTypes).map(type -> {
-            switch (type){
-                case ALL: return DEFAULT_SCOPE;
-                case PRIVATE: return new BotCommandScopeAllPrivateChats().getType();
-                case SUPERGROUP:
-                case GROUP: return new BotCommandScopeAllGroupChats().getType();
-                default: return null;
-            }
+        return Arrays.stream(chatTypes).map(type -> switch (type) {
+            case ALL -> DEFAULT_SCOPE;
+            case PRIVATE -> new BotCommandScopeAllPrivateChats().getType();
+            case SUPERGROUP, GROUP -> new BotCommandScopeAllGroupChats().getType();
+            default -> null;
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

@@ -3,7 +3,7 @@ package org.telegram.telegrise.annotations;
 import java.lang.annotation.*;
 
 /**
- * Indicates that an annotated class can be used as controller for a tree.
+ * Indicates that an annotated class can be used as a controller for a tree.
  * Tree controller should have a constructor with no arguments.
  * <p>
  * After selecting the next dialog tree and creating the tree controller, annotated resources are injected, followed by invoking method annotated by <code>OnCreate</code>, if exists.

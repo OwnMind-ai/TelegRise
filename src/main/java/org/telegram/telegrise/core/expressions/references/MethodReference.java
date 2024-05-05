@@ -7,6 +7,7 @@ import org.telegram.telegrise.core.ResourcePool;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -61,6 +62,7 @@ public class MethodReference implements ReferenceExpression{
         return method.getReturnType();
     }
 
+    @Serial
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException, NoSuchMethodException {
         stream.defaultReadObject();
         assert this.declaringClass != null && this.methodGetter != null : "Corrupted serialized object of class " + this.getClass().getSimpleName();

@@ -2,7 +2,8 @@ package org.telegram.telegrise.transition;
 
 import lombok.Getter;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.*;
+import org.telegram.telegrise.SessionMemoryImpl;
+import org.telegram.telegrise.TreeExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
@@ -32,14 +33,27 @@ public class TransitionController {
     }
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
-        switch (transition.getDirection()){
-            case Transition.NEXT: this.applyNext(tree, transition, pool); return false;
-            case Transition.PREVIOUS: this.applyPrevious(transition, pool); return false;
-            case Transition.JUMP: this.applyJump(tree, transition, pool); return false;
-            case Transition.LOCAL: this.applyLocal(tree, transition, pool); return true;   // INTERRUPTING
-            case Transition.CALLER: return this.applyCaller(tree, transition, pool);
-            default: throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
-        }
+
+        return switch (transition.getDirection()) {
+            case Transition.NEXT -> {
+                this.applyNext(tree, transition, pool);
+                yield false;
+            }
+            case Transition.PREVIOUS -> {
+                this.applyPrevious(transition, pool);
+                yield false;
+            }
+            case Transition.JUMP -> {
+                this.applyJump(tree, transition, pool);
+                yield false;
+            }
+            case Transition.LOCAL -> {
+                this.applyLocal(tree, transition, pool);
+                yield true; // INTERRUPTING
+            }
+            case Transition.CALLER -> this.applyCaller(tree, transition, pool);
+            default -> throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
+        };
     }
 
     private boolean applyCaller(Tree tree, Transition transition, ResourcePool pool) {

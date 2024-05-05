@@ -1,9 +1,8 @@
 package org.telegram.telegrise.resources;
 
 import lombok.Getter;
-import org.telegram.telegrise.exceptions.TelegRiseInternalException;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.annotations.Resource;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

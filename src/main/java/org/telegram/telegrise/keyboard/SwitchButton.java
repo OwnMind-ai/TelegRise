@@ -9,13 +9,14 @@ import org.telegram.telegrise.core.elements.keyboard.Switch;
  * Represents a dynamic switch that used in <a href="#{@link}">{@link org.telegram.telegrise.keyboard.DynamicKeyboard DynamicKeyboard}</a>.
  * Switch buttons contain two button states that replace each other when interacting with them. 
  * <p>
- * After interacting with the switch, it changes its callback data using folowing pattern (replace square brackets with corresponding values):
- * <code>[SWITCH_NAME]-[on/off]</code>. This callback data indecates next switch state after interacting with it, 
+ * After interacting with the switch, it changes its callback data using the following pattern (replace square brackets with corresponding values):
+ * <code>[SWITCH_NAME]-[on/off]</code>. This callback data indicates next switch state after interacting with it,
  * so that enabled switch will produce <code>[SWITCH_NAME]-off</code> and disabled will produce <code>[SWITCH_NAME]-on</code>.
  * 
  * @see DynamicButton
  * @since 0.4
  */
+@Getter
 public final class SwitchButton extends DynamicButton{
     /**
     * Creates a switch button from a <a href="#{@link}">{@link org.telegram.telegrise.core.elements.keyboard.Switch Switch}</a> object.
@@ -39,13 +40,9 @@ public final class SwitchButton extends DynamicButton{
     public static final String OFF_SUFFIX = "-off";
     public static final String ON_SUFFIX = "-on";
 
-    @Getter
     private final GeneratedValue<String> onState;
-    @Getter
     private final GeneratedValue<String> offState;
-    @Getter
     private final String name;
-    @Getter
     private boolean enabled;
 
     public SwitchButton(GeneratedValue<String> onState, GeneratedValue<String> offState, String name) {

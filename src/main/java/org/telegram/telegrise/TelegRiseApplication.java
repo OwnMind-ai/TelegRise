@@ -105,6 +105,7 @@ public final class TelegRiseApplication {
             if (!PrimaryHandler.class.isAssignableFrom(clazz))
                 throw new TelegRiseRuntimeException("Handler class '" + clazz.getName() + "' doesn't implement PrimaryHandler interface");
 
+        //noinspection unchecked
         return handlerCandidates.stream().map(c -> (Class<? extends PrimaryHandler>)c).collect(Collectors.toList());
     }
 

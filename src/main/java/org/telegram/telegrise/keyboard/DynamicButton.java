@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * Represents a dynamic button that used in <a href="#{@link}">{@link org.telegram.telegrise.keyboard.DynamicKeyboard DynamicKeyboard}</a>.
  * Dynamic buttons can possess attributes that store pre-defined expressions within <code>GeneratedValue</code> objects.
- * These buttons can be dynamically disabled or enabled based on specified conditions that can be setted using <code>setWhen</code> method.
+ * These buttons can be dynamically disabled or enabled based on specified conditions that can be set using <code>setWhen</code> method.
  * 
  * @see DynamicKeyboard
  * @see DynamicRow
