@@ -33,16 +33,17 @@ public class OperationReference<L, R> implements ReferenceExpression{
     }
 
     @Override
-    public Object invoke(Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
+    public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
         ExpressionSupplier<L> leftSupplier = (overrideArgs) ->
-                this.invokeSide(this.left, instance, overrideArgs.length == 0 ? args : overrideArgs, composeLeft);
+                this.invokeSide(this.left, pool, instance, overrideArgs.length == 0 ? args : overrideArgs, composeLeft);
         ExpressionSupplier<R> rightSupplier = (overrideArgs) ->
-                this.invokeSide(this.right, instance, overrideArgs.length == 0 ? args : overrideArgs, composeRight);
+                this.invokeSide(this.right, pool, instance, overrideArgs.length == 0 ? args : overrideArgs, composeRight);
 
         return operation.apply(leftSupplier, rightSupplier);
     }
 
-    private <K> K invokeSide(ReferenceExpression reference, Object instance, Object[] args, boolean flexible) throws InvocationTargetException, IllegalAccessException {
+    private <K> K invokeSide(ReferenceExpression reference, ResourcePool pool, Object instance, Object[] args,
+                             boolean flexible) throws InvocationTargetException, IllegalAccessException {
         Object[] parameters = flexible ? composeParameters(reference, args) : args;
 
         // for cases like #getNull -> (#first OPERATOR #second)
@@ -53,7 +54,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
         }
 
         //noinspection unchecked
-        return (K) reference.invoke(instance, parameters);
+        return (K) reference.invoke(pool, instance, parameters);
     }
 
     private Object @NotNull [] composeParameters(ReferenceExpression reference, Object[] args) {

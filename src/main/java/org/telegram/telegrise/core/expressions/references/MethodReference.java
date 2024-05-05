@@ -1,6 +1,9 @@
 package org.telegram.telegrise.core.expressions.references;
 
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.caching.MethodReferenceCache;
+import org.telegram.telegrise.core.ResourcePool;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +16,7 @@ public class MethodReference implements ReferenceExpression{
     private final Class<?> declaringClass;
     private final MethodGetter methodGetter;
     private final boolean isStatic;
+    private transient final MethodReferenceCache<Object> cache;
 
     public MethodReference(Method method, boolean isStatic) {
         this.method = method;
@@ -24,16 +28,26 @@ public class MethodReference implements ReferenceExpression{
         String methodName = method.getName();
         Class<?>[] parameters = method.getParameterTypes();
         this.methodGetter = clazz -> clazz.getDeclaredMethod(methodName, parameters);
+        this.cache = new MethodReferenceCache<>(this.method.getAnnotation(Reference.class).caching());
     }
 
     @Override
-    public Object invoke(Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
+    public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
         assert isStatic || instance != null : "Unable to invoke method reference: handler object in ResourcePool is null";
 
-        if (isStatic)
-            return method.invoke(null, args);
-        else
-            return method.invoke(instance, args);
+        if(cache.isCacheApplicable(pool)){
+            return cache.getCachedValue();
+        } else {
+            Object result;
+            if (isStatic)
+                result = method.invoke(null, args);
+            else
+                result = method.invoke(instance, args);
+
+            cache.write(result, pool);
+
+            return result;
+        }
     }
 
     @Override
@@ -61,7 +75,7 @@ public class MethodReference implements ReferenceExpression{
 
     public static final ReferenceExpression NOT = new ReferenceExpression(){
         @Override
-        public Object invoke(Object instance, Object... args) {
+        public Object invoke(ResourcePool pool, Object instance, Object... args) {
             return !((Boolean) args[0]);
         }
 

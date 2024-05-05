@@ -2,7 +2,9 @@ package org.telegram.telegrise.core.expressions;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
@@ -16,8 +18,11 @@ import org.w3c.dom.Node;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MethodReferenceCompiler {
+    private final Map<Method, MethodReference> referenceMap = new HashMap<>();
 
     public ReferenceExpression compile(Token rootToken, LocalNamespace namespace, Class<?> returnType, Node node) {
         if (rootToken.getTokenType() == TokenTypes.REFERENCE) {
@@ -142,7 +147,18 @@ public class MethodReferenceCompiler {
             throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);
 
         if (token.getParams() == null) {
-            return new MethodReference(method, token.isStatic());
+            if (this.referenceMap.containsKey(method)) {
+                return this.referenceMap.get(method);
+            } else {
+                CachingStrategy strategy = method.getAnnotation(Reference.class).caching();
+                if (strategy != CachingStrategy.NONE && strategy != CachingStrategy.UPDATE &&
+                        Arrays.asList(method.getParameterTypes()).contains(Update.class))
+                    throw new TranscriptionParsingException("Method with parameter of class Update cannot have caching strategy other than NONE or UPDATE. Current strategy: " + strategy, node);
+
+                MethodReference methodReference = new MethodReference(method, token.isStatic());
+                this.referenceMap.put(method, methodReference);
+                return methodReference;
+            }
         } else {
             return this.compileParametrizedReference(token, method, namespace, returnType, node);
         }
@@ -158,8 +174,8 @@ public class MethodReferenceCompiler {
 
             return new ReferenceExpression(){
                 @Override
-                public Object invoke(Object instance, Object... args) {
-                    return result.generate((ResourcePool) args[0]);
+                public Object invoke(ResourcePool pool, Object instance, Object... args) {
+                    return result.generate(pool);
                 }
 
                 @Override

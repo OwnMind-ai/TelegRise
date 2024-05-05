@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.expressions.references;
 
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrise.core.ResourcePool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -19,22 +20,22 @@ public class IfReference implements ReferenceExpression{
     }
 
     @Override
-    public Object invoke(Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-        Boolean condition = (Boolean) this.invokeReference(this.predicate, instance, args);
+    public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
+        Boolean condition = (Boolean) this.invokeReference(this.predicate, pool, instance, args);
 
         if (condition){
-            return this.invokeReference(this.doAction, instance, args);
+            return this.invokeReference(this.doAction, pool, instance, args);
         } else {
-            return this.elseAction == null ? null : this.invokeReference(this.elseAction, instance, args);
+            return this.elseAction == null ? null : this.invokeReference(this.elseAction, pool, instance, args);
         }
     }
 
-    private Object invokeReference(ReferenceExpression reference, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
+    private Object invokeReference(ReferenceExpression reference, ResourcePool pool, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
         Map<Class<?>, Object> argsMap = Arrays.stream(args).collect(Collectors.toMap(Object::getClass, o -> o));
 
         Object[] requiredArgs = Arrays.stream(reference.parameterTypes()).map(argsMap::get).toArray();
 
-        return reference.invoke(instance, requiredArgs);
+        return reference.invoke(pool, instance, requiredArgs);
     }
 
     @Override

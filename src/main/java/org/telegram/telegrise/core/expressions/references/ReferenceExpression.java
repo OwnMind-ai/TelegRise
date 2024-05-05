@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface ReferenceExpression extends Serializable {
-    Object invoke(Object instance, Object... args) throws InvocationTargetException, IllegalAccessException;
+    Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException;
 
     @NotNull Class<?>[] parameterTypes();
     @NotNull Class<?> returnType();
@@ -36,7 +36,7 @@ public interface ReferenceExpression extends Serializable {
                     .map(p -> ResourcePool.extractComponent(components, p)).toArray();
 
             try {
-                Object result = this.invoke(pool.getHandler(), parameters);
+                Object result = this.invoke(pool, pool.getHandler(), parameters);
                 return ClassUtils.isAssignable(type, Void.class) ? null : (U) result;
             } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e.getCause());

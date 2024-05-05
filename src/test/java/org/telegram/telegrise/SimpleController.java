@@ -9,6 +9,7 @@ import org.telegram.telegrise.annotations.OnCreate;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.Resource;
 import org.telegram.telegrise.annotations.TreeController;
+import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.senders.BotSender;
 
 import java.io.File;
@@ -61,6 +62,25 @@ public class SimpleController {
     @Reference
     public boolean messageText(Update update, String text){
         return text.equals(update.getMessage().getText());
+    }
+
+    @Reference(caching = CachingStrategy.UPDATE)
+    public Integer extractNumber(Update update){
+        try {
+            return Integer.parseInt(update.getMessage().getText());
+        } catch (NumberFormatException e){
+            return null;
+        }
+    }
+
+    @Reference
+    public boolean notNull(Object o){
+        return o != null;
+    }
+
+    @Reference
+    public void process(Integer i){
+        System.out.println(i);
     }
 
     @Reference
