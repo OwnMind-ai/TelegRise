@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TranscriptionManager {
     private final Map<String, Serializable> objects = new HashMap<>();
     private final UserSession.TranscriptionInterrupter interruptor;
@@ -46,6 +46,38 @@ public class TranscriptionManager {
                 .map(e -> Map.entry(e.getKey(), ((InteractiveElement<?>) e.getValue()).createInteractiveObject(this.resourcePoolProducer)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
+    }
+
+    /** Clears cache for specific method reference and returns it previous value.
+     * If no cache was stored or method reference was not found, this method will return <code>null</code>.
+     *
+     * @param instance instance of declaring class
+     * @param methodName method name, which should match with <code>Method::getName</code>
+     * @return previously cached value
+     * @since 0.6
+     * @see org.telegram.telegrise.caching.CachingStrategy
+     */
+    public Object clearCache(Object instance, String methodName){
+        return clearCache(instance.getClass(), methodName);
+    }
+
+    /** Clears cache for specific method reference and returns it previous value.
+     * If no cache was stored or method reference was not found, this method will return <code>null</code>.
+     *
+     * @param clazz declaring class
+     * @param methodName method name, which should match with <code>Method::getName</code>
+     * @return previously cached value
+     * @since 0.6
+     * @see org.telegram.telegrise.caching.CachingStrategy
+     */
+    public Object clearCache(Class<?> clazz, String methodName){
+        return sessionMemory.getCacheMap().entrySet().stream()
+                .filter(r -> r.getKey().getMethod().getName().equals(methodName) && r.getKey().getMethod().getDeclaringClass().equals(clazz))
+                .map(Map.Entry::getValue).map(c -> {
+                    Object res = c.getCachedValue();
+                    c.clear();
+                    return res;
+                }).findFirst().orElse(null);
     }
 
     public TranscriptionManager getTranscriptionManager(UserIdentifier userIdentifier){
