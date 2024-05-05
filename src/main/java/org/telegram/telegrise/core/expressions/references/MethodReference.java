@@ -90,4 +90,38 @@ public class MethodReference implements ReferenceExpression{
             return boolean.class;
         }
     };
+
+    public static final ReferenceExpression IS_NULL = new ReferenceExpression(){
+        @Override
+        public Object invoke(ResourcePool pool, Object instance, Object... args) {
+            return args[0] == null;
+        }
+
+        @Override
+        public @NotNull Class<?>[] parameterTypes() {
+            return new Class[]{Object.class};
+        }
+
+        @Override
+        public @NotNull Class<?> returnType() {
+            return boolean.class;
+        }
+    };
+
+    public static final ReferenceExpression NOT_NULL = new ReferenceExpression(){
+        @Override
+        public Object invoke(ResourcePool pool, Object instance, Object... args) {
+            return args[0] != null;
+        }
+
+        @Override
+        public @NotNull Class<?>[] parameterTypes() {
+            return new Class[]{Object.class};
+        }
+
+        @Override
+        public @NotNull Class<?> returnType() {
+            return boolean.class;
+        }
+    };
 }

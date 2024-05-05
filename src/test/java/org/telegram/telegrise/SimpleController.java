@@ -74,11 +74,6 @@ public class SimpleController {
     }
 
     @Reference
-    public boolean notNull(Object o){
-        return o != null;
-    }
-
-    @Reference
     public void process(Long i){
         System.out.println(i);
     }

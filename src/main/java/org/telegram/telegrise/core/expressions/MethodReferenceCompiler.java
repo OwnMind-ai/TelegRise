@@ -126,8 +126,16 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
-        if (token.getClassName() == null && token.getParams() == null && token.getMethod().equals(Syntax.NOT_REFERENCE))
-            return MethodReference.NOT;
+        if (token.getClassName() == null && token.getParams() == null) {
+            switch (token.getMethod()) {
+                case Syntax.NOT_REFERENCE:
+                    return MethodReference.NOT;
+                case Syntax.IS_NULL_REFERENCE:
+                    return MethodReference.IS_NULL;
+                case Syntax.NOT_NULL_REFERENCE:
+                    return MethodReference.NOT_NULL;
+            }
+        }
 
         if (!token.isStatic() && namespace.getHandlerClass() == null)
             throw new TranscriptionParsingException("Unable to parse method '" + token.getMethod() + "': no controller class is assigned", node);
