@@ -1,7 +1,7 @@
 package org.telegram.telegrise.core.expressions.references;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
 
@@ -12,11 +12,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MethodReference implements ReferenceExpression{
+    @Getter
     private transient Method method;
     private final Class<?> declaringClass;
     private final MethodGetter methodGetter;
     private final boolean isStatic;
-    private transient final MethodReferenceCache<Object> cache;
 
     public MethodReference(Method method, boolean isStatic) {
         this.method = method;
@@ -28,14 +28,14 @@ public class MethodReference implements ReferenceExpression{
         String methodName = method.getName();
         Class<?>[] parameters = method.getParameterTypes();
         this.methodGetter = clazz -> clazz.getDeclaredMethod(methodName, parameters);
-        this.cache = new MethodReferenceCache<>(this.method.getAnnotation(Reference.class).caching());
     }
 
     @Override
     public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
         assert isStatic || instance != null : "Unable to invoke method reference: handler object in ResourcePool is null";
 
-        if(cache.isCacheApplicable(pool)){
+        MethodReferenceCache cache = pool.getMemory() != null ? pool.getMemory().getMethodReferenceCache(this) : null;
+        if(cache != null && cache.isCacheApplicable(pool)){
             return cache.getCachedValue();
         } else {
             Object result;
@@ -44,7 +44,8 @@ public class MethodReference implements ReferenceExpression{
             else
                 result = method.invoke(instance, args);
 
-            cache.write(result, pool);
+            if(cache != null)
+                cache.write(result, pool);
 
             return result;
         }

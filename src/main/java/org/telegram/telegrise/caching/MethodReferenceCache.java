@@ -5,10 +5,10 @@ import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MethodReferenceCache <T>{
+public class MethodReferenceCache{
     private final CachingStrategy strategy;
     private CacheContext currentContext;
-    private final AtomicReference<T> cachedValue = new AtomicReference<>(null);
+    private final AtomicReference<Object> cachedValue = new AtomicReference<>(null);
 
     public MethodReferenceCache(CachingStrategy strategy) {
         this.strategy = strategy;
@@ -19,7 +19,7 @@ public class MethodReferenceCache <T>{
         this.cachedValue.set(null);
     }
 
-    public void write(T result, ResourcePool pool) {
+    public void write(Object result, ResourcePool pool) {
         if (this.strategy == CachingStrategy.NONE) return;
 
         this.currentContext = this.extractContext(pool);
@@ -46,7 +46,7 @@ public class MethodReferenceCache <T>{
         return this.strategy != CachingStrategy.NONE && this.extractContext(pool).equals(this.currentContext);
     }
 
-    public T getCachedValue() {
+    public Object getCachedValue() {
         return this.cachedValue.get();
     }
 }

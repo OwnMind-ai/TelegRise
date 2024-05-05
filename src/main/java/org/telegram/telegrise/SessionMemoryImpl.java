@@ -3,8 +3,12 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.caching.CachingStrategy;
+import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
 
@@ -32,6 +36,9 @@ public class SessionMemoryImpl implements SessionMemory {
     private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
     @Getter
     private final String botUsername;
+
+    @Getter
+    private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new HashMap<>();
 
     @Getter @Setter
     private UserRole userRole;
@@ -135,5 +142,18 @@ public class SessionMemoryImpl implements SessionMemory {
         this.jumpPoints.forEach(p -> {
             if (!this.branchingElements.contains(p.getTo())) this.jumpPoints.remove(p);
         });
+    }
+
+    public MethodReferenceCache getMethodReferenceCache(MethodReference reference){
+        MethodReferenceCache res = this.cacheMap.get(reference);
+        if (res == null) {
+            CachingStrategy strategy = reference.getMethod().getAnnotation(Reference.class).caching();
+            if (strategy != CachingStrategy.NONE) {
+                res = new MethodReferenceCache(strategy);
+                this.cacheMap.put(reference, res);
+            }
+        }
+
+        return res;
     }
 }

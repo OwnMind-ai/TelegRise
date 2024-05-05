@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MethodReferenceCompiler {
+    // Used to exclude reference duplication
     private final Map<Method, MethodReference> referenceMap = new HashMap<>();
 
     public ReferenceExpression compile(Token rootToken, LocalNamespace namespace, Class<?> returnType, Node node) {

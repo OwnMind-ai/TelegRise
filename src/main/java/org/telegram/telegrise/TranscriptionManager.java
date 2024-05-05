@@ -18,6 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class TranscriptionManager {
     private final Map<String, Serializable> objects = new HashMap<>();
     private final UserSession.TranscriptionInterrupter interruptor;
@@ -96,7 +97,7 @@ public class TranscriptionManager {
         transition.setTarget(GeneratedValue.ofValue(element));
         transition.setExecute(execute);
 
-        // Simulates naturally closed tree
+        // Simulates a naturally closed tree
         if (!this.transitionController.getTreeExecutors().isEmpty())
             this.transitionController.getTreeExecutors().getLast().close();
 
