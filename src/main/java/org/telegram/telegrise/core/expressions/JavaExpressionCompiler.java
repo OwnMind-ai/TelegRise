@@ -15,12 +15,13 @@ import org.w3c.dom.Node;
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,7 +113,7 @@ public class JavaExpressionCompiler {
         File result = new File(tempDirectoryPath, className(hashcode) + ".java");
         //noinspection ResultOfMethodCallIgnored
         result.getParentFile().mkdirs();
-        Files.write(result.toPath(), source.toString().getBytes(StandardCharsets.UTF_8));
+        Files.writeString(result.toPath(), source.toString());
 
         return result;
     }
@@ -155,7 +156,7 @@ public class JavaExpressionCompiler {
 
     private int calculateHashcode(String expression, LocalNamespace namespace){
         return Math.abs((
-                        expression + VERSION +
+                        expression + VERSION + System.getProperty("java.version") +
                         (namespace.getHandlerClass() != null ? namespace.getHandlerClass().getName() : "") +
                         namespace.getApplicationNamespace().getImportedClasses().stream().map(Class::getName).sorted().collect(Collectors.joining())
                 ).hashCode());
