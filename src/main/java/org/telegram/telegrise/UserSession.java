@@ -7,11 +7,10 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrise.caching.CachingStrategy;
+import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.BotTranscription;
-import org.telegram.telegrise.core.elements.BranchingElement;
-import org.telegram.telegrise.core.elements.Menu;
-import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
@@ -23,10 +22,7 @@ import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 import org.telegram.telegrise.utils.MessageUtils;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -286,58 +282,89 @@ public class UserSession implements Runnable{
         executor.update(update);
         this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
 
-        // There are 4 cases when executor is closed:
-        // 1. Transition is declared — performs transition
-        // 2. Unrecognized (no branch responded) update, but predicate interrupter found — performs interruption
-        // 3. Unrecognized update, no interrupter — ignores update (TODO: sends warning)
-        // 4. Naturally closed (branch or tree has no continuation) — goes back to the previous branch element (and executes)
         if (executor.isClosed()){
-            boolean execute = true;
-            if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
-                // Transition case
-                boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
-                execute = executor.getLastBranch().getTransition().isExecute();
-
-                if (interrupted) return;
-            } else if(!executor.isNaturallyClosed()){
-                Chat chat = MessageUtils.getChat(update);
-                List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
-                if ((executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
-                    || executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_PREDICATES)))
-                {
-                    for (Tree tree : this.transcription.getRootMenu().getTrees()) {
-                        if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
-                            // Interrupter found case (tree)
-                            this.interruptTreeChain(update, tree, true);
-                            return;
-                        }
-                    }
-                }
-
-                Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
-                // Interrupter found case (handler where Handler.afterTress() is true)
-                if (handlerCandidate.isPresent()){
-                    boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
-
-                    if (intercept) return;
-                }
-
-                // Unrecognized update case
-                executor.open();
-                return;
-            }
-
-            // Naturally closed case
-            if (executor.getLastBranch() == null || executor.getLastBranch().getTransition() == null)  // This condition prevents interfering with transition case
-                this.transitionController.removeExecutor(executor);
-            BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
-            if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
-                this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
-
-            if (execute)
-                this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
+            this.processClosedTree(update, executor, pool);
         } else {
             this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
+        }
+
+        this.updateCaches();
+    }
+
+    /** There are four cases when executor is closed:
+     * <ol>
+     *      <li>Transition is declared — performs transition</li>
+     *      <li>Unrecognized (no branch responded) update, but predicate interrupter found — performs interruption</li>
+     *      <li>Unrecognized update, no interrupter — ignores update</li>
+     *      <li>Naturally closed (branch or tree has no continuation) — goes back to the previous branch element (and executes)</li>
+     * </ol>
+     */
+    private void processClosedTree(Update update, TreeExecutor executor, ResourcePool pool) {
+        boolean execute = true;
+        if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
+            // Transition case
+            boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
+            execute = executor.getLastBranch().getTransition().isExecute();
+
+            if (interrupted) return;
+        } else if(!executor.isNaturallyClosed()){
+            Chat chat = MessageUtils.getChat(update);
+            List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
+            if ((executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
+                || executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_PREDICATES)))
+            {
+                for (Tree tree : this.transcription.getRootMenu().getTrees()) {
+                    if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
+                        // Interrupter found case (tree)
+                        this.interruptTreeChain(update, tree, true);
+                        return;
+                    }
+                }
+            }
+
+            Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
+            // Interrupter found case (handler where Handler.afterTress() is true)
+            if (handlerCandidate.isPresent()){
+                boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
+
+                if (intercept) return;
+            }
+
+            // Unrecognized update case
+            executor.open();
+            return;
+        }
+
+        // Naturally closed case
+        // This condition prevents interfering with a transition case
+        if (executor.getLastBranch() == null || executor.getLastBranch().getTransition() == null)
+            this.transitionController.removeExecutor(executor);
+        BranchingElement last = this.sessionMemory.getBranchingElements().getLast();
+        if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
+            this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
+
+        if (execute)
+            this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
+    }
+
+    private void updateCaches() {
+        for (MethodReferenceCache r : sessionMemory.getCacheMap().values()) {
+            if (r.isEmpty()) continue;
+
+            boolean update = false;
+            if (r.getStrategy() == CachingStrategy.TREE) {
+                if (!sessionMemory.isOnStack(Tree.class)) {
+                    update = true;
+                } else {
+                    Tree tree = sessionMemory.getFromStack(Tree.class);
+                    update = !tree.getName().equals(r.getCurrentContext().getTreeName());
+                }
+            } else if (r.getStrategy() == CachingStrategy.BRANCH) {
+                update = sessionMemory.getCurrentBranch() == null || sessionMemory.getCurrentBranch().get() != r.getCurrentContext().getBranch();
+            }
+
+            if (update)
+                r.clear();
         }
     }
 

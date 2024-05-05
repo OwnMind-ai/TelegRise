@@ -64,10 +64,10 @@ public class SimpleController {
         return text.equals(update.getMessage().getText());
     }
 
-    @Reference(caching = CachingStrategy.TREE)
-    public Long extractNumber(){
+    @Reference(caching = CachingStrategy.UPDATE)
+    public Long extractNumber(Update update){
         try {
-            return Long.parseLong(String.valueOf(this.memory.getUserId()));
+            return Long.parseLong(update.getMessage().getText());
         } catch (NumberFormatException e){
             return null;
         }

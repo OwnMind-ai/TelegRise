@@ -1,12 +1,15 @@
 package org.telegram.telegrise.caching;
 
+import lombok.Getter;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MethodReferenceCache{
+    @Getter
     private final CachingStrategy strategy;
+    @Getter
     private CacheContext currentContext;
     private final AtomicReference<Object> cachedValue = new AtomicReference<>(null);
 
@@ -17,6 +20,10 @@ public class MethodReferenceCache{
     public void clear(){
         this.currentContext = null;
         this.cachedValue.set(null);
+    }
+
+    public boolean isEmpty(){
+        return cachedValue.get() == null;
     }
 
     public void write(Object result, ResourcePool pool) {

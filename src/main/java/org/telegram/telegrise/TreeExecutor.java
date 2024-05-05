@@ -86,6 +86,7 @@ public final class TreeExecutor {
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
 
         if (this.currentBranch != null){
+            this.memory.getCurrentBranch().set(this.currentBranch);
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
             if (this.currentBranch == null) {

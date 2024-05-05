@@ -1,11 +1,13 @@
 package org.telegram.telegrise.caching;
 
+import lombok.Getter;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.Tree;
 
 import java.util.Objects;
 
+@Getter
 public final class CacheContext {
     public static final CacheContext INVALID = new CacheContext();
 

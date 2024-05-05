@@ -15,10 +15,16 @@ package org.telegram.telegrise.caching;
  *     <li>TREE: Keeps cached value while working within specific <b>tree</b> where method was initially invoked</li>
  * </ul>
  *
+ * Strategies <b>BRANCH</b> and <b>TREE</b> should be used <b>carefully</b>, especially in "when" attribute,
+ * because it can create unexpected loop in the dialog tree.
+ * Those are intended
+ * to be used for getters that will never change values in the context of specific tree/branch
+ * or at least rarely changed.
+ * However, it's not obligatory, so feel free to experiment.
+ *
  * @since 0.6
  * @see org.telegram.telegrise.annotations.Reference
  */
-// TODO include passage about forced caching when implemented
 public enum CachingStrategy {
     NONE, UPDATE, BRANCH, TREE
 }
