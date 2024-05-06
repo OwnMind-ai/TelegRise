@@ -10,6 +10,7 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Document;
@@ -39,7 +40,7 @@ public class Link implements TranscriptionElement {
                 memory.getTasks().add(linkableElement.afterParsedTask());
         } catch (IOException e) {
             throw new TranscriptionParsingException("Unable to find source '" + this.source + "'", node);
-        } catch (TranscriptionParsingException | TelegRiseRuntimeException e){
+        } catch (TranscriptionParsingException | TelegRiseRuntimeException | TelegRiseInternalException e){
             throw e;
         }catch (Exception e) {
             throw new TranscriptionParsingException("An exception occurred during parsing '" + this.source + "': " + e.getMessage(), node);

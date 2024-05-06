@@ -8,7 +8,9 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 @Element(name = "if", checkInner = false)
@@ -22,13 +24,22 @@ public class TextIf implements TextConditionalElement {
 
     private GeneratedValue<String> text;
 
+    @Override
+    public void validate(Node node, TranscriptionMemory memory) {
+        if (text == null)
+            throw new TranscriptionParsingException("Text is empty", node);
+    }
+
     @Attribute(name = "", nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        if (this.textblock) {
-            this.text = ExpressionFactory.createExpression(XMLUtils.innerXMLTextBlock(node), String.class, node, namespace);
-        } else {
-            this.text = ExpressionFactory.createExpression(XMLUtils.innerXML(node), String.class, node, namespace);
-        }
+        String s;
+        if (this.textblock)
+            s = XMLUtils.innerXMLTextBlock(node);
+        else
+            s = XMLUtils.innerXML(node);
+
+        if (s != null)
+            this.text = ExpressionFactory.createExpression(s, String.class, node, namespace);
     }
 
     @Override

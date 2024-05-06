@@ -3,7 +3,6 @@ package org.telegram.telegrise.core.elements.text;
 import lombok.*;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -13,6 +12,7 @@ import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.types.TextBlock;
 import org.w3c.dom.Node;
@@ -57,7 +57,7 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
-        if (text == null && !conditional)
+        if (text == null && !conditional && byName == null)
             throw new TranscriptionParsingException("Text is empty", node);
 
         if (conditional && (textConditionalElements == null || textConditionalElements.isEmpty()))

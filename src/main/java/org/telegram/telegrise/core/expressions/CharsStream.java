@@ -9,7 +9,7 @@ public class CharsStream {
     private int position;
 
     public CharsStream(String input) {
-        this.text = input;
+        this.text = input == null ? "" : input;
     }
 
     public String next(int length) {
