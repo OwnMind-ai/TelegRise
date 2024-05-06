@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 public class XMLElementsParser {
@@ -115,12 +116,16 @@ public class XMLElementsParser {
             }
         }
 
+        AtomicBoolean hasEmbedded = new AtomicBoolean(false);
         Arrays.stream(element.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(InnerElement.class))
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
-                .forEach(f -> this.parseInnerElement(node, f, instance, expected));
+                .forEach(f -> {
+                    if (this.parseInnerElement(node, f, instance, expected))
+                        hasEmbedded.set(true);
+                });
 
-        if (!expected.isEmpty())
+        if (!expected.isEmpty() && !hasEmbedded.get())
             throw new TranscriptionParsingException("Unrecognized elements: " + String.join(", ", expected), node);
 
         finishElement(instance, node);
@@ -154,7 +159,7 @@ public class XMLElementsParser {
             this.namespace = (LocalNamespace) result;
     }
 
-    private void parseInnerElement(Node node, Field field, TranscriptionElement instance, Set<String> expected){
+    private boolean parseInnerElement(Node node, Field field, TranscriptionElement instance, Set<String> expected){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
         Class<?> actualType = ReflectionUtils.getRawGenericType(field);
@@ -177,7 +182,7 @@ public class XMLElementsParser {
 
         if (fieldNodes.isEmpty()){
             if (EmbeddableElement.class.isAssignableFrom(actualType)) {
-                if (nodeList.getLength() == 0) return;
+                if (nodeList.getLength() == 0) return false;
                 //FIXME optimize (use #text node name)
                 if (Arrays.stream(field.getDeclaringClass().getDeclaredFields())
                         .filter(f -> f.isAnnotationPresent(InnerElement.class))
@@ -191,7 +196,7 @@ public class XMLElementsParser {
                         .map(c -> c.getAnnotation(Element.class).name())
                         .anyMatch(nodeNames::contains)
                 ) {
-                    if (fieldData.nullable()) return;
+                    if (fieldData.nullable()) return false;
                     else {
                         assert innerElementData != null;
                         throw new TranscriptionParsingException("Embedded element '" + innerElementData.name() + "' is not allowed here, use <" + innerElementData.name() + "> instead", node);
@@ -205,13 +210,13 @@ public class XMLElementsParser {
                     finishElement(object, node);
 
                     PropertyUtils.setSimpleProperty(instance, field.getName(), object);
-                    return;
+                    return true;
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new TelegRiseInternalException(e);
                 }
             }
-            else if (fieldData.nullable()) return;
+            else if (fieldData.nullable()) return false;
             else throw new TranscriptionParsingException("Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" can't be null", node);
         }
 
@@ -232,6 +237,8 @@ public class XMLElementsParser {
         } catch (Exception e) {
             throw new TelegRiseInternalException(e);
         }
+
+        return false;
     }
 
     private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
