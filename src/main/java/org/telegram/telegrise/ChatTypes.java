@@ -1,6 +1,6 @@
 package org.telegram.telegrise;
 
-import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.*;
 
 import java.util.Arrays;

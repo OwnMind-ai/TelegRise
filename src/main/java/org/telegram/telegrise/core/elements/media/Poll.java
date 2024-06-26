@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.polls.SendPoll;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
+import org.telegram.telegrambots.meta.api.objects.polls.input.InputPollOption;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;
@@ -21,7 +22,7 @@ public class Poll implements MediaType {
     @Attribute(name = "question", nullable = false)
     private GeneratedValue<String> question;
     @Attribute(name = "options", nullable = false)
-    private GeneratedValue<List<String>> options;
+    private GeneratedValue<List<InputPollOption>> options;
     @Attribute(name = "isAnonymous")
     private GeneratedValue<Boolean> isAnonymous;
     @Attribute(name = "type")
