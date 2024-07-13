@@ -86,7 +86,7 @@ public class JavaExpressionCompiler {
 
     private void compileSourceFile(File source, Node node, List<Class<?>> imported) throws IOException {
         List<String> optionList = new ArrayList<>(Arrays.asList(
-                "-d", this.tempDirectoryPath.getAbsolutePath()
+                "-d", this.tempDirectoryPath.getAbsolutePath(), "-Xlint:none", "-XDsuppressNotes"
         ));
 
         if (System.getProperty("jdk.module.path") != null){
