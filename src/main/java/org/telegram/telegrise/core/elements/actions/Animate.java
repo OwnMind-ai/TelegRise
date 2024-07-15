@@ -1,21 +1,27 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.AnimationExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.elements.NodeElement;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "animate")
 @Data @NoArgsConstructor
-public class Animate implements ActionElement{
+public class Animate extends NodeElement implements ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

@@ -1,5 +1,7 @@
 package org.telegram.telegrise.senders.actions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.message.InaccessibleMessage;
@@ -10,6 +12,7 @@ import org.telegram.telegrise.senders.BotSender;
 
 @SuppressWarnings("unused")
 public class CallbackQueryActionBuilder{
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackQueryActionBuilder.class);
     private final CallbackQuery query;
     public final BotSender sender;
 
@@ -38,6 +41,7 @@ public class CallbackQueryActionBuilder{
                             .text(text)
                     .build());
         } catch (TelegramApiException e) {
+            LOGGER.error("An error occurred while answering callback query", e);
             throw new TelegramApiRuntimeException(e);
         }
     }

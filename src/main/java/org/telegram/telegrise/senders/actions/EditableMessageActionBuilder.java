@@ -1,5 +1,8 @@
 package org.telegram.telegrise.senders.actions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -14,6 +17,7 @@ import java.io.Serializable;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class EditableMessageActionBuilder extends MessageActionBuilder{
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditableMessageActionBuilder.class);
     public EditableMessageActionBuilder(BotSender sender, Message message) {
         super(sender, message);
     }
@@ -62,7 +66,19 @@ public class EditableMessageActionBuilder extends MessageActionBuilder{
                 }
             }
         } catch (TelegramApiException e) {
+            LOGGER.error("An error occurred while editing the message", e);
             throw new TelegramApiRuntimeException(e);
+        }
+    }
+
+    public boolean delete(){
+        try {
+            return this.sender.execute(DeleteMessage.builder()
+                            .chatId(chatId).messageId(message.getMessageId())
+                    .build());
+        } catch (TelegramApiException e) {
+            LOGGER.error("An error occurred while deleting the message", e);
+            throw new RuntimeException(e);
         }
     }
 }

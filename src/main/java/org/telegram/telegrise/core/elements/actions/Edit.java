@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
@@ -30,7 +32,8 @@ import java.util.Set;
 
 @Element(name = "edit")
 @Data @NoArgsConstructor
-public class Edit implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Edit extends NodeElement implements ActionElement{
     public static final String EDIT_TEXT = "text";
     public static final String EDIT_CAPTION = "caption";
     public static final String EDIT_MEDIA = "media";

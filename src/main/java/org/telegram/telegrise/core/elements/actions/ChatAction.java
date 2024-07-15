@@ -1,12 +1,14 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -18,7 +20,8 @@ import java.util.stream.Collectors;
 
 @Element(name = "chatAction")
 @Data @NoArgsConstructor
-public class ChatAction implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class ChatAction extends NodeElement implements ActionElement{
     private static final Set<String> ACTIONS = Set.of("typing", "upload_photo", "record_video", "upload_video",
             "record_voice", "upload_voice", "upload_document", "choose_sticker", "find_location", "record_video_note", "upload_video_note");
 

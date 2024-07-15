@@ -1,18 +1,21 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
 @Element(name = "forward")
 @Data @NoArgsConstructor
-public class Forward implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Forward extends NodeElement implements ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

@@ -1,21 +1,24 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 @Element(name = "answer")
 @Data @NoArgsConstructor
-public class Answer implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Answer extends NodeElement implements ActionElement{
     @Attribute(name = "callbackQueryId")
     private GeneratedValue<String> callbackQueryId;
 

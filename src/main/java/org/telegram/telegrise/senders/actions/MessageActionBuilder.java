@@ -1,5 +1,7 @@
 package org.telegram.telegrise.senders.actions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
@@ -15,6 +17,8 @@ import java.util.List;
 //TODO add media support
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class MessageActionBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageActionBuilder.class);
+
     protected final Message message;
     protected final BotSender sender;
 
@@ -143,6 +147,7 @@ public class MessageActionBuilder {
                     .entities(entities)
                     .build());
         } catch (TelegramApiException e) {
+            LOGGER.error("An error occurred while sending the message", e);
             throw new TelegramApiRuntimeException(e);
         }
     }

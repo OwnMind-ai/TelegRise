@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
@@ -10,10 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.text.Text;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.elements.text.Text;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -23,7 +28,8 @@ import java.util.stream.Stream;
 
 @Element(name = "send")
 @Data @NoArgsConstructor
-public class Send implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Send extends NodeElement implements ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

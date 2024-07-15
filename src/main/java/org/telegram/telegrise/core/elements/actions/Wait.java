@@ -1,14 +1,16 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,7 +18,8 @@ import java.util.function.Consumer;
 
 @Element(name = "wait")
 @Data @NoArgsConstructor
-public class Wait implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Wait extends NodeElement implements ActionElement{
     @Attribute(name = "timeout", nullable = false)
     private GeneratedValue<Double> timeout;
 

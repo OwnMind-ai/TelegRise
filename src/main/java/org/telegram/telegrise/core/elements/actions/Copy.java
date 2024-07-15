@@ -1,14 +1,16 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.text.Text;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -17,7 +19,8 @@ import java.util.List;
 
 @Element(name = "copy")
 @Data @NoArgsConstructor
-public class Copy implements ActionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Copy extends NodeElement implements ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

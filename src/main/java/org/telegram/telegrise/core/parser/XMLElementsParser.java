@@ -10,6 +10,7 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
@@ -69,6 +70,9 @@ public class XMLElementsParser {
     public TranscriptionElement parse(@NotNull Node node) throws Exception {
         Class<? extends TranscriptionElement> element = this.elements.get(node.getNodeName());
         TranscriptionElement instance = element.getConstructor().newInstance();
+        if (instance instanceof NodeElement nodeElement){
+            nodeElement.setElementNode(node);
+        }
 
         final Map<Class<?>, Object> resourcesMap = Map.of(
                 Node.class, node,

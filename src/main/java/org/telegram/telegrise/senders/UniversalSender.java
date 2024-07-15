@@ -1,10 +1,13 @@
 package org.telegram.telegrise.senders;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 
@@ -14,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class UniversalSender {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UniversalSender.class);
 
     private static final Map<String, Method> methods = new HashMap<>();
     private static final String METHOD_NAME = "execute";
@@ -40,8 +44,10 @@ public class UniversalSender {
         try {
             return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);
         } catch (IllegalAccessException e) {
+            LOGGER.error("An error occurred during invocation of an undefined api method", e);
             throw new TelegRiseInternalException(e);
         } catch (InvocationTargetException e) {
+            LOGGER.error("An error occurred during invocation of an undefined api method", e.getTargetException());
             throw new TelegRiseInternalException(e.getTargetException());
         }
     }
@@ -49,7 +55,13 @@ public class UniversalSender {
     //TODO Move to package-private class
     public void execute(ActionElement action, ResourcePool pool) throws TelegramApiException {
         PartialBotApiMethod<?> method = action.generateMethod(pool);
-        Object result = this.execute(method);
+        Object result;
+        try {
+            result = this.execute(method);
+        } catch (TelegramApiException e) {
+            LOGGER.error("An error occurred while executing transcription action:\n\n{}\n", NodeElement.formatNode(action.getElementNode()), e);
+            throw e;
+        }
 
         if (result instanceof List<?> resultList) {
             if (!resultList.isEmpty() && resultList.get(0) instanceof Message)
