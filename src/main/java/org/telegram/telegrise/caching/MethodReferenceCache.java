@@ -29,14 +29,14 @@ public class MethodReferenceCache{
     public void write(Object result, ResourcePool pool) {
         if (this.strategy == CachingStrategy.NONE) return;
 
-        this.currentContext = this.extractContext(pool);
+        this.currentContext = this.extractMethodContext(pool);
         if (currentContext.isValid())
             this.cachedValue.set(result);
         else
             this.clear();   // failsafe case
     }
 
-    private CacheContext extractContext(ResourcePool pool) {
+    private CacheContext extractMethodContext(ResourcePool pool) {
         return switch (this.strategy) {
             case UPDATE -> pool.getUpdate() != null ? new CacheContext(pool.getUpdate()) : CacheContext.INVALID;
             case TREE ->
@@ -48,7 +48,17 @@ public class MethodReferenceCache{
     }
 
     public boolean isCacheApplicable(ResourcePool pool) {
-        return this.strategy != CachingStrategy.NONE && this.extractContext(pool).equals(this.currentContext);
+        return this.strategy != CachingStrategy.NONE && this.currentContext != null
+                && this.currentContext.applicable(this.extractCheckContext(pool));
+    }
+
+    private CacheContext extractCheckContext(ResourcePool pool) {
+        if (pool.getMemory().getCurrentBranch().get() != null)
+            return new CacheContext(pool.getMemory().getCurrentBranch().get());
+        else if (pool.getMemory().isOnStack(Tree.class))
+            return new CacheContext(pool.getMemory().getFromStack(Tree.class));
+        else
+            return null;
     }
 
     public Object getCachedValue() {

@@ -2,9 +2,7 @@ package org.telegram.telegrise.core.expressions;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.annotations.Reference;
-import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
@@ -159,10 +157,13 @@ public class MethodReferenceCompiler {
             if (this.referenceMap.containsKey(method)) {
                 return this.referenceMap.get(method);
             } else {
-                CachingStrategy strategy = method.getAnnotation(Reference.class).caching();
-                if (strategy != CachingStrategy.NONE && strategy != CachingStrategy.UPDATE &&
-                        Arrays.asList(method.getParameterTypes()).contains(Update.class))
-                    throw new TranscriptionParsingException("Method with parameter of class Update cannot have caching strategy other than NONE or UPDATE. Current strategy: " + strategy, node);
+                //TODO temporary removed, decide later.
+                // Maybe add a specific property for @Reference,
+                // which indicates that method should take input only once, so the code below works correctly
+//                CachingStrategy strategy = method.getAnnotation(Reference.class).caching();
+//                if (strategy != CachingStrategy.NONE && strategy != CachingStrategy.UPDATE &&
+//                        Arrays.asList(method.getParameterTypes()).contains(Update.class))
+//                    throw new TranscriptionParsingException("Method with parameter of class Update cannot have caching strategy other than NONE or UPDATE. Current strategy: " + strategy, node);
 
                 MethodReference methodReference = new MethodReference(method, token.isStatic());
                 this.referenceMap.put(method, methodReference);

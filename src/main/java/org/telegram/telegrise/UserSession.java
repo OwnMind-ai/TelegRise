@@ -362,7 +362,7 @@ public class UserSession implements Runnable{
                     update = true;
                 } else {
                     Tree tree = sessionMemory.getFromStack(Tree.class);
-                    update = !tree.getName().equals(r.getCurrentContext().getTreeName());
+                    update = !tree.getName().equals(r.getCurrentContext().getTree().getName());
                 }
             } else if (r.getStrategy() == CachingStrategy.BRANCH) {
                 update = sessionMemory.getCurrentBranch() == null || sessionMemory.getCurrentBranch().get() != r.getCurrentContext().getBranch();

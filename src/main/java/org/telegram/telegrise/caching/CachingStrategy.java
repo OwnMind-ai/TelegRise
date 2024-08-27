@@ -11,8 +11,8 @@ package org.telegram.telegrise.caching;
  * <ul>
  *     <li>NONE (default): Disables caching completely</li>
  *     <li>UPDATE: Keeps cached value while the tree controller handles <b>the latest update</b> (relies on update's ID)</li>
- *     <li>BRANCH: Keeps cached value while working within specific <b>branch</b> where method was initially invoked</li>
- *     <li>TREE: Keeps cached value while working within specific <b>tree</b> where method was initially invoked</li>
+ *     <li>BRANCH: Keeps cached value while working within specific <b>branch</b> (including it's children) where method was initially invoked</li>
+ *     <li>TREE: Keeps cached value while working within specific <b>tree</b> (including it's children) where method was initially invoked</li>
  * </ul>
  *
  * Strategies <b>BRANCH</b> and <b>TREE</b> should be used <b>carefully</b>, especially in "when" attribute,
