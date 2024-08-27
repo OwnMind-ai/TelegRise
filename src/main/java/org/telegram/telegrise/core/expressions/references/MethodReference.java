@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 public class MethodReference implements ReferenceExpression{
     @Getter
     private transient Method method;
+    @Getter
     private final Class<?> declaringClass;
     private final MethodGetter methodGetter;
     private final boolean isStatic;

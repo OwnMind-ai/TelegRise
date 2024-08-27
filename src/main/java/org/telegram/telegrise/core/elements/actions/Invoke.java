@@ -14,7 +14,7 @@ import org.telegram.telegrise.core.parser.Element;
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Invoke extends NodeElement implements ActionElement{
-    @Attribute(name = "method")
+    @Attribute(name = "method", nullable = false)
     private GeneratedValue<Void> method;
 
     @Override

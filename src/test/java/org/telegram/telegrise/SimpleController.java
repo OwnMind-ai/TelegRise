@@ -64,7 +64,7 @@ public class SimpleController {
         return text.equals(update.getMessage().getText());
     }
 
-    @Reference(caching = CachingStrategy.BRANCH)
+    @Reference(caching = CachingStrategy.TREE)
     public Long extractNumber(Update update){
         try {
             return Long.parseLong(update.getMessage().getText());
