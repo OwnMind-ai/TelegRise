@@ -30,8 +30,8 @@ public class SessionMemoryImpl implements SessionMemory {
     private final int transcriptionHashcode;
     @Getter
     private final UserIdentifier userIdentifier;
-    @Getter
     private final AtomicReference<Branch> currentBranch = new AtomicReference<>();
+
     @Getter
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
     @Getter
@@ -53,6 +53,14 @@ public class SessionMemoryImpl implements SessionMemory {
         this.transcriptionHashcode = transcriptionHashcode;
         this.userIdentifier = userIdentifier;
         this.botUsername = botUsername;
+    }
+
+    public Branch getCurrentBranch(){
+        return currentBranch.get();
+    }
+
+    public void setCurrentBranch(Branch branch){
+        currentBranch.set(branch);
     }
 
     @Override

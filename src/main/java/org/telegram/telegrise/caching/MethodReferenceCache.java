@@ -42,7 +42,7 @@ public class MethodReferenceCache{
             case TREE ->
                     pool.getMemory().isOnStack(Tree.class) ? new CacheContext(pool.getMemory().getFromStack(Tree.class)) : CacheContext.INVALID;
             case BRANCH ->
-                    pool.getMemory().getCurrentBranch().get() != null ? new CacheContext(pool.getMemory().getCurrentBranch().get()) : CacheContext.INVALID;
+                    pool.getMemory().getCurrentBranch() != null ? new CacheContext(pool.getMemory().getCurrentBranch()) : CacheContext.INVALID;
             default -> throw new IllegalStateException();
         };
     }
@@ -53,8 +53,8 @@ public class MethodReferenceCache{
     }
 
     private CacheContext extractCheckContext(ResourcePool pool) {
-        if (pool.getMemory().getCurrentBranch().get() != null)
-            return new CacheContext(pool.getMemory().getCurrentBranch().get());
+        if (pool.getMemory().getCurrentBranch() != null)
+            return new CacheContext(pool.getMemory().getCurrentBranch());
         else if (pool.getMemory().isOnStack(Tree.class))
             return new CacheContext(pool.getMemory().getFromStack(Tree.class));
         else

@@ -2,20 +2,25 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScopes;
 
-@Element(name = "branch")
+@Element(name = "branch", validateAfterParsing = true)
 @Data
 @NoArgsConstructor
-public class Branch implements StorableElement, TranscriptionElement{
+public class Branch implements BranchingElement, TranscriptionElement{
     @Attribute(name = "name")
     private String name;
 
@@ -45,8 +50,13 @@ public class Branch implements StorableElement, TranscriptionElement{
     @InnerElement
     private Transition transition;
 
+    private int level = -1;
+
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
+        if (level < 2)   // Branches can't be at level 1, only trees do
+            throw new TranscriptionParsingException("Invalid branch level: %d. \nThis is an internal error. Please, report to https://github.com/OwnMind-ai/TelegRise/issues if this error occurred and attach: error message, the .xml file with problematic branch.".formatted(level), node);
+
         if (when == null && callbackTriggers == null && keys == null)
             throw new TranscriptionParsingException("Branch is unreachable, missing 'when', 'keys' or 'callbackTriggers' attributes", node);
 
@@ -55,6 +65,16 @@ public class Branch implements StorableElement, TranscriptionElement{
 
         if (this.allowedInterruptions != null && improperInterruptionScopes(this.allowedInterruptions))
             throw new TranscriptionParsingException("Undefined interruption scopes", node);
+    }
+
+    @Override
+    public String[] getChatTypes() {
+        return new String[]{ChatTypes.ALL};
+    }
+
+    @Override
+    public List<? extends BranchingElement> getChildren() {
+        return Objects.requireNonNullElse(branches, List.of());
     }
 
     @Override

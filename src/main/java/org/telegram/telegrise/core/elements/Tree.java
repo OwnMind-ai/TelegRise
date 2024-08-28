@@ -22,6 +22,7 @@ import org.telegram.telegrise.types.CommandData;
 import org.telegram.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -84,6 +85,8 @@ public class Tree implements BranchingElement{
     private List<Menu> menus;
     @InnerElement
     private DefaultBranch defaultBranch;
+
+    private int level = -1;
 
     @Override
     public void validate(Node node, TranscriptionMemory memory) {
@@ -160,5 +163,14 @@ public class Tree implements BranchingElement{
 
     public boolean isChatApplicable(List<String> chatTypes, Chat chat) {
         return ChatTypes.isApplicable(this.chatTypes == null ? chatTypes : List.of(this.chatTypes), chat);
+    }
+
+    @Override
+    public List<? extends BranchingElement> getChildren() {
+        var result = new ArrayList<BranchingElement>();
+        if (branches != null) result.addAll(branches);
+        if (menus != null) result.addAll(menus);
+
+        return result;
     }
 }

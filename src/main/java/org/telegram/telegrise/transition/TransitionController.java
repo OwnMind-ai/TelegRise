@@ -160,7 +160,7 @@ public class TransitionController {
         executor.close();
         executor.beforeRemoving();
         this.treeExecutors.remove(executor);
-        this.sessionMemory.getCurrentBranch().set(null);
+        this.sessionMemory.setCurrentBranch(null);
 
         assert this.sessionMemory.getBranchingElements().getLast().equals(executor.getTree());
         this.sessionMemory.getBranchingElements().removeLast();

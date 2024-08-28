@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
@@ -206,7 +205,7 @@ public class UserSession implements Runnable{
         this.treeExecutors.forEach(TreeExecutor::beforeRemoving);
 
         this.treeExecutors.clear();
-        this.sessionMemory.getCurrentBranch().set(null);
+        this.sessionMemory.setCurrentBranch(null);
         this.sessionMemory.getJumpPoints().clear();
 
         this.sessionMemory.getBranchingElements().clear();
@@ -285,15 +284,15 @@ public class UserSession implements Runnable{
         ResourcePool pool = this.createResourcePool(update);
 
         executor.update(update);
-        this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
+        this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
 
         if (executor.isClosed()){
             this.processClosedTree(update, executor, pool);
         } else {
-            this.sessionMemory.getCurrentBranch().set(executor.getCurrentBranch());
+            this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
         }
 
-        this.updateCaches();
+        this.updateCaches(pool);
     }
 
     /** There are four cases when executor is closed:
@@ -352,23 +351,11 @@ public class UserSession implements Runnable{
             this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
     }
 
-    private void updateCaches() {
+    private void updateCaches(ResourcePool pool) {
         for (MethodReferenceCache r : sessionMemory.getCacheMap().values()) {
             if (r.isEmpty()) continue;
 
-            boolean update = false;
-            if (r.getStrategy() == CachingStrategy.TREE) {
-                if (!sessionMemory.isOnStack(Tree.class)) {
-                    update = true;
-                } else {
-                    Tree tree = sessionMemory.getFromStack(Tree.class);
-                    update = !tree.getName().equals(r.getCurrentContext().getTree().getName());
-                }
-            } else if (r.getStrategy() == CachingStrategy.BRANCH) {
-                update = sessionMemory.getCurrentBranch() == null || sessionMemory.getCurrentBranch().get() != r.getCurrentContext().getBranch();
-            }
-
-            if (update)
+            if (!r.isCacheApplicable(pool))
                 r.clear();
         }
     }

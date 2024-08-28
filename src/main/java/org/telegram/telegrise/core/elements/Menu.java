@@ -32,6 +32,8 @@ public class Menu implements BranchingElement{
     @InnerElement
     private DefaultBranch defaultBranch;
 
+    private int level = -1;
+
     public Tree findTree(ResourcePool pool, SessionMemoryImpl sessionMemory){
         List<String> chatTypes = List.of(sessionMemory.getLastChatTypes());
         Chat chat = MessageUtils.getChat(pool.getUpdate());
@@ -50,5 +52,10 @@ public class Menu implements BranchingElement{
         }
 
         return founded;
+    }
+
+    @Override
+    public List<? extends BranchingElement> getChildren() {
+        return trees;
     }
 }

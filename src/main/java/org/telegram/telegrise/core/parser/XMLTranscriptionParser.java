@@ -3,10 +3,14 @@ package org.telegram.telegrise.core.parser;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class XMLTranscriptionParser implements TranscriptionParser{
     private final Document document;
@@ -31,6 +35,8 @@ public class XMLTranscriptionParser implements TranscriptionParser{
         this.elementsParser.getTranscriptionMemory().getTasks().forEach(t -> t.accept(result));
         this.elementsParser.getTranscriptionMemory().getTasks().clear();
 
+        this.calculateTreeNodesLevel(result);
+
         this.elementsParser.getTranscriptionMemory().getPendingValidation()
                 .forEach(p -> p.getLeft().validate(p.getRight(), this.elementsParser.getTranscriptionMemory()));
 
@@ -52,6 +58,22 @@ public class XMLTranscriptionParser implements TranscriptionParser{
             this.applicationNamespace.addClass(node.getNodeValue().trim());
         } catch (ClassNotFoundException e) {
             throw new TranscriptionParsingException("Unable to import class '" + node.getNodeValue() + "': Class not found", node.getParentNode());
+        }
+    }
+
+    private void calculateTreeNodesLevel(BotTranscription result) {
+        result.getRootMenu().setLevel(0);
+
+        Queue<BranchingElement> queue = new LinkedList<>();
+        queue.add(result.getRootMenu());
+
+        while (!queue.isEmpty()){
+            var element = queue.poll();
+
+            element.getChildren().forEach(e -> {
+                e.setLevel(element.getLevel() + 1);
+                queue.add(e);
+            });
         }
     }
 }
