@@ -85,6 +85,7 @@ public final class TreeExecutor {
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
 
+        // Next branch found
         if (this.currentBranch != null){
             this.memory.setCurrentBranch(this.currentBranch);
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
@@ -98,19 +99,21 @@ public final class TreeExecutor {
                 this.naturallyClosed = true;
                 this.close();
             }
-        } else if(previous != null && previous.getDefaultBranch() != null) {
+        } else if (nextBranches.isEmpty()) {       // There is no continuation of the branch
+            this.lastBranch = previous;
+            this.naturallyClosed = false;
+            this.close();
+        } else if(previous != null && previous.getDefaultBranch() != null) {   // Branch wasn't found, looking for default one in previous branch
             DefaultBranch defaultBranch = previous.getDefaultBranch();
             if (defaultBranch.getWhen().generate(resourcePool))
                 this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
 
             this.currentBranch = previous;
-        } else if(previous == null && this.tree.getDefaultBranch() != null) {
+        } else if(previous == null && this.tree.getDefaultBranch() != null) {  // the branch wasn't found, looking for the default one in the tree
             if (this.tree.getDefaultBranch().getWhen().generate(resourcePool))
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
-            this.lastBranch = previous;
-            this.naturallyClosed = false;
-            this.close();
+            this.currentBranch = previous;      // Effectively ignores the update
         }
     }
 

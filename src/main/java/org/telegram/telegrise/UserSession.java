@@ -286,11 +286,10 @@ public class UserSession implements Runnable{
         executor.update(update);
         this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
 
-        if (executor.isClosed()){
+        if (executor.isClosed())
             this.processClosedTree(update, executor, pool);
-        } else {
+        else
             this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
-        }
 
         this.updateCaches(pool);
     }
