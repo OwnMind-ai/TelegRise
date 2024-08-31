@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Element(name = "link")
 @Data
@@ -28,22 +29,41 @@ public class Link implements TranscriptionElement {
     @Attribute(name = "src", nullable = false)
     private void linkSource(Node node, TranscriptionMemory memory, XMLElementsParser parser) {
         this.source = node.getAttributes().getNamedItem("src").getNodeValue();
+        String[] sources = new String[]{this.source};
 
+        if (source.endsWith("*")) {
+            String path = source.substring(0, source.length() - 1);
+            File directory = path.startsWith("/") ? new File(path) : new File(parser.getRootDirectory(), path);
+            File[] files = directory.listFiles();
+            if (files == null)
+                throw new TranscriptionParsingException("Unable to find source '" + this.source + "'", node);
+
+            files = Arrays.stream(files).filter(File::isFile).filter(f -> f.getName().endsWith(".xml")).toArray(File[]::new);
+            sources = new String[files.length];
+            for (int i = 0; i < files.length; i++)
+                sources[i] = files[i].getAbsolutePath();
+        }
+
+        for (String source : sources)
+            parseSource(source, node, memory, parser);
+    }
+
+    private void parseSource(String source, Node node, TranscriptionMemory memory, XMLElementsParser parser) {
         try {
-            Document document = XMLUtils.loadDocument(new File(parser.getRootDirectory(), this.source));
+            Document document = XMLUtils.loadDocument(source.startsWith("/") ? new File(source) : new File(parser.getRootDirectory(), source));
             TranscriptionElement result = parser.parse(document.getDocumentElement());
 
             if (!(result instanceof LinkableElement linkableElement))
-                throw new TranscriptionParsingException("Unable to link element '" + result.getClass().getAnnotation(Element.class).name() + "' in '" + this.source + "'", node);
+                throw new TranscriptionParsingException("Unable to link element '" + result.getClass().getAnnotation(Element.class).name() + "' in '" + source + "'", node);
 
             if (linkableElement.afterParsedTask() != null)
                 memory.getTasks().add(linkableElement.afterParsedTask());
         } catch (IOException e) {
-            throw new TranscriptionParsingException("Unable to find source '" + this.source + "'", node);
+            throw new TranscriptionParsingException("Unable to find source '" + source + "'", node);
         } catch (TranscriptionParsingException | TelegRiseRuntimeException | TelegRiseInternalException e){
             throw e;
         }catch (Exception e) {
-            throw new TranscriptionParsingException("An exception occurred during parsing '" + this.source + "': " + e.getMessage(), node);
+            throw new TranscriptionParsingException("An exception occurred during parsing '" + source + "': " + e.getMessage(), node);
         }
     }
 }

@@ -19,7 +19,7 @@ class LinkTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(), new File("src/test/resources/"));
         parser.load();
 
-        Node linkNode = toNode("<link src=\"keyboards.xml\"/>");
+        Node linkNode = toNode("<link src=\"test/keyboards.xml\"/>");
 
         parser.parse(linkNode);
 

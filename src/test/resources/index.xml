@@ -5,8 +5,7 @@
 <?import org.telegram.telegrise.SimpleController ?>
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true">
     <head>
-        <link src="keyboards.xml"/>
-        <link src="tree.xml"/>
+        <link src="test/*"/>
     </head>
 
     <roles>
