@@ -31,13 +31,16 @@
                     <if condition="SimpleController#isHello" textblock="true">
                         Hello! <code>User</code>
 
-                        How&#160;can I help you?
+                            How&#160;can I help you?
 
                         ${SimpleController#isHello} ${SimpleController#isHello}
                         ${memory.get("test")}
                     </if>
                     <else>
                         Hello again!
+
+
+
                         ${SimpleController#isHello} ${SimpleController#isHello}
                     </else>
                 </text>
@@ -89,7 +92,8 @@
 
             <send returnConsumer="${ReturnConsumer.message(m -> { System.out.println(&quot;Message returned&quot;); })}">
                 <text parseMode="markdown">
-                    *Text*<br/>Да
+                    *Hello* ${MessageUtils.getFrom(update).getFirstName()}!
+                    How are you?
                 </text>
             </send>
             <branch name="point" when="${update.hasMessage() &amp;&amp; controller.check()}" allowedInterruptions="all">

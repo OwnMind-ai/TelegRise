@@ -14,9 +14,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class XMLUtils {
     @NotNull
@@ -29,18 +29,17 @@ public class XMLUtils {
     }
 
     public static String innerXML(Node node) {
-        String result = extractRawInnerXML(node).trim();
+        String result = extractRawInnerXML(node).stripIndent();
         if (result.isEmpty()) return null;
 
         String[] lines = result.split("\n");
-
-        for (int i = 0, splitLength = lines.length; i < splitLength; i++) {
-            lines[i] = lines[i].trim();
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            stringJoiner.add(line.trim());
         }
 
-        result = String.join("", lines);
-
-        return applyHTMLTextDecorators(result);
+        return applyHTMLTextDecorators(stringJoiner.toString());
     }
 
     private static String extractRawInnerXML(Node node) {
@@ -61,13 +60,13 @@ public class XMLUtils {
 
     public static String innerXMLTextBlock(Node node){
         String raw = extractRawInnerXML(node).trim();
-
         if (raw.isEmpty()) return null;
 
-        StringBuilder result = new StringBuilder();
-        Arrays.stream(raw.split("\n")).map(String::strip).forEach(str -> result.append(str).append("\n"));
+        // Reasoning for this is that the first line's indentation stripped by XML parser, but the rest of the lines are not
+        List<String> lines = List.of(raw.split("\n"));
+        String result = lines.get(0) + String.join("\n", lines.subList(1, lines.size())).stripIndent();
 
-        return applyHTMLTextDecorators(result.toString().trim());
+        return applyHTMLTextDecorators(result);
     }
 
     public static String applyHTMLTextDecorators(String string){
