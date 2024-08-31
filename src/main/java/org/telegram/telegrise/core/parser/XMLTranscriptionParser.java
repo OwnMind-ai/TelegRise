@@ -57,7 +57,7 @@ public class XMLTranscriptionParser implements TranscriptionParser{
         try {
             this.applicationNamespace.addClass(node.getNodeValue().trim());
         } catch (ClassNotFoundException e) {
-            throw new TranscriptionParsingException("Unable to import class '" + node.getNodeValue() + "': Class not found", node.getParentNode());
+            throw new TranscriptionParsingException("Unable to import class '" + node.getNodeValue() + "': Class not found", node);
         }
     }
 

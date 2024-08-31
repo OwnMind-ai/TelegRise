@@ -46,7 +46,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
                              boolean flexible) throws InvocationTargetException, IllegalAccessException {
         Object[] parameters = flexible ? composeParameters(reference, args) : args;
 
-        // for cases like #getNull -> (#first OPERATOR #second)
+        // for cases like #getNull → (#first OPERATOR #second)
         if (!flexible && reference instanceof OperationReference<?, ?> r){
             r.setComposeRight(false);
             r.setComposeLeft(false);

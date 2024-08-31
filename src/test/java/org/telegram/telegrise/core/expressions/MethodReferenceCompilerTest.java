@@ -93,7 +93,7 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
 
-        parser = new Parser(new Lexer(new CharsStream("#getNull -> (#isNull ; #consume)")));
+        parser = new Parser(new Lexer(new CharsStream("#getNull -> (#isNull ; #isNull)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
     }

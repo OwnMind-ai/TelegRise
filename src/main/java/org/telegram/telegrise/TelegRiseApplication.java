@@ -14,7 +14,9 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.resources.ResourceFactory;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
@@ -92,9 +94,12 @@ public final class TelegRiseApplication {
             controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);
-        } catch (Throwable e) {
+        } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {
             throw TelegRiseRuntimeException.unfold(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
         return controller;
     }
 

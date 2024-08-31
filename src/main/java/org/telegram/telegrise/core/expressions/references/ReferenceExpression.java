@@ -10,9 +10,7 @@ import org.w3c.dom.Node;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public interface ReferenceExpression extends Serializable {
     Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException;
@@ -28,12 +26,15 @@ public interface ReferenceExpression extends Serializable {
         return pool -> {
             Map<Class<?>, Object> components = pool.getComponents();
 
-            if (!Arrays.stream(parameterTypes()).allMatch(p -> ResourcePool.extractComponent(components, p) != null))
-                throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(parameterTypes())
-                        .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
+            Class<?>[] types = parameterTypes();
+            Object[] parameters = new Object[types.length];
+            for (int i = 0; i < types.length; i++) {
+                Object o = ResourcePool.extractComponent(components, types[i]);
+                parameters[i] = o;
 
-            Object[] parameters = Arrays.stream(parameterTypes())
-                    .map(p -> ResourcePool.extractComponent(components, p)).toArray();
+                if (o == null)
+                    throw new TelegRiseRuntimeException("Unable to find '%s' in the available resources".formatted(types[i].getSimpleName()));
+            }
 
             try {
                 Object result = this.invoke(pool, pool.getHandler(), parameters);

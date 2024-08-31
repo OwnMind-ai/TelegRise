@@ -6,12 +6,12 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.List;
 
@@ -66,7 +66,8 @@ public class MediaGroup implements MediaType{
     }
 
     @Override
-    public GeneratedValue<InputFile> getInputFile() {
-        return null;
-    }
+    public GeneratedValue<InputFile> getInputFile() { return null; }
+
+    @Override
+    public boolean isMediaRequired() { return false; }
 }

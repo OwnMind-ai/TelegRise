@@ -1,85 +1,250 @@
 package org.telegram.telegrise;
 
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrise.annotations.OnCreate;
-import org.telegram.telegrise.annotations.Reference;
-import org.telegram.telegrise.annotations.Resource;
-import org.telegram.telegrise.annotations.TreeController;
-import org.telegram.telegrise.caching.CachingStrategy;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.annotations.*;
+import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.actions.Send;
+import org.telegram.telegrise.keyboard.DynamicKeyboard;
+import org.telegram.telegrise.keyboard.SwitchButton;
 import org.telegram.telegrise.senders.BotSender;
+import org.telegram.telegrise.utils.MessageUtils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @TreeController
 public class SimpleController {
-    public static void main(String[] args) {
-        TelegRiseApplication application = new TelegRiseApplication(new File("samples/index.xml"), SimpleController.class);
+    @Reference
+    public static boolean isHello(Update update, SessionMemory memory){
+        if (!memory.containsKey("hello"))
+            memory.put("hello", false);
 
-        application.start();
-    }
-
-    @Resource  // Injects resource into created instance, customizable
-    private SessionMemory memory;
-
-    @Resource
-    private BotSender sender;
-
-    @OnCreate
-    public void initialize() {
-        System.out.println("Someone pressed '/start'");
+        memory.put("hello", !memory.get("hello", Boolean.class));
+        return memory.get("hello", Boolean.class);
     }
 
     @Reference
-    public void respond(Update update) throws InterruptedException {
-        Message result = sender.of(update.getMessage())
-                .replyMarkup(new InlineKeyboardMarkup(List.of(new InlineKeyboardRow(InlineKeyboardButton.builder().text("a").callbackData("a").build()))))
-                .disableNotification(true)
-                .disableWebPagePreview(true)
-                .reply("response");
-
-        Thread.sleep(1000);
-
-        sender.ofEditable(result).edit("edited", InlineKeyboardMarkup.builder().clearKeyboard().build());
-    }
-
-    @Reference  // Indicates that method can be referenced at transcription by using '#' sign
-    public void logResponse(Update update) {
-        this.memory.put("response", update);
-        sender.of(update.getCallbackQuery()).answer("Ok");
-    }
-
-    @Reference
-    public boolean messageSent(Update update) {
+    public static boolean checkStart(Update update, SessionMemory memory){
         return update.hasMessage();
     }
 
     @Reference
-    public boolean messageText(Update update, String text){
-        return text.equals(update.getMessage().getText());
+    public Consumer<Update> getWarnListener(){
+        return update -> this.sender.of(memory.getLastSentMessage()).send("You are not allowed to use this command");
     }
 
-    @Reference(caching = CachingStrategy.TREE)
-    public Long extractNumber(Update update){
-        try {
-            return Long.parseLong(update.getMessage().getText());
-        } catch (NumberFormatException e){
-            return null;
+    @Reference
+    public static boolean getTrue(Update update){
+        return true;
+    }
+
+    @Reference
+    public static void printHello(){
+        System.out.println("Hello for static method!");
+    }
+
+    @Resource
+    private BotSender sender;
+
+    @Resource
+    private SessionMemory memory;
+
+    @Resource
+    private MediaCollector mediaCollector;
+    @Resource
+    private TranscriptionManager objectManager;
+
+    public static void main(String[] args) {
+        TelegRiseApplication application = new TelegRiseApplication(new File("src/test/resources/index.xml"), SimpleController.class);
+        application.setRoleProvider(new Provider());
+        application.setSessionInitializer(new SessionInitializer() {
+            @Resource
+            private BotSender sender;
+
+            @Override
+            public void initialize(SessionMemory memory) {
+                memory.put("test", "test");
+                try {
+                    sender.execute(SendMessage.builder().chatId(memory.getUserIdentifier().getId()).text("Initialized").build());
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        application.addService(new SimpleService());
+        application.start();
+    }
+
+    @OnCreate
+    public void onCreate(){
+        System.out.println("OnCreate executed, user identifier: " + memory.getUserIdentifier().getId());
+    }
+
+    @OnClose
+    public void onClose(){
+        System.out.println("OnClose method executed");
+    }
+
+    @Reference
+    public void fillKeyboard(){
+        DynamicKeyboard keyboard = this.memory.get("dynamic", DynamicKeyboard.class);
+        System.out.println(keyboard);
+    }
+
+    @Reference
+    public boolean predicate(Update update){
+        return update.hasMessage() && update.getMessage().hasPhoto();
+    }
+
+    @Reference
+    public void log(Update update){
+        System.out.println("Got a message from " + Objects.requireNonNull(MessageUtils.getFrom(update)).getFirstName());
+        System.out.println("Last sent message ID: " + Objects.requireNonNull(this.memory.getLastSentMessage()).getMessageId());
+        System.out.println("Start text: " + this.objectManager.getTextBlock("startText").getText(update).replace("\n", "   "));
+    }
+
+    @Reference
+    public boolean not(boolean b){
+        return !b;
+    }
+
+    @Reference
+    public void send(Update update) throws TelegramApiException {
+        sender.execute(SendMessage.builder().chatId(update.getCallbackQuery().getMessage().getChatId()).text("Done").build());
+    }
+
+    public static InputStream downloadFile(String fileUrl) throws Exception {
+        URL url = new URL(fileUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new RuntimeException("Failed to download file: " + connection.getResponseMessage());
+        }
+
+        return connection.getInputStream();
+    }
+
+    @Reference
+    public InputFile getVideo() throws Exception {
+        return new InputFile(downloadFile("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"), "video.mp4");
+    }
+
+    @Reference
+    public void switchButton(){
+        this.memory.get("dynamic", DynamicKeyboard.class).get(3, 0);
+
+        SwitchButton button = (SwitchButton) this.memory.get("dynamic", DynamicKeyboard.class).get(3, 0);
+        button.flip(new ResourcePool());
+    }
+
+    @Reference
+    public void disableButton(){
+        this.memory.get("dynamic", DynamicKeyboard.class).disableRow(2);
+    }
+
+    @Reference
+    public boolean doSendPhoto(Update update){
+        return Objects.requireNonNull(MessageUtils.getFrom(update)).getId() == 503138767L;
+    }
+
+    @Reference
+    public boolean isMediagroup(Update update){
+        return update.hasMessage() && update.getMessage().getMediaGroupId() != null;
+    }
+
+    @Reference
+    public List<InputMedia> duplicateMedias(Update update){
+        return this.mediaCollector.collect(update).stream().map(MessageUtils::toInputMedia).collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unused")
+    public boolean check(){
+        System.out.println("Check executed");
+        return true;
+    }
+
+    @Reference
+    public PartialBotApiMethod<?> createSendMethod(Send send, Update update){
+        return SendMessage.builder()
+                .chatId(update.getMessage().getChatId())
+                .text("Got Send object: " + send.toString())
+                .build();
+    }
+
+    @Handler(absolute = true)
+    public static class PHandler implements PrimaryHandler {
+        @Resource
+        private BotSender sender;
+        @Resource
+        private TranscriptionManager manager;
+
+        @Override
+        public boolean canHandle(Update update) {
+            return update.hasMessage() && "/transit".equals(update.getMessage().getText());
+        }
+
+        @Override
+        public void handle(Update update) {
+            System.out.println("Primary handler triggered from tree " + manager.getCurrentTree());
+            manager.transitPrevious(update, "Main", true);
         }
     }
 
-    @Reference
-    public void process(Long i){
-        System.out.println(i);
+    @Handler(independent = true, absolute = true)
+    public static class SecondHandler implements PrimaryHandler {
+        @Override
+        public boolean canHandle(Update update) {
+            return update.hasMessage() && "/second".equals(update.getMessage().getText());
+        }
+
+        @Override
+        public void handle(Update update) {
+            System.out.println("Second primary handler triggered from " + Objects.requireNonNull(MessageUtils.getChat(update)).getId());
+        }
     }
 
-    @Reference
-    public String getNull(){
-        return null;
+    public static class Provider implements RoleProvider{
+
+        @Override
+        public String getRole(User user, SessionMemory sessionMemory) {
+            return user.getId() == 503138767L ? "admin"
+                    : user.getId() == 5128967123L ? "secondary" : "unauthorised";
+        }
+    }
+
+    @TreeController
+    public static class StartController{
+        private boolean hello;
+
+        @Reference
+        public boolean isHello(){
+            this.hello = !hello;
+            return this.hello;
+        }
+    }
+
+    public static class SimpleService implements Service{
+        @Resource
+        private BotSender sender;
+
+        @Override
+        public void run() {
+            System.out.println("Service started wih injected: " + sender);
+        }
     }
 }

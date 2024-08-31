@@ -18,6 +18,8 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MethodReferenceCompiler {
     // Used to exclude reference duplication
@@ -105,6 +107,15 @@ public class MethodReferenceCompiler {
                 ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
                 ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
 
+                for (Class<?> leftParameter : left.parameterTypes()){
+                    for (Class<?> rightParameter : right.parameterTypes()){
+                        if (leftParameter != rightParameter &&
+                                (ClassUtils.isAssignable(leftParameter, rightParameter) || ClassUtils.isAssignable(rightParameter, leftParameter))){
+                            throw new TranscriptionParsingException("Unable to apply '|' operator: left side requires parameter of type '%s' which conflicts (assignable one to another) with parameter of type '%s' on the right".formatted(leftParameter.getSimpleName(), rightParameter.getSimpleName()), node);
+                        }
+                    }
+                }
+
                 OperationReference<?, ?> reference = new OperationReference<>(left.returnType());
                 reference.setLeft(left);
                 reference.setRight(right);
@@ -114,7 +125,10 @@ public class MethodReferenceCompiler {
 
                     return result;
                 });
-                reference.setParameters(left.parameterTypes());
+                reference.setParameters(
+                        Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
+                            .collect(Collectors.toSet()).toArray(Class[]::new)
+                );
 
                 return reference;
             }

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import org.telegram.telegrise.utils.MessageUtils ?>
+<?import org.telegram.telegrise.ReturnConsumer ?>
+<?import org.telegram.telegrise.SimpleController ?>
+<bot username="" token="" autoCommands="true" interruptions="true">
+    <head>
+        <link src="keyboards.xml"/>
+        <link src="tree.xml"/>
+    </head>
+
+    <roles>
+        <role name="admin" level="100" onDeniedTree="denied"/>
+        <role name="secondary" accessibleTrees="startTree" level="0" onDeniedTree="denied"/>
+        <role name="unauthorised" level="-1" onDeniedTree="denied"/>
+    </roles>
+
+    <menu name="Main" >
+        <send>
+            <text parseMode="markdown">Menu</text>
+        </send>
+        <tree name="startTree" commands="start" description="Start" accessLevel="0"
+              predicate="SimpleController#checkStart(update, memory) AND SimpleController#getTrue">
+            <keyboards>
+                <keyboard name="startKeyboard" type="reply" resize="true">
+                    <row><button accessLevel="1">First Button</button></row>
+                    <row><button>Second Button</button></row>
+                </keyboard>
+            </keyboards>
+            <send>
+                <text name="startText"  conditional="true">
+                    <if condition="SimpleController#isHello" textblock="true">
+                        Hello! <code>User</code>
+
+                        How&#160;can I help you?
+
+                        ${SimpleController#isHello} ${SimpleController#isHello}
+                        ${memory.get("test")}
+                    </if>
+                    <else>
+                        Hello again!
+                        ${SimpleController#isHello} ${SimpleController#isHello}
+                    </else>
+                </text>
+                <keyboard byName="startKeyboard"/>
+            </send>
+        </tree>
+        <tree name="copyStartText" commands="copy_start_text" description="Test for text loading by name" accessLevel="0">
+            <send>
+                <text byName="startText"/>
+            </send>
+        </tree>
+        <tree name="testMediaCollector" commands="test_media_collector" description="Test for media collector" controller="SimpleController"  accessLevel="0" >
+            <send>
+                Send mediagroup
+            </send>
+            <branch when="#isMediagroup">
+                <send>
+                    <mediaGroup inputMedia="#duplicateMedias"/>
+                </send>
+            </branch>
+            <default>
+                <send>
+                    It's not a mediagroup
+                </send>
+            </default>
+        </tree>
+        <tree name="testMedia" commands="test_media" description="Test for media tag" controller="SimpleController"  accessLevel="0" >
+            <send>
+                <media sendMethod="#createSendMethod"/>
+            </send>
+            <branch when="true">
+                <send>Bye!</send>
+            </branch>
+        </tree>
+        <tree name="denied">
+            <send>Sorry, your request was denied</send>
+        </tree>
+        <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
+              controller="SimpleController" chats="private" description="test" accessLevel="0" allowedInterruptions="none">
+            <keyboards>
+                <keyboard name="First" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
+                    <row><button data="first">First</button></row>
+                    <row><button data="second">Second</button></row>
+                    <row><button data="disableMe">Disable Me!</button></row>
+                    <row><switch name="switch" off="Off" on="On"/></row>
+                    <row><button data="testAnimation">Test Animation</button></row>
+                </keyboard>
+            </keyboards>
+
+            <send returnConsumer="${ReturnConsumer.message(m -> { System.out.println(&quot;Message returned&quot;); })}">
+                <text parseMode="markdown">
+                    *Text*<br/>Да
+                </text>
+            </send>
+            <branch name="point" when="${update.hasMessage() &amp;&amp; controller.check()}" allowedInterruptions="all">
+                <chatAction action="typing"/>
+                <wait timeout="3" listener="#getWarnListener"/>
+                <send>
+                    <photo when="#doSendPhoto" url="https://i0.wp.com/www.alphr.com/wp-content/uploads/2022/09/ikaw-lang-1.png"/>
+                    <text>Hi, ${MessageUtils.getFrom(update).getFirstName()}</text>
+                    <keyboard byName="First" />
+                </send>
+
+                <branch when="#predicate -> #not -> #not">
+                    <send>
+                        <photo fileId="${update.getMessage().getPhoto().get(0).getFileId()}"/>
+                        <text parseMode="html"><b>Bye</b></text>
+                    </send>
+                </branch>
+                <branch callbackTriggers="first; second" invoke="#send; #log; SimpleController#printHello">
+                    <transition direction="next" target="newMenu" execute="true"/>
+                </branch>
+                <branch callbackTriggers="disableMe">
+                    <invoke method="#disableButton"/>
+                    <answer text="Done!"/>
+                    <edit keyboardId="dynamic" source="callback"/>
+                    <transition direction="local" target="point" execute="false"/>
+                </branch>
+                <branch callbackTriggers="switch-on; switch-off">
+                    <flip id="dynamic" switch="switch"/>
+                    <edit keyboardId="dynamic"  source="callback"/>
+                    <transition direction="local" target="point" execute="false"/>
+                </branch>
+                <branch callbackTriggers="testAnimation">
+                    <animate period="0.5" loops="5" parallel="false">
+                        <frame>Loading /</frame>
+                        <frame>Loading -</frame>
+                        <frame>Loading \</frame>
+                        <frame>Loading |</frame>
+                    </animate>
+                    <send>Done!</send>
+                    <transition direction="local" target="point" execute="true"/>
+                </branch>
+                <default>
+                    <send>Wrong</send>
+                </default>
+            </branch>
+
+            <menu name="newMenu">
+                <send>New menu</send>
+                <tree name="tree" keys="Ok" accessLevel="0">
+                    <send>Yes or no?</send>
+                    <branch keys="yes">
+                        <send>Okay</send>
+                        <transition direction="jump" target="toBeCalled">
+                            <send>Jump ended</send>
+                            <transition direction="previous" target="Main"/>
+                        </transition>
+                    </branch>
+                </tree>
+                <default>
+                    <send>Default</send>
+                </default>
+            </menu>
+        </tree>
+        <tree name="toBeCalled" accessLevel="0">
+            <send>
+                <text>Jumped to Tree</text>
+                <keyboard type="inline">
+                    <row><button data="back">Back</button></row>
+                    <row><button data="1">1</button></row>
+                </keyboard>
+            </send>
+            <branch callbackTriggers="back">
+                <transition direction="caller" type="tree"/>
+            </branch>
+            <branch callbackTriggers="1" name="initial">
+                <edit source="callback">
+                    <text>1</text>
+                    <keyboard type="inline">
+                        <row><button data="2">2</button></row>
+                    </keyboard>
+                </edit>
+                <transition direction="previous" target="toBeCalled" execute="false"/>
+            </branch>
+            <branch callbackTriggers="2">
+                <edit source="callback">
+                    <text>2</text>
+                    <keyboard type="inline">
+                        <row><button data="1">1</button></row>
+                    </keyboard>
+                </edit>
+                <transition direction="previous" target="toBeCalled" execute="false"/>
+            </branch>
+        </tree>
+        <default when="${MessageUtils.getChat(update).isUserChat()}">
+            <send>Don't get it</send>
+        </default>
+    </menu>
+</bot>

@@ -1,9 +1,10 @@
 package org.telegram.telegrise.exceptions;
 
 public class TelegRiseRuntimeException extends RuntimeException{
-    public static TelegRiseRuntimeException unfold(Throwable e){
-        if (e instanceof TelegRiseRuntimeException) return (TelegRiseRuntimeException) e;
-        else if (!(e instanceof TelegRiseInternalException)) return new TelegRiseRuntimeException(null, e, false);
+    public static RuntimeException unfold(Throwable e){
+        if (e instanceof TelegRiseRuntimeException ex) return ex;
+        if (e instanceof TranscriptionParsingException ex) return ex;
+        else if (!(e instanceof TelegRiseInternalException)) return new TelegRiseRuntimeException(e.getMessage(), e, false);
 
         while (e.getCause() instanceof TelegRiseInternalException){
             e = e.getCause();

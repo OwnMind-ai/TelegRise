@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements;
 
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.LSSerializer;
 
@@ -17,11 +18,12 @@ public abstract class NodeElement {
     public static @NotNull String formatNode(Node node) {
         StringBuilder builder = new StringBuilder();
 
-        if (node.getOwnerDocument().getDocumentURI() == null){
+        Document document = node.getNodeType() == Node.DOCUMENT_NODE ? (Document) node : node.getOwnerDocument();
+        if (document == null || document.getDocumentURI() == null){
             builder.append("<unknown source>: ");
         } else {
             try {
-                builder.append(new URI(node.getOwnerDocument().getDocumentURI()).toURL().getFile()).append(": ");
+                builder.append(new URI(document.getDocumentURI()).toURL().getFile()).append(": ");
             } catch (MalformedURLException | URISyntaxException e) {
                 builder.append(node.getOwnerDocument().getDocumentURI()).append(": ");
             }
@@ -29,7 +31,7 @@ public abstract class NodeElement {
 
         List<String> path = new ArrayList<>();
         traversePath(path, node.getParentNode());
-        builder.append(String.join("/", path)).append("/");
+        builder.append(String.join(".", path));
 
         LSSerializer serializer = XMLUtils.getLsSerializer(node);
         builder.append("\n").append(serializer.writeToString(node).split("\n")[0]);

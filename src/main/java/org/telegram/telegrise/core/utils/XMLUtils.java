@@ -21,8 +21,8 @@ import java.util.List;
 public class XMLUtils {
     @NotNull
     public static LSSerializer getLsSerializer(Node node) {
-
-        DOMImplementationLS ls = (DOMImplementationLS) node.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+        Document document = node.getNodeType() == Node.DOCUMENT_NODE ? (Document) node : node.getOwnerDocument();
+        DOMImplementationLS ls = (DOMImplementationLS) document.getImplementation().getFeature("LS", "3.0");
         LSSerializer lsSerializer = ls.createLSSerializer();
         lsSerializer.getDomConfig().setParameter("xml-declaration", false);
         return lsSerializer;

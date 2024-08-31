@@ -2,9 +2,11 @@ package org.telegram.telegrise.core.parser;
 
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.io.Serializable;
@@ -54,8 +56,12 @@ public final class TranscriptionMemory implements Serializable {
     public void put(String name, TranscriptionElement transcriptionElement) {
         if (readOnly) throw new UnsupportedOperationException();
 
-        if (elements.containsKey(name))
-            throw new TelegRiseRuntimeException("Name '" + name + "' already exists");
+        if (elements.containsKey(name)) {
+            if (transcriptionElement instanceof NodeElement node)
+                throw new TranscriptionParsingException("Name '" + name + "' already exists", node.getElementNode());
+            else
+                throw new TelegRiseRuntimeException("Name '" + name + "' already exists");
+        }
 
         elements.put(name, transcriptionElement);
     }

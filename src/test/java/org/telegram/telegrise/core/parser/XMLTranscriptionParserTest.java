@@ -45,7 +45,7 @@ public class XMLTranscriptionParserTest {
     void before() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(new File("src/test/resources/sample.xml"));
+        Document document = db.parse(new File("src/test/resources/parseTestSample.xml"));
         document.getDocumentElement().normalize();
 
         var elementParser = new XMLElementsParser(
