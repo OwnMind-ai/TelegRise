@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.XMLElementsParser;
 import org.telegram.telegrise.core.parser.XMLTranscriptionParser;
 import org.telegram.telegrise.core.utils.XMLUtils;
@@ -59,7 +60,7 @@ public final class TelegRiseApplication {
     public void start(){
         this.handlersClasses = this.loadPrimaryHandlers();
         TelegramSessionsController controller = this.createController();
-        final String token = controller.getTranscription().getToken();
+        final String token = controller.getTranscription().getToken().generate(new ResourcePool());
 
         LongPollingUpdateConsumer bot = BotFactory.createLongPooling(controller);
         TelegramClient client = new OkHttpTelegramClient(token);

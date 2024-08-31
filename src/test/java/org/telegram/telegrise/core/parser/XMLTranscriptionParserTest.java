@@ -120,8 +120,8 @@ public class XMLTranscriptionParserTest {
 
         BotTranscription transcription = new BotTranscription();
         transcription.setHead(new HeadBlock(List.of(new Link("keyboards.xml"))));
-        transcription.setUsername("bot");
-        transcription.setToken("token");
+        transcription.setUsername(GeneratedValue.ofValue("bot"));
+        transcription.setToken(GeneratedValue.ofValue("token"));
         transcription.setRootMenu(expectedMenu);
 
         assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null));

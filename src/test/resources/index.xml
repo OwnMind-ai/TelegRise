@@ -3,7 +3,7 @@
 <?import org.telegram.telegrise.utils.MessageUtils ?>
 <?import org.telegram.telegrise.ReturnConsumer ?>
 <?import org.telegram.telegrise.SimpleController ?>
-<bot username="" token="" autoCommands="true" interruptions="true">
+<bot username='#env("BOT_USERNAME")' token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true">
     <head>
         <link src="keyboards.xml"/>
         <link src="tree.xml"/>

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.core.elements.security.Roles;
@@ -14,6 +14,7 @@ import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public final class BotTranscription implements TranscriptionElement {
 
     //TODO webhooks support
     @Attribute(name = "username", nullable = false)
-    private String username;
+    private GeneratedValue<String> username;
 
     @Attribute(name = "token", nullable = false)
-    private String token;
+    private GeneratedValue<String> token;
 
     @Attribute(name = "interruptions")
     private boolean interruptions = false;

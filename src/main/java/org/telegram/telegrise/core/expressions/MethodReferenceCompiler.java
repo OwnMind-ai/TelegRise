@@ -138,7 +138,7 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
-        if (token.getClassName() == null && token.getParams() == null) {
+        if (token.getClassName() == null) {
             switch (token.getMethod()) {
                 case Syntax.NOT_REFERENCE:
                     return MethodReference.NOT;
@@ -146,6 +146,11 @@ public class MethodReferenceCompiler {
                     return MethodReference.IS_NULL;
                 case Syntax.NOT_NULL_REFERENCE:
                     return MethodReference.NOT_NULL;
+            }
+
+            if (token.getMethod().equals(Syntax.ENV_REFERENCE) && token.getParams().size() == 1){
+                String expression = String.format("System.getenv((String) %s)", token.getParams().get(0));
+                return getReferenceExpression(namespace, String.class, node, expression);
             }
         }
 
@@ -193,10 +198,14 @@ public class MethodReferenceCompiler {
 
         String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", token.getParams()));
 
+        return getReferenceExpression(namespace, returnType, node, expression);
+    }
+
+    private static @NotNull ReferenceExpression getReferenceExpression(LocalNamespace namespace, Class<?> returnType, Node node, String expression) {
         try {
             GeneratedValue<?> result = ExpressionFactory.getJavaExpressionCompiler().compile(expression, namespace, returnType, node);
 
-            return new ReferenceExpression(){
+            return new ReferenceExpression() {
                 @Override
                 public Object invoke(ResourcePool pool, Object instance, Object... args) {
                     return result.generate(pool);

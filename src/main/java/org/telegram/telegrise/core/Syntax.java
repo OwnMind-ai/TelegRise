@@ -28,4 +28,5 @@ public final class Syntax {
     public static final String NOT_REFERENCE = "not";
     public static final String NOT_NULL_REFERENCE = "notNull";
     public static final String IS_NULL_REFERENCE = "isNull";
+    public static final String ENV_REFERENCE = "env";
 }

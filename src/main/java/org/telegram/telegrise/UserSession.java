@@ -61,7 +61,7 @@ public class UserSession implements Runnable{
 
     public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(userIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername());
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername().generate(new ResourcePool()));
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
