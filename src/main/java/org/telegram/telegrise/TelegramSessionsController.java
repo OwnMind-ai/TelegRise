@@ -3,6 +3,7 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
+import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -99,6 +101,14 @@ public class TelegramSessionsController {
                     throw new RuntimeException(e);
                 }
             });
+        }
+
+        if (transcription.getUsername() == null){
+            try {
+                transcription.setUsername(GeneratedValue.ofValue(botSender.execute(new GetMe()).getUserName()));
+            } catch (TelegramApiException e) {
+                throw new TelegRiseRuntimeException("Bot username wasn't specified and the attempt of getting one caused TelegramApiException: " + e.getMessage());
+            }
         }
     }
 

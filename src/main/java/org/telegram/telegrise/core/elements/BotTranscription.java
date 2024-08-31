@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public final class BotTranscription implements TranscriptionElement {
 
     //TODO webhooks support
-    @Attribute(name = "username", nullable = false)
+    @Attribute(name = "username")
     private GeneratedValue<String> username;
 
     @Attribute(name = "token", nullable = false)
