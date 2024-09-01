@@ -10,9 +10,9 @@ import java.util.List;
 public class MethodReferenceToken implements Token {
     private String className;
     private String method;
-    private List<String> params;
+    private List<PrimitiveToken> params;
 
-    public MethodReferenceToken(String method, List<String> params){
+    public MethodReferenceToken(String method, List<PrimitiveToken> params){
         this.method = method;
         this.params = params;
     }

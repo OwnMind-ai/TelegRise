@@ -2,6 +2,8 @@ package org.telegram.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.core.expressions.tokens.MethodReferenceToken;
+import org.telegram.telegrise.core.expressions.tokens.RawToken;
+import org.telegram.telegrise.core.expressions.tokens.ValueToken;
 
 import java.util.List;
 
@@ -24,9 +26,9 @@ class LexerTest {
         assertEquals(new MethodReferenceToken("if_ignore.Class", "method", null), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method(\"string 1\", 123)"));
-        assertEquals(new MethodReferenceToken("method", List.of("\"string 1\"", "123")), lexer.next());
+        assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("string 1", String.class), new ValueToken("123", Long.class))), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method((1 + 2) / (3 - (3 + 1)), controller.getValue())"));
-        assertEquals(new MethodReferenceToken("method", List.of("(1+2)/(3-(3+1))", "controller.getValue()")), lexer.next());
+        assertEquals(new MethodReferenceToken("method", List.of(new RawToken("(1+2)/(3-(3+1))"), new RawToken("controller.getValue()"))), lexer.next());
     }
 }

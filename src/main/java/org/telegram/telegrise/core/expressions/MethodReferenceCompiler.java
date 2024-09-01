@@ -13,6 +13,7 @@ import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -149,7 +150,7 @@ public class MethodReferenceCompiler {
             }
 
             if (token.getMethod().equals(Syntax.ENV_REFERENCE) && token.getParams().size() == 1){
-                String expression = String.format("System.getenv((String) %s)", token.getParams().get(0));
+                String expression = String.format("System.getenv((String) %s)", token.getParams().get(0).getStringValue());
                 return getReferenceExpression(namespace, String.class, node, expression);
             }
         }
@@ -194,9 +195,25 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Class<?> returnType, Node node) {
-        String caller = token.isStatic() ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
+        if (token.getParams().stream().allMatch(ValueToken.class::isInstance)) {
+            Object[] params = token.getParams().stream().map(ValueToken.class::cast).map(ValueToken::getValue).toArray();
+            return new ReferenceExpression() {
+                @Override
+                public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
+                    return method.invoke(token.isStatic() ? null : instance, params);
+                }
 
-        String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", token.getParams()));
+                @Override
+                public @NotNull Class<?>[] parameterTypes() {return new Class[0];}
+
+                @Override
+                public @NotNull Class<?> returnType() { return method.getReturnType(); }
+            };
+        }
+
+        String caller = token.isStatic() ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
+        String expression = String.format("%s.%s(%s)", caller, method.getName(),
+                token.getParams().stream().map(PrimitiveToken::getStringValue).collect(Collectors.joining(", ")));
 
         return getReferenceExpression(namespace, returnType, node, expression);
     }

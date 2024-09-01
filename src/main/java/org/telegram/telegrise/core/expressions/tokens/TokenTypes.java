@@ -5,7 +5,8 @@ public enum TokenTypes {
     OPERATOR,
     PUNCTUATION,
     KEYWORD,
+    VALUE,
 
     IF_CONSTRUCTION,
-    EXPRESSION
+    RAW, EXPRESSION
 }

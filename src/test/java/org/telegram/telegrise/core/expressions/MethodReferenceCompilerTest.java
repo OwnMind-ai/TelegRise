@@ -33,6 +33,10 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
 
+        parser = new Parser(new Lexer(new CharsStream("#second(!true)")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
         parser = new Parser(new Lexer(new CharsStream("#first -> #second")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));

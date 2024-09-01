@@ -130,7 +130,7 @@ public final class Lexer {
     }
 
     private class ReferenceReader{
-        private final List<String> params = new LinkedList<>();
+        private final List<PrimitiveToken> params = new LinkedList<>();
 
         private ReferenceReader() {
         }
@@ -163,22 +163,22 @@ public final class Lexer {
             int opened = 1;
             int closed = 0;
 
-            StringBuilder parameter = new StringBuilder();
+            StringBuilder parameterValue = new StringBuilder();
             while (!charsStream.eof()){
                 skipWhitespaces();
                 char c = charsStream.peek();
 
                 if (c == '"') {
-                    parameter.append(charsStream.next());
-                    parameter.append(readWhile(s -> !"\"".equals(s), true));
-                    parameter.append(charsStream.next());  // Adds '"'
+                    parameterValue.append(charsStream.next());
+                    parameterValue.append(readWhile(s -> !"\"".equals(s), true));
+                    parameterValue.append(charsStream.next());  // Adds '"'
                 } else if (c == '\''){
-                    parameter.append(charsStream.next());
-                    parameter.append(readWhile(s -> !"'".equals(s), true));
-                    parameter.append(charsStream.next());  // Adds '\''
+                    parameterValue.append(charsStream.next());
+                    parameterValue.append(readWhile(s -> !"'".equals(s), true));
+                    parameterValue.append(charsStream.next());  // Adds '\''
                 } else if (c == ',') {
-                    this.params.add(parameter.toString());
-                    parameter = new StringBuilder();
+                    this.addParameter(parameterValue.toString());
+                    parameterValue = new StringBuilder();
                     charsStream.next();
                 } else if (c == '(' || c == ')'){
                     if (c == '('){
@@ -187,18 +187,37 @@ public final class Lexer {
                         closed++;
                     }
 
-                    parameter.append(charsStream.next());
+                    parameterValue.append(charsStream.next());
                     if (opened == closed) {
-                        String last = parameter.toString();
-                        this.params.add(last.substring(0, last.length() - 1));  // Removes redundant ")" at the end
+                        String last = parameterValue.toString();
+                        this.addParameter(last.substring(0, last.length() - 1));  // Removes redundant ")" at the end
                         break;
                     }
                 } else {
-                    parameter.append(charsStream.next());
+                    parameterValue.append(charsStream.next());
                 }
             }
 
             return opened == closed;
+        }
+
+        private void addParameter(String parameter){
+            if (parameter.isEmpty()) return;
+
+            if (parameter.startsWith("\"") && parameter.endsWith("\"")
+                    && parameter.replace("\\\"", "").split("\"").length == 2){  // Ensures that there is only one string and not an expression like "a" + "b"
+                this.params.add(new ValueToken(parameter.substring(1, parameter.length() - 1), String.class));
+            } else if (parameter.startsWith("'") && parameter.endsWith("'")){
+                this.params.add(new ValueToken(parameter.substring(1, parameter.length() - 1), Character.class));
+            } else if (parameter.matches("\\d+")){
+                this.params.add(new ValueToken(parameter, Long.class));
+            } else if (parameter.matches("\\d+\\.\\d+")){
+                this.params.add(new ValueToken(parameter, Double.class));
+            } else if (List.of("false", "true").contains(parameter)){
+                this.params.add(new ValueToken(parameter.equals("true"), Boolean.class));
+            } else {
+                this.params.add(new RawToken(parameter));
+            }
         }
     }
 }
