@@ -52,6 +52,11 @@ public class SimpleController {
     }
 
     @Reference
+    public String concat(String... strings){
+        return String.join(" ", strings);
+    }
+
+    @Reference
     public static void printHello(){
         System.out.println("Hello for static method!");
     }

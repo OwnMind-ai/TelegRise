@@ -90,6 +90,7 @@
                 </keyboard>
             </keyboards>
 
+            <send>${#concat("Hi", "World")}</send>
             <send returnConsumer="${ReturnConsumer.message(m -> { System.out.println(&quot;Message returned&quot;); })}">
                 <text parseMode="markdown">
                     *Hello* ${MessageUtils.getFrom(update).getFirstName()}!

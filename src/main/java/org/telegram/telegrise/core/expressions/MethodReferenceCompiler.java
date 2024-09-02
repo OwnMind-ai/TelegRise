@@ -219,7 +219,7 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Class<?> returnType, Node node) {
-        if (token.getParams().stream().allMatch(ValueToken.class::isInstance)) {
+        if (token.getParams().stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray)) {
             List<ValueToken> tokenList = token.getParams().stream().map(ValueToken.class::cast).toList();
             Object[] params = IntStream.range(0, tokenList.size())
                     .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
