@@ -23,7 +23,7 @@ public final class Syntax {
     public static final String DO = "DO";
     public static final String ELSE = "ELSE";
     public static final List<String> KEYWORDS = List.of(IF, DO, ELSE);
-    public static final int MAX_KEYWORDS_LENGTH = 4;
+    public static final int MAX_KEYWORDS_LENGTH = KEYWORDS.stream().mapToInt(String::length).max().orElse(0);
 
     public static final String NOT_REFERENCE = "not";
     public static final String NOT_NULL_REFERENCE = "notNull";

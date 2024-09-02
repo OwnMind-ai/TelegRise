@@ -3,6 +3,8 @@ package org.telegram.telegrise.core.expressions;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.core.expressions.tokens.*;
 
+import java.util.List;
+
 import static org.telegram.telegrise.core.Syntax.*;
 import static org.telegram.telegrise.core.expressions.ErrorCodes.ILLEGAL_IF_ARGUMENT;
 import static org.telegram.telegrise.core.expressions.ErrorCodes.MISSING_DO_STATEMENT;
@@ -27,7 +29,7 @@ public class Parser {
         Token token = this.lexer.next();
 
         if (EXPRESSION_START_TOKEN.equals(token)){
-            Token expression = this.buildExpressionTree(this.parseToken(), 0);
+            Token expression = this.parse();
             this.lexer.next(); // Skip expression end
             return expression;
         }
@@ -36,7 +38,7 @@ public class Parser {
             return parseIfToken();
         }
 
-        if (token != null && token.getTokenType() == TokenTypes.REFERENCE)
+        if (token != null && (token.getTokenType() == TokenTypes.REFERENCE || token.getTokenType() == TokenTypes.VALUE))
             return token;
 
         throw new ReferenceParsingException(ErrorCodes.UNDEFINED_TOKEN, this.lexer.getPosition());
@@ -44,7 +46,7 @@ public class Parser {
 
     private Token parseIfToken() throws ReferenceParsingException {
         IfToken result = new IfToken();
-        result.setPredicate(this.parseToken());
+        result.setPredicate(this.parse());
 
         if (this.isPassiveToken(result.getPredicate()))
             throw new ReferenceParsingException(ILLEGAL_IF_ARGUMENT, this.lexer.getPosition());
@@ -53,7 +55,7 @@ public class Parser {
             throw new ReferenceParsingException(MISSING_DO_STATEMENT, this.lexer.getPosition());
         }
 
-        result.setDoAction(this.parseToken());
+        result.setDoAction(this.parse());
 
         if (this.isPassiveToken(result.getDoAction()))
             throw new ReferenceParsingException(ILLEGAL_IF_ARGUMENT, this.lexer.getPosition());
@@ -61,7 +63,7 @@ public class Parser {
         if (IF_ELSE_TOKEN.equals(this.lexer.peek())){
             this.lexer.next();
 
-            result.setElseAction(this.parseToken());
+            result.setElseAction(this.parse());
 
             if (this.isPassiveToken(result.getElseAction()))
                 throw new ReferenceParsingException(ILLEGAL_IF_ARGUMENT, this.lexer.getPosition());
@@ -71,8 +73,7 @@ public class Parser {
     }
 
     private boolean isPassiveToken(Token token){
-        return token.getTokenType() != TokenTypes.EXPRESSION && token.getTokenType() != TokenTypes.REFERENCE
-                && token.getTokenType() != TokenTypes.IF_CONSTRUCTION;
+        return !List.of(TokenTypes.REFERENCE, TokenTypes.EXPRESSION, TokenTypes.REFERENCE, TokenTypes.VALUE).contains(token.getTokenType());
     }
 
     private Token buildExpressionTree(Token previousToken, int currentPrecedence) throws ReferenceParsingException {

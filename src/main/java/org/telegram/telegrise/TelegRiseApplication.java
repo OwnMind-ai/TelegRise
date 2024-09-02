@@ -62,6 +62,9 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller = this.createController();
         final String token = controller.getTranscription().getToken().generate(new ResourcePool());
 
+        if (token == null || !token.matches("\\d+:[a-zA-Z0-9_-]{35}"))
+            throw new TelegRiseRuntimeException("Invalid token: null");
+
         LongPollingUpdateConsumer bot = BotFactory.createLongPooling(controller);
         TelegramClient client = new OkHttpTelegramClient(token);
         controller.setClient(client);

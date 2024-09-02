@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public final class Lexer {
     private final static String WHITESPACES = " \n\t\r";
@@ -54,11 +55,40 @@ public final class Lexer {
             return keywordToken.get();
         }
 
+        Optional<ValueToken> valueToken = this.readValue();
+        if (valueToken.isPresent())
+            return valueToken.get();
+
         Optional<Token> referenceToken = this.readReference();
         if (referenceToken.isPresent())
             return referenceToken.get();
 
         throw new ReferenceParsingException(ErrorCodes.UNDEFINED_TOKEN, this.charsStream.getPosition());
+    }
+
+    private Optional<ValueToken> readValue() {
+        char c = this.charsStream.peek();
+
+        if (c == '"' || c == '\'') {
+            charsStream.next();
+            String value = this.readWhile(s -> !s.equals(String.valueOf(c)), true);
+            charsStream.next();
+            return Optional.of(new ValueToken(c == '"' ? value : value.charAt(0),
+                    c == '"' ? String.class : Character.class));
+        } else if (Character.isDigit(c)) {
+            String value = this.readWhile(s -> Character.isDigit(s.charAt(0)));
+            if (this.charsStream.peek() == '.') {
+                value += this.charsStream.next();
+                value += this.readWhile(s -> Character.isDigit(s.charAt(0)));
+                return Optional.of(new ValueToken(Double.parseDouble(value), Double.class));
+            }
+
+            return Optional.of(new ValueToken(Long.parseLong(value), Long.class));
+        }
+
+        return Stream.of("true", "false").filter(s -> this.charsStream.peek(5).startsWith(s))
+                .map(s -> new ValueToken(Boolean.parseBoolean(s), Boolean.class))
+                .findFirst();
     }
 
     private Optional<KeywordToken> readKeyword() {
@@ -210,9 +240,9 @@ public final class Lexer {
             } else if (parameter.startsWith("'") && parameter.endsWith("'")){
                 this.params.add(new ValueToken(parameter.substring(1, parameter.length() - 1), Character.class));
             } else if (parameter.matches("\\d+")){
-                this.params.add(new ValueToken(parameter, Long.class));
+                this.params.add(new ValueToken(Long.parseLong(parameter), Long.class));
             } else if (parameter.matches("\\d+\\.\\d+")){
-                this.params.add(new ValueToken(parameter, Double.class));
+                this.params.add(new ValueToken(Double.parseDouble(parameter), Double.class));
             } else if (List.of("false", "true").contains(parameter)){
                 this.params.add(new ValueToken(parameter.equals("true"), Boolean.class));
             } else {

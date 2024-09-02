@@ -18,8 +18,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class MethodReferenceCompiler {
@@ -39,7 +41,29 @@ public class MethodReferenceCompiler {
             return this.compileIf((IfToken) rootToken, namespace, returnType, node);
         }
 
+        if (rootToken.getTokenType() == TokenTypes.VALUE){
+            return this.compileValue((ValueToken) rootToken, returnType);
+        }
+
         return null;
+    }
+
+    private ReferenceExpression compileValue(ValueToken rootToken, Class<?> returnType) {
+        Object value = rootToken.getValue(returnType);
+        return new ReferenceExpression() {
+            @Override
+            public Object invoke(ResourcePool pool, Object instance, Object... args) { return value; }
+
+            @Override
+            public @NotNull Class<?>[] parameterTypes() {
+                return new Class[0];
+            }
+
+            @Override
+            public @NotNull Class<?> returnType() {
+                return returnType;
+            }
+        };
     }
 
     private ReferenceExpression compileIf(IfToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
@@ -196,7 +220,11 @@ public class MethodReferenceCompiler {
 
     private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Class<?> returnType, Node node) {
         if (token.getParams().stream().allMatch(ValueToken.class::isInstance)) {
-            Object[] params = token.getParams().stream().map(ValueToken.class::cast).map(ValueToken::getValue).toArray();
+            List<ValueToken> tokenList = token.getParams().stream().map(ValueToken.class::cast).toList();
+            Object[] params = IntStream.range(0, tokenList.size())
+                    .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
+                    .toArray();
+
             return new ReferenceExpression() {
                 @Override
                 public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {

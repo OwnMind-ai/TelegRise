@@ -12,7 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LexerTest {
     @Test
     public void referenceTest() throws ReferenceParsingException {
-        Lexer lexer = new Lexer(new CharsStream("#method"));
+        Lexer lexer = new Lexer(new CharsStream("123"));
+        assertEquals(new ValueToken(123L, Long.class), lexer.next());
+
+        lexer = new Lexer(new CharsStream("#method"));
         assertEquals(new MethodReferenceToken("method", null), lexer.next());
 
         lexer = new Lexer(new CharsStream("Class#method"));
@@ -26,7 +29,7 @@ class LexerTest {
         assertEquals(new MethodReferenceToken("if_ignore.Class", "method", null), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method(\"string 1\", 123)"));
-        assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("string 1", String.class), new ValueToken("123", Long.class))), lexer.next());
+        assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("string 1", String.class), new ValueToken(123L, Long.class))), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method((1 + 2) / (3 - (3 + 1)), controller.getValue())"));
         assertEquals(new MethodReferenceToken("method", List.of(new RawToken("(1+2)/(3-(3+1))"), new RawToken("controller.getValue()"))), lexer.next());

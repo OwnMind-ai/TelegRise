@@ -8,8 +8,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
 import org.w3c.dom.Node;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.toNode;
 
 public class MethodReferenceCompilerTest {
@@ -21,8 +20,16 @@ public class MethodReferenceCompilerTest {
         ResourcePool pool = new ResourcePool(null, this, null, null);
         Node node = toNode("<tag/>");
 
-        Parser parser = new Parser(new Lexer(new CharsStream("#first")));
-        ReferenceExpression expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        Parser parser = new Parser(new Lexer(new CharsStream("\"value\"")));
+        ReferenceExpression expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("value", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("123")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(123, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#first")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
 
         parser = new Parser(new Lexer(new CharsStream("MethodReferenceCompilerTest#getOne")));
@@ -32,6 +39,15 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("#second(false)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#env(\"JAVA_HOME\")")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        ReferenceExpression finalExpression = expression;
+        assertDoesNotThrow(() -> finalExpression.toGeneratedValue(String.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#setNum(123)")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(123, expression.toGeneratedValue(Integer.class, node).generate(pool));
 
         parser = new Parser(new Lexer(new CharsStream("#second(!true)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
@@ -65,7 +81,23 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
 
+        parser = new Parser(new Lexer(new CharsStream("true -> (#second -> #second)")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
         parser = new Parser(new Lexer(new CharsStream("IF #first DO MethodReferenceCompilerTest#getOne")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("IF #first DO 123 ELSE 456")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(123, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("IF #first -> #not DO 123 ELSE (#first OR #third) -> (#second -> #second")));
+        expression = compiler.compile(parser.parse(), namespace, Object.class, node);
+        assertEquals(true, expression.toGeneratedValue(Object.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("IF #first -> (#not -> #not) -> #not DO 123 ELSE MethodReferenceCompilerTest#getOne")));
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
 
@@ -120,6 +152,11 @@ public class MethodReferenceCompilerTest {
     @Reference
     public static int getOne(){
         return 1;
+    }
+
+    @Reference
+    public int setNum(int num){
+        return num;
     }
 
     @Reference
