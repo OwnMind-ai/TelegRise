@@ -11,11 +11,13 @@ import org.telegram.telegrambots.meta.api.methods.stickers.CreateNewStickerSet;
 import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumbnail;
 import org.telegram.telegrambots.meta.api.methods.stickers.UploadStickerFile;
 import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
+import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -41,6 +43,14 @@ public class BotSender {
     public BotSender(TelegramClient client, SessionMemoryImpl memory) {
         this.client = client;
         this.memory = memory;
+    }
+
+    public boolean delete(MaybeInaccessibleMessage message) throws TelegramApiException {
+        return this.client.execute(DeleteMessage.builder().chatId(message.getChatId()).messageId(message.getMessageId()).build());
+    }
+
+    public boolean delete(CallbackQuery query) throws TelegramApiException {
+        return delete(query.getMessage());
     }
 
     public MessageActionBuilder of(Message message){
