@@ -75,6 +75,11 @@
                 <send>Bye!</send>
             </branch>
         </tree>
+        <tree name="testError" commands="test_error" description="Tests error" accessLevel="0">
+            <send chat="100">
+                Error
+            </send>
+        </tree>
         <tree name="denied">
             <send>Sorry, your request was denied</send>
         </tree>

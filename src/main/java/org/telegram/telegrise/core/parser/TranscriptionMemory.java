@@ -9,7 +9,6 @@ import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 import java.io.Serializable;
@@ -73,7 +72,7 @@ public final class TranscriptionMemory implements Serializable {
 
         if ((currentTree != null && treeMemory.getOrDefault(currentTree, Map.of()).containsKey(name)) ||
                 (currentTree == null && standardMemory.containsKey(name))) {
-            throw new TranscriptionParsingException("Name '" + name + "' already exists", element.getElementNode());
+            throw new TelegRiseRuntimeException("Name '" + name + "' already exists", element.getElementNode());
         }
 
         if (element instanceof NamedElement namedElement && namedElement.isGlobal())

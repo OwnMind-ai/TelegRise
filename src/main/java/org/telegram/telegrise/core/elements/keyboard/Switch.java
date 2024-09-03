@@ -32,11 +32,11 @@ public class Switch extends Button{
 
     @Override
     public InlineKeyboardButton createInlineButton(ResourcePool pool) {
-        throw new TelegRiseRuntimeException("Switch buttons are only allowed in dynamic keyboards");
+        throw new TelegRiseRuntimeException("Switch buttons are only allowed in dynamic keyboards", node);
     }
 
     @Override
     public KeyboardButton createKeyboardButton(ResourcePool pool) {
-        throw new TelegRiseRuntimeException("Switch buttons are only allowed in dynamic keyboards");
+        throw new TelegRiseRuntimeException("Switch buttons are only allowed in dynamic keyboards", node);
     }
 }

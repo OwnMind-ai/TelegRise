@@ -47,7 +47,7 @@ public class Wait extends ActionElement{
             if(onInterrupted != null)
                 onInterrupted.generate(resourcePool).accept(e);
             else
-                throw new TelegRiseRuntimeException("Waiting action was interrupted:" + e.getMessage());
+                throw new TelegRiseRuntimeException("Waiting action was interrupted:" + e.getMessage(), node);
         }
 
         return null;

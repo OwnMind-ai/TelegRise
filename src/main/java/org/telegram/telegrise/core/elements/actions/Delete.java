@@ -30,7 +30,7 @@ public class Delete extends ActionElement{
                 .chatId(this.generateChatId(resourcePool))
                 .messageId(messageId != null ? messageId.generate(resourcePool) :
                         Optional.ofNullable(MessageUtils.getMessageId(resourcePool.getUpdate()))
-                                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to extract message ID for deletion action")))
+                                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to extract message ID for deletion action", node)))
                 .build();
     }
 }

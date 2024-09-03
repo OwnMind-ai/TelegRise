@@ -31,7 +31,7 @@ public class MediaGroup extends MediaType{
         List<InputMedia> media = inputMedia.generate(pool);
 
         if (media.size() <= 1 || media.size() > 10)
-            throw new TelegRiseRuntimeException("Number of media must be between 2 and 10");
+            throw new TelegRiseRuntimeException("Number of media must be between 2 and 10", node);
 
         return SendMediaGroup.builder().medias(this.applyCaption(media, parent, pool))
                 .chatId(parent.generateChatId(pool))

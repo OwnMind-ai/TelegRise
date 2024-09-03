@@ -52,7 +52,7 @@ public class TransitionController {
                 yield true; // INTERRUPTING
             }
             case Transition.CALLER -> this.applyCaller(tree, transition, pool);
-            default -> throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'");
+            default -> throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'", transition.getElementNode());
         };
     }
 
@@ -61,7 +61,7 @@ public class TransitionController {
         JumpPoint point = this.sessionMemory.getJumpPoints().peekLast();
 
         if (point == null)
-            throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'");
+            throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'", transition.getElementNode());
 
         if (point.getActions() != null) {
             TreeExecutor pointExecutor = this.treeExecutors.stream()
@@ -117,7 +117,7 @@ public class TransitionController {
     private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
         String target = transition.getTarget().generate(pool);
         BranchingElement requested = this.transcriptionMemory.get(tree, target, BranchingElement.class, Transition.TYPE_LIST);
-        if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + target + "'");
+        if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + target + "'", transition.getElementNode());
 
         this.sessionMemory.getBranchingElements().add(requested);
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
@@ -126,7 +126,7 @@ public class TransitionController {
     private void applyNext(Tree tree, Transition transition, ResourcePool pool) {
         final String target = transition.getTarget().generate(pool);
         Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(target)).findFirst()
-                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + target + "' in tree '" + tree.getName() + "'"));
+                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + target + "' in tree '" + tree.getName() + "'", transition.getElementNode()));
 
         this.sessionMemory.getBranchingElements().add(next);
     }
@@ -153,7 +153,7 @@ public class TransitionController {
             }
         }
 
-        throw new TelegRiseRuntimeException("Unable to find element called '" + target + "'");
+        throw new TelegRiseRuntimeException("Unable to find element called '" + target + "'", transition.getElementNode());
     }
 
     public void removeExecutor(TreeExecutor executor){

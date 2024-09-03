@@ -159,7 +159,7 @@ public class TranscriptionManager {
 
     private void checkSessionMemory(){
         if (this.sessionMemory == null || this.interruptor == null || transcription == null)
-            throw new TelegRiseRuntimeException("Session memory-oriented methods cannot be called from an independent handler");
+            throw new TelegRiseRuntimeException("Memory-oriented methods cannot be called from an independent handler");
     }
 
     public <T extends Serializable> T get(String name, Class<T> tClass){

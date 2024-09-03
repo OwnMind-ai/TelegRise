@@ -29,7 +29,7 @@ public class Flip extends ActionElement{
         SwitchButton switchButton = keyboard.getSwitch(name);
 
         if (switchButton == null)
-            throw new TelegRiseRuntimeException("Unable to find switch '" + name);
+            throw new TelegRiseRuntimeException("Unable to find switch '" + name, node);
 
         switchButton.flip(resourcePool);
 

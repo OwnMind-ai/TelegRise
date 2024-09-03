@@ -55,7 +55,7 @@ public class Answer extends ActionElement{
         else if (pool.getUpdate() != null && pool.getUpdate().hasCallbackQuery())
             return pool.getUpdate().getCallbackQuery().getId();
         else
-            throw new TelegRiseRuntimeException("No callbackQueryId was specified and update doesn't contains callback query");
+            throw new TelegRiseRuntimeException("No callbackQueryId was specified and update doesn't contains callback query", node);
     }
 
     @Override

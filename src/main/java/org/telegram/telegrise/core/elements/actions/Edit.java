@@ -104,22 +104,22 @@ public class Edit extends ActionElement{
     private Message extractMessage(ResourcePool pool){
         if (LAST.equals(this.getSource())){
             if (pool.getMemory().getLastSentMessage() == null)
-                throw new TelegRiseRuntimeException("Unable to apply refresh element: last sent message doesn't exists");
+                throw new TelegRiseRuntimeException("Unable to apply refresh element: last sent message doesn't exists", node);
 
             return pool.getMemory().getLastSentMessage();
         } else if (CALLBACK.equals(this.getSource())) {
             if (pool.getUpdate() == null || !pool.getUpdate().hasCallbackQuery())
-                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed update has no callback query");
+                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed update has no callback query", node);
 
             MaybeInaccessibleMessage maybeInaccessibleMessage = pool.getUpdate().getCallbackQuery().getMessage();
 
             if (!(maybeInaccessibleMessage instanceof Message))
-                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed callback query refers to inaccessible message");
+                throw new TelegRiseRuntimeException("Unable to apply refresh element: passed callback query refers to inaccessible message", node);
 
             return (Message) maybeInaccessibleMessage;
         }
 
-        throw new TelegRiseRuntimeException("Unable to apply refresh element: unknown refresh type " + this.getType());
+        throw new TelegRiseRuntimeException("Unable to apply refresh element: unknown refresh type " + this.getType(), node);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class Edit extends ActionElement{
             return EDIT_MARKUP;
         }
 
-        throw new TelegRiseRuntimeException("Unknown edit type");
+        throw new TelegRiseRuntimeException("Unknown edit type", node);
     }
 
     private InlineKeyboardMarkup getMarkup(ResourcePool pool){
@@ -177,7 +177,7 @@ public class Edit extends ActionElement{
 
     private PartialBotApiMethod<?> editLocation(ResourcePool pool, Integer messageId) {
         if (this.location == null)
-            throw new TelegRiseRuntimeException("New location is not specified");
+            throw new TelegRiseRuntimeException("New location is not specified", node);
 
         return EditMessageLiveLocation.builder()
                 .chatId(this.generateChatId(pool))
@@ -200,7 +200,7 @@ public class Edit extends ActionElement{
             newMedia = inputMedia.generate(pool);
 
         if (newMedia == null)
-            throw new TelegRiseRuntimeException("No input media passed to EditMessageMedia method");
+            throw new TelegRiseRuntimeException("No input media passed to EditMessageMedia method", node);
 
         if (this.text != null){
             newMedia.setCaption(this.text.generateText(pool));
@@ -219,7 +219,7 @@ public class Edit extends ActionElement{
 
     private PartialBotApiMethod<?> editCaption(ResourcePool pool, Integer messageId) {
         if (text == null)
-            throw new TelegRiseRuntimeException("New caption is not specified");
+            throw new TelegRiseRuntimeException("New caption is not specified", node);
 
         return EditMessageCaption.builder()
                 .chatId(this.generateChatId(pool))
@@ -234,7 +234,7 @@ public class Edit extends ActionElement{
 
     private PartialBotApiMethod<?> editText(ResourcePool pool, Integer messageId){
         if (text == null)
-            throw new TelegRiseRuntimeException("New text is not specified");
+            throw new TelegRiseRuntimeException("New text is not specified", node);
 
         return EditMessageText.builder()
                 .chatId(this.generateChatId(pool))

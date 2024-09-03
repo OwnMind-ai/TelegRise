@@ -104,6 +104,9 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
 
         if (dynamic && create != null)
             throw new TranscriptionParsingException("'create' attribute conflicts with dynamic keyboard declaration, use 'filler' attribute to modify keyboard before action execution", node);
+
+        if (type != null && !List.of(REPLY, INLINE).contains(type))
+            throw new TranscriptionParsingException("Invalid keyboard type '" + type + "'", node);
     }
 
     @Override
@@ -167,7 +170,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
 
                 return keyboard;
             default:
-                throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
+                throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'", node);
         }
     }
 
@@ -181,7 +184,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
             return switch (type.toLowerCase()) {
                 case INLINE -> keyboard.createInline(pool);
                 case REPLY -> keyboard.createReply(pool);
-                default -> throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'");
+                default -> throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'", node);
             };
         } else {
             DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);

@@ -107,7 +107,7 @@ public class Text extends NodeElement implements EmbeddableElement, InteractiveE
             if (element.isApplicable(pool))
                 return element.getString(pool);
 
-        throw new TelegRiseRuntimeException("No conditions has been satisfied in conditional text element");
+        throw new TelegRiseRuntimeException("No conditions has been satisfied in conditional text element", node);
     }
 
     public GeneratedValue<String> getParseMode(){

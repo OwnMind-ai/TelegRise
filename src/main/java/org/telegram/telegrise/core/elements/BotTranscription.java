@@ -14,7 +14,6 @@ import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public final class BotTranscription extends NodeElement {
                         String tree = pair.getLeft();
                         Role role = pair.getRight();
                         if (!memory.containsKey(tree) || !(memory.get(tree) instanceof Tree))
-                            throw new TelegRiseRuntimeException("Role '" + role.getName() + "' gives access to a non-existent tree '" + tree + "'");
+                            throw new TranscriptionParsingException("Role '" + role.getName() + "' gives access to a non-existent tree '" + tree + "'", role.getElementNode());
                     });
     }
 

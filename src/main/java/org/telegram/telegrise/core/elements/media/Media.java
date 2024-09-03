@@ -32,7 +32,7 @@ public class Media extends MediaType{
     @Override
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         if (sendMethod == null)
-            throw new TelegRiseRuntimeException("Unable to send media: send method is null");
+            throw new TelegRiseRuntimeException("Unable to send media: send method is null", node);
 
         pool.addComponent(parent);
         return sendMethod.generate(pool);

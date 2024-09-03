@@ -44,7 +44,7 @@ public abstract class MediaType extends NodeElement {
         if (fileResult != null)
             return fileResult;
 
-        throw new TelegRiseRuntimeException("fileId, url and inputFile cannot be null");
+        throw new TelegRiseRuntimeException("fileId, url and inputFile cannot be null", node);
     }
 
     public <T extends InputMedia> T createInputMedia(T instance, ResourcePool pool){
