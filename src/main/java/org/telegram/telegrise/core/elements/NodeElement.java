@@ -1,19 +1,44 @@
 package org.telegram.telegrise.core.elements;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrise.core.ApplicationNamespace;
+import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.LocalNamespace;
+import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.LSSerializer;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class NodeElement {
-    private Node node;
+public abstract class NodeElement implements Serializable {
+    protected transient Node node;
+    @Getter @Setter
+    protected Tree parentTree;
+
+    public LocalNamespace createNamespace(ApplicationNamespace global){
+        return null;
+    }
+
+    public void validate(TranscriptionMemory memory){}
+    public void load(TranscriptionMemory memory){}
+
+    protected final <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){
+        return property == null ? null : property.generate(pool);
+    }
+
+    protected final <T> T generateNullableProperty(GeneratedValue<T> property, T orElse, ResourcePool pool){
+        return property == null ? orElse : property.generate(pool);
+    }
 
     public static @NotNull String formatNode(Node node) {
         StringBuilder builder = new StringBuilder();

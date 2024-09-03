@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.polls.SendPoll;
@@ -16,9 +17,10 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "poll")
 @Data @NoArgsConstructor
-public class Poll implements MediaType {
+public class Poll extends MediaType {
     @Attribute(name = "question", nullable = false)
     private GeneratedValue<String> question;
     @Attribute(name = "options", nullable = false)

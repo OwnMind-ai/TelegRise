@@ -2,8 +2,8 @@ package org.telegram.telegrise;
 
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.ChatInviteLink;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageId;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.Collections;

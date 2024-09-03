@@ -1,23 +1,25 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.Collections;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "media")
 @Data @NoArgsConstructor
-public class Media implements MediaType{
+public class Media extends MediaType{
     @Attribute(name = "sendMethod")
     private GeneratedValue<PartialBotApiMethod<?>> sendMethod;
 

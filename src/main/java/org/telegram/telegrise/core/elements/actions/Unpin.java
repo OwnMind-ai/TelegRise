@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinAllChatMes
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
@@ -16,7 +15,7 @@ import org.telegram.telegrise.core.parser.Element;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Unpin extends NodeElement implements ActionElement{
+public class Unpin extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

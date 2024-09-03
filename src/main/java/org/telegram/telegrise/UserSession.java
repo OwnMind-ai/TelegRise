@@ -65,8 +65,7 @@ public class UserSession implements Runnable{
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
-        this.transcriptionManager.load(transcription);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcription, transcriptionGetter, this::createResourcePool);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
@@ -84,8 +83,7 @@ public class UserSession implements Runnable{
 
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcriptionGetter, this::createResourcePool);
-        this.transcriptionManager.load(transcription);
+        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcription, transcriptionGetter, this::createResourcePool);
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
 

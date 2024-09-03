@@ -10,9 +10,10 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
+import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.StorableElement;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
@@ -32,17 +33,19 @@ import java.util.stream.Stream;
 public class XMLElementsParser {
     private static final String ELEMENTS_PACKAGE = "org.telegram.telegrise.core.elements";
 
-    private static Set<Class<? extends TranscriptionElement>> loadClasses(){
-        return new Reflections(ELEMENTS_PACKAGE).getSubTypesOf(TranscriptionElement.class);
+    private static Set<Class<? extends NodeElement>> loadClasses(){
+        return new Reflections(ELEMENTS_PACKAGE).getSubTypesOf(NodeElement.class);
     }
 
-    private final Map<String, Class<? extends TranscriptionElement>> elements = new HashMap<>();
+    private final Map<String, Class<? extends NodeElement>> elements = new HashMap<>();
     @Setter
     private LocalNamespace namespace;
     @Getter
     private final TranscriptionMemory transcriptionMemory = new TranscriptionMemory();
     @Getter
     private final File rootDirectory;
+    @Setter
+    private Tree currentTree;
 
     public XMLElementsParser(LocalNamespace namespace, File rootDirectory){
         assert rootDirectory == null || rootDirectory.isDirectory();
@@ -67,12 +70,17 @@ public class XMLElementsParser {
         });
     }
 
-    public TranscriptionElement parse(@NotNull Node node) throws Exception {
-        Class<? extends TranscriptionElement> element = this.elements.get(node.getNodeName());
-        TranscriptionElement instance = element.getConstructor().newInstance();
-        if (instance instanceof NodeElement nodeElement){
-            nodeElement.setElementNode(node);
-        }
+    public NodeElement parse(@NotNull Node node) throws Exception {
+        Class<? extends NodeElement> element = this.elements.get(node.getNodeName());
+        NodeElement instance = element.getConstructor().newInstance();
+        instance.setElementNode(node);
+
+        if (instance instanceof Tree tree)
+            currentTree = tree;
+        else if (instance instanceof Menu)
+            currentTree = null;
+
+        instance.setParentTree(currentTree);
 
         final Map<Class<?>, Object> resourcesMap = Map.of(
                 Node.class, node,
@@ -125,8 +133,11 @@ public class XMLElementsParser {
                 .filter(f -> f.isAnnotationPresent(InnerElement.class))
                 .sorted(Comparator.<Field>comparingDouble(f -> f.getAnnotation(InnerElement.class).priority()).reversed())
                 .forEach(f -> {
+                    Tree oldTree = currentTree;
                     if (this.parseInnerElement(node, f, instance, expected))
                         hasEmbedded.set(true);
+
+                    currentTree = oldTree;
                 });
 
         if (!expected.isEmpty() && !hasEmbedded.get())
@@ -141,19 +152,19 @@ public class XMLElementsParser {
         return instance;
     }
 
-    private void finishElement(TranscriptionElement instance, @NotNull Node node) {
+    private void finishElement(NodeElement instance, @NotNull Node node) {
         // ORDER MATTERS:
         if(instance.getClass().getAnnotation(Element.class).validateAfterParsing())
             this.transcriptionMemory.getPendingValidation().add(Pair.of(instance, node));
         else
-            instance.validate(node, transcriptionMemory);
+            instance.validate(transcriptionMemory);
 
         instance.load(transcriptionMemory);
         if (instance instanceof StorableElement)
             ((StorableElement) instance).store(transcriptionMemory);
     }
 
-    private void parseMethod(TranscriptionElement instance, Map<Class<?>, Object> resourcesMap, Method method) throws IllegalAccessException, InvocationTargetException {
+    private void parseMethod(NodeElement instance, Map<Class<?>, Object> resourcesMap, Method method) throws IllegalAccessException, InvocationTargetException {
         method.setAccessible(true);
         Object[] parameters = Arrays.stream(method.getParameterTypes()).map(resourcesMap::get).toArray();
 
@@ -163,7 +174,7 @@ public class XMLElementsParser {
             this.namespace = (LocalNamespace) result;
     }
 
-    private boolean parseInnerElement(Node node, Field field, TranscriptionElement instance, Set<String> expected){
+    private boolean parseInnerElement(Node node, Field field, NodeElement instance, Set<String> expected){
         NodeList nodeList = node.getChildNodes();
         InnerElement fieldData = field.getAnnotation(InnerElement.class);
         Class<?> actualType = ReflectionUtils.getRawGenericType(field);
@@ -208,8 +219,10 @@ public class XMLElementsParser {
                 }
 
                 try {
-                    EmbeddableElement object = (EmbeddableElement) actualType.getConstructor().newInstance();
-                    object.parse(node, this.namespace);
+                    EmbeddableElement embeddableElement = (EmbeddableElement) actualType.getConstructor().newInstance();
+                    embeddableElement.parse(node, this.namespace);
+
+                    NodeElement object = (NodeElement) embeddableElement;
 
                     finishElement(object, node);
 
@@ -245,7 +258,7 @@ public class XMLElementsParser {
         return false;
     }
 
-    private void parseField(Field field, Node node, TranscriptionElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private void parseField(Field field, Node node, NodeElement instance) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         field.setAccessible(true);
         Attribute elementData = field.getAnnotation(Attribute.class);
 

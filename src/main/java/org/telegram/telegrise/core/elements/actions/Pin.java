@@ -7,14 +7,13 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
 @Element(name = "pin")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Pin extends NodeElement implements ActionElement{
+public class Pin extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

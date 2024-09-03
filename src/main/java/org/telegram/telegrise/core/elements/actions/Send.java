@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.MediaType;
 import org.telegram.telegrise.core.elements.text.Text;
@@ -20,7 +19,6 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +27,7 @@ import java.util.stream.Stream;
 @Element(name = "send")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Send extends NodeElement implements ActionElement{
+public class Send extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
@@ -61,7 +59,7 @@ public class Send extends NodeElement implements ActionElement{
     private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (this.text == null && medias.isEmpty())
             throw new TranscriptionParsingException("Requires text and/or media to send", node);
 

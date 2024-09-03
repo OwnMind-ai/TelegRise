@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
@@ -9,7 +10,6 @@ import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaVideo;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
@@ -17,9 +17,10 @@ import org.telegram.telegrise.types.MediaSize;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "video")
 @Data @NoArgsConstructor
-public class Video implements MediaType, TranscriptionElement {
+public class Video extends MediaType {
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 

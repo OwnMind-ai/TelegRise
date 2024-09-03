@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -8,16 +9,17 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "button", checkInner = false)
 @Data
 @NoArgsConstructor
-public class Button implements TranscriptionElement {
+public class Button extends NodeElement {
     private GeneratedValue<String> text;
 
     @Attribute(name = "data")

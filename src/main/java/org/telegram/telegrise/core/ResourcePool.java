@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TreeExecutor;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.util.HashMap;
 import java.util.Map;

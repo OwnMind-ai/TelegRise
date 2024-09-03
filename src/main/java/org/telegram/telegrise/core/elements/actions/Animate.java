@@ -8,20 +8,18 @@ import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.AnimationExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "animate")
 @Data @NoArgsConstructor
-public class Animate extends NodeElement implements ActionElement{
+public class Animate extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
@@ -47,7 +45,7 @@ public class Animate extends NodeElement implements ActionElement{
     private List<Frame> frames;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (frames.size() <= 1)
             throw new TranscriptionParsingException("Must have at least two frames or more", node);
     }

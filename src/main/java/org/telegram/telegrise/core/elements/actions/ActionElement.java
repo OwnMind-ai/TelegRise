@@ -4,24 +4,21 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.utils.MessageUtils;
-import org.w3c.dom.Node;
 
 import java.util.Objects;
 
-public interface ActionElement extends TranscriptionElement {
-    PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool);
-    GeneratedValue<Long> getChatId();
-    default GeneratedValue<ReturnConsumer> getReturnConsumer() { return null; }
+public abstract class ActionElement extends NodeElement {
+    public abstract PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool);
+    public abstract GeneratedValue<Long> getChatId();
+    public GeneratedValue<ReturnConsumer> getReturnConsumer() { return null; }
 
-    default ReturnConsumer getConsumer(ResourcePool pool){
+    public ReturnConsumer getConsumer(ResourcePool pool){
         return Objects.requireNonNullElse(generateNullableProperty(this.getReturnConsumer(), pool), null);
     }
 
-    default Long generateChatId(ResourcePool pool){
+    public Long generateChatId(ResourcePool pool){
         return getChatId() != null ? getChatId().generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
     }
-
-    Node getElementNode();
 }

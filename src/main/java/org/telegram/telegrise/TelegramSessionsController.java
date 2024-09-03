@@ -76,9 +76,8 @@ public class TelegramSessionsController {
 
         BotSender botSender = new BotSender(client, null);
         TranscriptionManager objectManager =  new TranscriptionManager(null, null,
-                null, null, this::getTranscriptionManager,
+                null, null, transcription, this::getTranscriptionManager,
                 u -> new ResourcePool(u, null, botSender, null));
-        objectManager.load(transcription);
 
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);

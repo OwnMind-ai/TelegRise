@@ -2,10 +2,14 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -15,7 +19,8 @@ import java.util.function.Predicate;
 
 @Element(name = "transition", validateAfterParsing = true)
 @Data @NoArgsConstructor @AllArgsConstructor
-public class Transition implements TranscriptionElement{
+@EqualsAndHashCode(callSuper = false)
+public class Transition extends NodeElement {
     public static final String NEXT = "next";
     public static final String PREVIOUS = "previous";
     public static final String JUMP = "jump";
@@ -44,7 +49,7 @@ public class Transition implements TranscriptionElement{
     private Transition nextTransition;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
                 && !direction.equals(LOCAL) && !direction.equals(CALLER))
             throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '"
@@ -76,15 +81,13 @@ public class Transition implements TranscriptionElement{
 
         if ((JUMP.equals(direction) || NEXT.equals(direction) || PREVIOUS.equals(direction)) && !this.target.validate(createValidationFor(memory, Tree.class, Menu.class)))
             throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'", node);
-
-
     }
 
     @SafeVarargs
-    private Predicate<String> createValidationFor(TranscriptionMemory memory, Class<? extends TranscriptionElement>... classes) {
+    private Predicate<String> createValidationFor(TranscriptionMemory memory, Class<? extends NodeElement>... classes) {
         return s -> {
             if (s == null) return false;
-            TranscriptionElement element = memory.get(s);
+            NodeElement element = memory.get(parentTree, s);
 
             return Arrays.stream(classes).anyMatch(c -> c.isInstance(element));
         };

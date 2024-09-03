@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.media.Location;
 import org.telegram.telegrise.core.elements.media.MediaType;
@@ -25,7 +24,6 @@ import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.utils.MessageUtils;
-import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +31,7 @@ import java.util.Set;
 @Element(name = "edit")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Edit extends NodeElement implements ActionElement{
+public class Edit extends ActionElement{
     public static final String EDIT_TEXT = "text";
     public static final String EDIT_CAPTION = "caption";
     public static final String EDIT_MEDIA = "media";
@@ -81,7 +79,7 @@ public class Edit extends NodeElement implements ActionElement{
     private GeneratedValue<ReturnConsumer> returnConsumer;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (type != null && !type.validate(TYPES::contains))
             throw new TranscriptionParsingException("Unrecognized type. Type could be one of the following: " +
                     String.join(", ", TYPES), node);
@@ -252,6 +250,6 @@ public class Edit extends NodeElement implements ActionElement{
 
     @Override
     public Long generateChatId(ResourcePool pool) {
-        return this.inlineMessageId == null ? ActionElement.super.generateChatId(pool) : null;
+        return this.inlineMessageId == null ? super.generateChatId(pool) : null;
     }
 }

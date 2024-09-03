@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrise.SessionMemoryImpl;
@@ -9,14 +10,16 @@ import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.utils.MessageUtils;
 
 import java.util.List;
 
 @Element(name = "menu")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Menu implements BranchingElement{
+public class Menu extends NodeElement implements BranchingElement {
     @Attribute(name = "name", nullable = false)
     private String name;
 
@@ -45,8 +48,8 @@ public class Menu implements BranchingElement{
         if (founded == null){
             for (Tree tree : trees) {
                 if (tree.getPredicate() != null && tree.isChatApplicable(chatTypes, chat) && tree.getPredicate().generate(pool)) {
-                        founded = tree;
-                        break;
+                    founded = tree;
+                    break;
                 }
             }
         }
@@ -57,5 +60,10 @@ public class Menu implements BranchingElement{
     @Override
     public List<? extends BranchingElement> getChildren() {
         return trees;
+    }
+
+    @Override
+    public void store(TranscriptionMemory memory) {
+        memory.put(parentTree, this.getName(), this);
     }
 }

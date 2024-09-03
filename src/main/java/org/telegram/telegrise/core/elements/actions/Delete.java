@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @Element(name = "delete")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Delete extends NodeElement implements ActionElement{
+public class Delete extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

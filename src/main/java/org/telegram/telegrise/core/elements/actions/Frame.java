@@ -1,17 +1,21 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.text.Text;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
-import org.telegram.telegrise.core.parser.*;
+import org.telegram.telegrise.core.parser.Attribute;
+import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.InnerElement;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "frame")
 @Data @NoArgsConstructor
-public class Frame implements TranscriptionElement {
+public class Frame extends NodeElement {
     public static final String SEND = "send";
     public static final String EDIT = "edit";
 
@@ -25,7 +29,7 @@ public class Frame implements TranscriptionElement {
     private Text text;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (!action.equals(EDIT) && !action.equals(SEND))
             throw new TranscriptionParsingException("'action' attribute must either '" + SEND + "' or '" + EDIT + "'", node);
     }

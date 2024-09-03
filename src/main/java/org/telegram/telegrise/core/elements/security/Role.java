@@ -1,17 +1,19 @@
 package org.telegram.telegrise.core.elements.security;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "role")
 @Data @NoArgsConstructor
-public class Role implements StorableElement {
+public class Role extends NodeElement implements StorableElement {
     @Attribute(name = "name", nullable = false)
     private String name;
 
@@ -25,13 +27,13 @@ public class Role implements StorableElement {
     private String onDeniedTree;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (level == null && trees == null)
             throw new TranscriptionParsingException("Either 'accessibleTrees' or 'level' must be specified", node);
     }
 
     @Override
     public void store(TranscriptionMemory memory) {
-        memory.put(this.name, this);
+        memory.put(parentTree, this.name, this);
     }
 }

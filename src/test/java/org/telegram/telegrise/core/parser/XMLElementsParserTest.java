@@ -11,7 +11,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
@@ -196,7 +196,7 @@ public class XMLElementsParserTest {
     }
 
 
-    public static void assertElements(TranscriptionElement expected, TranscriptionElement actual, ResourcePool pool){
+    public static void assertElements(NodeElement expected, NodeElement actual, ResourcePool pool){
         if (expected == actual)
             return;
 
@@ -221,15 +221,15 @@ public class XMLElementsParserTest {
         }
     }
 
-    private static boolean compareFields(Field expected, TranscriptionElement expectedInstance, Field actual, TranscriptionElement actualInstance, ResourcePool pool) throws IllegalAccessException {
+    private static boolean compareFields(Field expected, NodeElement expectedInstance, Field actual, NodeElement actualInstance, ResourcePool pool) throws IllegalAccessException {
         expected.setAccessible(true);
         actual.setAccessible(true);
 
         if (List.class.isAssignableFrom(expected.getType())
-                && TranscriptionElement.class.isAssignableFrom(((Class<?>) ((ParameterizedType) expected.getGenericType()).getActualTypeArguments()[0]))
-                && TranscriptionElement.class.isAssignableFrom(((Class<?>) ((ParameterizedType) actual.getGenericType()).getActualTypeArguments()[0]))) {
-            @SuppressWarnings("unchecked") List<TranscriptionElement> expectedList = (List<TranscriptionElement>) expected.get(expectedInstance);
-            @SuppressWarnings("unchecked") List<TranscriptionElement> actualList = (List<TranscriptionElement>) actual.get(actualInstance);
+                && NodeElement.class.isAssignableFrom(((Class<?>) ((ParameterizedType) expected.getGenericType()).getActualTypeArguments()[0]))
+                && NodeElement.class.isAssignableFrom(((Class<?>) ((ParameterizedType) actual.getGenericType()).getActualTypeArguments()[0]))) {
+            @SuppressWarnings("unchecked") List<NodeElement> expectedList = (List<NodeElement>) expected.get(expectedInstance);
+            @SuppressWarnings("unchecked") List<NodeElement> actualList = (List<NodeElement>) actual.get(actualInstance);
 
             if (expectedList == actualList) return true;
             if((expectedList != null && actualList != null) && expectedList.size() != actualList.size()) return false;
@@ -242,13 +242,13 @@ public class XMLElementsParserTest {
             return true;
         } else if (expected.getType().isArray()) {
             return Arrays.equals((Object[]) expected.get(expectedInstance), (Object[]) actual.get(actualInstance));
-        } else if (!TranscriptionElement.class.isAssignableFrom(expected.getType()))
+        } else if (!NodeElement.class.isAssignableFrom(expected.getType()))
             return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
                 (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)
                     && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), pool))
                 || (expected.get(expectedInstance).equals(actual.get(actualInstance)));
         else {
-            assertElements((TranscriptionElement) expected.get(expectedInstance), (TranscriptionElement) actual.get(actualInstance), pool);
+            assertElements((NodeElement) expected.get(expectedInstance), (NodeElement) actual.get(actualInstance), pool);
             return true;
         }
     }

@@ -3,13 +3,10 @@ package org.telegram.telegrise.core.elements.text;
 import lombok.*;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrise.core.ExpressionFactory;
-import org.telegram.telegrise.core.GeneratedValue;
-import org.telegram.telegrise.core.LocalNamespace;
-import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.elements.InteractiveElement;
-import org.telegram.telegrise.core.elements.StorableElement;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.parser.*;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -20,11 +17,12 @@ import org.w3c.dom.Node;
 import java.util.List;
 import java.util.function.Function;
 
-@Element(name = "text", checkInner = false)
+@Element(name = "text", checkInner = false, validateAfterParsing = true)
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Text implements TranscriptionElement, EmbeddableElement, StorableElement, InteractiveElement<TextBlock> {
+public class Text extends NodeElement implements EmbeddableElement, InteractiveElement<TextBlock>, NamedElement {
     @Getter(value = AccessLevel.NONE)
     private GeneratedValue<String> text;
 
@@ -49,14 +47,19 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     @Attribute(name = "conditional", priority = 1)
     private boolean conditional;
 
+    @Attribute(name = "global")
+    private boolean global;
+
     @InnerElement
     private List<TextConditionalElement> textConditionalElements;
 
     @Attribute(name = "lang")
     private String lang;
 
+    private Tree parentTree;
+
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (text == null && !conditional && byName == null)
             throw new TranscriptionParsingException("Text is empty", node);
 
@@ -68,13 +71,17 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     public void load(TranscriptionMemory memory) {
         if (this.byName == null) return;
 
-        Text original = memory.get(byName, Text.class, List.of("text"));
-        this.text = original.text;
-        this.parseMode = original.parseMode;
-        this.entities = original.entities;
-        this.conditional = original.conditional;
-        this.textConditionalElements = original.textConditionalElements;
-        this.byName = null;
+        try {
+            Text original = memory.get(parentTree, byName, Text.class, List.of("text"));
+            this.text = original.text;
+            this.parseMode = original.parseMode;
+            this.entities = original.entities;
+            this.conditional = original.conditional;
+            this.textConditionalElements = original.textConditionalElements;
+            this.byName = null;
+        } catch (TelegRiseRuntimeException e) {
+            throw new TranscriptionParsingException(e.getMessage(), node);
+        }
     }
 
     public Text(String text, String parseMode){
@@ -127,7 +134,7 @@ public class Text implements TranscriptionElement, EmbeddableElement, StorableEl
     @Override
     public void store(TranscriptionMemory memory) {
         if (name != null)
-            memory.put(name, this);
+            memory.put(parentTree, name, this);
     }
 
     @Override

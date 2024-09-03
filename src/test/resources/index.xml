@@ -27,7 +27,7 @@
                 </keyboard>
             </keyboards>
             <send>
-                <text name="startText"  conditional="true">
+                <text name="startText" global="true" conditional="true">
                     <if condition="SimpleController#isHello" textblock="true">
                         Hello! <code>User</code>
 
@@ -81,7 +81,7 @@
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               controller="SimpleController" chats="private" description="test" accessLevel="0" allowedInterruptions="none">
             <keyboards>
-                <keyboard name="First" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
+                <keyboard name="first" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
                     <row><button data="first">First</button></row>
                     <row><button data="second">Second</button></row>
                     <row><button data="disableMe">Disable Me!</button></row>
@@ -103,7 +103,7 @@
                 <send>
                     <photo when="#doSendPhoto" url="https://i0.wp.com/www.alphr.com/wp-content/uploads/2022/09/ikaw-lang-1.png"/>
                     <text>Hi, ${MessageUtils.getFrom(update).getFirstName()}</text>
-                    <keyboard byName="First" />
+                    <keyboard byName="first" />
                 </send>
 
                 <branch when="#predicate -> #not -> #not">

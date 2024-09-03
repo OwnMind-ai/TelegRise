@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -16,7 +15,7 @@ import org.telegram.telegrise.keyboard.SwitchButton;
 @Element(name = "flip")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Flip extends NodeElement implements ActionElement{
+public class Flip extends ActionElement{
     @Attribute(name = "id", nullable = false)
     private String id;
 

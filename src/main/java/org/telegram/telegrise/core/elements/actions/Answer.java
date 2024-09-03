@@ -7,18 +7,16 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
 @Element(name = "answer")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Answer extends NodeElement implements ActionElement{
+public class Answer extends ActionElement{
     @Attribute(name = "callbackQueryId")
     private GeneratedValue<String> callbackQueryId;
 
@@ -35,7 +33,7 @@ public class Answer extends NodeElement implements ActionElement{
     private GeneratedValue<Integer> cacheTime;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (!text.validate(s -> !s.isEmpty()))
             throw new TranscriptionParsingException("text is empty", node);
     }

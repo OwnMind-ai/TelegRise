@@ -8,14 +8,13 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
 @Element(name = "forward")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Forward extends NodeElement implements ActionElement{
+public class Forward extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 

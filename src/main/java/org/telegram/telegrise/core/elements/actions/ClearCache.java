@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 
@@ -17,7 +16,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ClearCache extends NodeElement implements ActionElement{
+public class ClearCache extends ActionElement{
     @Attribute(name = "method", nullable = false)
     private GeneratedValue<String> method;
 

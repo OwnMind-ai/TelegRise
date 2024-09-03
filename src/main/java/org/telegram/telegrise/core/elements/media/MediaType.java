@@ -3,37 +3,35 @@ package org.telegram.telegrise.core.elements.media;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrise.core.parser.TranscriptionMemory;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.actions.Send;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
 import java.util.List;
 
-public interface MediaType extends TranscriptionElement {
-    PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool);
-    List<InputMedia> createInputMedia(ResourcePool pool);
-    GeneratedValue<Boolean> getWhen();
+public abstract class MediaType extends NodeElement {
+    public abstract PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool);
+    public abstract List<InputMedia> createInputMedia(ResourcePool pool);
+    public abstract GeneratedValue<Boolean> getWhen();
 
-    default boolean isGroupable() {
-        return true;
-    }
-    default boolean isMediaRequired(){ return true; }
+    public boolean isGroupable() { return true; }
+    public boolean isMediaRequired(){ return true; }
 
-    GeneratedValue<String> getFileId();
-    GeneratedValue<String> getUrl();
-    GeneratedValue<InputFile> getInputFile();
+    public abstract GeneratedValue<String> getFileId();
+    public abstract GeneratedValue<String> getUrl();
+    public abstract GeneratedValue<InputFile> getInputFile();
 
-    default void validate(Node node, TranscriptionMemory memory) {
+    @Override
+    public void validate(TranscriptionMemory memory) {
         if (isMediaRequired() && getFileId() == null && getUrl() == null  && getInputFile() == null)
             throw new TranscriptionParsingException("No media source found: url, fileId, inputFile", node);
     }
 
-    default InputFile createInputFile(ResourcePool pool){
+    public InputFile createInputFile(ResourcePool pool){
         String fileIdResult = generateNullableProperty(getFileId(), pool);
         if (fileIdResult != null)
             return new InputFile(fileIdResult);
@@ -49,7 +47,7 @@ public interface MediaType extends TranscriptionElement {
         throw new TelegRiseRuntimeException("fileId, url and inputFile cannot be null");
     }
 
-    default <T extends InputMedia> T createInputMedia(T instance, ResourcePool pool){
+    public <T extends InputMedia> T createInputMedia(T instance, ResourcePool pool){
         InputFile inputFile = generateNullableProperty(getInputFile(), pool);
 
         // A workaround for required-args-constructor since 7.*

@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
@@ -14,9 +15,10 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "voice")
 @Data @NoArgsConstructor
-public class Voice implements MediaType{
+public class Voice extends MediaType{
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 

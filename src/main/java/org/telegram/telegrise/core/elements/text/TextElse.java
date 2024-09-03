@@ -1,11 +1,13 @@
 package org.telegram.telegrise.core.elements.text;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -15,15 +17,16 @@ import org.w3c.dom.Node;
 
 @Element(name = "else", checkInner = false)
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class TextElse implements TextConditionalElement {
+public class TextElse extends NodeElement implements TextConditionalElement {
     @Attribute(name = "textblock", priority = 1)
     private boolean textblock;
 
     private GeneratedValue<String> text;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (text == null)
             throw new TranscriptionParsingException("Text is empty", node);
     }

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Element(name = "tree")
 @Data
 @NoArgsConstructor
-public class Tree implements BranchingElement{
+public class Tree extends NodeElement implements BranchingElement{
     public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
     public static final String INTERRUPT_BY_KEYS = "keys";
     public static final String INTERRUPT_BY_COMMANDS = "commands";
@@ -75,7 +75,7 @@ public class Tree implements BranchingElement{
 
     private Class<?> controller;
 
-    @InnerElement
+    @InnerElement(priority = 100)
     private Keyboards keyboards;
     @InnerElement
     private List<ActionElement> actions;
@@ -89,7 +89,7 @@ public class Tree implements BranchingElement{
     private int level = -1;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if(this.controller != null && (this.branches == null || this.branches.isEmpty()))
             throw new TranscriptionParsingException("Trees with no branches cannot be connected to a controller", node);
 
@@ -172,5 +172,24 @@ public class Tree implements BranchingElement{
         if (menus != null) result.addAll(menus);
 
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Tree tree = (Tree) o;
+        return name.equals(tree.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public void store(TranscriptionMemory memory) {
+        memory.put(null, this.getName(), this);
     }
 }

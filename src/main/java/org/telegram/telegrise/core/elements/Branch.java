@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -10,7 +11,6 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,8 +19,9 @@ import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScop
 
 @Element(name = "branch", validateAfterParsing = true)
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Branch implements BranchingElement, TranscriptionElement{
+public class Branch extends NodeElement implements BranchingElement {
     @Attribute(name = "name")
     private String name;
 
@@ -53,7 +54,7 @@ public class Branch implements BranchingElement, TranscriptionElement{
     private int level = -1;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (level < 2)   // Branches can't be at level 1, only trees do
             throw new TranscriptionParsingException("Invalid branch level: %d. \nThis is an internal error. Please, report to https://github.com/OwnMind-ai/TelegRise/issues if this error occurred and attach: error message, the .xml file with problematic branch.".formatted(level), node);
 
@@ -80,6 +81,6 @@ public class Branch implements BranchingElement, TranscriptionElement{
     @Override
     public void store(TranscriptionMemory memory) {
         if (this.name != null)
-            memory.put(this.name, this);
+            memory.put(parentTree, this.name, this);
     }
 }

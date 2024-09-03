@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
@@ -14,9 +15,10 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "location")
 @Data @NoArgsConstructor
-public class Location implements MediaType{
+public class Location extends MediaType{
     @Attribute(name = "latitude", nullable = false)
     private GeneratedValue<Double> latitude;
     @Attribute(name = "longitude", nullable = false)

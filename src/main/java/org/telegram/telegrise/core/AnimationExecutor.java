@@ -4,10 +4,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.exceptions.TelegRiseInternalException;
-import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.core.elements.actions.Animate;
 import org.telegram.telegrise.core.elements.actions.Frame;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.util.List;
 

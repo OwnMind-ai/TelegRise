@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -19,7 +18,7 @@ import java.util.function.Consumer;
 @Element(name = "wait")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Wait extends NodeElement implements ActionElement{
+public class Wait extends ActionElement{
     @Attribute(name = "timeout", nullable = false)
     private GeneratedValue<Double> timeout;
 

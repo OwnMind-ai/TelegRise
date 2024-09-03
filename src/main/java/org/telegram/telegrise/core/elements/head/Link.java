@@ -2,9 +2,10 @@ package org.telegram.telegrise.core.elements.head;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.LinkableElement;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -20,10 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "link")
 @Data
 @NoArgsConstructor @AllArgsConstructor
-public class Link implements TranscriptionElement {
+public class Link extends NodeElement {
     private String source;
 
     @Attribute(name = "src", nullable = false)
@@ -50,8 +52,9 @@ public class Link implements TranscriptionElement {
 
     private void parseSource(String source, Node node, TranscriptionMemory memory, XMLElementsParser parser) {
         try {
+            parser.setCurrentTree(null);
             Document document = XMLUtils.loadDocument(source.startsWith("/") ? new File(source) : new File(parser.getRootDirectory(), source));
-            TranscriptionElement result = parser.parse(document.getDocumentElement());
+            NodeElement result = parser.parse(document.getDocumentElement());
 
             if (!(result instanceof LinkableElement linkableElement))
                 throw new TranscriptionParsingException("Unable to link element '" + result.getClass().getAnnotation(Element.class).name() + "' in '" + source + "'", node);

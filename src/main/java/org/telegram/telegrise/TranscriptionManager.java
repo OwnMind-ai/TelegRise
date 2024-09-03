@@ -1,9 +1,13 @@
 package org.telegram.telegrise;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.keyboard.Keyboard;
+import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.transition.TransitionController;
@@ -11,41 +15,37 @@ import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TranscriptionManager {
-    private final Map<String, Serializable> objects = new HashMap<>();
+    private final TranscriptionMemory transcriptionMemory;
     private final UserSession.TranscriptionInterrupter interruptor;
     private final SessionMemoryImpl sessionMemory;
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
     private final Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter;
-    private BotTranscription transcription;
+    private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
-    public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor, BiConsumer<BranchingElement, Update> elementExecutor, SessionMemoryImpl sessionMemory, TransitionController transitionController, Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter, Function<Update, ResourcePool> resourcePoolProducer) {
+    public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor,
+                                BiConsumer<BranchingElement, Update> elementExecutor,
+                                SessionMemoryImpl sessionMemory,
+                                TransitionController transitionController,
+                                BotTranscription transcription,
+                                Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter,
+                                Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
         this.transcriptionManagerGetter = transcriptionManagerGetter;
         this.resourcePoolProducer = resourcePoolProducer;
         this.elementExecutor = elementExecutor;
-    }
-
-    public void load(BotTranscription transcription){
+        this.transcriptionMemory = transcription.getMemory();
         this.transcription = transcription;
-        TranscriptionMemory memory = transcription.getMemory();
-        objects.putAll(memory.getElements().entrySet().stream().parallel()
-                .filter(e -> e.getValue() instanceof InteractiveElement)
-                .map(e -> Map.entry(e.getKey(), ((InteractiveElement<?>) e.getValue()).createInteractiveObject(this.resourcePoolProducer)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-        );
     }
 
     /** Clears cache for specific method reference and returns it previous value.
@@ -55,7 +55,7 @@ public class TranscriptionManager {
      * @param methodName method name, which should match with <code>Method::getName</code>
      * @return previously cached value
      * @since 0.6
-     * @see org.telegram.telegrise.caching.CachingStrategy
+     * @see CachingStrategy
      */
     public Object clearCache(Object instance, String methodName){
         return clearCache(instance.getClass(), methodName);
@@ -68,7 +68,7 @@ public class TranscriptionManager {
      * @param methodName method name, which should match with <code>Method::getName</code>
      * @return previously cached value
      * @since 0.6
-     * @see org.telegram.telegrise.caching.CachingStrategy
+     * @see CachingStrategy
      */
     public Object clearCache(Class<?> clazz, String methodName){
         return sessionMemory.getCacheMap().entrySet().stream()
@@ -162,36 +162,24 @@ public class TranscriptionManager {
             throw new TelegRiseRuntimeException("Session memory-oriented methods cannot be called from an independent handler");
     }
 
-    private void checkName(String name){
-        if (!this.objects.containsKey(name))
-            throw new TelegRiseRuntimeException("Element named '" + name + "' does not exist");
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private void checkType(String name, Class<?> type){
-        if (!type.isInstance(this.objects.get(name)))
-            throw new TelegRiseRuntimeException("Element named '" + name + "' does not inherit type '" + type.getSimpleName() + "'");
-    }
-
     public <T extends Serializable> T get(String name, Class<T> tClass){
-        checkName(name);
-        checkType(name, tClass);
+        var result = this.transcriptionMemory.get(this.sessionMemory == null ? null : getCurrentTree(), name);
 
-        return tClass.cast(this.objects.get(name));
+        if (result == null)
+            throw new TelegRiseRuntimeException("Element named '" + name + "' does not exist");
+
+        if (!ClassUtils.isAssignable(result.getClass(), tClass, true))
+            throw new TelegRiseRuntimeException("Element named '" + name + "' is not assignable to '" + tClass.getSimpleName() + "'");
+
+        return tClass.cast(result);
     }
 
     public TextBlock getTextBlock(String name){
-        checkName(name);
-        checkType(name, TextBlock.class);
-
-        return (TextBlock) this.objects.get(name);
+        return get(name, Text.class).createInteractiveObject(resourcePoolProducer);
     }
 
     public KeyboardMarkup getKeyboardMarkup(String name){
-        checkName(name);
-        checkType(name, KeyboardMarkup.class);
-
-        return (KeyboardMarkup) this.objects.get(name);
+        return get(name, Keyboard.class).createInteractiveObject(resourcePoolProducer);
     }
 
     //TODO getTextBlock(name, lang)

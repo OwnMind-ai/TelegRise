@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -8,10 +9,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.NamedElement;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.InteractiveElement;
-import org.telegram.telegrise.core.elements.StorableElement;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -21,15 +23,15 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.UserRole;
-import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Element(name = "keyboard")
+@EqualsAndHashCode(callSuper = false)
+@Element(name = "keyboard", validateAfterParsing = true)
 @Data @NoArgsConstructor
-public class Keyboard implements StorableElement, TranscriptionElement, InteractiveElement<KeyboardMarkup> {
+public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
 
@@ -60,6 +62,9 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     @Attribute(name = "autoClosable")
     private boolean autoClosable = true;
 
+    @Attribute(name = "global")
+    private boolean global;
+
     @Attribute(name = "filler")
     private GeneratedValue<Void> filler;
 
@@ -87,8 +92,10 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     @InnerElement
     private List<Row> rows;
 
+    private Tree parentTree;
+
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (!((type != null && rows != null) || byName != null || create != null || (dynamic && filler != null)))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
 
@@ -102,13 +109,13 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     @Override
     public void load(TranscriptionMemory memory) {
         if (byName != null){
-            TranscriptionElement element = memory.get(byName);
+            NodeElement element = memory.get(parentTree, byName);
 
             if (element == null)
-                throw new TelegRiseRuntimeException("Missing keyboard named '" + byName + "'");
+                throw new TranscriptionParsingException("Missing keyboard named '" + byName + "'", node);
             else if (!(element instanceof Keyboard))
-                throw new TelegRiseRuntimeException(String.format("The name '%s' belongs to an object of type '%s', type keyboard is required",
-                        byName, element.getClass().getAnnotation(Element.class).name()));
+                throw new TranscriptionParsingException(String.format("The name '%s' belongs to an object of type '%s', type keyboard is required",
+                        byName, element.getClass().getAnnotation(Element.class).name()), node);
 
             Keyboard original = (Keyboard) element;
             this.name = original.getName();
@@ -128,7 +135,7 @@ public class Keyboard implements StorableElement, TranscriptionElement, Interact
     @Override
     public void store(TranscriptionMemory memory) {
          if (name != null && byName == null)
-            memory.put(name, this);
+            memory.put(parentTree, name, this);
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){

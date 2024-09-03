@@ -3,10 +3,10 @@ package org.telegram.telegrise.core;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrise.exceptions.TelegRiseInternalException;
-import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.core.expressions.*;
 import org.telegram.telegrise.core.expressions.tokens.Token;
+import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 

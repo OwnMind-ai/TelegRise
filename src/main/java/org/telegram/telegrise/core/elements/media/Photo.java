@@ -2,6 +2,7 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -17,9 +18,10 @@ import org.telegram.telegrise.core.parser.Element;
 import java.util.List;
 
 @Element(name = "photo")
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor @AllArgsConstructor
-public class Photo implements MediaType{
+public class Photo extends MediaType{
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 

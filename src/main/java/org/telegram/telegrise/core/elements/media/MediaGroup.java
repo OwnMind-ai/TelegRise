@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
@@ -15,9 +16,10 @@ import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "mediaGroup")
 @Data @NoArgsConstructor
-public class MediaGroup implements MediaType{
+public class MediaGroup extends MediaType{
     @Attribute(name = "inputMedia", nullable = false)
     private GeneratedValue<List<InputMedia>> inputMedia;
 

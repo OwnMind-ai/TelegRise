@@ -1,12 +1,13 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.TranscriptionElement;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -14,9 +15,10 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode(callSuper = false)
 @Element(name = "row")
 @Data @NoArgsConstructor
-public class Row implements TranscriptionElement {
+public class Row extends NodeElement {
     @InnerElement(nullable = false)
     private List<Button> buttons;
 

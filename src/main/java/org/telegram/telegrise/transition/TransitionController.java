@@ -107,7 +107,7 @@ public class TransitionController {
         TreeExecutor last = this.treeExecutors.getLast();
         assert last.getTree().getName().equals(tree.getName());
 
-        Branch next = this.transcriptionMemory.get(transition.getTarget().generate(pool), Branch.class, List.of("branch"));
+        Branch next = this.transcriptionMemory.get(last.getTree(), transition.getTarget().generate(pool), Branch.class, List.of("branch"));
         last.setCurrentBranch(next);
 
         if (transition.isExecute())
@@ -116,7 +116,7 @@ public class TransitionController {
 
     private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
         String target = transition.getTarget().generate(pool);
-        BranchingElement requested = this.transcriptionMemory.get(target, BranchingElement.class, Transition.TYPE_LIST);
+        BranchingElement requested = this.transcriptionMemory.get(tree, target, BranchingElement.class, Transition.TYPE_LIST);
         if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + target + "'");
 
         this.sessionMemory.getBranchingElements().add(requested);

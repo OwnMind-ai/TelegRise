@@ -15,7 +15,7 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.w3c.dom.Node;
+import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 @Element(name = "bot")
 @Data
 @NoArgsConstructor
-public final class BotTranscription implements TranscriptionElement {
+@EqualsAndHashCode(callSuper = false)
+public final class BotTranscription extends NodeElement {
 
     //TODO webhooks support
     @Attribute(name = "username")
@@ -59,12 +60,12 @@ public final class BotTranscription implements TranscriptionElement {
     private TranscriptionMemory memory;
 
     @Override
-    public void validate(Node node, TranscriptionMemory memory) {
+    public void validate(TranscriptionMemory memory) {
         if (roles != null)
             roles.getRoles().stream()
                     .peek(r -> {
                         if (r.getOnDeniedTree() != null && (!memory.containsKey(r.getOnDeniedTree()) || !(memory.get(r.getOnDeniedTree()) instanceof Tree)))
-                            throw new TelegRiseRuntimeException("Role '" + r.getName() + "' refers to a non-existent tree '" + r.getOnDeniedTree() + "' at attribute 'onDeniedTree'");
+                            throw new TranscriptionParsingException("Role '" + r.getName() + "' refers to a non-existent tree '" + r.getOnDeniedTree() + "' in attribute 'onDeniedTree'", r.getElementNode());
                     })
                     .filter(r -> r.getTrees() != null)
                     .map(r -> Pair.of(r, r.getTrees()))

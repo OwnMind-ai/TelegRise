@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.Attribute;
@@ -20,7 +19,7 @@ import java.util.List;
 @Element(name = "copy")
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Copy extends NodeElement implements ActionElement{
+public class Copy extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
