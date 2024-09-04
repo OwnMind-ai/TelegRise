@@ -246,7 +246,7 @@ public class XMLElementsParserTest {
             return (expected.get(expectedInstance) == (actual.get(actualInstance))) ||
                 (expected.getType().isAssignableFrom(GeneratedValue.class) && actual.getType().isAssignableFrom(GeneratedValue.class)
                     && ((GeneratedValue<?>) expected.get(expectedInstance)).equalsTo((GeneratedValue<?>) actual.get(actualInstance), pool))
-                || (expected.get(expectedInstance).equals(actual.get(actualInstance)));
+                || (Objects.equals(expected.get(expectedInstance), actual.get(actualInstance)));
         else {
             assertElements((NodeElement) expected.get(expectedInstance), (NodeElement) actual.get(actualInstance), pool);
             return true;

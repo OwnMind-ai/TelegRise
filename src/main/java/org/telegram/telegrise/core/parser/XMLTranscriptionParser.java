@@ -43,8 +43,11 @@ public class XMLTranscriptionParser implements TranscriptionParser{
 
         this.calculateTreeNodesLevel(result);
 
-        this.elementsParser.getTranscriptionMemory().getPendingValidation()
-                .forEach(p -> p.getLeft().validate(this.elementsParser.getTranscriptionMemory()));
+        this.elementsParser.getTranscriptionMemory().getPendingFinalization()
+                .forEach(p -> {
+                    p.validate(this.elementsParser.getTranscriptionMemory());
+                    p.load(this.elementsParser.getTranscriptionMemory());
+                });
 
         //noinspection SpellCheckingInspection
         logger.info("Transcription parsed in {}", DurationFormatUtils.formatDuration(

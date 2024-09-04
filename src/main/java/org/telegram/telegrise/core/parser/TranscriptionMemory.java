@@ -1,7 +1,6 @@
 package org.telegram.telegrise.core.parser;
 
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.telegram.telegrise.core.NamedElement;
 import org.telegram.telegrise.core.elements.BotTranscription;
@@ -9,8 +8,8 @@ import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.w3c.dom.Node;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,7 +24,9 @@ public final class TranscriptionMemory implements Serializable {
     @Getter
     private final List<Consumer<BotTranscription>> tasks = new LinkedList<>();
     @Getter
-    private final List<Pair<NodeElement, Node>> pendingValidation = new LinkedList<>();
+    private final List<NodeElement> pendingFinalization = new LinkedList<>();
+    @Getter
+    private final Set<File> linkedFiles = new HashSet<>();
 
     private boolean readOnly = false;
 

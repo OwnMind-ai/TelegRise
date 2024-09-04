@@ -29,6 +29,11 @@ class LinkTest {
         Node keyboardNode = toNode("<keyboard byName=\"first\"/>");
 
         Keyboard result = (Keyboard) parser.parse(keyboardNode);
+        parser.getTranscriptionMemory().getPendingFinalization().forEach(p -> {
+            p.validate(parser.getTranscriptionMemory());
+            p.load(parser.getTranscriptionMemory());
+        });
+
         result.setByName(null);
         assertElements(parser.getTranscriptionMemory().get("first"), result, new ResourcePool());
     }

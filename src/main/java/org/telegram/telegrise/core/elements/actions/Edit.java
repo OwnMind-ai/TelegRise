@@ -28,7 +28,7 @@ import org.telegram.telegrise.utils.MessageUtils;
 import java.util.List;
 import java.util.Set;
 
-@Element(name = "edit")
+@Element(name = "edit", finishAfterParsing = true)
 @Data @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Edit extends ActionElement{

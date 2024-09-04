@@ -64,7 +64,7 @@ public class XMLUtils {
 
         // Reasoning for this is that the first line's indentation stripped by XML parser, but the rest of the lines are not
         List<String> lines = List.of(raw.split("\n"));
-        String result = lines.get(0) + String.join("\n", lines.subList(1, lines.size())).stripIndent();
+        String result = lines.get(0) + "\n" + String.join("\n", lines.subList(1, lines.size())).stripIndent();
 
         return applyHTMLTextDecorators(result);
     }

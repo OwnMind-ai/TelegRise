@@ -90,6 +90,7 @@ public final class TelegRiseApplication {
     private TelegramSessionsController createController() {
         XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)), transcription.getParentFile());
         elementsParser.load();
+        elementsParser.getTranscriptionMemory().getLinkedFiles().add(transcription); // to prevent cyclic imports
 
         TelegramSessionsController controller;
         try {

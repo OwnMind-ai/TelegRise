@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-@Element(name = "transition", validateAfterParsing = true)
+@Element(name = "transition", finishAfterParsing = true)
 @Data @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Transition extends NodeElement {

@@ -17,7 +17,7 @@ import org.w3c.dom.Node;
 import java.util.List;
 import java.util.function.Function;
 
-@Element(name = "text", checkInner = false, validateAfterParsing = true)
+@Element(name = "text", checkInner = false, finishAfterParsing = true)
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor

@@ -30,7 +30,7 @@ public class MethodReferenceCompiler {
 
     public ReferenceExpression compile(Token rootToken, LocalNamespace namespace, Class<?> returnType, Node node) {
         if (rootToken.getTokenType() == TokenTypes.REFERENCE) {
-            return this.compileMethodReference((MethodReferenceToken) rootToken, namespace, returnType, node);
+            return this.compileMethodReference((MethodReferenceToken) rootToken, namespace, node);
         }
 
         if (rootToken.getTokenType() == TokenTypes.EXPRESSION){
@@ -162,7 +162,7 @@ public class MethodReferenceCompiler {
         throw new IllegalArgumentException();
     }
 
-    private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
+    private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Node node) {
         if (token.getClassName() == null) {
             switch (token.getMethod()) {
                 case Syntax.NOT_REFERENCE:
@@ -214,11 +214,11 @@ public class MethodReferenceCompiler {
                 return methodReference;
             }
         } else {
-            return this.compileParametrizedReference(token, method, namespace, returnType, node);
+            return this.compileParametrizedReference(token, method, namespace, node);
         }
     }
 
-    private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Class<?> returnType, Node node) {
+    private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Node node) {
         if (token.getParams().stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray)) {
             List<ValueToken> tokenList = token.getParams().stream().map(ValueToken.class::cast).toList();
             Object[] params = IntStream.range(0, tokenList.size())
@@ -243,7 +243,7 @@ public class MethodReferenceCompiler {
         String expression = String.format("%s.%s(%s)", caller, method.getName(),
                 token.getParams().stream().map(PrimitiveToken::getStringValue).collect(Collectors.joining(", ")));
 
-        return getReferenceExpression(namespace, returnType, node, expression);
+        return getReferenceExpression(namespace, method.getReturnType(), node, expression);
     }
 
     private static @NotNull ReferenceExpression getReferenceExpression(LocalNamespace namespace, Class<?> returnType, Node node, String expression) {

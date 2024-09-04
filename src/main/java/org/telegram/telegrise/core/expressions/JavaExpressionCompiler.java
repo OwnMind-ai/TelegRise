@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.expressions;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.forge.roaster.ParserException;
 import org.jboss.forge.roaster.Roaster;
@@ -62,6 +63,11 @@ public class JavaExpressionCompiler {
         JavaClassSource source;
         List<Class<?>> imported;
         try {
+            if (returnType == void.class)
+                returnType = Void.class;
+            else if (returnType.isPrimitive())
+                returnType = ClassUtils.primitiveToWrapper(returnType);
+
             Pair<JavaClassSource, List<Class<?>>> pair = this.createSource(expression, hashcode, returnType, namespace);
             source = pair.getKey();
             imported = pair.getValue();

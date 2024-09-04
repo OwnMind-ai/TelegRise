@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 public @interface Element {
     String name();
     boolean checkInner() default true;
-    boolean validateAfterParsing() default false;
+    boolean finishAfterParsing() default false;
 }

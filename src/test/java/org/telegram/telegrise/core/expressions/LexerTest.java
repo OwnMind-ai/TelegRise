@@ -15,6 +15,9 @@ class LexerTest {
         Lexer lexer = new Lexer(new CharsStream("123"));
         assertEquals(new ValueToken(123L, Long.class), lexer.next());
 
+        lexer = new Lexer(new CharsStream("\"\""));
+        assertEquals(new ValueToken("", String.class), lexer.next());
+
         lexer = new Lexer(new CharsStream("#method"));
         assertEquals(new MethodReferenceToken("method", null), lexer.next());
 
@@ -28,8 +31,8 @@ class LexerTest {
         lexer = new Lexer(new CharsStream("if_ignore.Class#method"));
         assertEquals(new MethodReferenceToken("if_ignore.Class", "method", null), lexer.next());
 
-        lexer = new Lexer(new CharsStream("#method(\"string 1\", 123)"));
-        assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("string 1", String.class), new ValueToken(123L, Long.class))), lexer.next());
+        lexer = new Lexer(new CharsStream("#method(\"\", 123)"));
+        assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("", String.class), new ValueToken(123L, Long.class))), lexer.next());
 
         lexer = new Lexer(new CharsStream("#method((1 + 2) / (3 - (3 + 1)), controller.getValue())"));
         assertEquals(new MethodReferenceToken("method", List.of(new RawToken("(1+2)/(3-(3+1))"), new RawToken("controller.getValue()"))), lexer.next());

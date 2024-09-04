@@ -52,8 +52,13 @@ public class Link extends NodeElement {
 
     private void parseSource(String source, Node node, TranscriptionMemory memory, XMLElementsParser parser) {
         try {
+            File file = source.startsWith("/") ? new File(source) : new File(parser.getRootDirectory(), source);
+            if (memory.getLinkedFiles().stream().anyMatch(f -> f.getAbsolutePath().equals(file.getAbsolutePath())))
+                return;
+            memory.getLinkedFiles().add(file);
+
             parser.setCurrentTree(null);
-            Document document = XMLUtils.loadDocument(source.startsWith("/") ? new File(source) : new File(parser.getRootDirectory(), source));
+            Document document = XMLUtils.loadDocument(file);
             NodeElement result = parser.parse(document.getDocumentElement());
 
             if (!(result instanceof LinkableElement linkableElement))

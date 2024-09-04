@@ -29,7 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = false)
-@Element(name = "keyboard", validateAfterParsing = true)
+@Element(name = "keyboard", finishAfterParsing = true)
 @Data @NoArgsConstructor
 public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement {
     public static final String INLINE = "inline";

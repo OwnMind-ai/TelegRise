@@ -17,7 +17,7 @@ import java.util.Objects;
 
 import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScopes;
 
-@Element(name = "branch", validateAfterParsing = true)
+@Element(name = "branch", finishAfterParsing = true)
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor

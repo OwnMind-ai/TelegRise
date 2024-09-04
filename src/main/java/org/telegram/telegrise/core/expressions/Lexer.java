@@ -235,7 +235,7 @@ public final class Lexer {
             if (parameter.isEmpty()) return;
 
             if (parameter.startsWith("\"") && parameter.endsWith("\"")
-                    && parameter.replace("\\\"", "").split("\"").length == 2){  // Ensures that there is only one string and not an expression like "a" + "b"
+                    && parameter.replace("\\\"", "").split("\"").length <= 2){  // Ensures that there is only one string and not an expression like "a" + "b"
                 this.params.add(new ValueToken(parameter.substring(1, parameter.length() - 1), String.class));
             } else if (parameter.startsWith("'") && parameter.endsWith("'")){
                 this.params.add(new ValueToken(parameter.substring(1, parameter.length() - 1), Character.class));

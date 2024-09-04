@@ -3,7 +3,6 @@ package org.telegram.telegrise.core.parser;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrise.core.ExpressionFactory;
@@ -143,7 +142,7 @@ public class XMLElementsParser {
         if (!expected.isEmpty() && !hasEmbedded.get())
             throw new TranscriptionParsingException("Unrecognized elements: " + String.join(", ", expected), node);
 
-        finishElement(instance, node);
+        finishElement(instance);
 
         LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
         if (newNamespace != null)
@@ -152,14 +151,15 @@ public class XMLElementsParser {
         return instance;
     }
 
-    private void finishElement(NodeElement instance, @NotNull Node node) {
+    private void finishElement(NodeElement instance) {
         // ORDER MATTERS:
-        if(instance.getClass().getAnnotation(Element.class).validateAfterParsing())
-            this.transcriptionMemory.getPendingValidation().add(Pair.of(instance, node));
-        else
+        if(instance.getClass().getAnnotation(Element.class).finishAfterParsing())
+            this.transcriptionMemory.getPendingFinalization().add(instance);
+        else {
             instance.validate(transcriptionMemory);
+            instance.load(transcriptionMemory);
+        }
 
-        instance.load(transcriptionMemory);
         if (instance instanceof StorableElement)
             ((StorableElement) instance).store(transcriptionMemory);
     }
@@ -224,7 +224,7 @@ public class XMLElementsParser {
 
                     NodeElement object = (NodeElement) embeddableElement;
 
-                    finishElement(object, node);
+                    finishElement(object);
 
                     PropertyUtils.setSimpleProperty(instance, field.getName(), object);
                     return true;
