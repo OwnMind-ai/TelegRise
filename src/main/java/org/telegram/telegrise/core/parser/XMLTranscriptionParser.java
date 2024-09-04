@@ -1,5 +1,8 @@
 package org.telegram.telegrise.core.parser;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.elements.BotTranscription;
@@ -13,6 +16,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class XMLTranscriptionParser implements TranscriptionParser{
+    private static final Logger logger = LoggerFactory.getLogger(XMLTranscriptionParser.class);
+
     private final Document document;
     private final XMLElementsParser elementsParser;
     private final ApplicationNamespace applicationNamespace;
@@ -25,6 +30,7 @@ public class XMLTranscriptionParser implements TranscriptionParser{
     }
 
     public BotTranscription parse() throws Exception {
+        long startMillis = System.currentTimeMillis();
         this.processInstructions(XMLUtils.getInstructions(document));
 
         BotTranscription result = (BotTranscription) elementsParser.parse(document.getElementsByTagName(
@@ -39,6 +45,11 @@ public class XMLTranscriptionParser implements TranscriptionParser{
 
         this.elementsParser.getTranscriptionMemory().getPendingValidation()
                 .forEach(p -> p.getLeft().validate(this.elementsParser.getTranscriptionMemory()));
+
+        //noinspection SpellCheckingInspection
+        logger.info("Transcription parsed in {}", DurationFormatUtils.formatDuration(
+                System.currentTimeMillis() - startMillis, "s's 'S'ms'"
+        ));
 
         return result;
     }

@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 //TODO webhooks
-//TODO multiple bots
 //TODO bot options
 public final class TelegRiseApplication {
     @Setter
