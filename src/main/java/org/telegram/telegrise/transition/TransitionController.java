@@ -35,10 +35,6 @@ public class TransitionController {
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
 
         return switch (transition.getDirection()) {
-            case Transition.NEXT -> {
-                this.applyNext(tree, transition, pool);
-                yield false;
-            }
             case Transition.PREVIOUS -> {
                 this.applyPrevious(transition, pool);
                 yield false;
@@ -95,7 +91,7 @@ public class TransitionController {
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
         if (transition.getType().equals(Transition.MENU_TYPE)){
             for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
-                if (it.next() instanceof Menu) break;
+                if (it.next() instanceof Root) break;
                 this.sessionMemory.getBranchingElements().removeLast();
             }
         }
@@ -121,14 +117,6 @@ public class TransitionController {
 
         this.sessionMemory.getBranchingElements().add(requested);
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
-    }
-
-    private void applyNext(Tree tree, Transition transition, ResourcePool pool) {
-        final String target = transition.getTarget().generate(pool);
-        Menu next = tree.getMenus().stream().filter(m -> m.getName().equals(target)).findFirst()
-                .orElseThrow(() -> new TelegRiseRuntimeException("Unable to find a menu '" + target + "' in tree '" + tree.getName() + "'", transition.getElementNode()));
-
-        this.sessionMemory.getBranchingElements().add(next);
     }
 
     private void applyPrevious(Transition transition, ResourcePool pool){

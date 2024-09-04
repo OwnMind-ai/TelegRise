@@ -82,8 +82,8 @@ public class TelegramSessionsController {
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
-        if(this.transcription.getRootMenu().getChatTypes() == null)
-            this.transcription.getRootMenu().setChatTypes(new String[]{ChatTypes.ALL});
+        if(this.transcription.getRoot().getChatTypes() == null)
+            this.transcription.getRoot().setChatTypes(new String[]{ChatTypes.ALL});
 
         if (Boolean.parseBoolean(this.transcription.getAutoCommands())) {
             try {

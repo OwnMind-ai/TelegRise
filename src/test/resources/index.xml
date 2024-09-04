@@ -14,7 +14,7 @@
         <role name="unauthorised" level="-1" onDeniedTree="denied"/>
     </roles>
 
-    <menu name="Main" >
+    <root>
         <send>
             <text parseMode="markdown">Menu</text>
         </send>
@@ -118,7 +118,7 @@
                     </send>
                 </branch>
                 <branch callbackTriggers="first; second" invoke="#send; #log; SimpleController#printHello">
-                    <transition direction="next" target="newMenu" execute="true"/>
+                    <transition direction="previous" target="root" execute="true"/>
                 </branch>
                 <branch callbackTriggers="disableMe">
                     <invoke method="#disableButton"/>
@@ -145,23 +145,6 @@
                     <send>Wrong</send>
                 </default>
             </branch>
-
-            <menu name="newMenu">
-                <send>New menu</send>
-                <tree name="tree" keys="Ok" accessLevel="0">
-                    <send>Yes or no?</send>
-                    <branch keys="yes">
-                        <send>Okay</send>
-                        <transition direction="jump" target="toBeCalled">
-                            <send>Jump ended</send>
-                            <transition direction="previous" target="Main"/>
-                        </transition>
-                    </branch>
-                </tree>
-                <default>
-                    <send>Default</send>
-                </default>
-            </menu>
         </tree>
         <tree name="toBeCalled" accessLevel="0">
             <send>
@@ -196,5 +179,5 @@
         <default when="${MessageUtils.getChat(update).isUserChat()}">
             <send>Don't get it</send>
         </default>
-    </menu>
+    </root>
 </bot>

@@ -4,7 +4,7 @@
     <head>
         <link src="test/keyboards.xml"/>
     </head>
-    <menu name="Main">
+    <root name="Main">
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               controller="XMLTranscriptionParserTest">
             <send>
@@ -23,5 +23,5 @@
                 </branch>
             </branch>
         </tree>
-    </menu>
+    </root>
 </bot>

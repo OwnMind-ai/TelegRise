@@ -18,6 +18,6 @@ public class Trees extends NodeElement implements LinkableElement{
 
     @Override
     public Consumer<BotTranscription> afterParsedTask() {
-        return transcription -> transcription.getRootMenu().getTrees().addAll(trees);
+        return transcription -> transcription.getRoot().getTrees().addAll(trees);
     }
 }

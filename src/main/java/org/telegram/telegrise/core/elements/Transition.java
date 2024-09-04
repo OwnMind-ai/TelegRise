@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 @Data @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Transition extends NodeElement {
-    public static final String NEXT = "next";
     public static final String PREVIOUS = "previous";
     public static final String JUMP = "jump";
     public static final String LOCAL = "local";
@@ -50,10 +49,10 @@ public class Transition extends NodeElement {
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (direction != null && !direction.equals(NEXT) && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
+        if (direction != null && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
                 && !direction.equals(LOCAL) && !direction.equals(CALLER))
-            throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '"
-                    + NEXT + "', '" + PREVIOUS + "', '" + LOCAL + "' or '" + JUMP + "'" , node);
+            throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '" +
+                    PREVIOUS + "', '" + LOCAL + "' or '" + JUMP + "'" , node);
 
         if (!JUMP.equals(this.direction) && (this.nextTransition != null || this.actions != null))
             throw new TranscriptionParsingException("Transitions with direction other then '" + JUMP + "' cannot contain next transition or actions", node);
@@ -79,7 +78,7 @@ public class Transition extends NodeElement {
         if (LOCAL.equals(direction) && !this.target.validate(createValidationFor(memory, Branch.class)))
             throw new TranscriptionParsingException("Unable to find branch named '" + this.target.generate(null) + "'" , node);
 
-        if ((JUMP.equals(direction) || NEXT.equals(direction) || PREVIOUS.equals(direction)) && !this.target.validate(createValidationFor(memory, Tree.class, Menu.class)))
+        if ((JUMP.equals(direction) || PREVIOUS.equals(direction)) && !this.target.validate(createValidationFor(memory, Tree.class, Root.class)))
             throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'", node);
     }
 

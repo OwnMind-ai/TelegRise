@@ -22,10 +22,10 @@ import org.telegram.telegrise.types.CommandData;
 import org.telegram.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Element(name = "tree")
@@ -81,8 +81,6 @@ public class Tree extends NodeElement implements BranchingElement{
     private List<ActionElement> actions;
     @InnerElement
     private List<Branch> branches;
-    @InnerElement
-    private List<Menu> menus;
     @InnerElement
     private DefaultBranch defaultBranch;
 
@@ -149,9 +147,12 @@ public class Tree extends NodeElement implements BranchingElement{
         return false;
     }
 
-    public boolean isProducesBotCommands(BotCommandScope scope, Menu rootMenu){
+    public boolean isProducesBotCommands(BotCommandScope scope, Root rootMenu){
         List<String> scopes = this.scopes != null ? List.of(this.scopes) :
-                ChatTypes.chatTypesToScopes(Objects.requireNonNullElse(this.chatTypes ,rootMenu.getChatTypes()));
+                ChatTypes.chatTypesToScopes(
+                        Optional.ofNullable(this.chatTypes)
+                                .or(() -> Optional.ofNullable(rootMenu.getChatTypes()))
+                                .orElse(new String[]{ChatTypes.DEFAULT_SCOPE}));
 
         return this.description != null && this.commands != null && ChatTypes.isApplicable(scopes, scope);
     }
@@ -167,11 +168,7 @@ public class Tree extends NodeElement implements BranchingElement{
 
     @Override
     public List<? extends BranchingElement> getChildren() {
-        var result = new ArrayList<BranchingElement>();
-        if (branches != null) result.addAll(branches);
-        if (menus != null) result.addAll(menus);
-
-        return result;
+        return branches;
     }
 
     @Override

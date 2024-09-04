@@ -11,7 +11,7 @@ import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.BranchingElement;
-import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Root;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
@@ -92,7 +92,7 @@ public class UserSession implements Runnable{
     }
 
     private void initialize(){
-        this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
+        this.sessionMemory.getBranchingElements().add(this.transcription.getRoot());
     }
 
     public void update(Update update){
@@ -138,8 +138,8 @@ public class UserSession implements Runnable{
             if (intercept) return;
         }
 
-        if (this.sessionMemory.isOnStack(Menu.class))
-            this.initializeTree(update, this.sessionMemory.getFromStack(Menu.class));
+        if (this.sessionMemory.isOnRoot())
+            this.initializeTree(update, transcription.getRoot());
 
         else if (this.sessionMemory.isOnStack(Tree.class)) {
             if (this.transcription.isInterruptions()){
@@ -165,7 +165,7 @@ public class UserSession implements Runnable{
         Chat chat = MessageUtils.getChat(update);
         boolean containAll = scopes.contains(INTERRUPT_BY_ALL);
         List<String> lastScopes = List.of(this.sessionMemory.getLastChatTypes());
-        List<Tree> trees = this.transcription.getRootMenu().getTrees().stream()
+        List<Tree> trees = this.transcription.getRoot().getTrees().stream()
                 .filter(t -> t.isChatApplicable(lastScopes, chat))
                 .toList();
 
@@ -207,21 +207,21 @@ public class UserSession implements Runnable{
         this.sessionMemory.getJumpPoints().clear();
 
         this.sessionMemory.getBranchingElements().clear();
-        this.sessionMemory.getBranchingElements().add(this.transcription.getRootMenu());
+        this.sessionMemory.getBranchingElements().add(this.transcription.getRoot());
         this.initializeTree(update, tree, execute);
     }
 
-    private void initializeTree(Update update, Menu menu) {
+    private void initializeTree(Update update, Root root) {
         ResourcePool pool = this.createResourcePool(update);
-        Tree tree = menu.findTree(this.createResourcePool(update), this.sessionMemory);
+        Tree tree = root.findTree(this.createResourcePool(update), this.sessionMemory);
 
         if (tree != null) {
             this.initializeTree(update, tree, true);
             return;
         }
 
-        if (menu.getDefaultBranch() != null && menu.getDefaultBranch().getWhen().generate(pool)){
-            TreeExecutor.invokeBranch(menu.getDefaultBranch().getToInvoke(), menu.getDefaultBranch().getActions(),
+        if (root.getDefaultBranch() != null && root.getDefaultBranch().getWhen().generate(pool)){
+            TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
                     pool, sender);
         }
 
@@ -314,7 +314,7 @@ public class UserSession implements Runnable{
             if ((executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_ALL)
                 || executor.getCurrentInterruptionScopes().contains(INTERRUPT_BY_PREDICATES)))
             {
-                for (Tree tree : this.transcription.getRootMenu().getTrees()) {
+                for (Tree tree : this.transcription.getRoot().getTrees()) {
                     if (tree.getPredicate() != null && tree.isChatApplicable(lastScopes, chat) && tree.getPredicate().generate(pool)) {
                         // Interrupter found case (tree)
                         this.interruptTreeChain(update, tree, true);

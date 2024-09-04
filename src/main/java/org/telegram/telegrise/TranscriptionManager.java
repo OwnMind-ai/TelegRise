@@ -5,7 +5,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Transition;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -15,7 +18,6 @@ import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -100,20 +102,6 @@ public class TranscriptionManager {
         return last instanceof Tree ? (Tree) last : null;
     }
 
-    public Menu getCurrentMenu(){
-        checkSessionMemory();
-
-        Iterator<BranchingElement> iterator = sessionMemory.getBranchingElements().descendingIterator();
-        while (iterator.hasNext()){
-            BranchingElement next = iterator.next();
-
-            if (next instanceof Menu)
-                return (Menu) next;  //TODO return immutable proxy of a menu
-        }
-
-        return null;
-    }
-
     public void transitPrevious(String element){
         this.transitPrevious(null, element, false);
     }
@@ -149,7 +137,7 @@ public class TranscriptionManager {
 
         checkSessionMemory();
 
-        Tree requestedTree = this.transcription.getRootMenu().getTrees().stream()
+        Tree requestedTree = this.transcription.getRoot().getTrees().stream()
                 .filter(t -> t.getName().equals(treeName)).findFirst().orElse(null);
 
         if (requestedTree == null) throw new IllegalArgumentException("Tree '" + treeName + "' has not been found at root menu");

@@ -15,7 +15,7 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BotTranscription;
 import org.telegram.telegrise.core.elements.Branch;
-import org.telegram.telegrise.core.elements.Menu;
+import org.telegram.telegrise.core.elements.Root;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
@@ -113,16 +113,16 @@ public class XMLTranscriptionParserTest {
         expectedTree.setActions(List.of(treeSend));
         expectedTree.setBranches(List.of(expectedBranch));
 
-        Menu expectedMenu = new Menu();
-        expectedMenu.setName("Main");
-        expectedMenu.setActions(null);
-        expectedMenu.setTrees(List.of(expectedTree));
+        Root expectedRoot = new Root();
+        expectedRoot.setName("Main");
+        expectedRoot.setActions(null);
+        expectedRoot.setTrees(List.of(expectedTree));
 
         BotTranscription transcription = new BotTranscription();
         transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml"))));
         transcription.setUsername(GeneratedValue.ofValue("bot"));
         transcription.setToken(GeneratedValue.ofValue("token"));
-        transcription.setRootMenu(expectedMenu);
+        transcription.setRoot(expectedRoot);
 
         assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null));
     }

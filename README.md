@@ -19,7 +19,7 @@ Firstly, create your first transcription .xml file. Here is an example of one (i
         <link src="..."/>  <!-- List your other transcriptions here -->
     </head>
 
-    <menu name="RootMenu">
+    <root>
         <tree name="StartTree" commands="start" chats="private" 
               description="Bot start" controller="SimpleController">
             <!-- Sends a message to a chat from which '/start' command came -->
@@ -46,7 +46,7 @@ Firstly, create your first transcription .xml file. Here is an example of one (i
                 <send>Unrecognized command. Say what?</send>
             </default>
         </tree>
-    </menu>
+    </root>
 </bot>
 ```
 

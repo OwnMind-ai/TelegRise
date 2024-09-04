@@ -15,13 +15,13 @@ import org.telegram.telegrise.utils.MessageUtils;
 
 import java.util.List;
 
-@Element(name = "menu")
+@Element(name = "root")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Menu extends NodeElement implements BranchingElement {
-    @Attribute(name = "name", nullable = false)
-    private String name;
+public class Root extends NodeElement implements BranchingElement {
+    @Attribute(name = "name")
+    private String name = "root";
 
     @Attribute(name = "chats")
     private String[] chatTypes;

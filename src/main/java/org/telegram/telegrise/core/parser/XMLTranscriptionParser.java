@@ -62,18 +62,19 @@ public class XMLTranscriptionParser implements TranscriptionParser{
     }
 
     private void calculateTreeNodesLevel(BotTranscription result) {
-        result.getRootMenu().setLevel(0);
+        result.getRoot().setLevel(0);
 
         Queue<BranchingElement> queue = new LinkedList<>();
-        queue.add(result.getRootMenu());
+        queue.add(result.getRoot());
 
         while (!queue.isEmpty()){
             var element = queue.poll();
 
-            element.getChildren().forEach(e -> {
-                e.setLevel(element.getLevel() + 1);
-                queue.add(e);
-            });
+            if (element.getChildren() != null)
+                element.getChildren().forEach(e -> {
+                    e.setLevel(element.getLevel() + 1);
+                    queue.add(e);
+                });
         }
     }
 }

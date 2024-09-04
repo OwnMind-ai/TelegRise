@@ -10,8 +10,8 @@ import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.Syntax;
-import org.telegram.telegrise.core.elements.Menu;
 import org.telegram.telegrise.core.elements.NodeElement;
+import org.telegram.telegrise.core.elements.Root;
 import org.telegram.telegrise.core.elements.StorableElement;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.utils.ReflectionUtils;
@@ -77,7 +77,7 @@ public class XMLElementsParser {
 
         if (instance instanceof Tree tree)
             currentTree = tree;
-        else if (instance instanceof Menu)
+        else if (instance instanceof Root)
             currentTree = null;
 
         instance.setParentTree(currentTree);

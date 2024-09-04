@@ -8,6 +8,7 @@ import org.telegram.telegrise.caching.CachingStrategy;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Root;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
@@ -165,5 +166,9 @@ public class SessionMemoryImpl implements SessionMemory {
         }
 
         return res;
+    }
+
+    public boolean isOnRoot() {
+        return branchingElements.size() == 1 && branchingElements.getFirst() instanceof Root;
     }
 }

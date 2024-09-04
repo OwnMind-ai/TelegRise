@@ -50,7 +50,7 @@ public final class BotTranscription extends NodeElement {
     private HeadBlock head;
 
     @InnerElement(nullable = false)
-    private Menu rootMenu;
+    private Root root;
 
     @InnerElement(priority = -1)
     private Roles roles;
@@ -78,14 +78,14 @@ public final class BotTranscription extends NodeElement {
     }
 
     public SetMyCommands getSetCommands(BotCommandScope scope){
-        return new SetMyCommands(this.rootMenu.getTrees().stream()
-                .filter(t -> t.isProducesBotCommands(scope, this.rootMenu))
+        return new SetMyCommands(this.root.getTrees().stream()
+                .filter(t -> t.isProducesBotCommands(scope, this.root))
                 .map(Tree::getBotCommands)
                 .flatMap(List::stream).collect(Collectors.toList()), scope, null);  //FIXME add language support
     }
 
-    public void setRootMenu(Menu rootMenu) {
-        this.rootMenu = rootMenu;
-        rootMenu.setTrees(new ArrayList<>(rootMenu.getTrees()));
+    public void setRoot(Root root) {
+        this.root = root;
+        root.setTrees(new ArrayList<>(root.getTrees()));
     }
 }
