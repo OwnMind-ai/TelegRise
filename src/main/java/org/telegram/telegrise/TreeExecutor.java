@@ -99,7 +99,7 @@ public final class TreeExecutor {
                 this.naturallyClosed = true;
                 this.close();
             }
-        } else if (nextBranches.isEmpty()) {       // There is no continuation of the branch
+        } else if (nextBranches == null || nextBranches.isEmpty()) {       // There is no continuation of the branch
             this.lastBranch = previous;
             this.naturallyClosed = false;
             this.close();
