@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.exceptions.TelegramApiRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 
@@ -17,6 +18,7 @@ import java.util.List;
 //TODO add media support
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class MessageActionBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(MessageActionBuilder.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageActionBuilder.class);
 
     protected final Message message;
@@ -37,12 +39,24 @@ public class MessageActionBuilder {
     protected ReplyParameters replyParameters;
     protected String businessConnectionId;
 
-    public MessageActionBuilder(BotSender sender, Message message) {
+    private SessionMemoryImpl memory;
+    private boolean sneaky;
+
+    public MessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memoryImpl) {
         this.message = message;
         this.sender = sender;
+        sneaky = memory == null;
 
         this.chatId = String.valueOf(message.getChatId());
         this.messageThreadId = message.getMessageThreadId();
+    }
+
+    public MessageActionBuilder sneaky(){
+        if (memory == null) 
+            logger.warn("Sender is already sneaky since there is no session memory");
+            
+        sneaky = true;
+        return this;
     }
 
     public MessageActionBuilder parseMode(String parseMode){
@@ -130,7 +144,7 @@ public class MessageActionBuilder {
 
     private Message execute() {
         try {
-            return this.sender.execute(SendMessage.builder()
+            Message result = this.sender.execute(SendMessage.builder()
                     .chatId(chatId)
                     .messageThreadId(messageThreadId)
                     .parseMode(entities != null ? null : parseMode)
@@ -146,6 +160,12 @@ public class MessageActionBuilder {
                     .businessConnectionId(businessConnectionId)
                     .entities(entities)
                     .build());
+
+            if (!sneaky)
+                this.memory.setLastSentMessage(result);
+            
+            sneaky = memory == null;
+            return result;
         } catch (TelegramApiException e) {
             LOGGER.error("An error occurred while sending the message", e);
             throw new TelegramApiRuntimeException(e);

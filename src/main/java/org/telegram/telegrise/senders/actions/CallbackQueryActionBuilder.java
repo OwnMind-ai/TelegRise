@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.message.InaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.exceptions.TelegramApiRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 
@@ -15,8 +16,9 @@ public class CallbackQueryActionBuilder{
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackQueryActionBuilder.class);
     private final CallbackQuery query;
     public final BotSender sender;
+    private SessionMemoryImpl sessionMemory;
 
-    public CallbackQueryActionBuilder(BotSender sender, CallbackQuery query) {
+    public CallbackQueryActionBuilder(BotSender sender, CallbackQuery query, SessionMemoryImpl sessionMemory) {
         this.query = query;
         this.sender = sender;
     }
@@ -50,6 +52,6 @@ public class CallbackQueryActionBuilder{
         if (isInaccessible())
             throw new IllegalStateException("Message is inaccessible");
 
-        return new EditableMessageActionBuilder(sender, getMessage());
+        return new EditableMessageActionBuilder(sender, getMessage(), sessionMemory);
     }
 }

@@ -2,6 +2,8 @@ package org.telegram.telegrise.senders;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
@@ -33,6 +35,7 @@ import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
 public class BotSender {
+    private static final Logger logger = LoggerFactory.getLogger(BotSender.class);
     public static String DEFAULT_PARSE_MODE = "html";
 
     @Getter
@@ -43,6 +46,7 @@ public class BotSender {
     public BotSender(TelegramClient client, SessionMemoryImpl memory) {
         this.client = client;
         this.memory = memory;
+        isSneaky = memory == null;
     }
 
     public boolean delete(MaybeInaccessibleMessage message) throws TelegramApiException {
@@ -54,15 +58,15 @@ public class BotSender {
     }
 
     public MessageActionBuilder of(Message message){
-        return new MessageActionBuilder(this, message);
+        return new MessageActionBuilder(this, message, memory);
     }
 
     public EditableMessageActionBuilder ofEditable(Message message){
-        return new EditableMessageActionBuilder(this, message);
+        return new EditableMessageActionBuilder(this, message, memory);
     }
 
     public CallbackQueryActionBuilder of(CallbackQuery callbackQuery) {
-        return new CallbackQueryActionBuilder(this, callbackQuery);
+        return new CallbackQueryActionBuilder(this, callbackQuery, memory);
     }
 
     private void finish(@Nullable Message message) {
@@ -70,10 +74,13 @@ public class BotSender {
             this.memory.setLastSentMessage(message);
         }
 
-        isSneaky = false;
+        isSneaky = memory == null;
     }
 
     public BotSender sneaky(){
+        if (memory == null) 
+            logger.warn("Sender is already sneaky since there is no session memory");
+            
         this.isSneaky = true;
         return this;
     }
@@ -95,14 +102,16 @@ public class BotSender {
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> executeAsync(Method method) throws TelegramApiException {
-        CompletableFuture<T> future = this.client.executeAsync(method);
-        this.finish(null);
+        CompletableFuture<T> future = this.client.executeAsync(method).thenApply(r -> {
+            this.finish(r instanceof Message m ? m : null);
+            return r;
+        });
         return future;
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> T execute(Method method) throws TelegramApiException {
         T result = this.client.execute(method);
-        this.finish(null);
+        this.finish(result instanceof Message m ? m : null);
         return result;
     }
 

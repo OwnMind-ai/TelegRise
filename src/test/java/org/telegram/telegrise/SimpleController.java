@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.*;
 import org.telegram.telegrise.core.ResourcePool;
@@ -127,8 +128,12 @@ public class SimpleController {
     }
 
     @Reference
-    public void send(Update update) throws TelegramApiException {
-        sender.execute(SendMessage.builder().chatId(update.getCallbackQuery().getMessage().getChatId()).text("Done").build());
+    public void send(Update update) throws TelegramApiException, InterruptedException {
+        System.out.println(memory.getLastSentMessage().getMessageId());
+        Message m = sender.of(update.getCallbackQuery()).message().send("Done");
+        System.out.println(memory.getLastSentMessage().getMessageId());
+        Thread.sleep(1000);
+        sender.ofEditable(m).edit(m.getText() +"... or is it?");
     }
 
     public static InputStream downloadFile(String fileUrl) throws Exception {
