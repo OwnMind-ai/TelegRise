@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.text;
 
 import java.util.List;
 
-import org.checkerframework.checker.units.qual.t;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.elements.LinkableElement;
 import org.telegram.telegrise.core.elements.NodeElement;

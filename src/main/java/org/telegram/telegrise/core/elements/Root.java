@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.elements.keyboard.Keyboards;
 import org.telegram.telegrise.core.elements.text.Texts;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
@@ -38,6 +39,9 @@ public class Root extends NodeElement implements BranchingElement {
 
     @InnerElement
     private Texts texts;
+
+    @InnerElement
+    private Keyboards keyboards;
 
     private int level = -1;
 
