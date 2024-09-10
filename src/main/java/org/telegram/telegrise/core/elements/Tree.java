@@ -13,6 +13,7 @@ import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboards;
+import org.telegram.telegrise.core.elements.text.Texts;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -77,6 +78,8 @@ public class Tree extends NodeElement implements BranchingElement{
 
     @InnerElement(priority = 100)
     private Keyboards keyboards;
+    @InnerElement(priority = 100)
+    private Texts texts;
     @InnerElement
     private List<ActionElement> actions;
     @InnerElement

@@ -94,13 +94,9 @@
                     <row><button data="testAnimation">Test Animation</button></row>
                 </keyboard>
             </keyboards>
-
             <send>${#concat("Hi", "World")}</send>
             <send returnConsumer="${ReturnConsumer.message(m -> { System.out.println(&quot;Message returned&quot;); })}">
-                <text parseMode="markdown">
-                    *Hello* ${MessageUtils.getFrom(update).getFirstName()}!
-                    How are you?
-                </text>
+                <text byName="HelloText"/>
             </send>
             <branch name="point" when="${update.hasMessage() &amp;&amp; controller.check()}" allowedInterruptions="all">
                 <chatAction action="typing"/>

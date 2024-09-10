@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<texts context="SimpleController">
+    <text name="HelloText" parseMode="markdown">
+        *Hello* ${MessageUtils.getFrom(update).getFirstName()}!
+        How are you? ${#predicate}
+    </text>
+</texts>

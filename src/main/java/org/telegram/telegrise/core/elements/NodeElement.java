@@ -24,12 +24,18 @@ public abstract class NodeElement implements Serializable {
     protected transient Node node;
     @Getter @Setter
     protected Tree parentTree;
+    @Getter @Setter
+    protected NodeElement parent;
 
     public LocalNamespace createNamespace(ApplicationNamespace global){
         return null;
     }
 
-    public void validate(TranscriptionMemory memory){}
+    public void validate(TranscriptionMemory memory, ApplicationNamespace namespace){
+        validate(memory);
+    }
+    
+    protected void validate(TranscriptionMemory memory){}
     public void load(TranscriptionMemory memory){}
 
     protected final <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){

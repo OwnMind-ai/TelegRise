@@ -37,7 +37,7 @@ public class XMLElementsParser {
     }
 
     private final Map<String, Class<? extends NodeElement>> elements = new HashMap<>();
-    @Setter
+    @Setter @Getter
     private LocalNamespace namespace;
     @Getter
     private final TranscriptionMemory transcriptionMemory = new TranscriptionMemory();
@@ -70,6 +70,10 @@ public class XMLElementsParser {
     }
 
     public NodeElement parse(@NotNull Node node) throws Exception {
+        return parse(node, null);
+    }
+
+    public NodeElement parse(@NotNull Node node, NodeElement parent) throws Exception {
         Class<? extends NodeElement> element = this.elements.get(node.getNodeName());
         NodeElement instance = element.getConstructor().newInstance();
         instance.setElementNode(node);
@@ -80,6 +84,7 @@ public class XMLElementsParser {
             currentTree = null;
 
         instance.setParentTree(currentTree);
+        instance.setParent(parent);
 
         final Map<Class<?>, Object> resourcesMap = Map.of(
                 Node.class, node,
@@ -156,7 +161,7 @@ public class XMLElementsParser {
         if(instance.getClass().getAnnotation(Element.class).finishAfterParsing())
             this.transcriptionMemory.getPendingFinalization().add(instance);
         else {
-            instance.validate(transcriptionMemory);
+            instance.validate(transcriptionMemory, namespace.getApplicationNamespace());
             instance.load(transcriptionMemory);
         }
 
@@ -241,12 +246,12 @@ public class XMLElementsParser {
             if (List.class.isAssignableFrom(field.getType())) {
                 PropertyUtils.setSimpleProperty(instance, field.getName(), fieldNodes.stream()
                         .map(n -> {
-                            try { return parse(n); } catch (Exception e) { throw new TelegRiseInternalException(e); }
+                            try { return parse(n, instance); } catch (Exception e) { throw new TelegRiseInternalException(e); }
                         }).toList()
                 );
             } else {
                 if (fieldNodes.size() == 1)
-                    PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNodes.getFirst()));
+                    PropertyUtils.setSimpleProperty(instance, field.getName(), this.parse(fieldNodes.getFirst(), instance));
                 else
                     throw new TranscriptionParsingException(
                             "Field \"" + (innerElementData != null ? innerElementData.name() : field.getName()) + "\" has more than one definition", node);

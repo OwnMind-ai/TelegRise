@@ -45,7 +45,7 @@ public class XMLTranscriptionParser implements TranscriptionParser{
 
         this.elementsParser.getTranscriptionMemory().getPendingFinalization()
                 .forEach(p -> {
-                    p.validate(this.elementsParser.getTranscriptionMemory());
+                    p.validate(this.elementsParser.getTranscriptionMemory(), elementsParser.getNamespace().getApplicationNamespace());
                     p.load(this.elementsParser.getTranscriptionMemory());
                 });
 

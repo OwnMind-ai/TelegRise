@@ -30,7 +30,7 @@ class LinkTest {
 
         Keyboard result = (Keyboard) parser.parse(keyboardNode);
         parser.getTranscriptionMemory().getPendingFinalization().forEach(p -> {
-            p.validate(parser.getTranscriptionMemory());
+            p.validate(parser.getTranscriptionMemory(), parser.getNamespace().getApplicationNamespace());
             p.load(parser.getTranscriptionMemory());
         });
 

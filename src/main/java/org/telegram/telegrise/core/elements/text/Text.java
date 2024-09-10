@@ -122,7 +122,21 @@ public class Text extends NodeElement implements EmbeddableElement, InteractiveE
             else raw = XMLUtils.innerXML(node);
 
             if (raw == null) return;
-            this.text = ExpressionFactory.createExpression(raw, String.class, node, namespace);
+
+            Class<?> controllerClass = namespace.getHandlerClass();
+            if (parent instanceof Texts texts && texts.getContext() != null) {
+                try {
+                    Class<?> contextClass = namespace.getApplicationNamespace().getClass(texts.getContext());
+                    if (controllerClass != null && !controllerClass.getName().equals(contextClass.getName()))
+                        throw new TranscriptionParsingException("Conflict of contexts between '%s' and '%s'".formatted(contextClass.getName(), controllerClass.getName()), node);
+
+                    controllerClass = contextClass;
+                } catch (TelegRiseRuntimeException e){
+                    throw new TranscriptionParsingException(e.getMessage(), node);
+                }
+            }
+
+            this.text = ExpressionFactory.createExpression(raw, String.class, node, new LocalNamespace(controllerClass, namespace.getApplicationNamespace()));
         }
     }
 

@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.elements.text.Texts;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
@@ -34,6 +35,9 @@ public class Root extends NodeElement implements BranchingElement {
 
     @InnerElement
     private DefaultBranch defaultBranch;
+
+    @InnerElement
+    private Texts texts;
 
     private int level = -1;
 
