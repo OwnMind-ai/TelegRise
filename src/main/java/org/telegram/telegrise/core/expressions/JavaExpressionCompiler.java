@@ -10,6 +10,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
@@ -29,7 +30,8 @@ import java.util.stream.Collectors;
 
 public class JavaExpressionCompiler {
     // Change to force recompilation of expressions when incompatible changes introduced
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
+    private static final String VERSION_FIELD = "VERSION";
 
     public static String getTempDirectory(){
         return Objects.requireNonNullElse(
@@ -58,7 +60,7 @@ public class JavaExpressionCompiler {
         int hashcode = this.calculateHashcode(expression, namespace);
 
         if (this.isExpressionExists(hashcode))
-            return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
+            return createInstance(hashcode, node);
 
         JavaClassSource source;
         List<Class<?>> imported;
@@ -78,7 +80,23 @@ public class JavaExpressionCompiler {
         File sourceFile = this.createSourceFile(source, hashcode);
         this.compileSourceFile(sourceFile, node, imported);
 
-        return (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
+        return createInstance(hashcode, node);
+    }
+
+    private GeneratedValue<?> createInstance(int hashcode, Node node) throws InstantiationException, IllegalAccessException,
+            InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+        var result = (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
+
+        Arrays.stream(result.getClass().getFields())
+            .filter(f -> f.getName().equals(VERSION_FIELD))
+            .map(f -> { try { return f.get(null); } catch(Exception e) { return null; } })
+            .findFirst().ifPresent(
+                v -> {
+                    if (!v.equals(VERSION)) throw new TranscriptionParsingException("Wrong version of compiled expression was found: " + v, node);  // TODO recompile if got there
+                }
+            );
+
+        return result;
     }
 
     private boolean isExpressionExists(int hashcode){
@@ -131,6 +149,9 @@ public class JavaExpressionCompiler {
         source.addImport(ResourcePool.class);
         source.addImport(returnType);
         source.addInterface(GeneratedValue.class.getSimpleName() + '<' + returnType.getSimpleName() + '>');
+
+        source.addField().setStatic(true).setFinal(true).setPublic()
+              .setType(String.class).setName(VERSION_FIELD).setLiteralInitializer("\"" + VERSION + "\"");
 
         String safeExpression = returnType.equals(String.class) ? "String.valueOf(" + expression + ")" : expression;
         StringBuilder builder = new StringBuilder(namespace.getResourceInitializationCode("pool"));
