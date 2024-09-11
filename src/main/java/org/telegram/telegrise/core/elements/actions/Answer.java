@@ -37,7 +37,7 @@ public class Answer extends ActionElement{
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (!text.validate(s -> !s.isEmpty()))
+        if (text != null && !text.validate(s -> !s.isEmpty()))
             throw new TranscriptionParsingException("text is empty", node);
     }
 
