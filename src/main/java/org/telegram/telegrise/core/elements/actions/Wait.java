@@ -22,6 +22,9 @@ public class Wait extends ActionElement{
     @Attribute(name = "timeout", nullable = false)
     private GeneratedValue<Double> timeout;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
+
     @Attribute(name = "listener")
     private GeneratedValue<Consumer<Update>> listener;
 

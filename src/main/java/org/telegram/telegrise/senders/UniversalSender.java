@@ -54,6 +54,8 @@ public class UniversalSender {
 
     //TODO Move to package-private class
     public void execute(ActionElement action, ResourcePool pool) throws TelegramApiException {
+        if (action.getWhen() != null && !action.getWhen().generate(pool)) return;
+
         PartialBotApiMethod<?> method = action.generateMethod(pool);
         Object result;
         try {

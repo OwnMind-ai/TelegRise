@@ -13,6 +13,7 @@ public abstract class ActionElement extends NodeElement {
     public abstract PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool);
     public abstract GeneratedValue<Long> getChatId();
     public GeneratedValue<ReturnConsumer> getReturnConsumer() { return null; }
+    public abstract GeneratedValue<Boolean> getWhen();
 
     public ReturnConsumer getConsumer(ResourcePool pool){
         return Objects.requireNonNullElse(generateNullableProperty(this.getReturnConsumer(), pool), null);

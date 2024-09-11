@@ -16,6 +16,9 @@ public class Invoke extends ActionElement{
     @Attribute(name = "method", nullable = false)
     private GeneratedValue<Void> method;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
+
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
         method.generate(resourcePool);

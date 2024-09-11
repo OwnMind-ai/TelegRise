@@ -25,8 +25,6 @@ public class ClearCache extends ActionElement{
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
-        if (when != null && !when.generate(resourcePool)) return null;
-
         String methodName = method.generate(resourcePool);
         Class<?> clazz = resourcePool.getCurrentExecutor().getControllerInstance().getClass();
 

@@ -23,6 +23,9 @@ public class Animate extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
+
     @Attribute(name = "period", nullable = false)
     private GeneratedValue<Float> period;
 

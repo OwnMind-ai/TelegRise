@@ -19,6 +19,9 @@ public class Flip extends ActionElement{
     @Attribute(name = "id", nullable = false)
     private String id;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
+
     @Attribute(name = "switch", nullable = false)
     private GeneratedValue<String> switchName;
 

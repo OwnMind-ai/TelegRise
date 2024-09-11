@@ -26,6 +26,7 @@
                     <row><button>Second Button</button></row>
                 </keyboard>
             </keyboards>
+            <send when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}'>ABC</send>
             <send>
                 <text name="startText" global="true" conditional="true">
                     <if condition="SimpleController#isHello" textblock="true">

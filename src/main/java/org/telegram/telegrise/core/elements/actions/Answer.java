@@ -20,6 +20,9 @@ public class Answer extends ActionElement{
     @Attribute(name = "callbackQueryId")
     private GeneratedValue<String> callbackQueryId;
 
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
+
     @Attribute(name = "text")
     private GeneratedValue<String> text;
 
