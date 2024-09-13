@@ -12,7 +12,12 @@
             </send>
             <branch when="${update.hasMessage()}">
                 <send chat="${update.getMessage().getChatId()}">
-                    <text>Hi, ${update.getMessage().getFrom().getFirstName()}</text>
+                    <text>
+                        Hi, ${update.getMessage().getFrom().getFirstName()}<br/>
+                        <br/>
+                        1<br/>
+                        2
+                    </text>
                     <keyboard byName="first"/>
                 </send>
                 <branch when="#predicate">

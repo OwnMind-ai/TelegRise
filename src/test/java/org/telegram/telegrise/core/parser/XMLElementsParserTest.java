@@ -204,17 +204,23 @@ public class XMLElementsParserTest {
             fail(String.format("Elements %s and %s are instances of different types", expected.getClass().getCanonicalName(), actual.getClass().getCanonicalName()));
 
         Map<String, Field> expectedFields = Arrays.stream(expected.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class))
+                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class) || GeneratedValue.class.isAssignableFrom(f.getType()))
                 .collect(Collectors.toMap(Field::getName, f -> f));
 
         Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class))
+                .filter(f -> f.isAnnotationPresent(Attribute.class) || f.isAnnotationPresent(InnerElement.class) || GeneratedValue.class.isAssignableFrom(f.getType()))
                 .collect(Collectors.toMap(Field::getName, f -> f));
 
         for (String name : expectedFields.keySet()) {
             try {
-                if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual, pool))
-                    fail(String.format("Field '%s' does not match to expected '%s'", actualFields.get(name).get(actual), expectedFields.get(name).get(expected)));
+                if(!compareFields(expectedFields.get(name), expected, actualFields.get(name), actual, pool)) {
+                    Object f = actualFields.get(name).get(actual);
+                    Object s = expectedFields.get(name).get(expected);
+                    fail(String.format("Field '%s' does not match to expected '%s'",
+                            f instanceof GeneratedValue<?> g ? g.generate(pool) : f,
+                            s instanceof GeneratedValue<?> g ? g.generate(pool) : s
+                            ));
+                }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

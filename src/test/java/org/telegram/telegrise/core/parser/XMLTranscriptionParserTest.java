@@ -90,7 +90,7 @@ public class XMLTranscriptionParserTest {
 
         Send expectedSend = new Send();
         expectedSend.setText(new Text(
-                "Hi, " + update.getMessage().getFrom().getFirstName(),
+                "Hi, " + update.getMessage().getFrom().getFirstName() + "\n\n1\n2",
                 "html"
         ));
         expectedSend.setKeyboard(keyboard);

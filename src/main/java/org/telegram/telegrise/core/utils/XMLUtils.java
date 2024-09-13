@@ -70,7 +70,7 @@ public class XMLUtils {
     }
 
     public static String applyHTMLTextDecorators(String string){
-        return StringEscapeUtils.unescapeHtml4(string).replace("<br/>", "\n");
+        return StringEscapeUtils.unescapeHtml4(string).replaceAll("<br/> ?", "\n");
     }
 
     public static Node[] getInstructions(Document element){
