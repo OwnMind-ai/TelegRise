@@ -23,7 +23,7 @@ public class MethodReferenceCache{
     }
 
     public boolean isEmpty(){
-        return cachedValue.get() == null;
+        return currentContext == null;
     }
 
     public void write(Object result, ResourcePool pool) {
