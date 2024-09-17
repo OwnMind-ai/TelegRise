@@ -130,7 +130,7 @@ public class SimpleController {
     @Reference
     public void send(Update update) throws TelegramApiException, InterruptedException {
         System.out.println(memory.getLastSentMessage().getMessageId());
-        Message m = sender.of(update.getCallbackQuery()).message().send("Done");
+        Message m = sender.of(memory.getChatId()).send("Done");
         System.out.println(memory.getLastSentMessage().getMessageId());
         Thread.sleep(1000);
         sender.ofEditable(m).edit(m.getText() +"... or is it?");

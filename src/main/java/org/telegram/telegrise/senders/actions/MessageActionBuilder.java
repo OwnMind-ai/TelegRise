@@ -21,7 +21,6 @@ public class MessageActionBuilder {
     private static final Logger logger = LoggerFactory.getLogger(MessageActionBuilder.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageActionBuilder.class);
 
-    protected final Message message;
     protected final BotSender sender;
 
     protected final String chatId;
@@ -43,12 +42,21 @@ public class MessageActionBuilder {
     private boolean sneaky;
 
     public MessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memoryImpl) {
-        this.message = message;
         this.sender = sender;
         sneaky = memory == null;
 
         this.chatId = String.valueOf(message.getChatId());
         this.messageThreadId = message.getMessageThreadId();
+        this.replyToMessageId = message.getMessageId();
+    }
+
+    public MessageActionBuilder(BotSender sender, String chatId, Integer messageThreadId, Integer messageId, SessionMemoryImpl memoryImpl) {
+        this.sender = sender;
+        sneaky = memory == null;
+
+        this.chatId = chatId;
+        this.messageThreadId = messageThreadId;
+        this.replyToMessageId = messageId;
     }
 
     public MessageActionBuilder sneaky(){
@@ -116,12 +124,14 @@ public class MessageActionBuilder {
 
     public Message send(String text){
         this.text = text;
+        this.replyToMessageId = null;
         return this.execute();
     }
 
     public Message send(String text, ReplyKeyboard replyMarkup){
         this.text = text;
         this.replyMarkup = replyMarkup;
+        this.replyToMessageId = null;
         return this.execute();
     }
 
@@ -135,7 +145,6 @@ public class MessageActionBuilder {
 
     public Message reply(String text, Boolean allowSendingWithoutReply, ReplyParameters replyParameters){
         this.text = text;
-        this.replyToMessageId = message.getMessageId();
         this.allowSendingWithoutReply = allowSendingWithoutReply;
         this.replyParameters = replyParameters;
 

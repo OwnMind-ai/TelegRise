@@ -57,6 +57,14 @@ public class BotSender {
         return delete(query.getMessage());
     }
 
+    public MessageActionBuilder of(String chatId){
+        return new MessageActionBuilder(this, chatId, null, null, memory);
+    }
+
+    public MessageActionBuilder of(long chatId){
+        return new MessageActionBuilder(this, Long.toString(chatId), null, null, memory);
+    }
+
     public MessageActionBuilder of(Message message){
         return new MessageActionBuilder(this, message, memory);
     }
