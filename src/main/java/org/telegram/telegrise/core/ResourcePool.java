@@ -1,6 +1,5 @@
 package org.telegram.telegrise.core;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 @Data
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
 public final class ResourcePool {
     public static Object extractComponent(Map<Class<?>, Object> components, Class<?> target){
         if (components.containsKey(target)) return components.get(target);
@@ -36,6 +35,8 @@ public final class ResourcePool {
     private TreeExecutor currentExecutor;
     private BlockingQueue<Update> updates;
 
+    private ApiResponseWrapper apiResponseWrapper;
+
     private final Map<Class<?>, Object> components = new HashMap<>(Map.of(ResourcePool.class,this));
 
     public ResourcePool(Update update, Object handler, BotSender sender, SessionMemoryImpl memory) {
@@ -43,6 +44,15 @@ public final class ResourcePool {
         this.handler = handler;
         this.sender = sender;
         this.memory = memory;
+    }
+
+    public ResourcePool(Update update, Object handler, BotSender sender, SessionMemoryImpl memory, TreeExecutor executor, BlockingQueue<Update> updates) {
+        this.update = update;
+        this.handler = handler;
+        this.sender = sender;
+        this.memory = memory;
+        this.currentExecutor = executor;
+        this.updates = updates;
     }
 
     public void addComponent(Object object){
@@ -56,6 +66,7 @@ public final class ResourcePool {
             this.components.put(TelegramClient.class, sender.getClient());
         }
         if (memory != null) this.components.put(SessionMemory.class, memory);
+        if (apiResponseWrapper != null) this.components.put(ApiResponseWrapper.class, apiResponseWrapper);
 
         return this.components;
     }

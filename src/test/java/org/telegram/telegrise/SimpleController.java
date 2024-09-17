@@ -196,6 +196,11 @@ public class SimpleController {
                 .build();
     }
 
+    @Reference
+    public void consumeReturn(Message result){
+        System.out.println("Returned: " + result.getText());
+    }
+
     @Handler(absolute = true)
     public static class PHandler implements PrimaryHandler {
         @Resource

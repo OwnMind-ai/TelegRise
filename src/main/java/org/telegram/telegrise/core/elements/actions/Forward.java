@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
@@ -38,7 +37,7 @@ public class Forward extends ActionElement{
 
 
     @Attribute(name = "returnConsumer")
-    private GeneratedValue<ReturnConsumer> returnConsumer;
+    private GeneratedValue<Void> returnConsumer;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool pool) {

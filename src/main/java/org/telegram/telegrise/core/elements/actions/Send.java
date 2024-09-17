@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
@@ -59,7 +58,7 @@ public class Send extends ActionElement{
     private Keyboard keyboard;
 
     @Attribute(name = "returnConsumer")
-    private GeneratedValue<ReturnConsumer> returnConsumer;
+    private GeneratedValue<Void> returnConsumer;
 
     @Override
     public void validate(TranscriptionMemory memory) {

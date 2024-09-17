@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
@@ -79,7 +78,7 @@ public class Edit extends ActionElement{
     private Location location;
 
     @Attribute(name = "returnConsumer")
-    private GeneratedValue<ReturnConsumer> returnConsumer;
+    private GeneratedValue<Void> returnConsumer;
 
     @Override
     public void validate(TranscriptionMemory memory) {

@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.AnimationExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
@@ -33,7 +32,7 @@ public class Animate extends ActionElement{
     private boolean parallel;
 
     @Attribute(name = "after")
-    private GeneratedValue<ReturnConsumer> after;
+    private GeneratedValue<Void> after;
 
     @Attribute(name = "until")
     private GeneratedValue<Boolean> until;

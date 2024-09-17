@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
-import org.telegram.telegrise.ReturnConsumer;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
@@ -36,7 +35,7 @@ public class ChatAction extends ActionElement{
     private GeneratedValue<String> action;
 
     @Attribute(name = "returnConsumer")
-    private GeneratedValue<ReturnConsumer> returnConsumer;
+    private GeneratedValue<Void> returnConsumer;
 
     @Override
     public void validate(TranscriptionMemory memory) {

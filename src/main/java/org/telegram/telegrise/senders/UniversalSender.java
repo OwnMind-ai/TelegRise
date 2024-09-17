@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrise.core.ApiResponseWrapper;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
@@ -73,7 +75,10 @@ public class UniversalSender {
             pool.getMemory().setLastSentMessage((Message) result);
         }
 
-        if (action.getReturnConsumer() != null && result != null)
-            action.getConsumer(pool).consume(result);
+        if (action.getReturnConsumer() != null && result != null){
+            pool.addComponent(result);
+            pool.setApiResponseWrapper(new ApiResponseWrapper(result));
+            action.getReturnConsumer().generate(pool);   //TODO add result to pool
+        }
     }
 }
