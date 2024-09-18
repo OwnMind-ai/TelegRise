@@ -25,7 +25,11 @@
                     <row><button>Second Button</button></row>
                 </keyboard>
             </keyboards>
-            <send when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}' returnConsumer='#register("name")'>ABC</send>
+            <actionGroup when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}'>
+                <send returnConsumer='#register("name")'>ABC</send>
+                <send returnConsumer='#register("name")'>1</send>
+                <send returnConsumer='#register("name")'>2</send>
+            </actionGroup>
             <send>
                 <text name="startText" global="true" conditional="true">
                     <if condition="SimpleController#isHello" textblock="true">

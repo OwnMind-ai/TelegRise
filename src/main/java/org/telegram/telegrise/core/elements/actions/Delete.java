@@ -45,7 +45,7 @@ public class Delete extends ActionElement{
             return DeleteMessages.builder()
                     .chatId(chatId)
                     .messageIds(register.stream()
-                        .peek(m -> { if (!m.getChatId().equals(chatId)) 
+                        .peek(m -> { if (!m.getChatId().equals(chatId))  // TODO perhabs it is possible just to delete from these chats (groupingBy chatId and then execute deletes through pool.getSender())
                             throw new TelegRiseRuntimeException("Message from the register is in the different chat (%d) then specified (%d): %s".formatted(m.getChatId(), chatId, m), node); })
                         .map(Message::getMessageId).distinct().toList())
                     .build();
