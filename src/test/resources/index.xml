@@ -25,7 +25,7 @@
                     <row><button>Second Button</button></row>
                 </keyboard>
             </keyboards>
-            <send when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}'>ABC</send>
+            <send when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}' returnConsumer='#register("name")'>ABC</send>
             <send>
                 <text name="startText" global="true" conditional="true">
                     <if condition="SimpleController#isHello" textblock="true">
@@ -48,6 +48,7 @@
             </send>
         </tree>
         <tree name="copyStartText" commands="copy_start_text" description="Test for text loading by name" accessLevel="0">
+            <delete register="name"/>
             <send>
                 <text byName="startText"/>
             </send>

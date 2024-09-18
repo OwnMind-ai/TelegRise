@@ -6,6 +6,7 @@ import org.telegram.telegrise.types.UserRole;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.List;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface SessionMemory extends Serializable {
@@ -38,4 +39,8 @@ public interface SessionMemory extends Serializable {
 
     long getUserId();
     long getChatId();
+
+    List<Message> getRegister(String name);
+    List<Message> clearRegister(String name);
+    void putToRegister(String name, Message message);
 }

@@ -42,6 +42,7 @@ public class SessionMemoryImpl implements SessionMemory {
 
     @Getter
     private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new HashMap<>();
+    private final Map<String, List<Message>> registerMap = new HashMap<>();
 
     @Getter @Setter
     private UserRole userRole;
@@ -170,5 +171,23 @@ public class SessionMemoryImpl implements SessionMemory {
 
     public boolean isOnRoot() {
         return branchingElements.size() == 1 && branchingElements.getFirst() instanceof Root;
+    }
+
+    @Override
+    public List<Message> getRegister(String name) {
+        return this.registerMap.computeIfAbsent(name, k -> new ArrayList<Message>());
+    }
+
+    @Override
+    public List<Message> clearRegister(String name) {
+        var result = new ArrayList<>(getRegister(name));
+        this.registerMap.get(name).clear();
+
+        return result;
+    }
+
+    @Override
+    public void putToRegister(String name, Message message) {
+        this.registerMap.computeIfAbsent(name, k -> new ArrayList<Message>()).add(message);
     }
 }

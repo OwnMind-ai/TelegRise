@@ -176,6 +176,11 @@ public class MethodReferenceCompiler {
             if (token.getMethod().equals(Syntax.ENV_REFERENCE) && token.getParams().size() == 1){
                 String expression = String.format("System.getenv((String) %s)", token.getParams().get(0).getStringValue());
                 return getReferenceExpression(namespace, String.class, node, expression);
+            } 
+            
+            if (token.getMethod().equals(Syntax.REGISTER) && token.getParams().size() == 1){
+                String expression = String.format("memory.putToRegister(%s, java.util.Objects.requireNonNull(message))", token.getParams().get(0).getStringValue());
+                return getReferenceExpression(namespace, Void.class, node, expression);
             }
         }
 
