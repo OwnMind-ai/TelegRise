@@ -30,14 +30,14 @@ public class Delete extends ActionElement{
     @Attribute(name = "messageId")
     private GeneratedValue<Integer> messageId;
 
-    @Attribute(name = "register")
-    private GeneratedValue<String> register;
+    @Attribute(name = "registry")
+    private GeneratedValue<String> registry;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
-        if (register != null) {
-            String name = register.generate(resourcePool);
-            List<Message> register = resourcePool.getMemory().clearRegister(name);
+        if (registry != null) {
+            String name = registry.generate(resourcePool);
+            List<Message> register = resourcePool.getMemory().clearRegistry(name);
             
             if (register.isEmpty()) return null;
            
@@ -45,7 +45,7 @@ public class Delete extends ActionElement{
             return DeleteMessages.builder()
                     .chatId(chatId)
                     .messageIds(register.stream()
-                        .peek(m -> { if (!m.getChatId().equals(chatId))  // TODO perhabs it is possible just to delete from these chats (groupingBy chatId and then execute deletes through pool.getSender())
+                        .peek(m -> { if (!m.getChatId().equals(chatId))  // TODO perhaps it is possible just to delete from these chats (groupingBy chatId and then execute deletes through pool.getSender())
                             throw new TelegRiseRuntimeException("Message from the register is in the different chat (%d) then specified (%d): %s".formatted(m.getChatId(), chatId, m), node); })
                         .map(Message::getMessageId).distinct().toList())
                     .build();

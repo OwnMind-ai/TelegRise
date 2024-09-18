@@ -42,7 +42,7 @@ public class SessionMemoryImpl implements SessionMemory {
 
     @Getter
     private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new HashMap<>();
-    private final Map<String, List<Message>> registerMap = new HashMap<>();
+    private final Map<String, List<Message>> registryMap = new HashMap<>();
 
     @Getter @Setter
     private UserRole userRole;
@@ -174,20 +174,20 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public List<Message> getRegister(String name) {
-        return this.registerMap.computeIfAbsent(name, k -> new ArrayList<Message>());
+    public List<Message> getRegistry(String name) {
+        return this.registryMap.computeIfAbsent(name, k -> new ArrayList<>());
     }
 
     @Override
-    public List<Message> clearRegister(String name) {
-        var result = new ArrayList<>(getRegister(name));
-        this.registerMap.get(name).clear();
+    public List<Message> clearRegistry(String name) {
+        var result = new ArrayList<>(getRegistry(name));
+        this.registryMap.get(name).clear();
 
         return result;
     }
 
     @Override
-    public void putToRegister(String name, Message message) {
-        this.registerMap.computeIfAbsent(name, k -> new ArrayList<Message>()).add(message);
+    public void putToRegistry(String name, Message message) {
+        this.registryMap.computeIfAbsent(name, k -> new ArrayList<>()).add(message);
     }
 }

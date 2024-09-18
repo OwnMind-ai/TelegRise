@@ -179,7 +179,7 @@ public class MethodReferenceCompiler {
             } 
             
             if (token.getMethod().equals(Syntax.REGISTER) && token.getParams().size() == 1){
-                String expression = String.format("memory.putToRegister(%s, java.util.Objects.requireNonNull(message))", token.getParams().get(0).getStringValue());
+                String expression = String.format("memory.putToRegistry(%s, java.util.Objects.requireNonNull(message))", token.getParams().get(0).getStringValue());
                 return getReferenceExpression(namespace, Void.class, node, expression);
             }
         }

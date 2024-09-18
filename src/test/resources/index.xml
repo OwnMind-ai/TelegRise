@@ -52,7 +52,7 @@
             </send>
         </tree>
         <tree name="copyStartText" commands="copy_start_text" description="Test for text loading by name" accessLevel="0">
-            <delete register="name"/>
+            <delete registry="name"/>
             <send>
                 <text byName="startText"/>
             </send>
