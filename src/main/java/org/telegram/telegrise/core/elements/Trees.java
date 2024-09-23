@@ -3,9 +3,7 @@ package org.telegram.telegrise.core.elements;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;

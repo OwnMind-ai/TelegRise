@@ -45,6 +45,7 @@ public class JavaExpressionCompiler {
 
     private final File tempDirectoryPath;
     private final URLClassLoader classLoader;
+    private boolean attemptRecompile = true;
 
     public JavaExpressionCompiler(String tempDirectoryPath) {
         this.tempDirectoryPath = new File(tempDirectoryPath);
@@ -58,8 +59,21 @@ public class JavaExpressionCompiler {
     public GeneratedValue<?> compile(String expression, LocalNamespace namespace, Class<?> returnType, Node node) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
         int hashcode = this.calculateHashcode(expression, namespace);
 
-        if (this.isExpressionExists(hashcode))
-            return createInstance(hashcode, node);
+        if (this.isExpressionExists(hashcode)){
+            try{
+                return createInstance(hashcode, node);
+            } catch(Throwable t) {
+                if (!attemptRecompile) throw t;
+                System.out.println("Recompile " + hashcode + t.getMessage());
+
+                // Deletes problematic file
+                for (File f : this.tempDirectoryPath.listFiles(((file, s) -> s.equals(className(hashcode) + ".class")))) 
+                    f.delete();
+
+                attemptRecompile = false;
+                compile(expression, namespace, returnType, node);
+            }
+        }
 
         JavaClassSource source;
         List<Class<?>> imported;
@@ -79,6 +93,7 @@ public class JavaExpressionCompiler {
         File sourceFile = this.createSourceFile(source, hashcode);
         this.compileSourceFile(sourceFile, node, imported);
 
+        attemptRecompile = true;
         return createInstance(hashcode, node);
     }
 
@@ -91,7 +106,7 @@ public class JavaExpressionCompiler {
             .map(f -> { try { return f.get(null); } catch(Exception e) { return null; } })
             .findFirst().ifPresent(
                 v -> {
-                    if (!v.equals(VERSION)) throw new TranscriptionParsingException("Wrong version of compiled expression was found: " + v, node);  // TODO recompile if got there
+                    if (!v.equals(VERSION)) throw new TranscriptionParsingException("Wrong version of compiled expression was found: " + v, node);
                 }
             );
 
