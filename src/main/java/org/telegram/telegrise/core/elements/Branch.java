@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.ChatTypes;
@@ -18,7 +19,7 @@ import java.util.Objects;
 import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScopes;
 
 @Element(name = "branch", finishAfterParsing = true)
-@Data
+@Getter @Setter
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class Branch extends NodeElement implements BranchingElement {

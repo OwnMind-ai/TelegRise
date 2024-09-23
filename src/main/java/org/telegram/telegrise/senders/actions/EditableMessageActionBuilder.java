@@ -119,26 +119,26 @@ public class EditableMessageActionBuilder {
         return this;
     }
 
-    public Message send(String text){
+    public Message send(String text) throws TelegramApiException{
         this.text = text;
         return this.executeSend();
     }
 
-    public Message send(String text, ReplyKeyboard replyMarkup){
+    public Message send(String text, ReplyKeyboard replyMarkup) throws TelegramApiException{
         this.text = text;
         this.replyMarkup = replyMarkup;
         return this.executeSend();
     }
 
-    public Message reply(String text){
+    public Message reply(String text) throws TelegramApiException{
         return this.reply(text, null, null);
     }
 
-    public Message reply(String text, Boolean allowSendingWithoutReply){
+    public Message reply(String text, Boolean allowSendingWithoutReply) throws TelegramApiException{
         return this.reply(text, allowSendingWithoutReply, null);
     }
 
-    public Message reply(String text, Boolean allowSendingWithoutReply, ReplyParameters replyParameters){
+    public Message reply(String text, Boolean allowSendingWithoutReply, ReplyParameters replyParameters) throws TelegramApiException{
         this.text = text;
         this.replyToMessageId = message.getMessageId();
         this.allowSendingWithoutReply = allowSendingWithoutReply;
@@ -147,95 +147,54 @@ public class EditableMessageActionBuilder {
         return this.executeSend();
     }
 
-    public Serializable edit(String text){
+    public Serializable edit(String text) throws TelegramApiException{
         return edit(text, null);
     }
 
-    public Serializable edit(InlineKeyboardMarkup markup){
+    public Serializable edit(InlineKeyboardMarkup markup) throws TelegramApiException{
         return edit(null, markup);
     }
 
-    public Serializable edit(String text, InlineKeyboardMarkup markup){
+    public Serializable edit(String text, InlineKeyboardMarkup markup) throws TelegramApiException{
         assert text != null || markup != null;
         if (message.getMediaGroupId() != null && markup != null)
             throw new TelegRiseRuntimeException("Unable to edit inline keyboard to the media-group message");
 
-        try {
-            if (text == null){
-                return this.sender.execute(EditMessageReplyMarkup.builder()
-                        .messageId(message.getMessageId())
-                        .chatId(chatId)
-                        .replyMarkup(markup)
-                        .build());
+        if (text == null) {
+            return this.sender.execute(EditMessageReplyMarkup.builder().messageId(message.getMessageId()).chatId(chatId)
+                    .replyMarkup(markup).build());
+        } else {
+            if (message.hasPhoto() || message.hasAudio() || message.hasVideo() || message.hasDocument()) {
+                return this.sender.execute(EditMessageCaption.builder().chatId(chatId).messageId(message.getMessageId())
+                        .parseMode(entities != null ? null : parseMode).caption(text).replyMarkup(markup)
+                        .captionEntities(entities).build());
             } else {
-                if (message.hasPhoto() || message.hasAudio() || message.hasVideo() || message.hasDocument()) {
-                    return this.sender.execute(EditMessageCaption.builder()
-                            .chatId(chatId)
-                            .messageId(message.getMessageId())
-                            .parseMode(entities != null ? null : parseMode)
-                            .caption(text)
-                            .replyMarkup(markup)
-                            .captionEntities(entities)
-                            .build());
-                } else {
-                    return this.sender.execute(EditMessageText.builder()
-                            .chatId(chatId)
-                            .messageId(message.getMessageId())
-                            .parseMode(entities != null ? null : parseMode)
-                            .text(text)
-                            .disableWebPagePreview(disableWebPagePreview)
-                            .replyMarkup(markup)
-                            .linkPreviewOptions(linkPreviewOptions)
-                            .entities(entities)
-                            .build());
-                }
+                return this.sender.execute(EditMessageText.builder().chatId(chatId).messageId(message.getMessageId())
+                        .parseMode(entities != null ? null : parseMode).text(text)
+                        .disableWebPagePreview(disableWebPagePreview).replyMarkup(markup)
+                        .linkPreviewOptions(linkPreviewOptions).entities(entities).build());
             }
-        } catch (TelegramApiException e) {
-            logger.error("An error occurred while editing the message", e);
-            throw new TelegramApiRuntimeException(e);
         }
     }
 
-    public boolean delete(){
-        try {
-            return this.sender.execute(DeleteMessage.builder()
-                            .chatId(chatId).messageId(message.getMessageId())
-                    .build());
-        } catch (TelegramApiException e) {
-            logger.error("An error occurred while deleting the message", e);
-            throw new RuntimeException(e);
-        }
+    public boolean delete() throws TelegramApiException{
+        return this.sender.execute(DeleteMessage.builder().chatId(chatId).messageId(message.getMessageId()).build());
     }
 
 
-    private Message executeSend() {
-        try {
-            Message result = this.sender.execute(SendMessage.builder()
-                    .chatId(chatId)
-                    .messageThreadId(messageThreadId)
-                    .parseMode(entities != null ? null : parseMode)
-                    .text(text)
-                    .disableNotification(disableNotification)
-                    .disableWebPagePreview(disableWebPagePreview)
-                    .protectContent(protectContent)
-                    .allowSendingWithoutReply(allowSendingWithoutReply)
-                    .replyMarkup(replyMarkup)
-                    .replyToMessageId(replyToMessageId)
-                    .replyParameters(replyParameters)
-                    .linkPreviewOptions(linkPreviewOptions)
-                    .businessConnectionId(businessConnectionId)
-                    .entities(entities)
-                    .build());
+    private Message executeSend() throws TelegramApiException {
+        Message result = this.sender.execute(SendMessage.builder().chatId(chatId).messageThreadId(messageThreadId)
+                .parseMode(entities != null ? null : parseMode).text(text).disableNotification(disableNotification)
+                .disableWebPagePreview(disableWebPagePreview).protectContent(protectContent)
+                .allowSendingWithoutReply(allowSendingWithoutReply).replyMarkup(replyMarkup)
+                .replyToMessageId(replyToMessageId).replyParameters(replyParameters)
+                .linkPreviewOptions(linkPreviewOptions).businessConnectionId(businessConnectionId).entities(entities)
+                .build());
 
-            if (!sneaky)
-                this.memory.setLastSentMessage(result);
-            
-            sneaky = memory == null;
-            return result;
-        } catch (TelegramApiException e) {
-            logger.error("An error occurred while sending the message", e);
-            throw new TelegramApiRuntimeException(e);
-        }
+        if (!sneaky)
+            this.memory.setLastSentMessage(result);
 
+        sneaky = memory == null;
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.security;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.NodeElement;
@@ -12,7 +13,7 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "role")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Role extends NodeElement implements StorableElement {
     @Attribute(name = "name", nullable = false)
     private String name;

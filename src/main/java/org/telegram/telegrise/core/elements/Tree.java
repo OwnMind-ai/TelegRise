@@ -1,7 +1,9 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -30,7 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Element(name = "tree")
-@Data
+@Getter @Setter
 @NoArgsConstructor
 public class Tree extends NodeElement implements BranchingElement{
     public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
@@ -191,5 +193,10 @@ public class Tree extends NodeElement implements BranchingElement{
     @Override
     public void store(TranscriptionMemory memory) {
         memory.put(null, this.getName(), this);
+    }
+
+    @Override
+    public String toString(){
+        return "Tree(" + name + ")";
     }
 }

@@ -1,7 +1,8 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @Element(name = "transition", finishAfterParsing = true)
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Transition extends NodeElement {
     public static final String PREVIOUS = "previous";

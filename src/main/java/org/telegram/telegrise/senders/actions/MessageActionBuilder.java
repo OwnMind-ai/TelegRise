@@ -122,28 +122,28 @@ public class MessageActionBuilder {
         return this;
     }
 
-    public Message send(String text){
+    public Message send(String text) throws TelegramApiException{
         this.text = text;
         this.replyToMessageId = null;
         return this.execute();
     }
 
-    public Message send(String text, ReplyKeyboard replyMarkup){
+    public Message send(String text, ReplyKeyboard replyMarkup) throws TelegramApiException{
         this.text = text;
         this.replyMarkup = replyMarkup;
         this.replyToMessageId = null;
         return this.execute();
     }
 
-    public Message reply(String text){
+    public Message reply(String text) throws TelegramApiException{
         return this.reply(text, null, null);
     }
 
-    public Message reply(String text, Boolean allowSendingWithoutReply){
+    public Message reply(String text, Boolean allowSendingWithoutReply) throws TelegramApiException{
         return this.reply(text, allowSendingWithoutReply, null);
     }
 
-    public Message reply(String text, Boolean allowSendingWithoutReply, ReplyParameters replyParameters){
+    public Message reply(String text, Boolean allowSendingWithoutReply, ReplyParameters replyParameters) throws TelegramApiException{
         this.text = text;
         this.allowSendingWithoutReply = allowSendingWithoutReply;
         this.replyParameters = replyParameters;
@@ -151,33 +151,19 @@ public class MessageActionBuilder {
         return this.execute();
     }
 
-    private Message execute() {
-        try {
-            Message result = this.sender.execute(SendMessage.builder()
-                    .chatId(chatId)
-                    .messageThreadId(messageThreadId)
-                    .parseMode(entities != null ? null : parseMode)
-                    .text(text)
-                    .disableNotification(disableNotification)
-                    .disableWebPagePreview(disableWebPagePreview)
-                    .protectContent(protectContent)
-                    .allowSendingWithoutReply(allowSendingWithoutReply)
-                    .replyMarkup(replyMarkup)
-                    .replyToMessageId(replyToMessageId)
-                    .replyParameters(replyParameters)
-                    .linkPreviewOptions(linkPreviewOptions)
-                    .businessConnectionId(businessConnectionId)
-                    .entities(entities)
-                    .build());
+    private Message execute() throws TelegramApiException {
+        Message result = this.sender.execute(SendMessage.builder().chatId(chatId).messageThreadId(messageThreadId)
+                .parseMode(entities != null ? null : parseMode).text(text).disableNotification(disableNotification)
+                .disableWebPagePreview(disableWebPagePreview).protectContent(protectContent)
+                .allowSendingWithoutReply(allowSendingWithoutReply).replyMarkup(replyMarkup)
+                .replyToMessageId(replyToMessageId).replyParameters(replyParameters)
+                .linkPreviewOptions(linkPreviewOptions).businessConnectionId(businessConnectionId).entities(entities)
+                .build());
 
-            if (!sneaky)
-                this.memory.setLastSentMessage(result);
-            
-            sneaky = memory == null;
-            return result;
-        } catch (TelegramApiException e) {
-            LOGGER.error("An error occurred while sending the message", e);
-            throw new TelegramApiRuntimeException(e);
-        }
+        if (!sneaky)
+            this.memory.setLastSentMessage(result);
+
+        sneaky = memory == null;
+        return result;
     }
 }

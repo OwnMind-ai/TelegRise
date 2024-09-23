@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -39,7 +40,11 @@ public class PrimaryHandlersController {
     }
 
     public boolean applyHandler(Update update, PrimaryHandler handler){
-        handler.handle(update);
+        try {
+            handler.handle(update);
+        } catch (TelegramApiException e) {
+            handler.onException(e);
+        }
 
         if (handler.getClass().isAnnotationPresent(Handler.class)){
             Handler annotation = handler.getClass().getAnnotation(Handler.class);

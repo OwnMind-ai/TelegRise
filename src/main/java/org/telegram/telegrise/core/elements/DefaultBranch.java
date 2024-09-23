@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -12,7 +13,7 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import java.util.List;
 
 @Element(name = "default")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class DefaultBranch extends NodeElement {
     @Attribute(name = "invoke")

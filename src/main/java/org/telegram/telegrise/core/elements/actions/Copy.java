@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.actions;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
@@ -16,7 +17,7 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import java.util.List;
 
 @Element(name = "copy")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Copy extends ActionElement{
     @Attribute(name = "chat")

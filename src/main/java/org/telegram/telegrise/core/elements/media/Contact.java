@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "contact")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Contact extends MediaType {
     @Attribute(name = "phoneNumber")
     private GeneratedValue<String> phoneNumber;

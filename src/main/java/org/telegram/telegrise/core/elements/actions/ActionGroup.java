@@ -12,13 +12,14 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.senders.UniversalSender;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "actionGroup")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class ActionGroup extends ActionElement{
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;

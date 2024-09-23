@@ -1,7 +1,8 @@
 package org.telegram.telegrise.core.elements.head;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.LinkableElement;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "link")
-@Data
+@Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class Link extends NodeElement {
     private String source;

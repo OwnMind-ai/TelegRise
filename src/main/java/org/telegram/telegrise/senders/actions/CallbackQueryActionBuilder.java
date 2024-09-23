@@ -31,21 +31,13 @@ public class CallbackQueryActionBuilder{
         return query.getMessage() instanceof InaccessibleMessage;
     }
 
-    public boolean answer(String text){
+    public boolean answer(String text) throws TelegramApiException{
         return this.answer(text, false);
     }
 
-    public boolean answer(String text, boolean showAlert){
-        try {
-            return this.sender.execute(AnswerCallbackQuery.builder()
-                            .callbackQueryId(query.getId())
-                            .showAlert(showAlert)
-                            .text(text)
-                    .build());
-        } catch (TelegramApiException e) {
-            LOGGER.error("An error occurred while answering callback query", e);
-            throw new TelegramApiRuntimeException(e);
-        }
+    public boolean answer(String text, boolean showAlert) throws TelegramApiException{
+        return this.sender.execute(
+                AnswerCallbackQuery.builder().callbackQueryId(query.getId()).showAlert(showAlert).text(text).build());
     }
 
     public EditableMessageActionBuilder message(){

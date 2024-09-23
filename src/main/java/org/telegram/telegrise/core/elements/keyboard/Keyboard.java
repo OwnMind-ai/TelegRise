@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "keyboard", finishAfterParsing = true)
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";

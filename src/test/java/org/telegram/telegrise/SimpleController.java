@@ -44,7 +44,13 @@ public class SimpleController {
 
     @Reference
     public Consumer<Update> getWarnListener(){
-        return update -> this.sender.of(memory.getLastSentMessage()).send("You are not allowed to use this command");
+        return update -> {
+            try {
+                this.sender.of(memory.getLastSentMessage()).send("You are not allowed to use this command");
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        };
     }
 
     @Reference
@@ -214,9 +220,9 @@ public class SimpleController {
         }
 
         @Override
-        public void handle(Update update) {
-            System.out.println("Primary handler triggered from tree " + manager.getCurrentTree());
-            manager.transitPrevious(update, "Main", true);
+        public void handle(Update update) throws TelegramApiException {
+            sender.of(update.getMessage()).send("Primary handler triggered from tree " + manager.getCurrentTree());
+            manager.transitPrevious(update, "root", true);
         }
     }
 

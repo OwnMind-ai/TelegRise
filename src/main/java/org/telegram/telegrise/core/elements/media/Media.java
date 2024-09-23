@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.media;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "media")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Media extends MediaType{
     @Attribute(name = "sendMethod")
     private GeneratedValue<PartialBotApiMethod<?>> sendMethod;

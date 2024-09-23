@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Element(name = "bot")
-@Data
+@Getter @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public final class BotTranscription extends NodeElement {

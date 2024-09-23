@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.actions;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -14,7 +15,7 @@ import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 @Element(name = "answer")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Answer extends ActionElement{
     @Attribute(name = "callbackQueryId")

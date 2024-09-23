@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.actions;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -14,7 +15,7 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "frame")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Frame extends NodeElement {
     public static final String SEND = "send";
     public static final String EDIT = "edit";

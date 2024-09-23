@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @Element(name = "text", checkInner = false, finishAfterParsing = true)
-@Data
+@Getter @Setter
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor

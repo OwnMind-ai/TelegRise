@@ -1,7 +1,8 @@
 package org.telegram.telegrise.core.elements.head;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.NodeElement;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Element(name = "head")
-@Data
+@Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class HeadBlock extends NodeElement {
     @InnerElement(priority = 1)

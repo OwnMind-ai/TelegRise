@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.security;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.NodeElement;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name = "roles")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Roles extends NodeElement {
     @InnerElement(nullable = false)
     private List<Role> roles;

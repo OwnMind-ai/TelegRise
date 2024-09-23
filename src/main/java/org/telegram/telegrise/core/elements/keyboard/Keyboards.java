@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.LinkableElement;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Element(name="keyboards")
-@Data @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Keyboards extends NodeElement implements LinkableElement {
     @InnerElement(nullable = false)
     private List<Keyboard> keyboards;

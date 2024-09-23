@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core.elements.text;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.ExpressionFactory;
@@ -16,7 +17,7 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
 @Element(name = "else", checkInner = false)
-@Data
+@Getter @Setter
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class TextElse extends NodeElement implements TextConditionalElement {
