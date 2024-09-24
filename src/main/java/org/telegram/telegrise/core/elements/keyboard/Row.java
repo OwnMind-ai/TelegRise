@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -16,7 +15,6 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "row")
 @Getter @Setter @NoArgsConstructor
 public class Row extends NodeElement {

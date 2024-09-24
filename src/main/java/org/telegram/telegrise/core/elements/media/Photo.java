@@ -3,7 +3,6 @@ package org.telegram.telegrise.core.elements.media;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -19,7 +18,6 @@ import org.telegram.telegrise.core.parser.Element;
 import java.util.List;
 
 @Element(name = "photo")
-@EqualsAndHashCode(callSuper = false)
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class Photo extends MediaType{

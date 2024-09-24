@@ -3,7 +3,6 @@ package org.telegram.telegrise.core.elements;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
@@ -20,7 +19,6 @@ import java.util.function.Predicate;
 
 @Element(name = "transition", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Transition extends NodeElement {
     public static final String PREVIOUS = "previous";
     public static final String JUMP = "jump";

@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -20,7 +19,6 @@ import static org.telegram.telegrise.core.elements.Tree.improperInterruptionScop
 
 @Element(name = "branch", finishAfterParsing = true)
 @Getter @Setter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class Branch extends NodeElement implements BranchingElement {
     @Attribute(name = "name")

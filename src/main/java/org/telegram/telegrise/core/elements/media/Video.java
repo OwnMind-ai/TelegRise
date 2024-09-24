@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
@@ -18,7 +17,6 @@ import org.telegram.telegrise.types.MediaSize;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "video")
 @Getter @Setter @NoArgsConstructor
 public class Video extends MediaType {

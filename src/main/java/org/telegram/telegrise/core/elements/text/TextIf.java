@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.text;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.ExpressionFactory;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -18,7 +17,6 @@ import org.w3c.dom.Node;
 
 @Element(name = "if", checkInner = false)
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class TextIf extends NodeElement implements TextConditionalElement {
     @Attribute(name = "condition", nullable = false)
     private GeneratedValue<Boolean> condition;

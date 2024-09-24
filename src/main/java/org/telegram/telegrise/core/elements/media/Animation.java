@@ -1,9 +1,8 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -18,7 +17,6 @@ import org.telegram.telegrise.types.MediaSize;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "animation")
 @Getter @Setter @NoArgsConstructor
 public class Animation extends MediaType{

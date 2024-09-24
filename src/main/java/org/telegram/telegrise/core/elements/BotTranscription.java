@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 @Element(name = "bot")
 @Getter @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public final class BotTranscription extends NodeElement {
 
     //TODO webhooks support
@@ -56,7 +54,6 @@ public final class BotTranscription extends NodeElement {
     @InnerElement(priority = -1)
     private Roles roles;
 
-    @EqualsAndHashCode.Exclude
     private TranscriptionMemory memory;
 
     @Override

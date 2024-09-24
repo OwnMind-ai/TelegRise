@@ -14,10 +14,8 @@ import org.telegram.telegrise.senders.UniversalSender;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "actionGroup")
 @Getter @Setter @NoArgsConstructor
 public class ActionGroup extends ActionElement{

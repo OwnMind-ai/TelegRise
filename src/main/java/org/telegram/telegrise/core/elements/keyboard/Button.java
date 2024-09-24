@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -16,7 +15,6 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "button", checkInner = false)
 @Getter @Setter
 @NoArgsConstructor

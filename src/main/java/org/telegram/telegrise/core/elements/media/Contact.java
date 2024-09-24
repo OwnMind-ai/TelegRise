@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
@@ -16,7 +15,6 @@ import org.telegram.telegrise.core.parser.Element;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "contact")
 @Getter @Setter @NoArgsConstructor
 public class Contact extends MediaType {

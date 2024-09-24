@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
@@ -30,7 +29,6 @@ import java.util.Set;
 
 @Element(name = "edit", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Edit extends ActionElement{
     public static final String EDIT_TEXT = "text";
     public static final String EDIT_CAPTION = "caption";

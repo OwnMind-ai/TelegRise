@@ -19,7 +19,6 @@ import java.util.function.Function;
 
 @Element(name = "text", checkInner = false, finishAfterParsing = true)
 @Getter @Setter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Text extends NodeElement implements EmbeddableElement, InteractiveElement<TextBlock>, NamedElement {

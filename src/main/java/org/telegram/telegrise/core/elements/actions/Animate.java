@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.AnimationExecutor;
@@ -16,7 +15,6 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "animate")
 @Getter @Setter @NoArgsConstructor
 public class Animate extends ActionElement{

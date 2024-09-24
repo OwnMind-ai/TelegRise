@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.caching.MethodReferenceCache;
@@ -16,7 +15,6 @@ import java.util.Map;
 @Element(name = "clearCache")
 @Getter @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class ClearCache extends ActionElement{
     @Attribute(name = "method", nullable = false)
     private GeneratedValue<String> method;

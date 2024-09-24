@@ -64,7 +64,6 @@ public class JavaExpressionCompiler {
                 return createInstance(hashcode, node);
             } catch(Throwable t) {
                 if (!attemptRecompile) throw t;
-                System.out.println("Recompile " + hashcode + t.getMessage());
 
                 // Deletes problematic file
                 for (File f : this.tempDirectoryPath.listFiles(((file, s) -> s.equals(className(hashcode) + ".class")))) 

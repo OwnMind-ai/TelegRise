@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.media;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVenue;
@@ -17,7 +16,6 @@ import org.telegram.telegrise.core.parser.Element;
 import java.util.List;
 
 @Element(name = "venue")
-@EqualsAndHashCode(callSuper = false)
 @Getter @Setter
 @NoArgsConstructor
 public class Venue extends MediaType{

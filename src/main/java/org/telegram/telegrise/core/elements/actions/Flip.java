@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -15,7 +14,6 @@ import org.telegram.telegrise.keyboard.SwitchButton;
 
 @Element(name = "flip")
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Flip extends ActionElement{
     @Attribute(name = "id", nullable = false)
     private String id;

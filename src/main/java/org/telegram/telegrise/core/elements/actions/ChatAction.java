@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Element(name = "chatAction")
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class ChatAction extends ActionElement{
     private static final Set<String> ACTIONS = Set.of("typing", "upload_photo", "record_video", "upload_video",
             "record_voice", "upload_voice", "upload_document", "choose_sticker", "find_location", "record_video_note", "upload_video_note");

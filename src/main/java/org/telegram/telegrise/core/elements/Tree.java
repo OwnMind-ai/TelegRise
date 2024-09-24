@@ -186,11 +186,6 @@ public class Tree extends NodeElement implements BranchingElement{
     }
 
     @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
-    @Override
     public void store(TranscriptionMemory memory) {
         memory.put(null, this.getName(), this);
     }

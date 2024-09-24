@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinAllChatMessages;
@@ -15,7 +14,6 @@ import org.telegram.telegrise.core.parser.Element;
 @Element(name = "unpin")
 @Getter @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Unpin extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;

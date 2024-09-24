@@ -3,7 +3,6 @@ package org.telegram.telegrise.core.elements.head;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrise.core.elements.LinkableElement;
 import org.telegram.telegrise.core.elements.NodeElement;
@@ -22,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "link")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

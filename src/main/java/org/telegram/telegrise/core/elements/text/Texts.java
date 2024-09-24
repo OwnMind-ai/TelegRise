@@ -14,12 +14,10 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Element(name = "texts")
 @Getter @Setter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Texts extends NodeElement implements LinkableElement {

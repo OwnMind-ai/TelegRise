@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,7 +17,6 @@ import java.util.function.Consumer;
 
 @Element(name = "wait")
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Wait extends ActionElement{
     @Attribute(name = "timeout", nullable = false)
     private GeneratedValue<Double> timeout;

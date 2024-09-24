@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class NodeElement implements Serializable {
     protected transient Node node;
@@ -87,5 +88,23 @@ public abstract class NodeElement implements Serializable {
 
     public final Node getElementNode(){
         return node;
+    }
+
+    @Override
+    public int hashCode(){
+        Object[] hash = new Object[1 + node.getAttributes().getLength() * 2];
+        hash[0] = node.getNodeName();
+        for(int i = 0; i < node.getAttributes().getLength(); i++){
+            var attr = node.getAttributes().item(i);
+            hash[i * 2 + 1] = attr.getNodeName();
+            hash[i * 2 + 2] = attr.getNodeValue();
+        }
+
+        return Objects.hash(hash);
+    }
+
+    @Override
+    public String toString() {
+        return NodeElement.formatNode(node);
     }
 }

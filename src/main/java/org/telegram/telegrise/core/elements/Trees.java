@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import org.telegram.telegrise.core.parser.Element;
@@ -11,7 +10,6 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import java.util.List;
 import java.util.function.Consumer;
 
-@EqualsAndHashCode(callSuper = false)
 @Element(name = "trees")
 @Setter @Getter @NoArgsConstructor
 public class Trees extends NodeElement implements LinkableElement{

@@ -2,7 +2,6 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrise.SessionMemoryImpl;
@@ -20,7 +19,6 @@ import java.util.List;
 
 @Element(name = "root")
 @Getter @Setter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class Root extends NodeElement implements BranchingElement {
     @Attribute(name = "name")
