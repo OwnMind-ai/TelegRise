@@ -119,7 +119,7 @@ public class XMLTranscriptionParserTest {
         expectedRoot.setTrees(List.of(expectedTree));
 
         BotTranscription transcription = new BotTranscription();
-        transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml"))));
+        transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml")), null, null));
         transcription.setUsername(GeneratedValue.ofValue("bot"));
         transcription.setToken(GeneratedValue.ofValue("token"));
         transcription.setRoot(expectedRoot);

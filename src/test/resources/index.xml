@@ -5,6 +5,7 @@
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true">
     <head>
         <link src="test/*"/>
+        <!-- <token>${#env("BOT_TOKEN")}</token> -->
     </head>
 
     <roles>

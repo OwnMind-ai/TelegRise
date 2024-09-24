@@ -30,7 +30,7 @@ public final class BotTranscription extends NodeElement {
     @Attribute(name = "username")
     private GeneratedValue<String> username;
 
-    @Attribute(name = "token", nullable = false)
+    @Attribute(name = "token")
     private GeneratedValue<String> token;
 
     @Attribute(name = "interruptions")
@@ -55,6 +55,25 @@ public final class BotTranscription extends NodeElement {
     private Roles roles;
 
     private TranscriptionMemory memory;
+
+    @Override
+    public void load(TranscriptionMemory memory) {
+        if (token != null && head.getToken() != null) 
+            throw new TranscriptionParsingException("Conflicting configurations: 'token' in <bot> and <token> in <head>", node);
+
+        if (username != null && head.getUsername() != null) 
+            throw new TranscriptionParsingException("Conflicting configurations: 'username' in <bot> and <username> in <head>", node);
+
+        if (token == null) {
+            if (head.getToken() == null)
+                throw new TranscriptionParsingException("No bot token was specified. Include 'token' attribute to the <bot> element or add <token>your token</token> in the <head> element", node);
+
+            token = head.getToken().getToken();
+        }
+
+        if (username == null && head.getUsername() != null) 
+            username = head.getUsername().getUsername();
+    }
 
     @Override
     public void validate(TranscriptionMemory memory) {

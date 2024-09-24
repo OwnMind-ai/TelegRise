@@ -15,5 +15,11 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class HeadBlock extends NodeElement {
     @InnerElement(priority = 1)
-    List<Link> links;
-}
+    private List<Link> links;
+
+    @InnerElement(nullable = true)
+    private Token token;
+
+    @InnerElement(nullable = true)
+    private Username username;
+} 
