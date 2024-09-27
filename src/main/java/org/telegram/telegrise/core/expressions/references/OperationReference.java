@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import java.util.List;
 
 public class OperationReference<L, R> implements ReferenceExpression{
     @Setter
@@ -27,9 +27,11 @@ public class OperationReference<L, R> implements ReferenceExpression{
     private boolean composeRight = true;
     @Setter
     private boolean composeLeft = true;
+    private final Node node;  // For runtime errors
 
-    public OperationReference(Class<?> returnType) {
+    public OperationReference(Class<?> returnType, Node node) {
         this.returnType = returnType;
+        this.node = node;
     }
 
     @Override
@@ -57,15 +59,25 @@ public class OperationReference<L, R> implements ReferenceExpression{
     }
 
     private Object @NotNull [] composeParameters(ReferenceExpression reference, Object[] args) {
-        Map<Class<?>, Object> components = Arrays.stream(args).collect(Collectors.toMap(Object::getClass, o -> o));
+        Map<Class<?>, List<Object>> components = Arrays.stream(args).collect(Collectors.groupingBy(Object::getClass, Collectors.toList()));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)
-                .allMatch(p -> ResourcePool.extractComponent(components, p) != null))
+                .allMatch(p -> components.keySet().stream().anyMatch(c -> ClassUtils.isAssignable(p, c))))
             throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(reference.parameterTypes())
                     .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
-        return ClassUtils.isAssignable(Arrays.stream(args).map(Object::getClass).toArray(Class[]::new), reference.parameterTypes()) ? args
-                : Arrays.stream(reference.parameterTypes()).map(p -> ResourcePool.extractComponent(components, p)).toArray();
+        Object[] result = new Object[reference.parameterTypes().length];
+        for(int i = 0; i < result.length; i++){
+            Class<?> type = ClassUtils.primitiveToWrapper(reference.parameterTypes()[i]);
+            try{
+                result[i] = components.get(type).remove(0);
+            } catch(NullPointerException | IndexOutOfBoundsException e){
+                throw new TelegRiseRuntimeException("Unable to pass arguments of types %s to reference with parameters of types %s"
+                    .formatted(Arrays.stream(args).map(Object::getClass).toList(), Arrays.deepToString(reference.parameterTypes())), node);
+            }
+        }
+
+        return result;
     }
 
     @Override

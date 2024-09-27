@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +99,7 @@ public class MethodReferenceCompiler {
                             "Unable to apply '" + token.getOperatorToken().getOperator() + "' operator: right side returns non-boolean value", node);
                 }
 
-                OperationReference<Boolean, Boolean> reference = new OperationReference<>(Boolean.class);
+                OperationReference<Boolean, Boolean> reference = new OperationReference<>(Boolean.class, node);
                 reference.setLeft(left);
                 reference.setRight(right);
 
@@ -113,18 +114,29 @@ public class MethodReferenceCompiler {
             case Syntax.CHAIN_SEPARATOR: {
                 ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
                 ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
+                boolean isLeftList = ClassUtils.isAssignable(left.returnType(), List.class);
 
-                if (right.parameterTypes().length != 1 || !(right.parameterTypes()[0].isAssignableFrom(left.returnType())
-                        || ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(left.returnType()))) {
+                if (right.parameterTypes().length == 0 ||
+                    (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
+                        ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(left.returnType())))) {
                     throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type than right side consumes", node);
                 }
 
-                OperationReference<?, ?> reference = new OperationReference<>(right.returnType());
+                OperationReference<?, ?> reference = new OperationReference<>(right.returnType(), node);
                 reference.setLeft(left);
                 reference.setRight(right);
-                reference.setOperation((l, r) -> r.invoke(l.invoke()));
                 reference.setParameters(left.parameterTypes());
-                reference.setComposeRight(false);
+
+                if (!isLeftList || right.parameterTypes().length == 1 && ClassUtils.isAssignable(right.parameterTypes()[0], List.class)) {
+                    reference.setComposeRight(false);
+                    reference.setOperation((l, r) -> r.invoke(l.invoke()));
+                } else {
+                    reference.setComposeRight(true);
+                    reference.setOperation((l, r) -> {
+                        List<?> list = (List<?>) l.invoke();
+                        return r.invoke(list.toArray());
+                    });
+                }
 
                 return reference;
             }
@@ -136,12 +148,12 @@ public class MethodReferenceCompiler {
                     for (Class<?> rightParameter : right.parameterTypes()){
                         if (leftParameter != rightParameter &&
                                 (ClassUtils.isAssignable(leftParameter, rightParameter) || ClassUtils.isAssignable(rightParameter, leftParameter))){
-                            throw new TranscriptionParsingException("Unable to apply '|' operator: left side requires parameter of type '%s' which conflicts (assignable one to another) with parameter of type '%s' on the right".formatted(leftParameter.getSimpleName(), rightParameter.getSimpleName()), node);
+                            throw new TranscriptionParsingException("Unable to apply ';' operator: left side requires parameter of type '%s' which conflicts (assignable one to another) with parameter of type '%s' on the right".formatted(leftParameter.getSimpleName(), rightParameter.getSimpleName()), node);
                         }
                     }
                 }
 
-                OperationReference<?, ?> reference = new OperationReference<>(left.returnType());
+                OperationReference<?, ?> reference = new OperationReference<>(left.returnType(), node);
                 reference.setLeft(left);
                 reference.setRight(right);
                 reference.setOperation((l, r) -> {
@@ -154,6 +166,62 @@ public class MethodReferenceCompiler {
                         Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
                             .collect(Collectors.toSet()).toArray(Class[]::new)
                 );
+
+                return reference;
+            }
+            case Syntax.LIST_SEPARATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, Object.class, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, Object.class, node);
+
+                OperationReference<?, ?> reference = new OperationReference<>(List.class, node);
+                reference.setLeft(left);
+                reference.setRight(right);
+                reference.setParameters(
+                        Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
+                            .collect(Collectors.toSet()).toArray(Class[]::new)
+                );
+
+                boolean lc = ClassUtils.isAssignable(left.returnType(), List.class);
+                boolean rc = ClassUtils.isAssignable(right.returnType(), List.class);
+
+                if (!lc && !rc) {
+                    reference.setOperation((l, r) -> {
+                        return List.of(l.invoke(), r.invoke());
+                    });
+                } else if(lc && !rc) {
+                    reference.setOperation((l, r) -> {
+                        Object first = l.invoke();
+                        assert first instanceof List : "Left statement expected to return an instance of List, but got " + first.getClass().getName();
+
+                        List<Object> copy = new ArrayList<>((List<?>) first);
+                        copy.add(r.invoke());
+
+                        return copy;
+                    });
+                } else if(!lc && rc) {
+                    reference.setOperation((l, r) -> {
+                        Object second = r.invoke();
+                        assert second instanceof List : "Right statement expected to return an instance of List, but got " + second.getClass().getName();
+
+                        List<Object> copy = new ArrayList<>((List<?>) second);
+                        copy.add(0, l.invoke());
+
+                        return copy;
+                    });
+                } else {
+                    reference.setOperation((l, r) -> {
+                        Object first = l.invoke();
+                        assert first instanceof List : "Left statement expected to return an instance of List, but got " + first.getClass().getName();
+
+                        Object second = r.invoke();
+                        assert second instanceof List : "Right statement expected to return an instance of List, but got " + second.getClass().getName();
+
+                        List<Object> copy = new ArrayList<>((List<?>) first);
+                        copy.addAll((List<?>) second);
+
+                        return copy;
+                    });
+                }
 
                 return reference;
             }

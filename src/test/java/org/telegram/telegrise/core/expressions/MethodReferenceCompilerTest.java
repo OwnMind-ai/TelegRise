@@ -8,6 +8,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.toNode;
 
@@ -132,6 +133,32 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("#getNull -> (#isNull ; #isNull)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#getOne, #getTwo -> #setNum)")));
+        expression = compiler.compile(parser.parse(), namespace, List.class, node);
+        assertEquals(List.of(1, 2), expression.toGeneratedValue(List.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#getOne, #getTwo, (#getTwo, #getOne), \"ABC\")")));
+        expression = compiler.compile(parser.parse(), namespace, List.class, node);
+        assertEquals(List.of(1, 2, 2, 1, "ABC"), expression.toGeneratedValue(List.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#first, #third) -> #xor")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("\"ABC\" -> (#consume, #isNull) -> #concat")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("ABCAfalse", expression.toGeneratedValue(String.class, node).generate(pool));
+    }
+
+    @Reference
+    public String concat(String f, boolean s){
+        return f + s;
+    }
+
+    @Reference
+    public boolean xor(boolean first, boolean second){
+        return first ^ second;
     }
 
     @Reference

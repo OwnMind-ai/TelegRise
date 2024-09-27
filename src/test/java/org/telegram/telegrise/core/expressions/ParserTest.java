@@ -16,6 +16,7 @@ class ParserTest {
 
     private static final OperatorToken CHAIN_TOKEN = new OperatorToken(Syntax.CHAIN_SEPARATOR);
     private static final OperatorToken PARALLEL_TOKEN = new OperatorToken(Syntax.PARALLEL_SEPARATOR);
+    private static final OperatorToken LIST_TOKEN = new OperatorToken(Syntax.LIST_SEPARATOR);
     private static final OperatorToken AND_TOKEN = new OperatorToken(Syntax.AND_OPERATOR);
 
 
@@ -53,6 +54,20 @@ class ParserTest {
                 new ExpressionToken(FIRST_DUMMY, SECOND_DUMMY, AND_TOKEN),
                 THIRD_DUMMY,
                 CHAIN_TOKEN
+        ), parser.parse());
+        
+        parser = new Parser(new Lexer(new CharsStream("(#first, #second) -> #third")));
+        assertEquals(new ExpressionToken(
+                new ExpressionToken(FIRST_DUMMY, SECOND_DUMMY, LIST_TOKEN),
+                THIRD_DUMMY,
+                CHAIN_TOKEN
+        ), parser.parse());
+        
+        parser = new Parser(new Lexer(new CharsStream("#first, #second -> #third")));
+        assertEquals(new ExpressionToken(
+                FIRST_DUMMY,
+                new ExpressionToken(SECOND_DUMMY, THIRD_DUMMY, CHAIN_TOKEN),
+                LIST_TOKEN
         ), parser.parse());
 
         parser = new Parser(new Lexer(new CharsStream("((#first AND #second) -> #third) -> #first")));
