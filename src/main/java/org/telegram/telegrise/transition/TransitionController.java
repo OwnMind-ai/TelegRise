@@ -86,15 +86,9 @@ public class TransitionController {
             return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
         }
 
-        this.applyPrevious(new Transition(Transition.PREVIOUS, GeneratedValue.ofValue(point.getFrom().getName()), null, false, null, null), pool);
+        this.applyPrevious(new Transition(Transition.PREVIOUS, GeneratedValue.ofValue(point.getFrom().getName()), false, null, null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
-        if (transition.getType().equals(Transition.MENU_TYPE)){
-            for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
-                if (it.next() instanceof Root) break;
-                this.sessionMemory.getBranchingElements().removeLast();
-            }
-        }
 
         return false;
     }
@@ -112,7 +106,7 @@ public class TransitionController {
 
     private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
         String target = transition.getTarget().generate(pool);
-        BranchingElement requested = this.transcriptionMemory.get(tree, target, BranchingElement.class, Transition.TYPE_LIST);
+        BranchingElement requested = this.transcriptionMemory.get(tree, target, BranchingElement.class, List.of("tree"));
         if (requested == null) throw new TelegRiseRuntimeException("Unable to find an element called '" + target + "'", transition.getElementNode());
 
         this.sessionMemory.getBranchingElements().add(requested);

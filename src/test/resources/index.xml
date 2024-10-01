@@ -119,8 +119,11 @@
                         <text parseMode="html"><b>Bye</b></text>
                     </send>
                 </branch>
-                <branch callbackTriggers="first; second" invoke="#send; #log; SimpleController#printHello">
+                <branch callbackTriggers="first" invoke="#send; #log; SimpleController#printHello">
                     <transition direction="previous" target="root" execute="true"/>
+                </branch>
+                <branch callbackTriggers="second">
+                    <transition direction="jump" target="toBeCalled" execute="true"/>
                 </branch>
                 <branch callbackTriggers="disableMe">
                     <invoke method="#disableButton"/>
@@ -157,7 +160,7 @@
                 </keyboard>
             </send>
             <branch callbackTriggers="back">
-                <transition direction="caller" type="tree"/>
+                <transition direction="caller"/>
             </branch>
             <branch callbackTriggers="1" name="initial">
                 <edit source="callback">

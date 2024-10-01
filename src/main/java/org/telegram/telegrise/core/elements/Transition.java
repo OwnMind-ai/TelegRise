@@ -24,18 +24,12 @@ public class Transition extends NodeElement {
     public static final String JUMP = "jump";
     public static final String LOCAL = "local";
     public static final String CALLER = "caller";
-    public static final String MENU_TYPE = "menu";
-    private static final String TREE_TYPE = "tree";
-    public static final List<String> TYPE_LIST = List.of(MENU_TYPE, TREE_TYPE);
 
     @Attribute(name = "direction", nullable = false)
     private String direction;
 
     @Attribute(name = "target")
     private GeneratedValue<String> target;
-
-    @Attribute(name = "type")
-    private String type;
 
     @Attribute(name = "execute")
     private boolean execute = true;
@@ -56,14 +50,8 @@ public class Transition extends NodeElement {
         if (!JUMP.equals(this.direction) && (this.nextTransition != null || this.actions != null))
             throw new TranscriptionParsingException("Transitions with direction other then '" + JUMP + "' cannot contain next transition or actions", node);
 
-        if (type != null && !TYPE_LIST.contains(this.type))
-            throw new TranscriptionParsingException("Invalid type '" + type + "', possible types are: " + String.join(", ", TYPE_LIST), node);
-
         if (target == null && !CALLER.equals(this.direction))
             throw new TranscriptionParsingException("Target for direction '" + this.direction + "' is not specified" , node);
-
-        if (type == null && CALLER.equals(this.direction))
-            throw new TranscriptionParsingException("Caller type for direction '" + CALLER + "' is not specified", node);
 
         validateTarget(node, memory);
     }
