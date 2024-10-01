@@ -127,5 +127,4 @@ public class MethodReference implements ReferenceExpression{
             return boolean.class;
         }
     };
-
 }

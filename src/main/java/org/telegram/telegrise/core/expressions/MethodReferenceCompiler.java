@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -162,6 +163,32 @@ public class MethodReferenceCompiler {
 
                     return result;
                 });
+                reference.setParameters(
+                        Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
+                            .collect(Collectors.toSet()).toArray(Class[]::new)
+                );
+
+                return reference;
+            }
+            case Syntax.EQUALS_OPERATOR, Syntax.NOT_EQUALS_OPERATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, Object.class, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, Object.class, node);
+
+                String operator = token.getOperatorToken().getOperator();
+                if (ClassUtils.isAssignable(left.returnType(), void.class)) 
+                    throw new TranscriptionParsingException("Unable to apply '%s' operator: left side returns no value".formatted(operator), node);
+                if (ClassUtils.isAssignable(right.returnType(), void.class)) 
+                    throw new TranscriptionParsingException("Unable to apply '%s' operator: right side returns no value".formatted(operator), node);
+
+                OperationReference<?, ?> reference = new OperationReference<>(Boolean.class, node);
+                reference.setLeft(left);
+                reference.setRight(right);
+
+                if(operator.equals(Syntax.EQUALS_OPERATOR))
+                    reference.setOperation((l, r) -> Objects.equals(l.invoke(), r.invoke()));
+                else
+                    reference.setOperation((l, r) -> !Objects.equals(l.invoke(), r.invoke()));
+
                 reference.setParameters(
                         Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
                             .collect(Collectors.toSet()).toArray(Class[]::new)

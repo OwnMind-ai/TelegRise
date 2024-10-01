@@ -99,10 +99,11 @@ public class Parser {
     private int getPrecedence(@NotNull String operator) throws ReferenceParsingException {
         // ALWAYS > 0
         return switch (operator.toUpperCase()) {
-            case LIST_SEPARATOR -> 1;
-            case PARALLEL_SEPARATOR -> 2;
+            case PARALLEL_SEPARATOR -> 1;
+            case LIST_SEPARATOR -> 2;
             case OR_OPERATOR -> 4;
             case AND_OPERATOR -> 5;
+            case EQUALS_OPERATOR, NOT_EQUALS_OPERATOR -> 6;
             case CHAIN_SEPARATOR -> 11;
             default ->
                     throw new ReferenceParsingException(ErrorCodes.UNDEFINED_OPERATOR, this.lexer.getPosition() - operator.length());

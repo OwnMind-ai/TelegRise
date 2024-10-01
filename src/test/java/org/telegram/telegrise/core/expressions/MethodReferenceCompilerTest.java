@@ -149,6 +149,18 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("\"ABC\" -> (#consume, #isNull) -> #concat")));
         expression = compiler.compile(parser.parse(), namespace, String.class, node);
         assertEquals("ABCAfalse", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#getNull -> #consume == \"nullA\"")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#getNull -> #consume != \"nullA\"")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#getNull -> (#consume == \"nullA\" AND #isNull)")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
     }
 
     @Reference
