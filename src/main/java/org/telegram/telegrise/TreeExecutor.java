@@ -9,6 +9,7 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
+import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
@@ -35,17 +36,33 @@ public final class TreeExecutor {
         return new TreeExecutor(memory, handler, tree, sender, updatesQueue);
     }
 
-    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender){
+    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, String executeMode){
+        if (executeMode.equals(Transition.EXECUTE_FALSE)) return;
+
         if (toInvoke != null) toInvoke.generate(pool);
 
-        if (actions != null)
+        if (actions == null) return;
+
+        if (executeMode.equals(Transition.EXECUTE_TRUE)) {
             actions.forEach(action -> {
-                        try {
-                            new UniversalSender(sender).execute(action, pool);
-                        } catch (TelegramApiException e) {
-                            throw new TelegRiseInternalException(e);
-                        }
-                    });
+                try {
+                    new UniversalSender(sender).execute(action, pool);
+                } catch (TelegramApiException e) {
+                    throw new TelegRiseInternalException(e);
+                }
+            });
+        } else if (executeMode.equals(Transition.EXECUTE_EDIT)) {
+            for (ActionElement action : actions) {
+                if (action.toEdit() == null) continue;
+                try {
+                    new UniversalSender(sender).execute(action.toEdit(), pool);
+                    return;
+                } catch (TelegramApiException e) {
+                    throw new TelegRiseInternalException(e);
+                }
+            }
+            throw new TelegRiseRuntimeException("Unable to find an element to edit after the transition", actions.get(0).getElementNode());
+        }
     }
 
     private final List<String> relatedKeyboardIds = new LinkedList<>();
@@ -118,7 +135,7 @@ public final class TreeExecutor {
     }
 
     private void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool){
-        invokeBranch(toInvoke, actions, pool, this.sender);
+        invokeBranch(toInvoke, actions, pool, this.sender, Transition.EXECUTE_TRUE);
     }
 
     public List<String> getCurrentInterruptionScopes(){

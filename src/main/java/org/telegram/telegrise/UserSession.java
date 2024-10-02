@@ -9,10 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.BotTranscription;
-import org.telegram.telegrise.core.elements.BranchingElement;
-import org.telegram.telegrise.core.elements.Root;
-import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
@@ -222,7 +219,7 @@ public class UserSession implements Runnable{
 
         if (root.getDefaultBranch() != null && root.getDefaultBranch().getWhen().generate(pool)){
             TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
-                    pool, sender);
+                    pool, sender, Transition.EXECUTE_TRUE);
         }
 
         Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
@@ -301,11 +298,11 @@ public class UserSession implements Runnable{
      * </ol>
      */
     private void processClosedTree(Update update, TreeExecutor executor, ResourcePool pool) {
-        boolean execute = true;
+        String execute = Transition.EXECUTE_TRUE;
         if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
             // Transition case
             boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
-            execute = executor.getLastBranch().getTransition().isExecute();
+            execute = executor.getLastBranch().getTransition().getExecute();
 
             if (interrupted) return;
         } else if(!executor.isNaturallyClosed()){
@@ -344,8 +341,10 @@ public class UserSession implements Runnable{
         if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
             this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
 
-        if (execute)
+        if (execute.equals(Transition.EXECUTE_TRUE))
             this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
+        else if (execute.equals(Transition.EXECUTE_EDIT))
+            this.executeEditBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
     }
 
     private void updateCaches(ResourcePool pool) {
@@ -378,6 +377,21 @@ public class UserSession implements Runnable{
                 throw new TelegRiseInternalException(e);
             }
         }
+    }
+
+    private void executeEditBranchingElement(BranchingElement element, Update update){
+        if (element.getActions() == null) return;
+
+        for (ActionElement actionElement : element.getActions()) {
+            if (actionElement.toEdit() == null) continue;
+            try {
+                this.universalSender.execute(actionElement.toEdit(), this.createResourcePool(update));
+                return;
+            } catch (TelegramApiException e) {
+                throw new TelegRiseInternalException(e);
+            }
+        }
+        throw new TelegRiseRuntimeException("Unable to find an element to edit after the transition", element.getActions().get(0).getElementNode());
     }
 
     public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){

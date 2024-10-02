@@ -14,6 +14,11 @@ public abstract class ActionElement extends NodeElement {
     public GeneratedValue<Void> getReturnConsumer() { return null; }
     public abstract GeneratedValue<Boolean> getWhen();
 
+    // Used for <transition execute="edit"/>
+    public Edit toEdit(){
+        return null;
+    }
+
     public Long generateChatId(ResourcePool pool){
         return getChatId() != null ? getChatId().generate(pool) : Objects.requireNonNull(MessageUtils.getChat(pool.getUpdate())).getId();
     }

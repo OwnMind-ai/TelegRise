@@ -115,7 +115,7 @@ public class TranscriptionManager {
         Transition transition = new Transition();
         transition.setDirection(Transition.BACK);
         transition.setTarget(GeneratedValue.ofValue(element));
-        transition.setExecute(execute);
+        transition.setExecute(Boolean.toString(execute));
 
         // Simulates a naturally closed tree
         if (!this.transitionController.getTreeExecutors().isEmpty())

@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -125,5 +125,16 @@ public class Send extends ActionElement{
                 .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
                 .replyMarkup(createKeyboard(pool))
                 .build();
+    }
+
+    @Override
+    public Edit toEdit() {
+        Edit edit = new Edit();
+        edit.setChatId(this.chatId);
+        edit.setKeyboard(this.keyboard);
+        edit.setText(this.text);
+        edit.setWhen(this.when);
+
+        return edit;
     }
 }

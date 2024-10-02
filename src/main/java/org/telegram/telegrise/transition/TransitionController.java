@@ -77,7 +77,11 @@ public class TransitionController {
             return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
         }
 
-        this.applyBack(new Transition(Transition.BACK, GeneratedValue.ofValue(point.getFrom().getName()), false, null, null), pool);
+        this.applyBack(new Transition(Transition.BACK,
+                GeneratedValue.ofValue(point.getFrom().getName()),
+                Transition.EXECUTE_FALSE,
+                null,
+                null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
 
@@ -93,12 +97,11 @@ public class TransitionController {
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
     }
 
-    private void applyLocal(Branch branch, boolean execute, ResourcePool pool) {
+    private void applyLocal(Branch branch, String executeMode, ResourcePool pool) {
         TreeExecutor last = this.treeExecutors.getLast();
         last.setCurrentBranch(branch);
 
-        if (execute)
-            TreeExecutor.invokeBranch(branch.getToInvoke(), branch.getActions(), pool,  last.getSender());
+        TreeExecutor.invokeBranch(branch.getToInvoke(), branch.getActions(), pool, last.getSender(), executeMode);
     }
 
     private boolean applyBack(Transition transition, ResourcePool pool){
@@ -106,7 +109,7 @@ public class TransitionController {
             Branch branch = treeExecutors.getLast().getLastBranch();
 
             if (branch.getParent() instanceof Branch target){
-                applyLocal(target, transition.isExecute(), pool);
+                applyLocal(target, transition.getExecute(), pool);
                 return true;
             } else {
                 this.treeExecutors.getLast().open();
@@ -124,7 +127,7 @@ public class TransitionController {
             throw new TelegRiseRuntimeException("Unable to perform transition: element named '%s' is not a tree, root or branch".formatted(name), transition.getElementNode());
 
         if (target instanceof Branch branch){
-            applyLocal(branch, transition.isExecute(), pool);
+            applyLocal(branch, transition.getExecute(), pool);
             return true;
         } else {
             for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {

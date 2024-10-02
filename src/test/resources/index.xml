@@ -128,13 +128,11 @@
                 <branch callbackTriggers="disableMe">
                     <invoke method="#disableButton"/>
                     <answer text="Done!"/>
-                    <edit keyboardId="dynamic" source="callback"/>
-                    <transition direction="back"/>
+                    <transition direction="back" execute="edit"/>
                 </branch>
                 <branch callbackTriggers="switch-on; switch-off">
                     <flip id="dynamic" switch="switch"/>
-                    <edit keyboardId="dynamic"  source="callback"/>
-                    <transition direction="back"/>
+                    <transition direction="back" execute="edit"/>
                 </branch>
                 <branch callbackTriggers="testAnimation">
                     <animate period="0.5" loops="5" parallel="false">

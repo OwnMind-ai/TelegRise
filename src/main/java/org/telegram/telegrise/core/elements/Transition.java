@@ -24,6 +24,10 @@ public class Transition extends NodeElement {
     public static final String BACK = "back";
     public static final String CALLER = "caller";
 
+    public static final String EXECUTE_TRUE = "true";
+    public static final String EXECUTE_FALSE = "false";
+    public static final String EXECUTE_EDIT = "edit";
+
     @Attribute(name = "direction", nullable = false)
     private String direction;
 
@@ -31,7 +35,7 @@ public class Transition extends NodeElement {
     private GeneratedValue<String> target;
 
     @Attribute(name = "execute")
-    private boolean execute = false;
+    private String execute = "false";
 
     @InnerElement
     private List<ActionElement> actions;

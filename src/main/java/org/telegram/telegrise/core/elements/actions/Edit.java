@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -252,5 +252,10 @@ public class Edit extends ActionElement{
     @Override
     public Long generateChatId(ResourcePool pool) {
         return this.inlineMessageId == null ? super.generateChatId(pool) : null;
+    }
+
+    @Override
+    public Edit toEdit() {
+        return this;
     }
 }
