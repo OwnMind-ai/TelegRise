@@ -2,8 +2,8 @@ package org.telegram.telegrise.core.elements;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.parser.Attribute;
@@ -20,9 +20,8 @@ import java.util.function.Predicate;
 @Element(name = "transition", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Transition extends NodeElement {
-    public static final String PREVIOUS = "previous";
     public static final String JUMP = "jump";
-    public static final String LOCAL = "local";
+    public static final String BACK = "back";
     public static final String CALLER = "caller";
 
     @Attribute(name = "direction", nullable = false)
@@ -32,7 +31,7 @@ public class Transition extends NodeElement {
     private GeneratedValue<String> target;
 
     @Attribute(name = "execute")
-    private boolean execute = true;
+    private boolean execute = false;
 
     @InnerElement
     private List<ActionElement> actions;
@@ -42,15 +41,14 @@ public class Transition extends NodeElement {
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (direction != null && !direction.equals(PREVIOUS) && !direction.equals(JUMP)
-                && !direction.equals(LOCAL) && !direction.equals(CALLER))
+        if (!List.of(BACK, CALLER, JUMP).contains(direction))
             throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '" +
-                    PREVIOUS + "', '" + LOCAL + "' or '" + JUMP + "'" , node);
+                    BACK + "', '" + CALLER + "' or '" + JUMP + "'" , node);
 
         if (!JUMP.equals(this.direction) && (this.nextTransition != null || this.actions != null))
             throw new TranscriptionParsingException("Transitions with direction other then '" + JUMP + "' cannot contain next transition or actions", node);
 
-        if (target == null && !CALLER.equals(this.direction))
+        if (target == null && JUMP.equals(this.direction))
             throw new TranscriptionParsingException("Target for direction '" + this.direction + "' is not specified" , node);
 
         validateTarget(node, memory);
@@ -62,11 +60,8 @@ public class Transition extends NodeElement {
         // Code fragment 'this.target.generate(null)' is allowed in the code bellow because if tests fail,
         // then this.target is for sure an instance of StaticValue class
 
-        if (LOCAL.equals(direction) && !this.target.validate(createValidationFor(memory, Branch.class)))
-            throw new TranscriptionParsingException("Unable to find branch named '" + this.target.generate(null) + "'" , node);
-
-        if ((JUMP.equals(direction) || PREVIOUS.equals(direction)) && !this.target.validate(createValidationFor(memory, Tree.class, Root.class)))
-            throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'", node);
+        if (BACK.equals(direction) && target != null && !this.target.validate(createValidationFor(memory, Branch.class, Tree.class, Root.class)))
+            throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'" , node);
     }
 
     @SafeVarargs

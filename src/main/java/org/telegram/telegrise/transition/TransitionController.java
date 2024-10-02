@@ -24,7 +24,6 @@ public class TransitionController {
     private final TranscriptionMemory transcriptionMemory;
     private final UniversalSender sender;
 
-
     public TransitionController(SessionMemoryImpl sessionMemory, Deque<TreeExecutor> treeExecutors, TranscriptionMemory transcriptionMemory, BotSender sender) {
         this.sessionMemory = sessionMemory;
         this.treeExecutors = treeExecutors;
@@ -33,19 +32,11 @@ public class TransitionController {
     }
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
-
         return switch (transition.getDirection()) {
-            case Transition.PREVIOUS -> {
-                this.applyPrevious(transition, pool);
-                yield false;
-            }
+            case Transition.BACK -> this.applyBack(transition, pool);
             case Transition.JUMP -> {
                 this.applyJump(tree, transition, pool);
                 yield false;
-            }
-            case Transition.LOCAL -> {
-                this.applyLocal(tree, transition, pool);
-                yield true; // INTERRUPTING
             }
             case Transition.CALLER -> this.applyCaller(tree, transition, pool);
             default -> throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'", transition.getElementNode());
@@ -86,22 +77,11 @@ public class TransitionController {
             return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
         }
 
-        this.applyPrevious(new Transition(Transition.PREVIOUS, GeneratedValue.ofValue(point.getFrom().getName()), false, null, null), pool);
+        this.applyBack(new Transition(Transition.BACK, GeneratedValue.ofValue(point.getFrom().getName()), false, null, null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
 
         return false;
-    }
-
-    private void applyLocal(Tree tree, Transition transition, ResourcePool pool) {
-        TreeExecutor last = this.treeExecutors.getLast();
-        assert last.getTree().getName().equals(tree.getName());
-
-        Branch next = this.transcriptionMemory.get(last.getTree(), transition.getTarget().generate(pool), Branch.class, List.of("branch"));
-        last.setCurrentBranch(next);
-
-        if (transition.isExecute())
-            TreeExecutor.invokeBranch(next.getToInvoke(), next.getActions(), pool,  last.getSender());
     }
 
     private void applyJump(Tree tree, Transition transition, ResourcePool pool) {
@@ -113,29 +93,60 @@ public class TransitionController {
         this.sessionMemory.getJumpPoints().add(new JumpPoint(tree, requested, transition.getActions(), transition.getNextTransition()));
     }
 
-    private void applyPrevious(Transition transition, ResourcePool pool){
-        String target = transition.getTarget().generate(pool);
+    private void applyLocal(Branch branch, boolean execute, ResourcePool pool) {
+        TreeExecutor last = this.treeExecutors.getLast();
+        last.setCurrentBranch(branch);
 
-        for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
-            BranchingElement element = it.next();
+        if (execute)
+            TreeExecutor.invokeBranch(branch.getToInvoke(), branch.getActions(), pool,  last.getSender());
+    }
 
-            if (!element.getName().equals(target)) {
-                this.sessionMemory.getBranchingElements().remove(element);
+    private boolean applyBack(Transition transition, ResourcePool pool){
+        if (transition.getTarget() == null){
+            Branch branch = treeExecutors.getLast().getLastBranch();
 
-                if (element instanceof Tree){
-                    assert this.treeExecutors.getLast().getTree().getName().equals(element.getName());
-                    this.treeExecutors.getLast().beforeRemoving();
-                    this.treeExecutors.getLast().close();
-                    this.treeExecutors.removeLast();
-                }
+            if (branch.getParent() instanceof Branch target){
+                applyLocal(target, transition.isExecute(), pool);
+                return true;
             } else {
-                if (!this.treeExecutors.isEmpty())
-                    this.treeExecutors.getLast().open();
-                return;
+                this.treeExecutors.getLast().open();
+                return false;
             }
         }
 
-        throw new TelegRiseRuntimeException("Unable to find element called '" + target + "'", transition.getElementNode());
+        Tree lastTree = this.sessionMemory.isOnStack(Tree.class) ? (Tree) this.sessionMemory.getBranchingElements().getLast() : null;
+        String name = transition.getTarget().generate(pool);
+        NodeElement targetElement = this.transcriptionMemory.get(lastTree, name);
+
+        if (targetElement == null)
+            throw new TelegRiseRuntimeException("Unable to perform transition: element named '%s' doesn't exist".formatted(name), transition.getElementNode());
+        if (!(targetElement instanceof BranchingElement target))
+            throw new TelegRiseRuntimeException("Unable to perform transition: element named '%s' is not a tree, root or branch".formatted(name), transition.getElementNode());
+
+        if (target instanceof Branch branch){
+            applyLocal(branch, transition.isExecute(), pool);
+            return true;
+        } else {
+            for (Iterator<BranchingElement> it = this.sessionMemory.getBranchingElements().descendingIterator(); it.hasNext(); ) {
+                BranchingElement element = it.next();
+                if (!element.getName().equals(target.getName())) {
+                    this.sessionMemory.getBranchingElements().remove(element);
+
+                    if (element instanceof Tree) {
+                        assert this.treeExecutors.getLast().getTree().getName().equals(element.getName());
+                        this.treeExecutors.getLast().beforeRemoving();
+                        this.treeExecutors.getLast().close();
+                        this.treeExecutors.removeLast();
+                    }
+                } else {
+                    if (!this.treeExecutors.isEmpty())
+                        this.treeExecutors.getLast().open();
+                    return false;
+                }
+            }
+        }
+
+        throw new TelegRiseRuntimeException("Unable to find element called '" + target + "' in the stack", transition.getElementNode());
     }
 
     public void removeExecutor(TreeExecutor executor){

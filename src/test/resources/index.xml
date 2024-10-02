@@ -120,7 +120,7 @@
                     </send>
                 </branch>
                 <branch callbackTriggers="first" invoke="#send; #log; SimpleController#printHello">
-                    <transition direction="previous" target="root" execute="true"/>
+                    <transition direction="back" target="root" execute="true"/>
                 </branch>
                 <branch callbackTriggers="second">
                     <transition direction="jump" target="toBeCalled" execute="true"/>
@@ -129,12 +129,12 @@
                     <invoke method="#disableButton"/>
                     <answer text="Done!"/>
                     <edit keyboardId="dynamic" source="callback"/>
-                    <transition direction="local" target="point" execute="false"/>
+                    <transition direction="back"/>
                 </branch>
                 <branch callbackTriggers="switch-on; switch-off">
                     <flip id="dynamic" switch="switch"/>
                     <edit keyboardId="dynamic"  source="callback"/>
-                    <transition direction="local" target="point" execute="false"/>
+                    <transition direction="back"/>
                 </branch>
                 <branch callbackTriggers="testAnimation">
                     <animate period="0.5" loops="5" parallel="false">
@@ -144,7 +144,7 @@
                         <frame>Loading |</frame>
                     </animate>
                     <send>Done!</send>
-                    <transition direction="local" target="point" execute="true"/>
+                    <transition direction="back" execute="true"/>
                 </branch>
                 <default>
                     <send>Wrong</send>
@@ -160,7 +160,7 @@
                 </keyboard>
             </send>
             <branch callbackTriggers="back">
-                <transition direction="caller"/>
+                <transition direction="caller" execute="true"/>
             </branch>
             <branch callbackTriggers="1" name="initial">
                 <edit source="callback">
@@ -169,7 +169,7 @@
                         <row><button data="2">2</button></row>
                     </keyboard>
                 </edit>
-                <transition direction="previous" target="toBeCalled" execute="false"/>
+                <transition direction="back"/>
             </branch>
             <branch callbackTriggers="2">
                 <edit source="callback">
@@ -178,7 +178,7 @@
                         <row><button data="1">1</button></row>
                     </keyboard>
                 </edit>
-                <transition direction="previous" target="toBeCalled" execute="false"/>
+                <transition direction="back" execute="false"/>
             </branch>
         </tree>
         <default when="${MessageUtils.getChat(update).isUserChat()}">

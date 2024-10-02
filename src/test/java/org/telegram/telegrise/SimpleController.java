@@ -222,7 +222,7 @@ public class SimpleController {
         @Override
         public void handle(Update update) throws TelegramApiException {
             sender.of(update.getMessage()).send("Primary handler triggered from tree " + manager.getCurrentTree());
-            manager.transitPrevious(update, "root", true);
+            manager.transitBack(update, "root", true);
         }
     }
 

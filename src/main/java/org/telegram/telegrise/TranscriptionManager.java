@@ -102,18 +102,18 @@ public class TranscriptionManager {
         return last instanceof Tree ? (Tree) last : null;
     }
 
-    public void transitPrevious(String element){
-        this.transitPrevious(null, element, false);
+    public void transitBack(String element){
+        this.transitBack(null, element, false);
     }
 
-    public void transitPrevious(Update update, String element, boolean execute){
+    public void transitBack(Update update, String element, boolean execute){
         if (update == null && execute)
             throw new IllegalArgumentException("Targeted element '" + element + "' can not be execute without update");
 
         checkSessionMemory();
 
         Transition transition = new Transition();
-        transition.setDirection(Transition.PREVIOUS);
+        transition.setDirection(Transition.BACK);
         transition.setTarget(GeneratedValue.ofValue(element));
         transition.setExecute(execute);
 
