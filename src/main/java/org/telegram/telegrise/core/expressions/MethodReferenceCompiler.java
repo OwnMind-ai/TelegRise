@@ -71,12 +71,13 @@ public class MethodReferenceCompiler {
     private ReferenceExpression compileIf(IfToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
         ReferenceExpression predicate = this.compile(token.getPredicate(), namespace, Boolean.class, node);
         if (!ClassUtils.isAssignable(predicate.returnType(), Boolean.class))
-            throw new TranscriptionParsingException("Unable to parse IF statement: if condition returns '" + predicate.returnType().getSimpleName() + "' type, not boolean type", node);
+            throw new TranscriptionParsingException("Unable to parse IF statement: condition returns '" + predicate.returnType().getSimpleName() + "' type, not boolean type", node);
 
         ReferenceExpression doAction = this.compile(token.getDoAction(), namespace, returnType, node);
         ReferenceExpression elseAction = token.getElseAction() == null ? null : this.compile(token.getElseAction(), namespace, returnType, node);
 
-        if (elseAction != null && !ClassUtils.isAssignable(elseAction.returnType(), doAction.returnType()))
+        if (elseAction != null && !ClassUtils.isAssignable(elseAction.returnType(), doAction.returnType()) && 
+                !ClassUtils.isAssignable(doAction.returnType(), elseAction.returnType()))
             throw new TranscriptionParsingException("Unable to parse IF statement: DO and ELSE statements returns different types '"
                     + doAction.returnType().getSimpleName() + "' and '" + elseAction.returnType().getSimpleName() + "'", node);
 

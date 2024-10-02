@@ -102,6 +102,10 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
 
+        parser = new Parser(new Lexer(new CharsStream("IF false DO #getNull ELSE \"B\"")));
+        expression = compiler.compile(parser.parse(), namespace, Object.class, node);
+        assertEquals("B", expression.toGeneratedValue(Object.class, node).generate(pool));
+
         parser = new Parser(new Lexer(new CharsStream("IF (#first -> #not) DO MethodReferenceCompilerTest#getOne ELSE MethodReferenceCompilerTest#getTwo")));
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(2, expression.toGeneratedValue(Integer.class, node).generate(pool));
