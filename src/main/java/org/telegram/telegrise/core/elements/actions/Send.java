@@ -134,6 +134,7 @@ public class Send extends ActionElement{
         edit.setKeyboard(this.keyboard);
         edit.setText(this.text);
         edit.setWhen(this.when);
+        edit.setElementNode(this.getElementNode());
 
         return edit;
     }

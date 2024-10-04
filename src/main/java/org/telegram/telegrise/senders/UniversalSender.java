@@ -11,6 +11,7 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +58,13 @@ public class UniversalSender {
     public void execute(ActionElement action, ResourcePool pool) throws TelegramApiException {
         if (action.getWhen() != null && !action.getWhen().generate(pool)) return;
 
-        PartialBotApiMethod<?> method = action.generateMethod(pool);
+        PartialBotApiMethod<?> method;
+        try {
+            method = action.generateMethod(pool);
+        } catch (Exception e){
+            throw new TelegRiseRuntimeException(e.getMessage(), action.getElementNode());
+        }
+
         Object result;
         try {
             result = this.execute(method);

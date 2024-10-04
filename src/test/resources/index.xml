@@ -19,7 +19,7 @@
             <text parseMode="markdown">Menu</text>
         </send>
         <tree name="startTree" commands="start" description="Start" accessLevel="0"
-              predicate="SimpleController#checkStart(update, memory) AND SimpleController#getTrue">
+              predicate="SimpleController#getTrue AND SimpleController#checkStart">
             <keyboards>
                 <keyboard name="startKeyboard" type="reply" resize="true">
                     <row><button accessLevel="1">First Button</button></row>

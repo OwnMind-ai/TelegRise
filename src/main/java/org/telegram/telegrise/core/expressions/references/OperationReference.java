@@ -10,10 +10,11 @@ import org.w3c.dom.Node;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.List;
 
 public class OperationReference<L, R> implements ReferenceExpression{
     @Setter
@@ -62,7 +63,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
         Map<Class<?>, List<Object>> components = Arrays.stream(args).collect(Collectors.groupingBy(Object::getClass, Collectors.toList()));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)
-                .allMatch(p -> components.keySet().stream().anyMatch(c -> ClassUtils.isAssignable(p, c))))
+                .allMatch(p -> components.keySet().stream().anyMatch(c -> ClassUtils.isAssignable(c, p))))
             throw new TelegRiseRuntimeException("Illegal parameters set: {" + Arrays.stream(reference.parameterTypes())
                     .map(Class::getSimpleName).collect(Collectors.joining(", ")) + "}");
 
@@ -70,8 +71,9 @@ public class OperationReference<L, R> implements ReferenceExpression{
         for(int i = 0; i < result.length; i++){
             Class<?> type = ClassUtils.primitiveToWrapper(reference.parameterTypes()[i]);
             try{
-                result[i] = components.get(type).remove(0);
-            } catch(NullPointerException | IndexOutOfBoundsException e){
+                Class<?> key = components.keySet().stream().filter(c -> ClassUtils.isAssignable(c, type)).findFirst().orElseThrow();
+                result[i] = components.get(key).remove(0);
+            } catch(NullPointerException | IndexOutOfBoundsException | NoSuchElementException e){
                 throw new TelegRiseRuntimeException("Unable to pass arguments of types %s to reference with parameters of types %s"
                     .formatted(Arrays.stream(args).map(Object::getClass).toList(), Arrays.deepToString(reference.parameterTypes())), node);
             }
