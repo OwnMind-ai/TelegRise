@@ -92,7 +92,7 @@
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               controller="SimpleController" chats="private" description="test" accessLevel="0" allowedInterruptions="none">
             <keyboards>
-                <keyboard name="first" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
+                <keyboard name="firstt" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
                     <row><button data="first">First</button></row>
                     <row><button data="second">Second</button></row>
                     <row><button data="disableMe">Disable Me!</button></row>
@@ -107,10 +107,10 @@
             <branch name="point" when="${update.hasMessage() &amp;&amp; controller.check()}" allowedInterruptions="all">
                 <chatAction action="typing"/>
                 <wait timeout="3" listener="#getWarnListener"/>
-                <send>
+                <send name="send">
                     <photo when="#doSendPhoto" url="https://i0.wp.com/www.alphr.com/wp-content/uploads/2022/09/ikaw-lang-1.png"/>
                     <text>Hi, ${MessageUtils.getFrom(update).getFirstName()}</text>
-                    <keyboard byName="first" />
+                    <keyboard byName="firstt" />
                 </send>
 
                 <branch when="#predicate -> #not -> #not">
@@ -128,11 +128,11 @@
                 <branch callbackTriggers="disableMe">
                     <invoke method="#disableButton"/>
                     <answer text="Done!"/>
-                    <transition direction="back" execute="edit"/>
+                    <transition direction="back" edit="send"/>
                 </branch>
                 <branch callbackTriggers="switch-on; switch-off">
                     <flip id="dynamic" switch="switch"/>
-                    <transition direction="back" execute="edit"/>
+                    <transition direction="back" edit="first"/>
                 </branch>
                 <branch callbackTriggers="testAnimation">
                     <animate period="0.5" loops="5" parallel="false">

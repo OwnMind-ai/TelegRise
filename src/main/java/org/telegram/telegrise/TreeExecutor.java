@@ -12,11 +12,13 @@ import org.telegram.telegrise.core.elements.DefaultBranch;
 import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.elements.actions.Edit;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
+import org.telegram.telegrise.transition.ExecutionOptions;
 import org.telegram.telegrise.utils.MessageUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,14 +38,14 @@ public final class TreeExecutor {
         return new TreeExecutor(memory, handler, tree, sender, updatesQueue);
     }
 
-    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, String executeMode){
-        if (executeMode.equals(Transition.EXECUTE_FALSE)) return;
-
+    public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){
+        if (options.execute() != null && !options.execute()) return;
+        
         if (toInvoke != null) toInvoke.generate(pool);
 
         if (actions == null) return;
 
-        if (executeMode.equals(Transition.EXECUTE_TRUE)) {
+        if (options.execute() != null && options.execute()) {
             actions.forEach(action -> {
                 try {
                     new UniversalSender(sender).execute(action, pool);
@@ -51,11 +53,16 @@ public final class TreeExecutor {
                     throw new TelegRiseInternalException(e);
                 }
             });
-        } else if (executeMode.equals(Transition.EXECUTE_EDIT)) {
+        } else if (options.edit() != null) {
+            boolean isFirst = options.edit().equals(ExecutionOptions.EDIT_FIRST);
             for (ActionElement action : actions) {
-                if (action.toEdit() == null) continue;
                 try {
-                    new UniversalSender(sender).execute(action.toEdit(), pool);
+                    Edit editAction = action.toEdit();
+                    if (isFirst && editAction != null) {
+                        new UniversalSender(sender).execute(editAction, pool);
+                    } else if (!isFirst && options.edit().equals(action.getName())) {
+                        if(editAction == null) throw new TelegRiseRuntimeException("Unable to convert element named '%s' to edit action".formatted(options.edit()), action.getElementNode());
+                    }
                     return;
                 } catch (TelegramApiException e) {
                     throw new TelegRiseInternalException(e);
@@ -135,7 +142,7 @@ public final class TreeExecutor {
     }
 
     private void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool){
-        invokeBranch(toInvoke, actions, pool, this.sender, Transition.EXECUTE_TRUE);
+        invokeBranch(toInvoke, actions, pool, this.sender, ExecutionOptions.always());
     }
 
     public List<String> getCurrentInterruptionScopes(){
