@@ -29,6 +29,9 @@ public class Send extends ActionElement{
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    @Attribute(name = "name")
+    private String name;
+
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 

@@ -17,6 +17,7 @@ import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.senders.UniversalSender;
+import org.telegram.telegrise.transition.ExecutionOptions;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 import org.telegram.telegrise.utils.MessageUtils;
@@ -219,7 +220,7 @@ public class UserSession implements Runnable{
 
         if (root.getDefaultBranch() != null && root.getDefaultBranch().getWhen().generate(pool)){
             TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
-                    pool, sender, Transition.EXECUTE_TRUE);
+                    pool, sender, ExecutionOptions.always());
         }
 
         Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
@@ -298,11 +299,11 @@ public class UserSession implements Runnable{
      * </ol>
      */
     private void processClosedTree(Update update, TreeExecutor executor, ResourcePool pool) {
-        String execute = Transition.EXECUTE_TRUE;
+        ExecutionOptions execute = ExecutionOptions.always();
         if (executor.getLastBranch() != null && executor.getLastBranch().getTransition() != null) {
             // Transition case
             boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
-            execute = executor.getLastBranch().getTransition().getExecute();
+            execute = executor.getLastBranch().getTransition().getExecutionOptions();
 
             if (interrupted) return;
         } else if(!executor.isNaturallyClosed()){
@@ -341,10 +342,7 @@ public class UserSession implements Runnable{
         if (last instanceof Tree && !this.treeExecutors.getLast().getTree().getName().equals(last.getName()))
             this.treeExecutors.add(TreeExecutor.create((Tree) last, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue));
 
-        if (execute.equals(Transition.EXECUTE_TRUE))
-            this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
-        else if (execute.equals(Transition.EXECUTE_EDIT))
-            this.executeEditBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update);
+        this.executeBranchingElement(this.sessionMemory.getBranchingElements().getLast(), update, execute);
     }
 
     private void updateCaches(ResourcePool pool) {
@@ -368,30 +366,12 @@ public class UserSession implements Runnable{
     }
 
     private void executeBranchingElement(BranchingElement element, Update update){
-        if (element.getActions() == null) return;
-
-        for (ActionElement actionElement : element.getActions()) {
-            try {
-                this.universalSender.execute(actionElement, this.createResourcePool(update));
-            } catch (TelegramApiException e) {
-                throw new TelegRiseInternalException(e);
-            }
-        }
+        executeBranchingElement(element, update, ExecutionOptions.always());
     }
 
-    private void executeEditBranchingElement(BranchingElement element, Update update){
+    private void executeBranchingElement(BranchingElement element, Update update, ExecutionOptions options){
         if (element.getActions() == null) return;
-
-        for (ActionElement actionElement : element.getActions()) {
-            if (actionElement.toEdit() == null) continue;
-            try {
-                this.universalSender.execute(actionElement.toEdit(), this.createResourcePool(update));
-                return;
-            } catch (TelegramApiException e) {
-                throw new TelegRiseInternalException(e);
-            }
-        }
-        throw new TelegRiseRuntimeException("Unable to find an element to edit after the transition", element.getActions().get(0).getElementNode());
+        TreeExecutor.invokeBranch(null, element.getActions(), this.createResourcePool(update), sender, options);
     }
 
     public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){

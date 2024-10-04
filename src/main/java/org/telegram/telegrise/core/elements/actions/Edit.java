@@ -49,6 +49,9 @@ public class Edit extends ActionElement{
     @Attribute(name = "type")
     private GeneratedValue<String> type;
 
+    @Attribute(name = "name")
+    private String name;
+
     @Attribute(name = "keyboardId")
     private String keyboardId;
 

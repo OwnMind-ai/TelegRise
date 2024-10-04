@@ -11,6 +11,7 @@ import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
+import org.telegram.telegrise.transition.ExecutionOptions;
 import org.w3c.dom.Node;
 
 import java.util.Arrays;
@@ -24,10 +25,6 @@ public class Transition extends NodeElement {
     public static final String BACK = "back";
     public static final String CALLER = "caller";
 
-    public static final String EXECUTE_TRUE = "true";
-    public static final String EXECUTE_FALSE = "false";
-    public static final String EXECUTE_EDIT = "edit";
-
     @Attribute(name = "direction", nullable = false)
     private String direction;
 
@@ -35,7 +32,10 @@ public class Transition extends NodeElement {
     private GeneratedValue<String> target;
 
     @Attribute(name = "execute")
-    private String execute = "false";
+    private Boolean execute;
+
+    @Attribute(name = "edit")
+    private String edit;
 
     @InnerElement
     private List<ActionElement> actions;
@@ -54,6 +54,12 @@ public class Transition extends NodeElement {
 
         if (target == null && JUMP.equals(this.direction))
             throw new TranscriptionParsingException("Target for direction '" + this.direction + "' is not specified" , node);
+
+        if (execute != null && execute && edit != null) 
+            throw new TranscriptionParsingException("Attribute 'execute' conflicts with 'edit'", node);
+        
+        if(edit != null && !ExecutionOptions.EDIT_FIRST.equals(edit) && (!memory.containsKey(parentTree, edit) || !(memory.get(parentTree, edit) instanceof ActionElement a) || !a.getName().equals(edit)))
+            throw new TranscriptionParsingException("Unable to edit on-transition element named '" + edit + "'", node);
 
         validateTarget(node, memory);
     }
@@ -76,5 +82,9 @@ public class Transition extends NodeElement {
 
             return Arrays.stream(classes).anyMatch(c -> c.isInstance(element));
         };
+    }
+
+    public ExecutionOptions getExecutionOptions() {
+        return new ExecutionOptions(this.execute, this.edit);
     }
 }

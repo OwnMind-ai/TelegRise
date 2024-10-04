@@ -13,6 +13,7 @@ import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.transition.ExecutionOptions;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;
@@ -115,7 +116,7 @@ public class TranscriptionManager {
         Transition transition = new Transition();
         transition.setDirection(Transition.BACK);
         transition.setTarget(GeneratedValue.ofValue(element));
-        transition.setExecute(Boolean.toString(execute));
+        transition.setExecute(execute);
 
         // Simulates a naturally closed tree
         if (!this.transitionController.getTreeExecutors().isEmpty())
