@@ -9,7 +9,6 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.DefaultBranch;
-import org.telegram.telegrise.core.elements.Transition;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
 import org.telegram.telegrise.core.elements.actions.Edit;
@@ -45,7 +44,7 @@ public final class TreeExecutor {
 
         if (actions == null) return;
 
-        if (options.execute() != null && options.execute()) {
+        if (options.execute() != null) {
             actions.forEach(action -> {
                 try {
                     new UniversalSender(sender).execute(action, pool);
@@ -54,16 +53,20 @@ public final class TreeExecutor {
                 }
             });
         } else if (options.edit() != null) {
+            UniversalSender universalSender = new UniversalSender(sender);
             boolean isFirst = options.edit().equals(ExecutionOptions.EDIT_FIRST);
             for (ActionElement action : actions) {
                 try {
                     Edit editAction = action.toEdit();
                     if (isFirst && editAction != null) {
-                        new UniversalSender(sender).execute(editAction, pool);
+                        universalSender.execute(editAction, pool);
+                        return;
                     } else if (!isFirst && options.edit().equals(action.getName())) {
-                        if(editAction == null) throw new TelegRiseRuntimeException("Unable to convert element named '%s' to edit action".formatted(options.edit()), action.getElementNode());
+                        if(editAction == null)
+                            throw new TelegRiseRuntimeException("Unable to convert element named '%s' to edit action".formatted(options.edit()), action.getElementNode());
+                        universalSender.execute(editAction, pool);
+                        return;
                     }
-                    return;
                 } catch (TelegramApiException e) {
                     throw new TelegRiseInternalException(e);
                 }
