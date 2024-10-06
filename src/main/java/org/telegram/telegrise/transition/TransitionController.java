@@ -98,6 +98,7 @@ public class TransitionController {
     private void applyLocal(Branch branch, ExecutionOptions options, ResourcePool pool) {
         TreeExecutor last = this.treeExecutors.getLast();
         last.setCurrentBranch(branch);
+        pool.getMemory().setCurrentBranch(branch);
 
         TreeExecutor.invokeBranch(branch.getToInvoke(), branch.getActions(), pool, last.getSender(), options);
     }

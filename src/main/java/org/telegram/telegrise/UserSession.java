@@ -5,18 +5,17 @@ import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
-import org.telegram.telegrise.core.elements.*;
-import org.telegram.telegrise.core.elements.actions.ActionElement;
+import org.telegram.telegrise.core.elements.BotTranscription;
+import org.telegram.telegrise.core.elements.BranchingElement;
+import org.telegram.telegrise.core.elements.Root;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.elements.security.Role;
-import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.resources.ResourceInjector;
 import org.telegram.telegrise.senders.BotSender;
-import org.telegram.telegrise.senders.UniversalSender;
 import org.telegram.telegrise.transition.ExecutionOptions;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
@@ -49,7 +48,6 @@ public class UserSession implements Runnable{
     private final TransitionController transitionController;
     private final PrimaryHandlersController primaryHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
-    private final UniversalSender universalSender;
     @Getter
     private final TranscriptionManager transcriptionManager;
     @Setter
@@ -67,7 +65,6 @@ public class UserSession implements Runnable{
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
-        this.universalSender = new UniversalSender(this.sender);
     }
 
     public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
@@ -86,7 +83,6 @@ public class UserSession implements Runnable{
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
 
         this.initialize();
-        this.universalSender = new UniversalSender(this.sender);
     }
 
     private void initialize(){

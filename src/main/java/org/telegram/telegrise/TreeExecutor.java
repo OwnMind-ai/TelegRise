@@ -39,12 +39,11 @@ public final class TreeExecutor {
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){
         if (options.execute() != null && !options.execute()) return;
-        
-        if (toInvoke != null) toInvoke.generate(pool);
-
-        if (actions == null) return;
 
         if (options.execute() != null) {
+            if (toInvoke != null) toInvoke.generate(pool);
+            if (actions == null) return;
+
             actions.forEach(action -> {
                 try {
                     new UniversalSender(sender).execute(action, pool);
@@ -52,7 +51,7 @@ public final class TreeExecutor {
                     throw new TelegRiseInternalException(e);
                 }
             });
-        } else if (options.edit() != null) {
+        } else if (options.edit() != null && actions != null) {
             UniversalSender universalSender = new UniversalSender(sender);
             boolean isFirst = options.edit().equals(ExecutionOptions.EDIT_FIRST);
             for (ActionElement action : actions) {
@@ -117,6 +116,7 @@ public final class TreeExecutor {
             this.memory.setCurrentBranch(this.currentBranch);
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
+            // TODO This if statement can be removed... I guess?.. It was added as a part of "Bug fixes"
             if (this.currentBranch == null) {
                 this.lastBranch = previous;
                 this.naturallyClosed = false;

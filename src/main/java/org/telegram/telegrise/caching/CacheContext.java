@@ -78,8 +78,9 @@ public final class CacheContext {
         List<T> next = nextFunction.apply(compareTo);
         if (next == null) return false;
 
-        for(T t : next)
-            return traverseBranchingElement(target, t, nextFunction);
+        for(T t : next) {
+            if (traverseBranchingElement(target, t, nextFunction)) return true;
+        }
 
         return false;
     }
