@@ -16,7 +16,7 @@ public abstract class ActionElement extends NodeElement implements StorableEleme
     public GeneratedValue<Void> getReturnConsumer() { return null; }
     public abstract GeneratedValue<Boolean> getWhen();
 
-    // Used for <transition execute="edit"/>
+    // Used for <transition edit="..."/>
     public Edit toEdit(){
         return null;
     }

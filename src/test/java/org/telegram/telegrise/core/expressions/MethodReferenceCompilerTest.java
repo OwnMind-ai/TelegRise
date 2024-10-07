@@ -165,6 +165,10 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("#getNull -> (#consume == \"nullA\" AND #isNull)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
         assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(#getOne, #getLongTwelve) -> #sum")));
+        expression = compiler.compile(parser.parse(), namespace, Long.class, node);
+        assertEquals(13L, expression.toGeneratedValue(Long.class, node).generate(pool));
     }
 
     @Reference
@@ -205,6 +209,16 @@ public class MethodReferenceCompilerTest {
     @Reference
     public static int getTwo(){
         return 2;
+    }
+
+    @Reference
+    public long getLongTwelve(){
+        return 12L;
+    }
+
+    @Reference
+    public long sum(Number f, Number s){
+        return f.longValue() + s.longValue();
     }
 
     @Reference
