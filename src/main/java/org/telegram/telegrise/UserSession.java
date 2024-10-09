@@ -235,10 +235,17 @@ public class UserSession implements Runnable{
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue);
             this.treeExecutors.add(executor);
             this.sessionMemory.getBranchingElements().add(tree);
-        }
 
-        if (execute)
-            this.executeBranchingElement(tree, update);
+            if (execute)
+                this.executeBranchingElement(tree, update);
+        } else if(execute) {
+            sessionMemory.getBranchingElements().add(tree);
+            try {
+                this.executeBranchingElement(tree, update);
+            } finally {
+                sessionMemory.getBranchingElements().remove(tree);
+            }
+        }
     }
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){

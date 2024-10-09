@@ -2,6 +2,8 @@ package org.telegram.telegrise;
 
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrise.core.elements.Tree;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.types.UserRole;
 
 import java.io.Serializable;
@@ -18,6 +20,36 @@ public interface SessionMemory {
 
     Object get(String key);
     Object remove(String key);
+
+    private String localKey(Tree tree, String key){
+        if (tree == null) {
+            throw new TelegRiseRuntimeException("Unable to access local memory: there is no tree to access");
+        }
+
+        return "@" + tree.getName() + ":" + key;
+    }
+
+    default void put(String key, Tree tree, Object value) {
+        put(localKey(tree, key), value);
+    }
+
+    default boolean containsKey(String key, Tree tree){
+        return containsKey(localKey(tree, key));
+    }
+
+    default Object get(String key, Tree tree){
+        return get(localKey(tree, key));
+    }
+
+    default <T> T get(String key, Tree tree, Class<T> tClass){
+        return get(localKey(tree, key), tClass);
+    }
+
+    default Object remove(String key, Tree tree){
+        return remove(localKey(tree, key));
+    }
+
+    Tree getCurrentTree();
 
     <T> T get(String key, Class<T> tClass);
 

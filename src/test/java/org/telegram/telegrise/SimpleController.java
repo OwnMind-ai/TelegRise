@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 public class SimpleController {
     @Reference
     public static boolean isHello(Update update, SessionMemory memory){
-        if (!memory.containsKey("hello"))
-            memory.put("hello", false);
+        if (!memory.containsKey("hello", memory.getCurrentTree()))
+            memory.put("hello", memory.getCurrentTree(), false);
 
-        memory.put("hello", !memory.get("hello", Boolean.class));
-        return memory.get("hello", Boolean.class);
+        memory.put("hello", memory.getCurrentTree(), !memory.get("hello", memory.getCurrentTree(), Boolean.class));
+        return memory.get("hello", memory.getCurrentTree(), Boolean.class);
     }
 
     @Reference

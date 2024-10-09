@@ -26,7 +26,8 @@
                     <row><button>Second Button</button></row>
                 </keyboard>
             </keyboards>
-            <actionGroup when='${memory.containsKey("hello") &amp;&amp; memory.get("hello", Boolean.class)}'>
+            <!-- TODO: replace with #memory -->
+            <actionGroup when='${memory.containsKey("hello", memory.getCurrentTree()) &amp;&amp; memory.get("hello", memory.getCurrentTree(), Boolean.class)}'>
                 <send returnConsumer='#register("name")'>ABC</send>
                 <send returnConsumer='#register("name")'>1</send>
                 <send returnConsumer='#register("name")'>2</send>

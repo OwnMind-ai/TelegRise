@@ -2,6 +2,8 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.caching.CachingStrategy;
@@ -9,6 +11,7 @@ import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.elements.Branch;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Root;
+import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
@@ -51,6 +54,11 @@ public class SessionMemoryImpl implements SessionMemory {
 
     public Branch getCurrentBranch(){
         return currentBranch.get();
+    }
+
+    @Override
+    public @Nullable Tree getCurrentTree(){
+        return isOnStack(Tree.class) ? getFromStack(Tree.class) : null;
     }
 
     public void setCurrentBranch(Branch branch){
