@@ -28,9 +28,5 @@ public final class Syntax {
     public static final List<String> KEYWORDS = List.of(IF, DO, ELSE);
     public static final int MAX_KEYWORDS_LENGTH = KEYWORDS.stream().mapToInt(String::length).max().orElse(0);
 
-    public static final String NOT_REFERENCE = "not";
-    public static final String NOT_NULL_REFERENCE = "notNull";
-    public static final String IS_NULL_REFERENCE = "isNull";
-    public static final String ENV_REFERENCE = "env";
     public static final String REGISTER = "register";
 }

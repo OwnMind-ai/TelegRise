@@ -1,5 +1,6 @@
 package org.telegram.telegrise.core.expressions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.annotations.Reference;
@@ -16,16 +17,12 @@ import org.w3c.dom.Node;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Slf4j
 public class MethodReferenceCompiler {
     // Used to exclude reference duplication
     private final Map<Method, MethodReference> referenceMap = new HashMap<>();
@@ -213,9 +210,7 @@ public class MethodReferenceCompiler {
                 boolean rc = ClassUtils.isAssignable(right.returnType(), List.class);
 
                 if (!lc && !rc) {
-                    reference.setOperation((l, r) -> {
-                        return List.of(l.invoke(), r.invoke());
-                    });
+                    reference.setOperation((l, r) -> List.of(l.invoke(), r.invoke()));
                 } else if(lc && !rc) {
                     reference.setOperation((l, r) -> {
                         Object first = l.invoke();
@@ -226,7 +221,7 @@ public class MethodReferenceCompiler {
 
                         return copy;
                     });
-                } else if(!lc && rc) {
+                } else if(!lc) {
                     reference.setOperation((l, r) -> {
                         Object second = r.invoke();
                         assert second instanceof List : "Right statement expected to return an instance of List, but got " + second.getClass().getName();
@@ -259,25 +254,17 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Node node) {
-        if (token.getClassName() == null) {
-            switch (token.getMethod()) {
-                case Syntax.NOT_REFERENCE:
-                    return MethodReference.NOT;
-                case Syntax.IS_NULL_REFERENCE:
-                    return MethodReference.IS_NULL;
-                case Syntax.NOT_NULL_REFERENCE:
-                    return MethodReference.NOT_NULL;
-            }
-
-            if (token.getMethod().equals(Syntax.ENV_REFERENCE) && token.getParams().size() == 1){
-                String expression = String.format("System.getenv((String) %s)", token.getParams().get(0).getStringValue());
-                return getReferenceExpression(namespace, String.class, node, expression);
-            } 
-            
+        if (token.getClassName() == null && (BuiltinReferences.METHODS.contains(token.getMethod()) || token.getMethod().equals(Syntax.REGISTER))) {
+            //TODO Replace with reference generator, deprecate after that (uncomment line below)
             if (token.getMethod().equals(Syntax.REGISTER) && token.getParams().size() == 1){
-                String expression = String.format("memory.putToRegistry(%s, java.util.Objects.requireNonNull(message))", token.getParams().get(0).getStringValue());
+                var name = token.getParams().get(0).getStringValue();
+//                log.warn("{}\nReference call '#register({})' is deprecated, replace with '::register({})'", NodeElement.formatNode(node), name, name);
+                String expression = String.format("memory.putToRegistry(%s, java.util.Objects.requireNonNull(message))", name);
                 return getReferenceExpression(namespace, Void.class, node, expression);
             }
+
+            var dummy = new MethodReferenceToken(BuiltinReferences.class.getName(), token.getMethod(), token.getParams());
+            return compileMethodReference(dummy, namespace, node);
         }
 
         if (!token.isStatic() && namespace.getHandlerClass() == null)
