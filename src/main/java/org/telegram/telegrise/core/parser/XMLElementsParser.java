@@ -218,7 +218,6 @@ public class XMLElementsParser {
                 ) {
                     if (fieldData.nullable()) return false;
                     else {
-                        assert innerElementData != null;
                         throw new TranscriptionParsingException("Embedded element '" + innerElementData.name() + "' is not allowed here, use <" + innerElementData.name() + "> instead", node);
                     }
                 }

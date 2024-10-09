@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface SessionMemory extends Serializable {
-    Map<String, Serializable> getMemoryMap();
+public interface SessionMemory {
+    Map<String, Object> getMemoryMap();
 
-    void put(String key, Serializable value);
+    void put(String key, Object value);
 
     boolean containsKey(String key);
 
-    Serializable get(String key);
-    Serializable remove(String key);
+    Object get(String key);
+    Object remove(String key);
 
-    <T extends Serializable> T get(String key, Class<T> tClass);
+    <T> T get(String key, Class<T> tClass);
 
-    String addComponent(Serializable value);
+    String addComponent(Object value);
 
-    <T extends Serializable> T getComponent(Class<T> tClass);
-    <T extends Serializable> T removeComponent(Class<T> tClass);
-    <T extends Serializable> boolean containsComponent(Class<T> tClass);
+    <T> T getComponent(Class<T> tClass);
+    <T> T removeComponent(Class<T> tClass);
+    <T> boolean containsComponent(Class<T> tClass);
 
     UserRole getUserRole();
 

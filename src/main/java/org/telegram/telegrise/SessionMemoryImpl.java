@@ -13,20 +13,12 @@ import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SessionMemoryImpl implements SessionMemory {
-    @Serial
-    private static final long serialVersionUID = -8011212970107619938L;
-
-    /*
-        NOTE: To keep compatibly with the caching databases, SessionMemory and all their elements should be serializable.
-     */
-    private final Map<String, Serializable> memory = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Object> memory = Collections.synchronizedMap(new HashMap<>());
     @Getter
     private final int transcriptionHashcode;
     @Getter
@@ -66,12 +58,12 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public Map<String, Serializable> getMemoryMap(){
+    public Map<String, Object> getMemoryMap(){
         return memory;
     }
 
     @Override
-    public void put(String key, Serializable value){
+    public void put(String key, Object value){
         this.memory.put(key, value);
     }
 
@@ -81,22 +73,22 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public Serializable get(String key){
+    public Object get(String key){
         return this.memory.get(key);
     }
 
     @Override
-    public Serializable remove(String key) {
+    public Object remove(String key) {
         return this.memory.remove(key);
     }
 
     @Override
-    public <T extends Serializable> T get(String key, Class<T> tClass){
+    public <T extends Object> T get(String key, Class<T> tClass){
         return tClass.cast(this.memory.get(key));
     }
 
     @Override
-    public String addComponent(Serializable value){
+    public String addComponent(Object value){
         String key = value.getClass().getName();
         this.memory.put(key, value);
 
@@ -104,17 +96,17 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public <T extends Serializable> T getComponent(Class<T> tClass){
+    public <T extends Object> T getComponent(Class<T> tClass){
         return tClass.cast(this.memory.get(tClass.getName()));
     }
 
     @Override
-    public <T extends Serializable> T removeComponent(Class<T> tClass) {
+    public <T extends Object> T removeComponent(Class<T> tClass) {
         return tClass.cast(this.memory.remove(tClass.getName()));
     }
 
     @Override
-    public <T extends Serializable> boolean containsComponent(Class<T> tClass) {
+    public <T extends Object> boolean containsComponent(Class<T> tClass) {
         return this.memory.containsKey(tClass.getName());
     }
 
