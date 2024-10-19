@@ -1,6 +1,8 @@
 package org.telegram.telegrise.core;
 
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.annotations.ReferenceGenerator;
+import org.telegram.telegrise.generators.GeneratedReference;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -29,5 +31,10 @@ public class BuiltinReferences {
     @Reference
     public static String env(String key){
         return System.getenv(key);
+    }
+
+    @ReferenceGenerator
+    public GeneratedReference<String, Boolean> matches(String regex){
+        return input -> input.matches(regex);
     }
 }

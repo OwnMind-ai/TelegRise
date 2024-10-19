@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.caching.MethodReferenceCache;
 import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,7 +35,8 @@ public class MethodReference implements ReferenceExpression{
 
     @Override
     public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-        assert isStatic || instance != null : "Unable to invoke method reference: handler object in ResourcePool is null";
+        if(!isStatic && instance == null)
+            throw new TelegRiseRuntimeException("Unable to invoke method reference '%s': handler object in ResourcePool is null".formatted(method.getName()));
 
         MethodReferenceCache cache = pool.getMemory() != null ? pool.getMemory().getMethodReferenceCache(this) : null;
         if(cache != null && cache.isCacheApplicable(pool)){

@@ -2,10 +2,9 @@ package org.telegram.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.core.Syntax;
-import org.telegram.telegrise.core.expressions.tokens.ExpressionToken;
-import org.telegram.telegrise.core.expressions.tokens.IfToken;
-import org.telegram.telegrise.core.expressions.tokens.MethodReferenceToken;
-import org.telegram.telegrise.core.expressions.tokens.OperatorToken;
+import org.telegram.telegrise.core.expressions.tokens.*;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +17,6 @@ class ParserTest {
     private static final OperatorToken PARALLEL_TOKEN = new OperatorToken(Syntax.PARALLEL_SEPARATOR);
     private static final OperatorToken LIST_TOKEN = new OperatorToken(Syntax.LIST_SEPARATOR);
     private static final OperatorToken AND_TOKEN = new OperatorToken(Syntax.AND_OPERATOR);
-
 
     @Test
     void parse() throws ReferenceParsingException {
@@ -78,6 +76,13 @@ class ParserTest {
                         CHAIN_TOKEN
                 ),
                 FIRST_DUMMY,
+                CHAIN_TOKEN
+        ), parser.parse());
+
+        parser = new Parser(new Lexer(new CharsStream("#first -> ::create(1)")));
+        assertEquals(new ExpressionToken(
+                FIRST_DUMMY,
+                new ReferenceGeneratorToken(null, "create", List.of(new ValueToken(1L, Long.class))),
                 CHAIN_TOKEN
         ), parser.parse());
 

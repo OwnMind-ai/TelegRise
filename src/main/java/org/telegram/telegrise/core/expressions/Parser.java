@@ -38,7 +38,7 @@ public class Parser {
             return parseIfToken();
         }
 
-        if (token != null && (token.getTokenType() == TokenTypes.REFERENCE || token.getTokenType() == TokenTypes.VALUE))
+        if (token != null && List.of(TokenTypes.REFERENCE, TokenTypes.GENERATOR, TokenTypes.VALUE).contains(token.getTokenType()))
             return token;
 
         throw new ReferenceParsingException(ErrorCodes.UNDEFINED_TOKEN, this.lexer.getPosition());

@@ -2,13 +2,18 @@ package org.telegram.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
+import org.telegram.telegrise.generators.GeneratedPolyReference;
+import org.telegram.telegrise.generators.GeneratedReference;
 import org.w3c.dom.Node;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.telegram.telegrise.core.parser.XMLElementsParserTest.toNode;
 
@@ -169,6 +174,24 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("(#getOne, #getLongTwelve) -> #sum")));
         expression = compiler.compile(parser.parse(), namespace, Long.class, node);
         assertEquals(13L, expression.toGeneratedValue(Long.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#getTwo -> ::pow(6)")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(64, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(\"A\", 1, \"C\") -> ::join(\", \", 2)")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("A, 1", expression.toGeneratedValue(String.class, node).generate(pool));
+    }
+
+    @ReferenceGenerator
+    public GeneratedReference<Integer, Integer> pow(int power){
+        return i -> (int) Math.pow(i, power);
+    }
+
+    @ReferenceGenerator(parameters = { List.class })
+    public GeneratedPolyReference<String> join(String delimiter, int limit){
+        return args -> ((List<?>) args[0]).stream().map(Object::toString).limit(limit).collect(Collectors.joining(delimiter));
     }
 
     @Reference

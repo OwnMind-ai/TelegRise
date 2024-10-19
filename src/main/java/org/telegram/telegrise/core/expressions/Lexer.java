@@ -3,7 +3,7 @@ package org.telegram.telegrise.core.expressions;
 import org.telegram.telegrise.core.Syntax;
 import org.telegram.telegrise.core.expressions.tokens.*;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -106,7 +106,7 @@ public final class Lexer {
         return result;
     }
 
-    private Optional<Token> readReference() {
+    private Optional<Token> readReference() throws ReferenceParsingException {
         return Optional.ofNullable(new ReferenceReader().read());
     }
 
@@ -161,19 +161,22 @@ public final class Lexer {
     }
 
     private class ReferenceReader{
-        private final List<PrimitiveToken> params = new LinkedList<>();
+        private static final List<String> REFERENCE_STARTS = List.of(Syntax.METHOD_REFERENCE_START, Syntax.GENERATOR_START);
+        private final List<PrimitiveToken> params = new ArrayList<>();
 
-        private ReferenceReader() {
-        }
-
-        public Token read(){
+        public Token read() throws ReferenceParsingException {
             String className = null;
-            if (!Syntax.METHOD_REFERENCE_START.equals(String.valueOf(charsStream.peek()))){
+            var peeked = charsStream.peek(2);
+            if (REFERENCE_STARTS.stream().noneMatch(peeked::startsWith)){
                 className = readWhile(Pattern.compile("[.\\w_]").asPredicate());
             }
 
-            // Skip '#'
-            if (!Syntax.METHOD_REFERENCE_START.equals(String.valueOf(charsStream.next()))) return null;
+            TokenTypes type = switch (String.valueOf(charsStream.next())){
+                case Syntax.METHOD_REFERENCE_START -> TokenTypes.REFERENCE;
+                case ":" -> charsStream.next() == ':' ? TokenTypes.GENERATOR : null;
+                default -> null;
+            };
+            if (type == null) return null;
 
             String methodName = readWhile(Pattern.compile("[\\w_]").asPredicate());
 
@@ -185,7 +188,14 @@ public final class Lexer {
                 }
             }
 
-            return new MethodReferenceToken(className, methodName, params.isEmpty() ? null : params);
+            if (type == TokenTypes.REFERENCE) {
+                return new MethodReferenceToken(className, methodName, params.isEmpty() ? null : params);
+            } else {
+                if (params.isEmpty())
+                    throw new ReferenceParsingException(ErrorCodes.MISSING_PARAMETERS, charsStream.getPosition());
+
+                return new ReferenceGeneratorToken(className, methodName, params);
+            }
         }
 
         private boolean readParameters() {

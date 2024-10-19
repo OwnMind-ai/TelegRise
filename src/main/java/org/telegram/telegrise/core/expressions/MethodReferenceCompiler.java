@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
@@ -11,12 +12,16 @@ import org.telegram.telegrise.core.expressions.references.OperationReference;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
 import org.telegram.telegrise.core.expressions.tokens.*;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
+import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
+import org.telegram.telegrise.generators.GeneratedBiReference;
+import org.telegram.telegrise.generators.GeneratedPolyReference;
+import org.telegram.telegrise.generators.GeneratedReference;
+import org.telegram.telegrise.generators.GeneratedReferenceBase;
 import org.w3c.dom.Node;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,23 +33,15 @@ public class MethodReferenceCompiler {
     private final Map<Method, MethodReference> referenceMap = new HashMap<>();
 
     public ReferenceExpression compile(Token rootToken, LocalNamespace namespace, Class<?> returnType, Node node) {
-        if (rootToken.getTokenType() == TokenTypes.REFERENCE) {
-            return this.compileMethodReference((MethodReferenceToken) rootToken, namespace, node);
-        }
+        return switch (rootToken.getTokenType()) {
+            case REFERENCE -> this.compileMethodReference((MethodReferenceToken) rootToken, namespace, node);
+            case GENERATOR -> this.compileGenerator((ReferenceGeneratorToken) rootToken, namespace, node);
+            case EXPRESSION -> this.compileExpression((ExpressionToken) rootToken, namespace, returnType, node);
+            case IF_CONSTRUCTION -> this.compileIf((IfToken) rootToken, namespace, returnType, node);
+            case VALUE -> this.compileValue((ValueToken) rootToken, returnType);
+            default -> null;
+        };
 
-        if (rootToken.getTokenType() == TokenTypes.EXPRESSION){
-            return this.compileExpression((ExpressionToken) rootToken, namespace, returnType, node);
-        }
-
-        if (rootToken.getTokenType() == TokenTypes.IF_CONSTRUCTION){
-            return this.compileIf((IfToken) rootToken, namespace, returnType, node);
-        }
-
-        if (rootToken.getTokenType() == TokenTypes.VALUE){
-            return this.compileValue((ValueToken) rootToken, returnType);
-        }
-
-        return null;
     }
 
     private ReferenceExpression compileValue(ValueToken rootToken, Class<?> returnType) {
@@ -117,7 +114,7 @@ public class MethodReferenceCompiler {
 
                 if (right.parameterTypes().length == 0 ||
                     (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
-                        ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(left.returnType())))) {
+                        ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType()))))) {
                     throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type than right side consumes", node);
                 }
 
@@ -253,6 +250,61 @@ public class MethodReferenceCompiler {
         throw new IllegalArgumentException();
     }
 
+    private ReferenceExpression compileGenerator(ReferenceGeneratorToken token, LocalNamespace namespace, Node node) {
+        //TODO static generators: can be generated right there once, for W performance
+        Method method = getMethod(token, ReferenceGenerator.class, namespace, node);
+        ReferenceGenerator annotation = method.getAnnotation(ReferenceGenerator.class);
+
+        if (!ClassUtils.isAssignable(method.getReturnType(), GeneratedReferenceBase.class))
+            throw new TranscriptionParsingException("Reference generator named '%s' must return one of the following: %s".formatted(
+                    token.getMethod(), Stream.of(GeneratedReference.class, GeneratedBiReference.class, GeneratedPolyReference.class)
+                            .map(Class::getSimpleName).collect(Collectors.joining(", "))), node);
+
+        if (!ClassUtils.isAssignable(method.getReturnType(), GeneratedPolyReference.class) && annotation.parameters().length > 0) {
+            throw new TranscriptionParsingException("Property @ReferenceGenerator::parameters conflicts with method's return type '" + method.getReturnType().getSimpleName() +
+                    "': either remove parameters property or change return type to GeneratedPolyReference", node);
+        }
+
+        Type[] genericTypes = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments();
+        List<Class<?>> generics = Arrays.stream(genericTypes)
+                .peek(t -> {
+                    if (!(t instanceof Class))
+                        throw new TelegRiseRuntimeException("Unable to accept generator types: " + t.getTypeName());
+                })
+                .<Class<?>>map(t -> (Class<?>) t)
+                .toList();
+
+        if (generics.isEmpty())
+            throw new TelegRiseRuntimeException("Unable to accept generator named '%s'".formatted(method.getName()), node);
+
+        Class<?> returnType = generics.get(generics.size() - 1);
+        Class<?>[] parameterTypes = annotation.parameters().length > 0 ? annotation.parameters() :
+                generics.subList(0, generics.size() - 1).toArray(new Class[0]);
+
+        GeneratedValue<GeneratedReferenceBase> generator = compileParametrizedReference(method, token.getParams(), token.isStatic(), namespace, node)
+                .toGeneratedValue(GeneratedReferenceBase.class, node);
+
+        return new ReferenceExpression() {
+            @Override
+            public Object invoke(ResourcePool pool, Object instance, Object... args) {
+                GeneratedReferenceBase generated = generator.generate(pool);
+
+                //TODO add something better than 'invokeUnsafe'
+                if (generated instanceof GeneratedReference<?,?> reference){
+                    return reference.invokeUnsafe(args[0]);
+                } else if (generated instanceof GeneratedBiReference<?,?,?> reference){
+                    return reference.invokeUnsafe(args[0], args[1]);
+                } else if (generated instanceof GeneratedPolyReference<?> reference){
+                    return reference.run(args);
+                } else
+                    throw new TelegRiseRuntimeException("Invalid generated reference: " + generated.getClass().getName(), node);
+            }
+
+            @Override public @NotNull Class<?>[] parameterTypes() { return parameterTypes; }
+            @Override public @NotNull Class<?> returnType() { return returnType; }
+        };
+    }
+
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Node node) {
         if (token.getClassName() == null && (BuiltinReferences.METHODS.contains(token.getMethod()) || token.getMethod().equals(Syntax.REGISTER))) {
             //TODO Replace with reference generator, deprecate after that (uncomment line below)
@@ -267,13 +319,29 @@ public class MethodReferenceCompiler {
             return compileMethodReference(dummy, namespace, node);
         }
 
+        Method method = getMethod(token, Reference.class, namespace, node);
+
+        if (token.getParams() == null) {
+            if (this.referenceMap.containsKey(method)) {
+                return this.referenceMap.get(method);
+            } else {
+                MethodReference methodReference = new MethodReference(method, token.isStatic());
+                this.referenceMap.put(method, methodReference);
+                return methodReference;
+            }
+        } else {
+            return this.compileParametrizedReference(method, token.getParams(), token.isStatic(), namespace, node);
+        }
+    }
+
+    private static Method getMethod(MethodContainer token, Class<? extends Annotation> annotation, LocalNamespace namespace, Node node) {
         if (!token.isStatic() && namespace.getHandlerClass() == null)
-            throw new TranscriptionParsingException("Unable to parse method '" + token.getMethod() + "': no controller class is assigned", node);
+            throw new TranscriptionParsingException("Unable to compile method '" + token.getMethod() + "': no controller class is assigned", node);
 
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
 
         Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(Reference.class) && m.getName().equals(token.getMethod())).toArray(Method[]::new);
+                .filter(m -> m.isAnnotationPresent(annotation) && m.getName().equals(token.getMethod())).toArray(Method[]::new);
 
         if (found.length == 0)
             throw new TranscriptionParsingException("Method '" + token.getMethod() + "' not found in class '" + parentClass.getName() + "'", node);
@@ -285,30 +353,13 @@ public class MethodReferenceCompiler {
         if ((method.getModifiers() & Modifier.PUBLIC) == 0)
             throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);
 
-        if (token.getParams() == null) {
-            if (this.referenceMap.containsKey(method)) {
-                return this.referenceMap.get(method);
-            } else {
-                //TODO temporary removed, decide later.
-                // Maybe add a specific property for @Reference,
-                // which indicates that method should take input only once, so the code below works correctly
-//                CachingStrategy strategy = method.getAnnotation(Reference.class).caching();
-//                if (strategy != CachingStrategy.NONE && strategy != CachingStrategy.UPDATE &&
-//                        Arrays.asList(method.getParameterTypes()).contains(Update.class))
-//                    throw new TranscriptionParsingException("Method with parameter of class Update cannot have caching strategy other than NONE or UPDATE. Current strategy: " + strategy, node);
-
-                MethodReference methodReference = new MethodReference(method, token.isStatic());
-                this.referenceMap.put(method, methodReference);
-                return methodReference;
-            }
-        } else {
-            return this.compileParametrizedReference(token, method, namespace, node);
-        }
+        method.setAccessible(true);
+        return method;
     }
 
-    private ReferenceExpression compileParametrizedReference(MethodReferenceToken token, Method method, LocalNamespace namespace, Node node) {
-        if (token.getParams().stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray)) {
-            List<ValueToken> tokenList = token.getParams().stream().map(ValueToken.class::cast).toList();
+    private ReferenceExpression compileParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic, LocalNamespace namespace, Node node) {
+        if (parameters.stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray)) {
+            List<ValueToken> tokenList = parameters.stream().map(ValueToken.class::cast).toList();
             Object[] params = IntStream.range(0, tokenList.size())
                     .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
                     .toArray();
@@ -316,7 +367,7 @@ public class MethodReferenceCompiler {
             return new ReferenceExpression() {
                 @Override
                 public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-                    return method.invoke(token.isStatic() ? null : instance, params);
+                    return method.invoke(isStatic ? null : instance, params);
                 }
 
                 @Override
@@ -327,9 +378,9 @@ public class MethodReferenceCompiler {
             };
         }
 
-        String caller = token.isStatic() ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
+        String caller = isStatic ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
         String expression = String.format("%s.%s(%s)", caller, method.getName(),
-                token.getParams().stream().map(PrimitiveToken::getStringValue).collect(Collectors.joining(", ")));
+                parameters.stream().map(PrimitiveToken::getStringValue).collect(Collectors.joining(", ")));
 
         return getReferenceExpression(namespace, method.getReturnType(), node, expression);
     }
