@@ -14,10 +14,7 @@ import org.telegram.telegrise.core.expressions.tokens.*;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.telegram.telegrise.generators.GeneratedBiReference;
-import org.telegram.telegrise.generators.GeneratedPolyReference;
-import org.telegram.telegrise.generators.GeneratedReference;
-import org.telegram.telegrise.generators.GeneratedReferenceBase;
+import org.telegram.telegrise.generators.*;
 import org.w3c.dom.Node;
 
 import java.lang.annotation.Annotation;
@@ -257,7 +254,7 @@ public class MethodReferenceCompiler {
 
         if (!ClassUtils.isAssignable(method.getReturnType(), GeneratedReferenceBase.class))
             throw new TranscriptionParsingException("Reference generator named '%s' must return one of the following: %s".formatted(
-                    token.getMethod(), Stream.of(GeneratedReference.class, GeneratedBiReference.class, GeneratedPolyReference.class)
+                    token.getMethod(), Stream.of(GeneratedReference.class, GeneratedBiReference.class, GeneratedPolyReference.class, GeneratedVoidReference.class)
                             .map(Class::getSimpleName).collect(Collectors.joining(", "))), node);
 
         if (!ClassUtils.isAssignable(method.getReturnType(), GeneratedPolyReference.class) && annotation.parameters().length > 0) {
@@ -268,18 +265,20 @@ public class MethodReferenceCompiler {
         Type[] genericTypes = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments();
         List<Class<?>> generics = Arrays.stream(genericTypes)
                 .peek(t -> {
-                    if (!(t instanceof Class))
+                    if (!(t instanceof Class<?> || t instanceof ParameterizedType p && p.getRawType() instanceof Class<?>))
                         throw new TelegRiseRuntimeException("Unable to accept generator types: " + t.getTypeName());
                 })
-                .<Class<?>>map(t -> (Class<?>) t)
+                .map(t -> t instanceof Class<?> c ? c : (Class<?>) ((ParameterizedType) t).getRawType())
                 .toList();
 
         if (generics.isEmpty())
             throw new TelegRiseRuntimeException("Unable to accept generator named '%s'".formatted(method.getName()), node);
 
-        Class<?> returnType = generics.get(generics.size() - 1);
-        Class<?>[] parameterTypes = annotation.parameters().length > 0 ? annotation.parameters() :
-                generics.subList(0, generics.size() - 1).toArray(new Class[0]);
+        boolean isVoid = ClassUtils.isAssignable(method.getReturnType(), GeneratedVoidReference.class);
+        Class<?> returnType = isVoid ? void.class : generics.get(generics.size() - 1);
+        Class<?>[] parameterTypes = isVoid ? new Class[]{generics.get(0)}
+                    : annotation.parameters().length > 0 ? annotation.parameters()
+                    : generics.subList(0, generics.size() - 1).toArray(new Class[0]);
 
         GeneratedValue<GeneratedReferenceBase> generator = compileParametrizedReference(method, token.getParams(), token.isStatic(), namespace, node)
                 .toGeneratedValue(GeneratedReferenceBase.class, node);
@@ -296,6 +295,9 @@ public class MethodReferenceCompiler {
                     return reference.invokeUnsafe(args[0], args[1]);
                 } else if (generated instanceof GeneratedPolyReference<?> reference){
                     return reference.run(args);
+                } else if (generated instanceof GeneratedVoidReference<?> reference){
+                    reference.invokeUnsafe(args[0]);
+                    return null;
                 } else
                     throw new TelegRiseRuntimeException("Invalid generated reference: " + generated.getClass().getName(), node);
             }

@@ -28,9 +28,9 @@
             </keyboards>
             <!-- TODO: replace with #memory -->
             <actionGroup when='${memory.containsKey("hello", memory.getCurrentTree()) &amp;&amp; memory.get("hello", memory.getCurrentTree(), Boolean.class)}'>
-                <send returnConsumer='#register("name")'>ABC</send>
-                <send returnConsumer='#register("name")'>1</send>
-                <send returnConsumer='#register("name")'>2</send>
+                <send returnConsumer='::register("name")'>ABC</send>
+                <send returnConsumer='::register("name")'>1</send>
+                <send returnConsumer='::register("name")'>2</send>
             </actionGroup>
             <send>
                 <text name="startText" global="true" conditional="true">

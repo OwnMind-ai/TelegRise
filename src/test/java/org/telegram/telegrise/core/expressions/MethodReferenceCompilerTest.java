@@ -9,8 +9,11 @@ import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
 import org.telegram.telegrise.generators.GeneratedPolyReference;
 import org.telegram.telegrise.generators.GeneratedReference;
+import org.telegram.telegrise.generators.GeneratedVoidReference;
 import org.w3c.dom.Node;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -182,6 +185,22 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("(\"A\", 1, \"C\") -> ::join(\", \", 2)")));
         expression = compiler.compile(parser.parse(), namespace, String.class, node);
         assertEquals("A, 1", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        var original = System.out;
+        var mock = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(mock));
+
+        parser = new Parser(new Lexer(new CharsStream("(\"A\", \"B\") -> ::printf(\"%s: %s\")")));
+        expression = compiler.compile(parser.parse(), namespace, Void.class, node);
+        expression.toGeneratedValue(Void.class, node).generate(pool);
+
+        System.setOut(original);
+        assertEquals("A: B", mock.toString());
+    }
+
+    @ReferenceGenerator
+    public GeneratedVoidReference<List<String>> printf(String format){
+        return l -> System.out.printf(format, l.toArray());
     }
 
     @ReferenceGenerator
