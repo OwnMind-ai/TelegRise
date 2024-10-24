@@ -2,7 +2,6 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.annotations.Reference;
@@ -91,7 +90,7 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public <T extends Object> T get(String key, Class<T> tClass){
+    public <T> T get(String key, Class<T> tClass){
         return tClass.cast(this.memory.get(key));
     }
 
@@ -104,17 +103,17 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
-    public <T extends Object> T getComponent(Class<T> tClass){
+    public <T> T getComponent(Class<T> tClass){
         return tClass.cast(this.memory.get(tClass.getName()));
     }
 
     @Override
-    public <T extends Object> T removeComponent(Class<T> tClass) {
+    public <T> T removeComponent(Class<T> tClass) {
         return tClass.cast(this.memory.remove(tClass.getName()));
     }
 
     @Override
-    public <T extends Object> boolean containsComponent(Class<T> tClass) {
+    public <T> boolean containsComponent(Class<T> tClass) {
         return this.memory.containsKey(tClass.getName());
     }
 

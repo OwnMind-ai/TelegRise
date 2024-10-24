@@ -133,6 +133,7 @@ public class SimpleController {
         return !b;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Reference
     public void send(Update update) throws TelegramApiException, InterruptedException {
         System.out.println(memory.getLastSentMessage().getMessageId());
@@ -265,7 +266,7 @@ public class SimpleController {
 
         @Override
         public void run() {
-            System.out.println("Service started wih injected: " + sender);
+            System.out.println("Service started with injected: " + sender);
         }
     }
 }

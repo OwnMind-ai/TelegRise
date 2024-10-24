@@ -110,11 +110,10 @@ public class BotSender {
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> executeAsync(Method method) throws TelegramApiException {
-        CompletableFuture<T> future = this.client.executeAsync(method).thenApply(r -> {
+        return this.client.executeAsync(method).thenApply(r -> {
             this.finish(r instanceof Message m ? m : null);
             return r;
         });
-        return future;
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> T execute(Method method) throws TelegramApiException {

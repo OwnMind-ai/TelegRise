@@ -41,7 +41,6 @@ public class MethodReferenceCompiler {
             case VALUE -> this.compileValue((ValueToken) rootToken, returnType);
             default -> null;
         };
-
     }
 
     private ReferenceExpression compileValue(ValueToken rootToken, Class<?> returnType) {
@@ -116,7 +115,8 @@ public class MethodReferenceCompiler {
                 if (right.parameterTypes().length == 0 ||
                     (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
                         ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType()))))) {
-                    throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type than right side consumes", node);
+                    throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type '%s' than right side consumes '%s'"
+                            .formatted(left.returnType().getName(), right.returnType().getName()), node);
                 }
 
                 OperationReference<?, ?> reference = new OperationReference<>(right.returnType(), node);
@@ -252,6 +252,11 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileGenerator(ReferenceGeneratorToken token, LocalNamespace namespace, Node node) {
+        if (token.getClassName() == null && (BuiltinReferences.GENERATORS.contains(token.getMethod()) || token.getMethod().equals(Syntax.REGISTER))) {
+            var dummy = new ReferenceGeneratorToken(BuiltinReferences.class.getName(), token.getMethod(), token.getParams());
+            return compileGenerator(dummy, namespace, node);
+        }
+
         //TODO static generators: can be generated right there once, for W performance
         Method method = getMethod(token, ReferenceGenerator.class, namespace, node);
         ReferenceGenerator annotation = method.getAnnotation(ReferenceGenerator.class);
@@ -313,14 +318,6 @@ public class MethodReferenceCompiler {
 
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Node node) {
         if (token.getClassName() == null && (BuiltinReferences.METHODS.contains(token.getMethod()) || token.getMethod().equals(Syntax.REGISTER))) {
-            //TODO Replace with reference generator, deprecate after that (uncomment line below)
-            if (token.getMethod().equals(Syntax.REGISTER) && token.getParams().size() == 1){
-                var name = token.getParams().get(0).getStringValue();
-//                log.warn("{}\nReference call '#register({})' is deprecated, replace with '::register({})'", NodeElement.formatNode(node), name, name);
-                String expression = String.format("memory.putToRegistry(%s, java.util.Objects.requireNonNull(message))", name);
-                return getReferenceExpression(namespace, Void.class, node, expression);
-            }
-
             var dummy = new MethodReferenceToken(BuiltinReferences.class.getName(), token.getMethod(), token.getParams());
             return compileMethodReference(dummy, namespace, node);
         }

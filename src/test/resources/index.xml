@@ -26,8 +26,7 @@
                     <row><button>Second Button</button></row>
                 </keyboard>
             </keyboards>
-            <!-- TODO: replace with #memory -->
-            <actionGroup when='${memory.containsKey("hello", memory.getCurrentTree()) &amp;&amp; memory.get("hello", memory.getCurrentTree(), Boolean.class)}'>
+            <actionGroup when='#memory("hello") == true'>
                 <send returnConsumer='::register("name")'>ABC</send>
                 <send returnConsumer='::register("name")'>1</send>
                 <send returnConsumer='::register("name")'>2</send>
@@ -39,7 +38,7 @@
 
                             How&#160;can I help you?
 
-                        ${SimpleController#isHello} ${SimpleController#isHello}
+                        ${SimpleController#isHello} ${#memory("hello") -> #boolOrFalse -> #not -> ::store("hello")}
                         ${memory.get("test")}
                     </if>
                     <else>

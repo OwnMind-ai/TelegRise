@@ -17,10 +17,21 @@ public class BuiltinReferences {
             .filter(m -> m.isAnnotationPresent(Reference.class))
             .map(Method::getName).toList();
 
+    public static final List<String> GENERATORS = Arrays.stream(BuiltinReferences.class.getDeclaredMethods())
+            .filter(m -> m.isAnnotationPresent(ReferenceGenerator.class))
+            .map(Method::getName).toList();
+
     @Reference
     public static boolean not(boolean b){
         return !b;
     }
+
+    /*
+     * Meant to pair with #memory in certain scenarios. However, that is certainly not the best solution.
+     * TODO consider generics in method references: #method<Boolean> ; #method<String>(...) ; #memory<Boolean>("name")
+     */
+    @Reference
+    public static boolean boolOrFalse(Object b) { return b instanceof Boolean v ? v : false; }
 
     @Reference
     public static boolean isNull(Object o){
@@ -38,12 +49,38 @@ public class BuiltinReferences {
     }
 
     @ReferenceGenerator
-    public GeneratedReference<String, Boolean> matches(String regex){
+    public static GeneratedReference<String, Boolean> matches(String regex){
         return input -> input.matches(regex);
     }
 
     @ReferenceGenerator
-    public GeneratedVoidReference<Message> register(String registry, @HiddenParameter SessionMemory memory){
+    public static GeneratedVoidReference<Message> register(String registry, @HiddenParameter SessionMemory memory){
         return m -> memory.putToRegistry(registry, m);
+    }
+
+    @ReferenceGenerator
+    public static GeneratedReference<Object, Object> store(String name, @HiddenParameter SessionMemory memory){
+        return o -> {
+            memory.put(name, memory.getCurrentTree(),  o);
+            return o;
+        };
+    }
+
+    @ReferenceGenerator
+    public static GeneratedReference<Object, Object> storeGlobal(String name, @HiddenParameter SessionMemory memory){
+        return o -> {
+            memory.put(name, o);
+            return o;
+        };
+    }
+
+    @Reference
+    public static Object memory(String name, @HiddenParameter SessionMemory memory){
+        return memory.get(name, memory.getCurrentTree());
+    }
+
+    @Reference
+    public static Object memoryGlobal(String name, @HiddenParameter SessionMemory memory){
+        return memory.get(name);
     }
 }
