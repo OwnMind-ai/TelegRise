@@ -20,9 +20,11 @@ public final class ResourcePool {
     public static Object extractComponent(Map<Class<?>, Object> components, Class<?> target){
         if (components.containsKey(target)) return components.get(target);
 
-        return components.keySet().stream().filter(k -> ClassUtils.isAssignable(k, target))
-                .map(components::get)
-                .findFirst().orElse(null);
+        for (Class<?> k : components.keySet())
+            if (ClassUtils.isAssignable(k, target))
+                return components.get(k);
+
+        return null;
     }
 
     private Update update;
@@ -60,6 +62,7 @@ public final class ResourcePool {
     }
 
     public Map<Class<?>, Object> getComponents(){
+        //TODO why do i call all of that? just bake in the constructor
         if (update != null) this.addComponent(update);
         if (sender != null) {
             this.addComponent(sender);

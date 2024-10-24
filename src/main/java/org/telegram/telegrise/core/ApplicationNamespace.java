@@ -3,7 +3,10 @@ package org.telegram.telegrise.core;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrise.SessionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.senders.BotSender;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +49,13 @@ public final class ApplicationNamespace {
                 throw new TelegRiseRuntimeException("Unable to find class '" + name + "'");
             }
         }
+    }
+
+    public String getNameOfGlobal(Class<?> clazz){
+        if (clazz.equals(Update.class)) return updateName;
+        if (BotSender.class.isAssignableFrom(clazz)) return senderName;
+        if (SessionMemory.class.isAssignableFrom(clazz)) return memoryName;
+        throw new IllegalArgumentException(clazz.getName());
     }
 
     public LocalNamespace emptyLocal(){

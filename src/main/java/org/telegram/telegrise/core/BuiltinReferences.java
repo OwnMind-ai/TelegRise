@@ -1,8 +1,12 @@
 package org.telegram.telegrise.core;
 
+import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrise.SessionMemory;
+import org.telegram.telegrise.annotations.HiddenParameter;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.generators.GeneratedReference;
+import org.telegram.telegrise.generators.GeneratedVoidReference;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -36,5 +40,10 @@ public class BuiltinReferences {
     @ReferenceGenerator
     public GeneratedReference<String, Boolean> matches(String regex){
         return input -> input.matches(regex);
+    }
+
+    @ReferenceGenerator
+    public GeneratedVoidReference<Message> register(String registry, @HiddenParameter SessionMemory memory){
+        return m -> memory.putToRegistry(registry, m);
     }
 }

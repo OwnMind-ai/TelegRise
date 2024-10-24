@@ -3,6 +3,7 @@ package org.telegram.telegrise.core.expressions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrise.annotations.HiddenParameter;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.*;
@@ -23,6 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static org.telegram.telegrise.core.expressions.references.MethodReference.compileParametersMapping;
 
 @Slf4j
 public class MethodReferenceCompiler {
@@ -105,8 +108,9 @@ public class MethodReferenceCompiler {
                 return reference;
             }
             case Syntax.CHAIN_SEPARATOR: {
-                ReferenceExpression left = this.compile(token.getLeft(), namespace, returnType, node);
                 ReferenceExpression right = this.compile(token.getRight(), namespace, returnType, node);
+                var leftType = right.parameterTypes().length != 1 ? Object.class : right.parameterTypes()[0];
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, leftType, node);
                 boolean isLeftList = ClassUtils.isAssignable(left.returnType(), List.class);
 
                 if (right.parameterTypes().length == 0 ||
@@ -360,31 +364,51 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic, LocalNamespace namespace, Node node) {
-        if (parameters.stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray)) {
-            List<ValueToken> tokenList = parameters.stream().map(ValueToken.class::cast).toList();
-            Object[] params = IntStream.range(0, tokenList.size())
-                    .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
-                    .toArray();
+        if (parameters.stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray))
+            return compileExplicitParametrizedReference(method, parameters, isStatic);
 
-            return new ReferenceExpression() {
-                @Override
-                public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-                    return method.invoke(isStatic ? null : instance, params);
-                }
+        String[] passedParameters = parameters.stream().map(PrimitiveToken::getStringValue).toArray(String[]::new);
+        String[] actualParameters = new String[method.getParameterCount()];
 
-                @Override
-                public @NotNull Class<?>[] parameterTypes() {return new Class[0];}
-
-                @Override
-                public @NotNull Class<?> returnType() { return method.getReturnType(); }
-            };
+        int i, a;
+        for(i = 0, a = 0; i < actualParameters.length; i++){
+            if(method.getParameters()[i].isAnnotationPresent(HiddenParameter.class))
+                actualParameters[i] = namespace.getApplicationNamespace().getNameOfGlobal(method.getParameterTypes()[i]);
+            else
+                actualParameters[i] = passedParameters[a++];
         }
+        assert a == passedParameters.length;
 
         String caller = isStatic ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
-        String expression = String.format("%s.%s(%s)", caller, method.getName(),
-                parameters.stream().map(PrimitiveToken::getStringValue).collect(Collectors.joining(", ")));
+        String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", actualParameters));
 
         return getReferenceExpression(namespace, method.getReturnType(), node, expression);
+    }
+
+    private static @NotNull ReferenceExpression compileExplicitParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic) {
+        List<ValueToken> tokenList = parameters.stream().map(ValueToken.class::cast).toList();
+        Object[] tokenParams = IntStream.range(0, tokenList.size())
+                .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
+                .toArray();
+
+        Class<?>[] parametersMapping = compileParametersMapping(method);
+
+        return new ReferenceExpression() {
+            @Override
+            public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
+                return method.invoke(isStatic ? null : instance, MethodReference.compileArgs(tokenParams, pool, parametersMapping));
+            }
+
+            @Override
+            public @NotNull Class<?>[] parameterTypes() {
+                return new Class[0];
+            }
+
+            @Override
+            public @NotNull Class<?> returnType() {
+                return method.getReturnType();
+            }
+        };
     }
 
     private static @NotNull ReferenceExpression getReferenceExpression(LocalNamespace namespace, Class<?> returnType, Node node, String expression) {

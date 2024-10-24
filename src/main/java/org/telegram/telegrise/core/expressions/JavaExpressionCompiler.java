@@ -66,7 +66,8 @@ public class JavaExpressionCompiler {
                 if (!attemptRecompile) throw t;
 
                 // Deletes problematic file
-                for (File f : this.tempDirectoryPath.listFiles(((file, s) -> s.equals(className(hashcode) + ".class")))) 
+                for (File f : Objects.requireNonNull(this.tempDirectoryPath.listFiles(((file, s) -> s.equals(className(hashcode) + ".class")))))
+                    //noinspection ResultOfMethodCallIgnored
                     f.delete();
 
                 attemptRecompile = false;
@@ -101,13 +102,12 @@ public class JavaExpressionCompiler {
         var result = (GeneratedValue<?>) this.loadExpressionClass(hashcode).getConstructor().newInstance();
 
         Arrays.stream(result.getClass().getFields())
-            .filter(f -> f.getName().equals(VERSION_FIELD))
-            .map(f -> { try { return f.get(null); } catch(Exception e) { return null; } })
-            .findFirst().ifPresent(
-                v -> {
-                    if (!v.equals(VERSION)) throw new TranscriptionParsingException("Wrong version of compiled expression was found: " + v, node);
-                }
-            );
+                .filter(f -> f.getName().equals(VERSION_FIELD))
+                .map(f -> { try { return f.get(null); } catch (Exception e) { return null; } })
+                .filter(Objects::nonNull)
+                .findFirst().ifPresent(
+                        v -> { if (!v.equals(VERSION)) throw new TranscriptionParsingException("Wrong version of compiled expression was found: " + v, node); }
+                );
 
         return result;
     }

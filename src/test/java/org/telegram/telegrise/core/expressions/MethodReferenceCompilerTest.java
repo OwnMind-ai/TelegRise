@@ -1,6 +1,10 @@
 package org.telegram.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
+import org.telegram.telegrise.SessionMemory;
+import org.telegram.telegrise.SessionMemoryImpl;
+import org.telegram.telegrise.UserIdentifier;
+import org.telegram.telegrise.annotations.HiddenParameter;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.ApplicationNamespace;
@@ -26,7 +30,7 @@ public class MethodReferenceCompilerTest {
         MethodReferenceCompiler compiler = new MethodReferenceCompiler();
         LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader()));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
-        ResourcePool pool = new ResourcePool(null, this, null, null);
+        ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, UserIdentifier.ofId(0L), ""));
         Node node = toNode("<tag/>");
 
         Parser parser = new Parser(new Lexer(new CharsStream("\"value\"")));
@@ -126,6 +130,10 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, String.class, node);
         assertEquals("nullA", expression.toGeneratedValue(String.class, node).generate(pool));
 
+        parser = new Parser(new Lexer(new CharsStream("\"a\" -> #isNull")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(false, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
         parser = new Parser(new Lexer(new CharsStream("#getNull -> (#consume -> #consume)")));
         expression = compiler.compile(parser.parse(), namespace, String.class, node);
         assertEquals("nullAA", expression.toGeneratedValue(String.class, node).generate(pool));
@@ -196,6 +204,42 @@ public class MethodReferenceCompilerTest {
 
         System.setOut(original);
         assertEquals("A: B", mock.toString());
+
+        parser = new Parser(new Lexer(new CharsStream("\"foo\" -> #hidden")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(\"foo\", \"boo\") -> #hidden2")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#hidden(\"foo\")")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#hidden(\"fo\" + \"o\")")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("(\"A\", \"B\") -> ::mprintf(\"%s: %s\", \"mprintfResult\")")));
+        expression = compiler.compile(parser.parse(), namespace, Void.class, node);
+        expression.toGeneratedValue(Void.class, node).generate(pool);
+        assertEquals("A: B", pool.getMemory().get("mprintfResult"));
+    }
+
+    @ReferenceGenerator
+    public GeneratedVoidReference<List<String>> mprintf(String format, String name, @HiddenParameter SessionMemory memory){
+        return l -> memory.put(name, format.formatted(l.toArray()));
+    }
+
+    @Reference  // "if hidden is so good, why isn't there hidden 2?" There it is
+    public boolean hidden2(String ignore, String ignore2, @HiddenParameter SessionMemory memory){
+        return memory != null;
+    }
+
+    @Reference
+    public boolean hidden(String ignore, @HiddenParameter SessionMemory memory){
+        return memory != null;
     }
 
     @ReferenceGenerator
