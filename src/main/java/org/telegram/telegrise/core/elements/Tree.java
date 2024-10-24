@@ -1,9 +1,8 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
-
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -145,9 +144,9 @@ public class Tree extends NodeElement implements BranchingElement{
         CommandData command = MessageUtils.parseCommand(text);
         boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
 
-        if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.getUsername())))
+        if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.username())))
             return Arrays.stream(this.commands)
-                    .anyMatch(c -> c.equals(command.getName()));
+                    .anyMatch(c -> c.equals(command.name()));
 
         return false;
     }

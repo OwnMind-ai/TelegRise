@@ -218,7 +218,7 @@ public class XMLElementsParser {
                 ) {
                     if (fieldData.nullable()) return false;
                     else {
-                        throw new TranscriptionParsingException("Embedded element '" + innerElementData.name() + "' is not allowed here, use <" + innerElementData.name() + "> instead", node);
+                        throw new TranscriptionParsingException("Embedded element '" + Objects.requireNonNull(innerElementData).name() + "' is not allowed here, use <" + innerElementData.name() + "> instead", node);
                     }
                 }
 

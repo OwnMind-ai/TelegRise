@@ -16,11 +16,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegram.telegrise.exceptions.TelegramApiRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
-import java.util.List;
 
 import java.io.Serializable;
+import java.util.List;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class EditableMessageActionBuilder {
@@ -43,7 +42,7 @@ public class EditableMessageActionBuilder {
     protected ReplyParameters replyParameters;
     protected String businessConnectionId;
 
-    private SessionMemoryImpl memory;
+    private final SessionMemoryImpl memory;
     private boolean sneaky;
 
     public EditableMessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memory) {
@@ -182,6 +181,7 @@ public class EditableMessageActionBuilder {
     }
 
 
+    @SuppressWarnings("DuplicatedCode")
     private Message executeSend() throws TelegramApiException {
         Message result = this.sender.execute(SendMessage.builder().chatId(chatId).messageThreadId(messageThreadId)
                 .parseMode(entities != null ? null : parseMode).text(text).disableNotification(disableNotification)

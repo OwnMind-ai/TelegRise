@@ -151,7 +151,7 @@ public class SessionMemoryImpl implements SessionMemory {
 
     public void updateJumpPoints(){
         this.jumpPoints.forEach(p -> {
-            if (!this.branchingElements.contains(p.getTo())) this.jumpPoints.remove(p);
+            if (!this.branchingElements.contains(p.to())) this.jumpPoints.remove(p);
         });
     }
 

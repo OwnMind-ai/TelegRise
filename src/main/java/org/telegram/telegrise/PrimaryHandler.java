@@ -9,6 +9,6 @@ public interface PrimaryHandler {
     void handle(Update update) throws TelegramApiException;
 
     default void onException(TelegramApiException e){
-        LoggerFactory.getLogger(this.getClass()).error("An exception occured while executing handler", e);
+        LoggerFactory.getLogger(this.getClass()).error("An exception occurred while executing handler", e);
     }
 }

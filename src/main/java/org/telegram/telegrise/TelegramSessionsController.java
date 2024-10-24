@@ -29,7 +29,8 @@ public class TelegramSessionsController {
     private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 200;
     private static final int DEFAULT_CORE_THREAD_POOL_SIZE = 32;
 
-    private final ExecutorService poolExecutor;
+    @Setter
+    private ExecutorService poolExecutor;
     private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
@@ -69,6 +70,8 @@ public class TelegramSessionsController {
 
     public void initialize(){
         assert client != null;
+
+        if (poolExecutor == null) this.poolExecutor = createExecutorService();
 
         var splitHandlers = userHandlersClasses.stream()
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));

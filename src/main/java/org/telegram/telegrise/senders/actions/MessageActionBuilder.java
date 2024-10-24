@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
-import org.telegram.telegrise.exceptions.TelegramApiRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 
 import java.util.List;
@@ -39,11 +38,10 @@ public class MessageActionBuilder {
     protected String businessConnectionId;
 
     private SessionMemoryImpl memory;
-    private boolean sneaky;
+    private boolean sneaky = true;
 
     public MessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memoryImpl) {
         this.sender = sender;
-        sneaky = memory == null;
 
         this.chatId = String.valueOf(message.getChatId());
         this.messageThreadId = message.getMessageThreadId();
@@ -52,7 +50,6 @@ public class MessageActionBuilder {
 
     public MessageActionBuilder(BotSender sender, String chatId, Integer messageThreadId, Integer messageId, SessionMemoryImpl memoryImpl) {
         this.sender = sender;
-        sneaky = memory == null;
 
         this.chatId = chatId;
         this.messageThreadId = messageThreadId;
@@ -151,6 +148,7 @@ public class MessageActionBuilder {
         return this.execute();
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private Message execute() throws TelegramApiException {
         Message result = this.sender.execute(SendMessage.builder().chatId(chatId).messageThreadId(messageThreadId)
                 .parseMode(entities != null ? null : parseMode).text(text).disableNotification(disableNotification)

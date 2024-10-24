@@ -17,9 +17,9 @@ public class HeadBlock extends NodeElement {
     @InnerElement(priority = 1)
     private List<Link> links;
 
-    @InnerElement(nullable = true)
+    @InnerElement
     private Token token;
 
-    @InnerElement(nullable = true)
+    @InnerElement
     private Username username;
 } 

@@ -81,6 +81,7 @@ public class SimpleController {
 
     public static void main(String[] args) {
         TelegRiseApplication application = new TelegRiseApplication(new File("src/test/resources/index.xml"), SimpleController.class);
+//        application.setExecutorService(Executors::newSingleThreadExecutor);
         application.setRoleProvider(new Provider());
         application.setSessionInitializer(new SessionInitializer() {
             @Resource
@@ -176,7 +177,7 @@ public class SimpleController {
 
     @Reference
     public boolean doSendPhoto(Update update){
-        return Objects.requireNonNull(MessageUtils.getFrom(update)).getId() == 503138767L;
+        return List.of(503138767L, 5435941198L).contains(Objects.requireNonNull(MessageUtils.getFrom(update)).getId());
     }
 
     @Reference
@@ -244,7 +245,7 @@ public class SimpleController {
 
         @Override
         public String getRole(User user, SessionMemory sessionMemory) {
-            return user.getId() == 503138767L ? "admin"
+            return List.of(503138767L, 5435941198L).contains(user.getId()) ? "admin"
                     : user.getId() == 5128967123L ? "secondary" : "unauthorised";
         }
     }

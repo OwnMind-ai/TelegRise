@@ -6,7 +6,6 @@ import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.types.UserRole;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 

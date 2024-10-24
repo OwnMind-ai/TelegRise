@@ -1,6 +1,7 @@
 package org.telegram.telegrise.core;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -39,6 +40,7 @@ public final class ResourcePool {
 
     private ApiResponseWrapper apiResponseWrapper;
 
+    @Getter
     private final Map<Class<?>, Object> components = new HashMap<>(Map.of(ResourcePool.class,this));
 
     public ResourcePool(Update update, Object handler, BotSender sender, SessionMemoryImpl memory) {
@@ -46,6 +48,7 @@ public final class ResourcePool {
         this.handler = handler;
         this.sender = sender;
         this.memory = memory;
+        bakeComponents();
     }
 
     public ResourcePool(Update update, Object handler, BotSender sender, SessionMemoryImpl memory, TreeExecutor executor, BlockingQueue<Update> updates) {
@@ -55,14 +58,14 @@ public final class ResourcePool {
         this.memory = memory;
         this.currentExecutor = executor;
         this.updates = updates;
+        bakeComponents();
     }
 
     public void addComponent(Object object){
         this.components.put(object.getClass(), object);
     }
 
-    public Map<Class<?>, Object> getComponents(){
-        //TODO why do i call all of that? just bake in the constructor
+    private void bakeComponents(){
         if (update != null) this.addComponent(update);
         if (sender != null) {
             this.addComponent(sender);
@@ -70,7 +73,5 @@ public final class ResourcePool {
         }
         if (memory != null) this.components.put(SessionMemory.class, memory);
         if (apiResponseWrapper != null) this.components.put(ApiResponseWrapper.class, apiResponseWrapper);
-
-        return this.components;
     }
 }

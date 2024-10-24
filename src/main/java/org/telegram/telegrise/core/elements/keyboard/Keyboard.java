@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -37,7 +37,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
     public static boolean filterKeyboardElement(GeneratedValue<Boolean> when, Integer accessLevel, ResourcePool pool){
         if (accessLevel != null) {
             UserRole userRole = pool.getMemory().getUserRole();
-            return userRole != null && userRole.getLevel() >= accessLevel;
+            return userRole != null && userRole.level() >= accessLevel;
         }
 
         if (when != null)

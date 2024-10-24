@@ -37,12 +37,9 @@ public class MethodReferenceCache{
     }
 
     private CacheContext extractMethodContext(ResourcePool pool) {
+        //noinspection SwitchStatementWithTooFewBranches; There will be more in the future
         return switch (this.strategy) {
             case UPDATE -> pool.getUpdate() != null ? new CacheContext(pool.getUpdate()) : CacheContext.INVALID;
-            case TREE ->
-                    pool.getMemory().isOnStack(Tree.class) ? new CacheContext(pool.getMemory().getFromStack(Tree.class)) : CacheContext.INVALID;
-            case BRANCH ->
-                    pool.getMemory().getCurrentBranch() != null ? new CacheContext(pool.getMemory().getCurrentBranch()) : CacheContext.INVALID;
             default -> throw new IllegalStateException();
         };
     }

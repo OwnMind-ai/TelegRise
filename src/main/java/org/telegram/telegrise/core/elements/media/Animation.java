@@ -53,8 +53,8 @@ public class Animation extends MediaType{
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .animation(this.createInputFile(pool))
                 .duration(generateNullableProperty(duration, pool))
-                .width(size != null ? size.getWidth() : null)
-                .height(size != null ? size.getHeight() : null)
+                .width(size != null ? size.width() : null)
+                .height(size != null ? size.height() : null)
                 .thumbnail(generateNullableProperty(thumbnail, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
@@ -75,8 +75,8 @@ public class Animation extends MediaType{
         InputMediaAnimation mediaAnimation = new InputMediaAnimation("will be replaced");
 
         mediaAnimation.setDuration(generateNullableProperty(duration, pool));
-        mediaAnimation.setWidth(size != null ? size.getWidth() : null);
-        mediaAnimation.setHeight(size != null ? size.getHeight() : null);
+        mediaAnimation.setWidth(size != null ? size.width() : null);
+        mediaAnimation.setHeight(size != null ? size.height() : null);
         mediaAnimation.setThumbnail(generateNullableProperty(thumbnail, pool));
         mediaAnimation.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);
 

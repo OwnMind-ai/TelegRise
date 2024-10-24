@@ -13,7 +13,6 @@ import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.text.Text;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegram.telegrise.transition.ExecutionOptions;
 import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.TextBlock;

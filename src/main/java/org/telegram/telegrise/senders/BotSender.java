@@ -36,7 +36,7 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("unused")
 public class BotSender {
     private static final Logger logger = LoggerFactory.getLogger(BotSender.class);
-    public static String DEFAULT_PARSE_MODE = "html";
+    public static final String DEFAULT_PARSE_MODE = "html";
 
     @Getter
     private final TelegramClient client;

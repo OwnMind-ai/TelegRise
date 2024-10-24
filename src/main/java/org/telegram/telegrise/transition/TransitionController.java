@@ -50,14 +50,14 @@ public class TransitionController {
         if (point == null)
             throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'", transition.getElementNode());
 
-        if (point.getActions() != null) {
+        if (point.actions() != null) {
             TreeExecutor pointExecutor = this.treeExecutors.stream()
-                    .filter(t -> t.getTree().getName().equals(point.getFrom().getName()))
+                    .filter(t -> t.getTree().getName().equals(point.from().getName()))
                     .findFirst().orElseThrow();
             ResourcePool resourcePool = new ResourcePool(pool.getUpdate(), pointExecutor.getControllerInstance(),
                     pool.getSender(), pool.getMemory(), pointExecutor, pool.getUpdates());
 
-            point.getActions().forEach(action -> {
+            point.actions().forEach(action -> {
                 try {
                     this.sender.execute(action, resourcePool);
                 } catch (TelegramApiException e) {
@@ -66,7 +66,7 @@ public class TransitionController {
             });
         }
 
-        if (point.getNextTransition() != null) {
+        if (point.nextTransition() != null) {
             if(this.treeExecutors.getLast().getTree().getName().equals(tree.getName())) {
                 this.sessionMemory.getBranchingElements().removeLast();
                 this.treeExecutors.getLast().beforeRemoving();
@@ -74,11 +74,11 @@ public class TransitionController {
                 this.treeExecutors.removeLast();
             }
 
-            return this.applyTransition(this.treeExecutors.getLast().getTree(), point.getNextTransition(), pool);
+            return this.applyTransition(this.treeExecutors.getLast().getTree(), point.nextTransition(), pool);
         }
 
         this.applyBack(new Transition(Transition.BACK,
-                GeneratedValue.ofValue(point.getFrom().getName()),
+                GeneratedValue.ofValue(point.from().getName()),
                 false, null, null, null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;

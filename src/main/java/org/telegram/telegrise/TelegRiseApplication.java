@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 //TODO webhooks
@@ -39,6 +41,8 @@ public final class TelegRiseApplication {
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
     private final ServiceManager serviceManager = new ServiceManager();
     private final Class<?> mainClass;
+    @Setter
+    private Supplier<? extends ExecutorService> executorService;
 
     @Setter
     private RoleProvider roleProvider;
@@ -98,6 +102,8 @@ public final class TelegRiseApplication {
             controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);
+            if (executorService != null)
+                controller.setPoolExecutor(executorService.get());
         } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {
             throw TelegRiseRuntimeException.unfold(e);
         } catch (Exception e) {

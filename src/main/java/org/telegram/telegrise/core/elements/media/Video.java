@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.media;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -56,8 +56,8 @@ public class Video extends MediaType {
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .video(this.createInputFile(pool))
                 .duration(generateNullableProperty(duration, pool))
-                .width(size != null ? size.getWidth() : null)
-                .height(size != null ? size.getHeight() : null)
+                .width(size != null ? size.width() : null)
+                .height(size != null ? size.height() : null)
                 .thumbnail(generateNullableProperty(thumbnail, pool))
                 .supportsStreaming(generateNullableProperty(this.supportsStreaming, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
@@ -77,8 +77,8 @@ public class Video extends MediaType {
         MediaSize size = this.generateNullableProperty(this.size, pool);
         InputMediaVideo mediaVideo = new InputMediaVideo("");
         mediaVideo.setDuration(generateNullableProperty(duration, pool));
-        mediaVideo.setWidth(size != null ? size.getWidth() : null);
-        mediaVideo.setHeight(size != null ? size.getHeight() : null);
+        mediaVideo.setWidth(size != null ? size.width() : null);
+        mediaVideo.setHeight(size != null ? size.height() : null);
         mediaVideo.setThumbnail(generateNullableProperty(thumbnail, pool));
         mediaVideo.setSupportsStreaming(generateNullableProperty(this.supportsStreaming, pool));
         mediaVideo.setHasSpoiler(generateNullableProperty(spoiler, pool) != null);

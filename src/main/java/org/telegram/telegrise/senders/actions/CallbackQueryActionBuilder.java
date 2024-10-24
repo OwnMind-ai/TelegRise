@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.message.InaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
-import org.telegram.telegrise.exceptions.TelegramApiRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 
 @SuppressWarnings("unused")
