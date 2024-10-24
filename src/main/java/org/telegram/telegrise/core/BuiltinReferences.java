@@ -26,13 +26,6 @@ public class BuiltinReferences {
         return !b;
     }
 
-    /*
-     * Meant to pair with #memory in certain scenarios. However, that is certainly not the best solution.
-     * TODO consider generics in method references: #method<Boolean> ; #method<String>(...) ; #memory<Boolean>("name")
-     */
-    @Reference
-    public static boolean boolOrFalse(Object b) { return b instanceof Boolean v ? v : false; }
-
     @Reference
     public static boolean isNull(Object o){
         return o == null;

@@ -121,9 +121,8 @@ public class TelegramSessionsController {
     public void onUpdateReceived(Update update){
         Optional<PrimaryHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
-            boolean intercept = this.handlersController.applyHandler(update, candidate.get());
-
-            if (intercept) return;
+            poolExecutor.submit(() -> this.handlersController.applyHandler(update, candidate.get()));
+            return;
         }
 
         User from = MessageUtils.getFrom(update);

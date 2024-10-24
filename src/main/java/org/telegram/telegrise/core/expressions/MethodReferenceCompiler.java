@@ -112,9 +112,12 @@ public class MethodReferenceCompiler {
                 ReferenceExpression left = this.compile(token.getLeft(), namespace, leftType, node);
                 boolean isLeftList = ClassUtils.isAssignable(left.returnType(), List.class);
 
-                if (right.parameterTypes().length == 0 ||
+                // TODO If left returns Object.class, then we skip type check. Needed for #memory,
+                //  but there might be a better solution (like an annotation or wrapper idk)
+                // Since 0.9.0
+                if (!left.returnType().equals(Object.class) && (right.parameterTypes().length == 0 ||
                     (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
-                        ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType()))))) {
+                        ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType())))))) {
                     throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type '%s' than right side consumes '%s'"
                             .formatted(left.returnType().getName(), right.returnType().getName()), node);
                 }

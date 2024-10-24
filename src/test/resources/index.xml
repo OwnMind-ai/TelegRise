@@ -38,7 +38,7 @@
 
                             How&#160;can I help you?
 
-                        ${SimpleController#isHello} ${#memory("hello") -> #boolOrFalse -> #not -> ::store("hello")}
+                        ${SimpleController#isHello} ${#memory("hello") -> #not -> ::store("hello")}
                         ${memory.get("test")}
                     </if>
                     <else>
