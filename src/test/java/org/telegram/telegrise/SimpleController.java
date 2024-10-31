@@ -228,6 +228,24 @@ public class SimpleController {
         }
     }
 
+    @Handler(absolute = true)
+    public static class SHandler implements PrimaryHandler {
+        @Resource
+        private SessionMemory memory;
+        @Resource
+        private TranscriptionManager manager;
+
+        @Override
+        public boolean canHandle(Update update) {
+            return update.hasMessage() && "/reload".equals(update.getMessage().getText());
+        }
+
+        @Override
+        public void handle(Update update) {
+            manager.reinitializeSession(memory.getUserIdentifier());
+        }
+    }
+
     @Handler(independent = true, absolute = true)
     public static class SecondHandler implements PrimaryHandler {
         @Override

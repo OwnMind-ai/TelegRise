@@ -80,7 +80,7 @@ public class TelegramSessionsController {
         BotSender botSender = new BotSender(client, null);
         TranscriptionManager objectManager =  new TranscriptionManager(null, null,
                 null, null, transcription, this::getTranscriptionManager,
-                u -> new ResourcePool(u, null, botSender, null));
+                u -> new ResourcePool(u, null, botSender, null), this::reinitializeSession);
 
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
@@ -142,13 +142,13 @@ public class TelegramSessionsController {
         if (!(memory instanceof SessionMemoryImpl sessionMemory))
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
-        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager);
+        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager, this::reinitializeSession);
 
         this.sessions.put(sessionMemory.getUserIdentifier(), session);
     }
 
     private void createSession(UserIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
+        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager, this::reinitializeSession);
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
@@ -159,6 +159,11 @@ public class TelegramSessionsController {
         }
 
         this.sessions.put(identifier, session);
+    }
+
+    private void reinitializeSession(UserIdentifier userIdentifier) {
+        sessions.remove(userIdentifier);
+        createSession(userIdentifier);
     }
 
     private void updateSession(UserSession session, Update update){

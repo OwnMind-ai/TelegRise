@@ -119,7 +119,7 @@ public class MethodReferenceCompiler {
                     (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
                         ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType())))))) {
                     throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type '%s' than right side consumes '%s'"
-                            .formatted(left.returnType().getName(), right.returnType().getName()), node);
+                            .formatted(left.returnType().getName(), Arrays.stream(right.parameterTypes()).map(Class::getName).collect(Collectors.joining(", "))), node);
                 }
 
                 OperationReference<?, ?> reference = new OperationReference<>(right.returnType(), node);

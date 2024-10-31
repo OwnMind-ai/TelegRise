@@ -20,6 +20,7 @@ import org.telegram.telegrise.types.TextBlock;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -32,6 +33,7 @@ public class TranscriptionManager {
     private final Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter;
     private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
+    private final Consumer<UserIdentifier> sessionInitializer;
 
     public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor,
                                 BiConsumer<BranchingElement, Update> elementExecutor,
@@ -39,7 +41,7 @@ public class TranscriptionManager {
                                 TransitionController transitionController,
                                 BotTranscription transcription,
                                 Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter,
-                                Function<Update, ResourcePool> resourcePoolProducer) {
+                                Function<Update, ResourcePool> resourcePoolProducer, Consumer<UserIdentifier> sessionInitializer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
@@ -48,6 +50,12 @@ public class TranscriptionManager {
         this.elementExecutor = elementExecutor;
         this.transcriptionMemory = transcription.getMemory();
         this.transcription = transcription;
+        this.sessionInitializer = sessionInitializer;
+    }
+
+    //TODO replace with SessionManager resource object
+    public void reinitializeSession(UserIdentifier id){
+        sessionInitializer.accept(id);
     }
 
     /** Clears cache for specific method reference and returns it previous value.

@@ -29,6 +29,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.telegram.telegrise.core.elements.Tree.*;
@@ -55,19 +56,22 @@ public class UserSession implements Runnable{
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
+    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter, Consumer<UserIdentifier> sessionInitializer) {
         this.userIdentifier.set(userIdentifier);
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername().generate(new ResourcePool()));
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, sessionMemory, transitionController, transcription, transcriptionGetter, this::createResourcePool);
+        this.transcriptionManager = new TranscriptionManager(
+                this::interruptTreeChain, this::executeBranchingElement, sessionMemory,
+                transitionController, transcription, transcriptionGetter, this::createResourcePool, sessionInitializer
+        );
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
         this.initialize();
     }
 
-    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client,  Function<UserIdentifier, TranscriptionManager> transcriptionGetter) {
+    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter, Consumer<UserIdentifier> sessionInitializer) {
         this.userIdentifier.set(userIdentifier);
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
@@ -78,7 +82,10 @@ public class UserSession implements Runnable{
 
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory, transitionController, transcription, transcriptionGetter, this::createResourcePool);
+        this.transcriptionManager = new TranscriptionManager(
+                this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory,
+                transitionController, transcription, transcriptionGetter, this::createResourcePool, sessionInitializer
+        );
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
         this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
 
