@@ -116,7 +116,6 @@ public final class TreeExecutor {
             this.memory.setCurrentBranch(this.currentBranch);
             this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
 
-            // TODO This if statement can be removed... I guess?.. It was added as a part of "Bug fixes"
             if (this.currentBranch == null) {
                 this.lastBranch = previous;
                 this.naturallyClosed = false;

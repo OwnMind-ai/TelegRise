@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -225,6 +226,19 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Void.class, node);
         expression.toGeneratedValue(Void.class, node).generate(pool);
         assertEquals("A: B", pool.getMemory().get("mprintfResult"));
+
+        parser = new Parser(new Lexer(new CharsStream("#add(1)")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#add(1, 4, 6)")));
+        expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
+        assertEquals(11, expression.toGeneratedValue(Integer.class, node).generate(pool));
+    }
+
+    @Reference
+    public int add(@HiddenParameter SessionMemory memory, int... values){
+        return Arrays.stream(values).sum();
     }
 
     @ReferenceGenerator

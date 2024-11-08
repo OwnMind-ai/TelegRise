@@ -328,7 +328,10 @@ public class MethodReferenceCompiler {
         Method method = getMethod(token, Reference.class, namespace, node);
 
         if (token.getParams() == null) {
-            if (this.referenceMap.containsKey(method)) {
+            if (Arrays.stream(method.getParameters()).filter(p -> !p.isAnnotationPresent(HiddenParameter.class)).count() == 1
+                    && method.getParameters()[method.getParameterCount() - 1].isVarArgs()) {
+                throw new TelegRiseRuntimeException("Vararg parameters with no arguments are not supported");
+            } else if (this.referenceMap.containsKey(method)) {
                 return this.referenceMap.get(method);
             } else {
                 MethodReference methodReference = new MethodReference(method, token.isStatic());
@@ -364,9 +367,11 @@ public class MethodReferenceCompiler {
     }
 
     private ReferenceExpression compileParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic, LocalNamespace namespace, Node node) {
-        if (parameters.stream().allMatch(ValueToken.class::isInstance) && Arrays.stream(method.getParameterTypes()).noneMatch(Class::isArray))
+        if (parameters.stream().allMatch(ValueToken.class::isInstance) &&
+                Arrays.stream(method.getParameters()).noneMatch(p -> p.getType().isArray() || p.isVarArgs()))
             return compileExplicitParametrizedReference(method, parameters, isStatic);
 
+        boolean hasVarArg = method.getParameterCount() > 0 && method.getParameters()[method.getParameterCount() - 1].isVarArgs();
         String[] passedParameters = parameters.stream().map(PrimitiveToken::getStringValue).toArray(String[]::new);
         String[] actualParameters = new String[method.getParameterCount()];
 
@@ -377,7 +382,16 @@ public class MethodReferenceCompiler {
             else
                 actualParameters[i] = passedParameters[a++];
         }
-        assert a == passedParameters.length;
+
+        if(hasVarArg && a < passedParameters.length){
+            String[] temp = new String[method.getParameterCount() + passedParameters.length - a];
+            System.arraycopy(actualParameters, 0, temp, 0, actualParameters.length);
+            for(; i < temp.length; i++)
+                temp[i] = passedParameters[a++];
+
+            actualParameters = temp;
+        } else
+            assert a == passedParameters.length;
 
         String caller = isStatic ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
         String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", actualParameters));
