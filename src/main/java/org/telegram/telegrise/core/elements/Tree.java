@@ -92,9 +92,6 @@ public class Tree extends NodeElement implements BranchingElement{
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if(this.controller != null && (this.branches == null || this.branches.isEmpty()))
-            throw new TranscriptionParsingException("Trees with no branches cannot be connected to a controller", node);
-
         if (improperInterruptionScopes(this.allowedInterruptions))
             throw new TranscriptionParsingException("Undefined interruption scopes", node);
     }

@@ -328,10 +328,7 @@ public class MethodReferenceCompiler {
         Method method = getMethod(token, Reference.class, namespace, node);
 
         if (token.getParams() == null) {
-            if (Arrays.stream(method.getParameters()).filter(p -> !p.isAnnotationPresent(HiddenParameter.class)).count() == 1
-                    && method.getParameters()[method.getParameterCount() - 1].isVarArgs()) {
-                throw new TelegRiseRuntimeException("Vararg parameters with no arguments are not supported");
-            } else if (this.referenceMap.containsKey(method)) {
+            if (this.referenceMap.containsKey(method)) {
                 return this.referenceMap.get(method);
             } else {
                 MethodReference methodReference = new MethodReference(method, token.isStatic());

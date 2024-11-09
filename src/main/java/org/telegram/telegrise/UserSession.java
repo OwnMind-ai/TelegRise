@@ -238,13 +238,18 @@ public class UserSession implements Runnable{
     }
 
     private void applyTree(Update update, Tree tree, boolean execute) {
-        if (tree.getBranches() != null) {
+        if (tree.getBranches() != null || (tree.getController() != null && execute)) {
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue);
             this.treeExecutors.add(executor);
             this.sessionMemory.getBranchingElements().add(tree);
 
-            if (execute)
-                this.executeBranchingElement(tree, update);
+            try {
+                if (execute)
+                    this.executeBranchingElement(tree, update);
+            } finally {
+                if(tree.getBranches() == null)
+                    sessionMemory.getBranchingElements().remove(tree);
+            }
         } else if(execute) {
             sessionMemory.getBranchingElements().add(tree);
             try {
