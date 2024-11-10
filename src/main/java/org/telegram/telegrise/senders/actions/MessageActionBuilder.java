@@ -23,7 +23,7 @@ public class MessageActionBuilder {
     protected final BotSender sender;
 
     protected final String chatId;
-    protected final Integer messageThreadId;
+    protected Integer messageThreadId;
     protected String text;
     protected String parseMode = BotSender.DEFAULT_PARSE_MODE;
     protected Boolean disableWebPagePreview;
@@ -44,15 +44,13 @@ public class MessageActionBuilder {
         this.sender = sender;
 
         this.chatId = String.valueOf(message.getChatId());
-        this.messageThreadId = message.getMessageThreadId();
         this.replyToMessageId = message.getMessageId();
     }
 
-    public MessageActionBuilder(BotSender sender, String chatId, Integer messageThreadId, Integer messageId, SessionMemoryImpl memoryImpl) {
+    public MessageActionBuilder(BotSender sender, String chatId, Integer messageId, SessionMemoryImpl memoryImpl) {
         this.sender = sender;
 
         this.chatId = chatId;
-        this.messageThreadId = messageThreadId;
         this.replyToMessageId = messageId;
     }
 
@@ -61,6 +59,11 @@ public class MessageActionBuilder {
             logger.warn("Sender is already sneaky since there is no session memory");
             
         sneaky = true;
+        return this;
+    }
+
+    public MessageActionBuilder messageThreadId(Integer messageThreadId){
+        this.messageThreadId = messageThreadId;
         return this;
     }
 

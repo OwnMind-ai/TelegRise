@@ -28,7 +28,7 @@ public class EditableMessageActionBuilder {
     protected final BotSender sender;
 
     protected final String chatId;
-    protected final Integer messageThreadId;
+    protected Integer messageThreadId;
     protected String text;
     protected String parseMode = BotSender.DEFAULT_PARSE_MODE;
     protected Boolean disableWebPagePreview;
@@ -52,7 +52,6 @@ public class EditableMessageActionBuilder {
         sneaky = memory == null;
 
         this.chatId = String.valueOf(message.getChatId());
-        this.messageThreadId = message.getMessageThreadId();
     }
 
     public EditableMessageActionBuilder sneaky(){
@@ -60,6 +59,11 @@ public class EditableMessageActionBuilder {
             logger.warn("Sender is already sneaky since there is no session memory");
             
         sneaky = true;
+        return this;
+    }
+
+    public EditableMessageActionBuilder messageThreadId(Integer messageThreadId){
+        this.messageThreadId = messageThreadId;
         return this;
     }
 
