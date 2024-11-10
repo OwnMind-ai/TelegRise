@@ -35,7 +35,7 @@ import java.util.function.Function;
 import static org.telegram.telegrise.core.elements.Tree.*;
 
 public class UserSession implements Runnable{
-    private final ThreadLocal<UserIdentifier> userIdentifier = new ThreadLocal<>();
+    private final ThreadLocal<SessionIdentifier> userIdentifier = new ThreadLocal<>();
     @Getter
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
@@ -56,9 +56,9 @@ public class UserSession implements Runnable{
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(UserIdentifier userIdentifier, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter, Consumer<UserIdentifier> sessionInitializer) {
-        this.userIdentifier.set(userIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), userIdentifier, transcription.getUsername().generate(new ResourcePool()));
+    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter, Consumer<SessionIdentifier> sessionInitializer) {
+        this.userIdentifier.set(sessionIdentifier);
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getUsername().generate(new ResourcePool()));
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
@@ -71,8 +71,8 @@ public class UserSession implements Runnable{
         this.initialize();
     }
 
-    public UserSession(UserIdentifier userIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client, Function<UserIdentifier, TranscriptionManager> transcriptionGetter, Consumer<UserIdentifier> sessionInitializer) {
-        this.userIdentifier.set(userIdentifier);
+    public UserSession(SessionIdentifier sessionIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter, Consumer<SessionIdentifier> sessionInitializer) {
+        this.userIdentifier.set(sessionIdentifier);
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
             this.sessionMemory = sessionMemory;

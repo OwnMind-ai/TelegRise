@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
+import org.telegram.telegrise.SessionIdentifier;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.elements.security.Role;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 @Getter @Setter
 @NoArgsConstructor
 public final class BotTranscription extends NodeElement {
-
     //TODO webhooks support
     @Attribute(name = "username")
     private GeneratedValue<String> username;
@@ -41,6 +41,9 @@ public final class BotTranscription extends NodeElement {
 
     @Attribute(name = "autoCommands")
     private String autoCommands;
+
+    @Attribute(name = "sessionType")
+    private String sessionType;
 
     @Attribute(name = "throttlingTime")  // ms
     private Integer throttlingTime;
@@ -73,6 +76,12 @@ public final class BotTranscription extends NodeElement {
 
         if (username == null && head.getUsername() != null) 
             username = head.getUsername().getUsername();
+
+        if (sessionType == null)
+            sessionType = head.getSessionType() != null ? head.getSessionType().getType() : SessionIdentifier.SESSION_CHAT;
+
+        if(!List.of(SessionIdentifier.SESSION_CHAT, SessionIdentifier.SESSION_USER).contains(sessionType))
+            throw new TranscriptionParsingException("Invalid session type, must be 'chat' or 'user'", node);
     }
 
     @Override

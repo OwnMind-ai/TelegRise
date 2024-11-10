@@ -2,7 +2,7 @@
 
 <?import org.telegram.telegrise.utils.MessageUtils ?>
 <?import org.telegram.telegrise.SimpleController ?>
-<bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true">
+<bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
     <head>
         <link src="test/*"/>
         <!-- <token>${#env("BOT_TOKEN")}</token> -->
@@ -91,7 +91,7 @@
             <send>Sorry, your request was denied</send>
         </tree>
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
-              controller="SimpleController" chats="private" description="test" accessLevel="0" allowedInterruptions="none">
+              controller="SimpleController" description="test" accessLevel="0" allowedInterruptions="none">
             <keyboards>
                 <keyboard name="firstt" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
                     <row><button data="first">First</button></row>

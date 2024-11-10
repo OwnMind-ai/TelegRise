@@ -63,7 +63,7 @@ public interface SessionMemory {
     @Nullable Message getLastSentMessage();
 
     String getBotUsername();
-    UserIdentifier getUserIdentifier();
+    SessionIdentifier getSessionIdentifier();
 
     String getLanguageCode();
     void setLanguageCode(String code);

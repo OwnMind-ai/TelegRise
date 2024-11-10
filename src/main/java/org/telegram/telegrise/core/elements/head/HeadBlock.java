@@ -22,4 +22,7 @@ public class HeadBlock extends NodeElement {
 
     @InnerElement
     private Username username;
-} 
+
+    @InnerElement
+    private SessionType sessionType;
+}

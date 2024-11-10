@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.annotations.Handler;
@@ -31,7 +32,7 @@ public class TelegramSessionsController {
 
     @Setter
     private ExecutorService poolExecutor;
-    private final ConcurrentMap<UserIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<SessionIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
     @Setter
@@ -126,9 +127,15 @@ public class TelegramSessionsController {
         }
 
         User from = MessageUtils.getFrom(update);
-
-        if (from != null && !from.getIsBot()){
-            UserIdentifier identifier = UserIdentifier.of(from);
+        if (from != null && !from.getIsBot()) {
+            SessionIdentifier identifier;
+            if (transcription.getSessionType().equals(SessionIdentifier.SESSION_CHAT)){
+                Chat chat = MessageUtils.getChat(update);
+                identifier = chat != null ? SessionIdentifier.of(from, chat) : SessionIdentifier.ofUserOnly(from);
+            } else if (transcription.getSessionType().equals(SessionIdentifier.SESSION_USER)) {
+                identifier = SessionIdentifier.ofUserOnly(from);
+            } else
+                throw new IllegalStateException(transcription.getSessionType());
 
             if (!sessions.containsKey(identifier))
                 this.createSession(identifier);
@@ -142,12 +149,12 @@ public class TelegramSessionsController {
         if (!(memory instanceof SessionMemoryImpl sessionMemory))
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
-        UserSession session = new UserSession(sessionMemory.getUserIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager, this::reinitializeSession);
+        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager, this::reinitializeSession);
 
-        this.sessions.put(sessionMemory.getUserIdentifier(), session);
+        this.sessions.put(sessionMemory.getSessionIdentifier(), session);
     }
 
-    private void createSession(UserIdentifier identifier) {
+    private void createSession(SessionIdentifier identifier) {
         UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager, this::reinitializeSession);
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
@@ -161,9 +168,9 @@ public class TelegramSessionsController {
         this.sessions.put(identifier, session);
     }
 
-    private void reinitializeSession(UserIdentifier userIdentifier) {
-        sessions.remove(userIdentifier);
-        createSession(userIdentifier);
+    private void reinitializeSession(SessionIdentifier sessionIdentifier) {
+        sessions.remove(sessionIdentifier);
+        createSession(sessionIdentifier);
     }
 
     private void updateSession(UserSession session, Update update){
@@ -173,7 +180,7 @@ public class TelegramSessionsController {
             poolExecutor.submit(session);
     }
 
-    public TranscriptionManager getTranscriptionManager(UserIdentifier identifier){
+    public TranscriptionManager getTranscriptionManager(SessionIdentifier identifier){
         UserSession session = this.sessions.get(identifier);
         return session == null ? null : session.getTranscriptionManager();
     }

@@ -91,7 +91,7 @@ public class SimpleController {
             public void initialize(SessionMemory memory) {
                 memory.put("test", "test");
                 try {
-                    sender.execute(SendMessage.builder().chatId(memory.getUserIdentifier().getId()).text("Initialized").build());
+                    sender.of(memory.getChatId()).reply("Initialized " + memory.getSessionIdentifier());
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
@@ -103,7 +103,7 @@ public class SimpleController {
 
     @OnCreate
     public void onCreate(){
-        System.out.println("OnCreate executed, user identifier: " + memory.getUserIdentifier().getId());
+        System.out.println("OnCreate executed, user identifier: " + memory.getSessionIdentifier());
     }
 
     @OnClose
@@ -242,7 +242,7 @@ public class SimpleController {
 
         @Override
         public void handle(Update update) {
-            manager.reinitializeSession(memory.getUserIdentifier());
+            manager.reinitializeSession(memory.getSessionIdentifier());
         }
     }
 

@@ -141,7 +141,8 @@ public class Tree extends NodeElement implements BranchingElement{
         CommandData command = MessageUtils.parseCommand(text);
         boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
 
-        if (command != null && (isUserChat || pool.getMemory().getBotUsername().equals(command.username())))
+        //TODO Add an option to allow/restrict anon commands in groups (disable 'command.username() == null' bellow)
+        if (command != null && (isUserChat || command.username() == null || pool.getMemory().getBotUsername().equals(command.username())))
             return Arrays.stream(this.commands)
                     .anyMatch(c -> c.equals(command.name()));
 

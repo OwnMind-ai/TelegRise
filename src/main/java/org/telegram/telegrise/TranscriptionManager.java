@@ -30,18 +30,18 @@ public class TranscriptionManager {
     private final SessionMemoryImpl sessionMemory;
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
-    private final Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter;
+    private final Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter;
     private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
-    private final Consumer<UserIdentifier> sessionInitializer;
+    private final Consumer<SessionIdentifier> sessionInitializer;
 
     public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor,
                                 BiConsumer<BranchingElement, Update> elementExecutor,
                                 SessionMemoryImpl sessionMemory,
                                 TransitionController transitionController,
                                 BotTranscription transcription,
-                                Function<UserIdentifier, TranscriptionManager> transcriptionManagerGetter,
-                                Function<Update, ResourcePool> resourcePoolProducer, Consumer<UserIdentifier> sessionInitializer) {
+                                Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter,
+                                Function<Update, ResourcePool> resourcePoolProducer, Consumer<SessionIdentifier> sessionInitializer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
@@ -54,7 +54,7 @@ public class TranscriptionManager {
     }
 
     //TODO replace with SessionManager resource object
-    public void reinitializeSession(UserIdentifier id){
+    public void reinitializeSession(SessionIdentifier id){
         sessionInitializer.accept(id);
     }
 
@@ -90,8 +90,8 @@ public class TranscriptionManager {
                 }).findFirst().orElse(null);
     }
 
-    public TranscriptionManager getTranscriptionManager(UserIdentifier userIdentifier){
-        return this.transcriptionManagerGetter.apply(userIdentifier);
+    public TranscriptionManager getTranscriptionManager(SessionIdentifier sessionIdentifier){
+        return this.transcriptionManagerGetter.apply(sessionIdentifier);
     }
 
     public SessionMemory getSessionMemory(){

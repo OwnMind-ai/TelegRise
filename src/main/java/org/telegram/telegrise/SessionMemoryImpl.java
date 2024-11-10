@@ -24,7 +24,7 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter
     private final int transcriptionHashcode;
     @Getter
-    private final UserIdentifier userIdentifier;
+    private final SessionIdentifier sessionIdentifier;
     private final AtomicReference<Branch> currentBranch = new AtomicReference<>();
 
     @Getter
@@ -45,9 +45,9 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter @Setter
     private Message lastSentMessage;
 
-    public SessionMemoryImpl(int transcriptionHashcode, UserIdentifier userIdentifier, String botUsername) {
+    public SessionMemoryImpl(int transcriptionHashcode, SessionIdentifier sessionIdentifier, String botUsername) {
         this.transcriptionHashcode = transcriptionHashcode;
-        this.userIdentifier = userIdentifier;
+        this.sessionIdentifier = sessionIdentifier;
         this.botUsername = botUsername;
     }
 
@@ -119,14 +119,13 @@ public class SessionMemoryImpl implements SessionMemory {
 
     @Override
     public long getUserId() {
-        return this.userIdentifier.getId();
+        return this.sessionIdentifier.getUserId();
     }
 
     @Override
     public long getChatId() {
-        return getUserId();  //TODO add chat sessions
+        return Objects.requireNonNullElse(sessionIdentifier.getChatId(), getUserId());
     }
-
 
     public boolean isOnStack(Class<?> clazz){
         return !this.branchingElements.isEmpty() && clazz.isInstance(this.branchingElements.getLast());
