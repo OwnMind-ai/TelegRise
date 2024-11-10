@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
@@ -103,6 +103,6 @@ public final class BotTranscription extends NodeElement {
 
     public void setRoot(Root root) {
         this.root = root;
-        root.setTrees(new ArrayList<>(root.getTrees()));
+        root.setTrees(new ArrayList<>(root.getTrees() == null ? List.of() :root.getTrees()));
     }
 }

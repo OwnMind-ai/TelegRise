@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.ResourcePool;
@@ -27,7 +27,7 @@ public class Root extends NodeElement implements BranchingElement {
     @Attribute(name = "chats")
     private String[] chatTypes;
 
-    @InnerElement(nullable = false)
+    @InnerElement
     private List<Tree> trees;
 
     @InnerElement
