@@ -224,10 +224,10 @@ public class UserSession implements Runnable{
         if (root.getDefaultBranch() != null && root.getDefaultBranch().getWhen().generate(pool)){
             TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
                     pool, sender, ExecutionOptions.always());
+        } else {
+            Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
+            handlerCandidate.ifPresent(primaryHandler -> this.primaryHandlersController.applyHandler(update, primaryHandler));
         }
-
-        Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
-        handlerCandidate.ifPresent(primaryHandler -> this.primaryHandlersController.applyHandler(update, primaryHandler));
     }
 
     private void initializeTree(Update update, Tree tree, boolean execute) {
