@@ -8,15 +8,15 @@ import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
+import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegram.telegrise.keyboard.DynamicKeyboard;
-import org.telegram.telegrise.keyboard.SwitchButton;
+import org.telegram.telegrise.keyboard.KeyboardState;
 
-@Element(name = "flip")
+@Element(name = "flip", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
 public class Flip extends ActionElement{
-    @Attribute(name = "id", nullable = false)
-    private String id;
+    @Attribute(name = "keyboard", nullable = false)
+    private String keyboard;
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
@@ -26,16 +26,25 @@ public class Flip extends ActionElement{
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
-        DynamicKeyboard keyboard = resourcePool.getMemory().get(this.id, DynamicKeyboard.class);
+        KeyboardState state = resourcePool.getMemory().getKeyboardState(keyboard, parentTree);
+        if (state == null) 
+            throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
+            
         String name = switchName.generate(resourcePool);
-        SwitchButton switchButton = keyboard.getSwitch(name);
 
-        if (switchButton == null)
+        if (state.getSwitchValue(name) == null)
             throw new TelegRiseRuntimeException("Unable to find switch '" + name, node);
 
-        switchButton.flip(resourcePool);
+        state.flipSwitch(name);
 
         return null;
+    }
+
+    @Override
+    protected void validate(TranscriptionMemory memory) {
+        if (!memory.containsKey(parentTree, keyboard)) {
+            throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
+        }
     }
 
     @Override

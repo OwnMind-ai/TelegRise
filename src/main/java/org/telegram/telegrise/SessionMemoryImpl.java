@@ -12,15 +12,17 @@ import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.Root;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
+import org.telegram.telegrise.keyboard.KeyboardState;
 import org.telegram.telegrise.transition.JumpPoint;
 import org.telegram.telegrise.types.UserRole;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SessionMemoryImpl implements SessionMemory {
-    private final Map<String, Object> memory = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Object> memory = new ConcurrentHashMap<>();
     @Getter
     private final int transcriptionHashcode;
     @Getter
@@ -35,8 +37,10 @@ public class SessionMemoryImpl implements SessionMemory {
     private final String botUsername;
 
     @Getter
-    private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new HashMap<>();
-    private final Map<String, List<Message>> registryMap = new HashMap<>();
+    private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new ConcurrentHashMap<>();
+    private final Map<String, List<Message>> registryMap = new ConcurrentHashMap<>();
+    @Getter
+    private final Map<String, KeyboardState> keyboardStates = new ConcurrentHashMap<>();
 
     @Getter @Setter
     private UserRole userRole;
@@ -188,5 +192,13 @@ public class SessionMemoryImpl implements SessionMemory {
     @Override
     public void putToRegistry(String name, Message message) {
         this.registryMap.computeIfAbsent(name, k -> new ArrayList<>()).add(message);
+    }
+
+    public KeyboardState getKeyboardState(String name, Tree parentTree) {
+        return this.keyboardStates.get(parentTree.getName() + ":" + name);
+    }
+
+    public void putKeyboardState(String name, Tree parentTree, KeyboardState state) {
+        this.keyboardStates.put(parentTree.getName() + ":" + name, state);
     }
 }

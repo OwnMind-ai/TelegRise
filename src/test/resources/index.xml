@@ -92,11 +92,11 @@
         <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
               controller="SimpleController" chats="private" description="test" accessLevel="0" allowedInterruptions="none">
             <keyboards>
-                <keyboard name="firstt" type="inline" dynamic="true" id="dynamic" filler="#fillKeyboard">
+                <keyboard name="firstt" type="inline">
                     <row><button data="first">First</button></row>
                     <row><button data="second">Second</button></row>
                     <row><button data="disableMe">Disable Me!</button></row>
-                    <row><switch name="switch" off="Off" on="On"/></row>
+                    <row><switch name="switch" off="Off" on="On" prefix=""/></row>
                     <row><button data="testAnimation">Test Animation</button></row>
                 </keyboard>
             </keyboards>
@@ -110,7 +110,7 @@
                 <send name="send">
                     <photo when="#doSendPhoto" url="https://i0.wp.com/www.alphr.com/wp-content/uploads/2022/09/ikaw-lang-1.png"/>
                     <text>Hi, ${MessageUtils.getFrom(update).getFirstName()}</text>
-                    <keyboard byName="firstt" />
+                    <keyboard name="custom" byName="firstt" />
                 </send>
 
                 <branch when="#predicate -> #not -> #not">
@@ -130,8 +130,8 @@
                     <answer text="Done!"/>
                     <transition direction="back" edit="send"/>
                 </branch>
-                <branch callbackTriggers="switch-on; switch-off">
-                    <flip id="dynamic" switch="switch"/>
+                <branch callbackTriggers="switch">
+                    <flip keyboard="custom" switch="switch"/>
                     <transition direction="back" edit="first"/>
                 </branch>
                 <branch callbackTriggers="testAnimation">

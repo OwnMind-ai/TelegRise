@@ -11,8 +11,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.*;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.actions.Send;
-import org.telegram.telegrise.keyboard.DynamicKeyboard;
-import org.telegram.telegrise.keyboard.SwitchButton;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.utils.MessageUtils;
 
@@ -112,12 +110,6 @@ public class SimpleController {
     }
 
     @Reference
-    public void fillKeyboard(){
-        DynamicKeyboard keyboard = this.memory.get("dynamic", DynamicKeyboard.class);
-        System.out.println(keyboard);
-    }
-
-    @Reference
     public boolean predicate(Update update){
         return update.hasMessage() && update.getMessage().hasPhoto();
     }
@@ -164,15 +156,13 @@ public class SimpleController {
 
     @Reference
     public void switchButton(){
-        this.memory.get("dynamic", DynamicKeyboard.class).get(3, 0);
-
-        SwitchButton button = (SwitchButton) this.memory.get("dynamic", DynamicKeyboard.class).get(3, 0);
-        button.flip(new ResourcePool());
+        this.memory.getKeyboardState("custom", memory.getCurrentTree())
+            .flipSwitch("switch");
     }
 
     @Reference
     public void disableButton(){
-        this.memory.get("dynamic", DynamicKeyboard.class).disableRow(2);
+        this.memory.getKeyboardState("custom", memory.getCurrentTree()).disableRow(2);
     }
 
     @Reference
