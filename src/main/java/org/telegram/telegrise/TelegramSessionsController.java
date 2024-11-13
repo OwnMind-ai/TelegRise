@@ -123,7 +123,8 @@ public class TelegramSessionsController {
         Optional<PrimaryHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
             poolExecutor.submit(() -> this.handlersController.applyHandler(update, candidate.get()));
-            return;
+            if (candidate.get().getClass().getAnnotation(Handler.class).absolute())
+                return;
         }
 
         User from = MessageUtils.getFrom(update);
