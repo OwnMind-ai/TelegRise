@@ -24,6 +24,7 @@ import org.telegram.telegrise.utils.MessageUtils;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -366,6 +367,14 @@ public class UserSession implements Runnable{
 
             if (!r.isCacheApplicable(pool))
                 r.clear();
+        }
+
+        if(sessionMemory.getCurrentTree() != null){
+            BranchingElement currentElement = Objects.requireNonNullElse(sessionMemory.getCurrentBranch(), sessionMemory.getCurrentTree());
+            sessionMemory.getKeyboardStates().entrySet().removeIf(e -> !e.getValue().getParent().equals(currentElement)
+                        && e.getValue().getParent().getLevel() > currentElement.getLevel());
+        } else {
+            sessionMemory.getKeyboardStates().clear();
         }
     }
 

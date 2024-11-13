@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.core.elements.Tree;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegram.telegrise.keyboard.KeyboardState;
 import org.telegram.telegrise.types.UserRole;
 
 import java.util.List;
@@ -74,4 +75,6 @@ public interface SessionMemory {
     List<Message> getRegistry(String name);
     List<Message> clearRegistry(String name);
     void putToRegistry(String name, Message message);
+
+    KeyboardState getKeyboardState(String name, Tree parentTree);
 }

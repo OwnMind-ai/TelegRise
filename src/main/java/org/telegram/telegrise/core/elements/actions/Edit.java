@@ -21,7 +21,6 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.telegram.telegrise.keyboard.DynamicKeyboard;
 import org.telegram.telegrise.utils.MessageUtils;
 
 import java.util.List;
@@ -51,9 +50,6 @@ public class Edit extends ActionElement{
 
     @Attribute(name = "name")
     private String name;
-
-    @Attribute(name = "keyboardId")
-    private String keyboardId;
 
     @Attribute(name = "source")
     private String source = LAST;
@@ -94,15 +90,6 @@ public class Edit extends ActionElement{
         if (!LAST.equals(source) && !CALLBACK.equals(source))
             throw new TranscriptionParsingException("Invalid message source '" + source + "', possible sources are: '"
                     + LAST + "' or '" + CALLBACK + "'" , node);
-
-        if (keyboard != null && keyboardId != null)
-            throw new TranscriptionParsingException("KeyboardId and keyboard element conflict with each other", node);
-    }
-
-    @Override
-    public void load(TranscriptionMemory memory) {
-        if (this.keyboardId != null && this.text == null && this.media == null && this.location == null)
-            this.type = GeneratedValue.ofValue(EDIT_MARKUP);
     }
 
     private Message extractMessage(ResourcePool pool){
@@ -153,7 +140,7 @@ public class Edit extends ActionElement{
             return EDIT_MEDIA;
         } else if (this.getText() != null){
             return MessageUtils.hasMedia(message) ? EDIT_CAPTION : EDIT_TEXT;
-        } else if (this.keyboard != null || this.keyboardId != null){
+        } else if (this.keyboard != null){
             return EDIT_MARKUP;
         }
 
@@ -163,9 +150,6 @@ public class Edit extends ActionElement{
     private InlineKeyboardMarkup getMarkup(ResourcePool pool){
         if (this.keyboard != null)
             return (InlineKeyboardMarkup) this.keyboard.createMarkup(pool);
-
-        if (this.keyboardId != null)
-            return pool.getMemory().get(this.keyboardId, DynamicKeyboard.class).createInline(pool);
 
         return null;
     }

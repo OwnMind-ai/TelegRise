@@ -13,6 +13,7 @@ import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.parser.Attribute;
 import org.telegram.telegrise.core.parser.Element;
 import org.telegram.telegrise.core.utils.XMLUtils;
+import org.telegram.telegrise.keyboard.KeyboardState;
 import org.w3c.dom.Node;
 
 @Element(name = "button", checkInner = false)
@@ -43,7 +44,7 @@ public class Button extends NodeElement {
         this.callbackData = GeneratedValue.ofValue(callbackData);
     }
 
-    public InlineKeyboardButton createInlineButton(ResourcePool pool){
+    public InlineKeyboardButton createInlineButton(ResourcePool pool, KeyboardState keyboardState){
         return InlineKeyboardButton.builder()
                 .text(text.generate(pool))
                 .url(generateNullableProperty(url, pool))

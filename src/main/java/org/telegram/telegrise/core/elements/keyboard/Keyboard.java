@@ -7,7 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrise.SessionMemory;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.NamedElement;
 import org.telegram.telegrise.core.ResourcePool;
@@ -20,13 +22,14 @@ import org.telegram.telegrise.core.parser.InnerElement;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.exceptions.TranscriptionParsingException;
-import org.telegram.telegrise.keyboard.DynamicKeyboard;
+import org.telegram.telegrise.keyboard.KeyboardState;
 import org.telegram.telegrise.types.KeyboardMarkup;
 import org.telegram.telegrise.types.UserRole;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Element(name = "keyboard", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
@@ -55,20 +58,8 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
     @Attribute(name = "name")
     private String name;
 
-    @Attribute(name = "dynamic")
-    private boolean dynamic;
-
-    @Attribute(name = "autoClosable")
-    private boolean autoClosable = true;
-
     @Attribute(name = "global")
     private boolean global;
-
-    @Attribute(name = "filler")
-    private GeneratedValue<Void> filler;
-
-    @Attribute(name = "id")
-    private String id;
 
     @Attribute(name = "create")
     private GeneratedValue<ReplyKeyboard> create;
@@ -95,17 +86,14 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (!((type != null && rows != null) || byName != null || create != null || (dynamic && filler != null)))
+        if (!((type != null && rows != null) || byName != null || create != null))
             throw new TranscriptionParsingException("Invalid attributes for keyboard", node);
-
-        if (dynamic && (id == null || id.isEmpty()))
-            throw new TranscriptionParsingException("Dynamic keyboard must have an id attribute", node);
-
-        if (dynamic && create != null)
-            throw new TranscriptionParsingException("'create' attribute conflicts with dynamic keyboard declaration, use 'filler' attribute to modify keyboard before action execution", node);
 
         if (type != null && !List.of(REPLY, INLINE).contains(type))
             throw new TranscriptionParsingException("Invalid keyboard type '" + type + "'", node);
+
+        if(create != null && !rows.isEmpty())
+            throw new TranscriptionParsingException("Keyboards with 'create' attribute cannot have children elements", node);
     }
 
     @Override
@@ -120,10 +108,8 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
                         byName, element.getClass().getAnnotation(Element.class).name()), node);
 
             Keyboard original = (Keyboard) element;
-            this.name = original.getName();
+            this.name = Objects.requireNonNullElse(this.name, original.getName());
             this.type = original.getType();
-            this.dynamic = original.isDynamic();
-            this.id = original.getId();
             this.create = original.getCreate();
             this.persistent = original.getPersistent();
             this.oneTime = original.getOneTime();
@@ -136,30 +122,48 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
 
     @Override
     public void store(TranscriptionMemory memory) {
-         if (name != null && byName == null)
+        if (name != null)    // Method ::store runs before ::load
             memory.put(parentTree, name, this);
     }
 
     public ReplyKeyboard createMarkup(ResourcePool pool){
-        if (this.dynamic)
-            return extractDynamic(pool);
-
         if (this.create != null)
             return this.create.generate(pool);
 
+        SessionMemoryImpl memory = (SessionMemoryImpl) pool.getMemory();
+        KeyboardState state = memory.getKeyboardState(name, parentTree);
+        if(state == null){
+            state = new KeyboardState(Objects.requireNonNullElse(memory.getCurrentBranch(), parentTree), this, pool);
+            memory.putKeyboardState(name, parentTree, state);
+        }
+
         switch (type.toLowerCase()) {
             case INLINE:
-                return new InlineKeyboardMarkup(rows.stream()
-                        .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
-                        .map(r -> r.createInlineRow(pool))
-                        .filter(r -> !r.isEmpty())
-                        .collect(Collectors.toList()));
+                List<InlineKeyboardRow> inlineRows = new ArrayList<>();
+
+                for (int i = 0; i < rows.size(); i++) {
+                    Row r = rows.get(i);
+                    if (filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool)) {
+                        var inlineRow = r.createInlineRow(pool, state, i);
+                        if (!inlineRow.isEmpty()) 
+                            inlineRows.add(inlineRow);
+                    }
+                }
+
+                return new InlineKeyboardMarkup(inlineRows);
             case REPLY:
-                ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup(rows.stream()
-                        .filter(r -> filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool))
-                        .map(r -> r.createKeyboardRow(pool))
-                        .filter(r -> !r.isEmpty())
-                        .collect(Collectors.toList()));
+                List<KeyboardRow> replyRows = new ArrayList<>();
+
+                for (int i = 0; i < rows.size(); i++) {
+                    Row r = rows.get(i);
+                    if (filterKeyboardElement(r.getWhen(), r.getAccessLevel(), pool)) {
+                        var row = r.createKeyboardRow(pool, state, i);
+                        if (!row.isEmpty()) 
+                            replyRows.add(row);
+                    }
+                }
+
+                ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup(replyRows);
 
                 keyboard.setIsPersistent(generateNullableProperty(persistent, pool));
                 keyboard.setResizeKeyboard(generateNullableProperty(resize, pool));
@@ -170,32 +174,6 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
                 return keyboard;
             default:
                 throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'", node);
-        }
-    }
-
-    public ReplyKeyboard extractDynamic(ResourcePool pool){
-        assert pool.getMemory() != null : "Unable to create dynamic keyboard: session memory is null";
-        SessionMemory memory = pool.getMemory();
-
-        if (memory.containsKey(this.id)){
-            DynamicKeyboard keyboard = memory.get(this.id, DynamicKeyboard.class);
-
-            return switch (type.toLowerCase()) {
-                case INLINE -> keyboard.createInline(pool);
-                case REPLY -> keyboard.createReply(pool);
-                default -> throw new TelegRiseRuntimeException("Undefined keyboard type '" + type + "'", node);
-            };
-        } else {
-            DynamicKeyboard keyboard = DynamicKeyboard.ofKeyboard(this, pool);
-            memory.put(this.id, keyboard);
-
-            if (filler != null) filler.generate(pool);
-            keyboard.reloadSwitches();
-
-            if (pool.getCurrentExecutor() != null && autoClosable)
-                pool.getCurrentExecutor().connectKeyboard(this.id);
-
-            return this.extractDynamic(pool);
         }
     }
 
