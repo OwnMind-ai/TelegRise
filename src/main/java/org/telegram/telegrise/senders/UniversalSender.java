@@ -68,6 +68,7 @@ public class UniversalSender {
         Object result;
         try {
             result = this.execute(method);
+            LOGGER.debug("Action {} has been executed: {}\nAnd returned: {}", NodeElement.formatNode(action.getElementNode()), method, result);
         } catch (TelegramApiException e) {
             LOGGER.error("An error occurred while executing transcription action:\n\n{}\n", NodeElement.formatNode(action.getElementNode()), e);
             throw e;
