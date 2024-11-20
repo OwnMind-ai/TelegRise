@@ -1,9 +1,8 @@
 package org.telegram.telegrise.core.elements.keyboard;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
-
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -40,7 +39,7 @@ public class Row extends NodeElement {
 
         for(int i = 0; i < buttons.size(); i++){
             Button b = buttons.get(i);
-            if(state.isEnabled(rowIndex, i) && Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool)) 
+            if((state == null || state.isEnabled(rowIndex, i)) && Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
                 buttonsArray.add(b.createKeyboardButton(pool));
         }
 
@@ -52,7 +51,7 @@ public class Row extends NodeElement {
 
         for(int i = 0; i < buttons.size(); i++){
             Button b = buttons.get(i);
-            if(state.isEnabled(rowIndex, i) && Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
+            if((state == null || state.isEnabled(rowIndex, i)) && Keyboard.filterKeyboardElement(b.getWhen(), b.getAccessLevel(), pool))
                 buttonsArray.add(b.createInlineButton(pool, state));
         }
 

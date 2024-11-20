@@ -23,7 +23,6 @@ import org.telegram.telegrise.utils.MessageUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -74,7 +73,6 @@ public final class TreeExecutor {
         }
     }
 
-    private final List<String> relatedKeyboardIds = new LinkedList<>();
     private final SessionMemoryImpl memory;
 
     @Getter
@@ -114,16 +112,18 @@ public final class TreeExecutor {
         // Next branch found
         if (this.currentBranch != null){
             this.memory.setCurrentBranch(this.currentBranch);
-            this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
-
-            if (this.currentBranch == null) {
-                this.lastBranch = previous;
-                this.naturallyClosed = false;
-                this.close();
-            } else if ( this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
-                this.lastBranch = this.currentBranch;
-                this.naturallyClosed = true;
-                this.close();
+            try {
+                this.invokeBranch(this.currentBranch.getToInvoke(), this.currentBranch.getActions(), resourcePool);
+            } finally {
+                if (this.currentBranch == null) {
+                    this.lastBranch = previous;
+                    this.naturallyClosed = false;
+                    this.close();
+                } else if (this.currentBranch.getBranches() == null || this.currentBranch.getBranches().isEmpty()) {
+                    this.lastBranch = this.currentBranch;
+                    this.naturallyClosed = true;
+                    this.close();
+                }
             }
         } else if (nextBranches == null || nextBranches.isEmpty()) {       // There is no continuation of the branch
             this.lastBranch = previous;
@@ -131,10 +131,10 @@ public final class TreeExecutor {
             this.close();
         } else if(previous != null && previous.getDefaultBranch() != null) {   // Branch wasn't found, looking for default one in previous branch
             DefaultBranch defaultBranch = previous.getDefaultBranch();
+            this.currentBranch = previous;
+
             if (defaultBranch.getWhen().generate(resourcePool))
                 this.invokeBranch(defaultBranch.getToInvoke(), defaultBranch.getActions(), resourcePool);
-
-            this.currentBranch = previous;
         } else if(previous == null && this.tree.getDefaultBranch() != null) {  // the branch wasn't found, looking for the default one in the tree
             if (this.tree.getDefaultBranch().getWhen().generate(resourcePool))
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
@@ -163,7 +163,6 @@ public final class TreeExecutor {
 
     public void beforeRemoving(){
         this.executeOnCloseMethod();
-        this.relatedKeyboardIds.forEach(this.memory::remove);
     }
 
     private void executeOnCloseMethod() {
@@ -198,10 +197,6 @@ public final class TreeExecutor {
         }
 
         return null;
-    }
-
-    public void connectKeyboard(String id){
-        this.relatedKeyboardIds.add(id);
     }
 
     public void open() {

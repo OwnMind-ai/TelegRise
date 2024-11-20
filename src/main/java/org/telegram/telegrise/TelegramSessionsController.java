@@ -2,6 +2,7 @@ package org.telegram.telegrise;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class TelegramSessionsController {
     private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 200;
     private static final int DEFAULT_CORE_THREAD_POOL_SIZE = 32;
@@ -120,6 +122,7 @@ public class TelegramSessionsController {
     }
 
     public void onUpdateReceived(Update update){
+        log.debug("Update received: {}", update);
         Optional<PrimaryHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
             poolExecutor.submit(() -> this.handlersController.applyHandler(update, candidate.get()));

@@ -122,6 +122,7 @@ public class XMLTranscriptionParserTest {
         transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml")), null, null, null));
         transcription.setUsername(GeneratedValue.ofValue("bot"));
         transcription.setToken(GeneratedValue.ofValue("token"));
+        transcription.setSessionType("chat");
         transcription.setRoot(expectedRoot);
 
         assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null));

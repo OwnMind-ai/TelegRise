@@ -50,6 +50,7 @@ public class BotSender {
     }
 
     public boolean delete(MaybeInaccessibleMessage message) throws TelegramApiException {
+        logger.debug("Executing deletion: {}", message);
         return this.client.execute(DeleteMessage.builder().chatId(message.getChatId()).messageId(message.getMessageId()).build());
     }
 
@@ -94,22 +95,27 @@ public class BotSender {
     }
 
     public final java.io.File downloadFile(String filePath) throws TelegramApiException {
+        logger.debug("Downloading file: {}", filePath);
         return client.downloadFile(filePath);
     }
 
     public final java.io.File downloadFile(File file) throws TelegramApiException {
+        logger.debug("Downloading file: {}", file);
         return client.downloadFile(file);
     }
 
     public InputStream downloadFileAsStream(File file) throws TelegramApiException{
+        logger.debug("Downloading file as a stream: {}", file);
         return this.client.downloadFileAsStream(file);
     }
 
     public InputStream downloadFileAsStream(String filePath) throws TelegramApiException {
+        logger.debug("Downloading file as a stream: {}", filePath);
         return this.client.downloadFileAsStream(filePath);
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> CompletableFuture<T> executeAsync(Method method) throws TelegramApiException {
+        logger.debug("Executing method: {}", method);
         return this.client.executeAsync(method).thenApply(r -> {
             this.finish(r instanceof Message m ? m : null);
             return r;
@@ -117,116 +123,136 @@ public class BotSender {
     }
 
     public <T extends Serializable, Method extends BotApiMethod<T>> T execute(Method method) throws TelegramApiException {
+        logger.debug("Executing method: {}", method);
         T result = this.client.execute(method);
         this.finish(result instanceof Message m ? m : null);
         return result;
     }
 
     public final User getMe() throws TelegramApiException {
+        logger.debug("Getting me");
         this.finish(null);
         return this.client.execute(new GetMe());
     }
 
     public final WebhookInfo getWebhookInfo() throws TelegramApiException {
+        logger.debug("Getting webhook info");
         this.finish(null);
         return this.client.execute(new GetWebhookInfo());
     }
 
     public final CompletableFuture<User> getMeAsync() throws TelegramApiException {
+        logger.debug("Getting me");
         this.finish(null);
         return this.client.executeAsync(new GetMe());
     }
 
     public final CompletableFuture<WebhookInfo> getWebhookInfoAsync() throws TelegramApiException {
+        logger.debug("Getting webhook info");
         this.finish(null);
         return this.client.executeAsync(new GetWebhookInfo());
     }
 
     public Message execute(SendDocument method) throws TelegramApiException {
+        logger.debug("Sending document: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendPhoto method) throws TelegramApiException {
+        logger.debug("Sending photo: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVideo method) throws TelegramApiException {
+        logger.debug("Sending video: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVideoNote method) throws TelegramApiException {
+        logger.debug("Sending videoNote: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendSticker method) throws TelegramApiException {
+        logger.debug("Sending sticker: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendAudio method) throws TelegramApiException {
+        logger.debug("Sending audio: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public Message execute(SendVoice method) throws TelegramApiException {
+        logger.debug("Sending Voice: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;
     }
 
     public List<Message> execute(SendMediaGroup method) throws TelegramApiException {
+        logger.debug("Sending mediagroup: {}", method);
         List<Message> message = this.client.execute(method);
         this.finish(message.get(0));
         return message;
     }
 
     public Boolean execute(SetChatPhoto method) throws TelegramApiException {
+        logger.debug("Setting chat photo: {}", method);
         Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public Boolean execute(AddStickerToSet method) throws TelegramApiException {
+        logger.debug("Adding sticker to set: {}", method);
         Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public Boolean execute(SetStickerSetThumbnail method) throws TelegramApiException {
+        logger.debug("Setting stickerSet thumb: {}", method);
         Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public Boolean execute(CreateNewStickerSet method) throws TelegramApiException {
+        logger.debug("Creating new sticker set: {}", method);
         Boolean b = this.client.execute(method);
         this.finish(null);
         return b;
     }
 
     public File execute(UploadStickerFile method) throws TelegramApiException {
+        logger.debug("Uploading sticker file: {}", method);
         File file = this.client.execute(method);
         this.finish(null);
         return file;
     }
 
     public Serializable execute(EditMessageMedia method) throws TelegramApiException {
+        logger.debug("Editing message media: {}", method);
         Serializable s = this.client.execute(method);
         this.finish(null);
         return s;
     }
 
     public Message execute(SendAnimation method) throws TelegramApiException {
+        logger.debug("Sending animation: {}", method);
         Message message = this.client.execute(method);
         this.finish(message);
         return message;

@@ -1,16 +1,15 @@
 package org.telegram.telegrise.keyboard;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import lombok.Getter;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.BranchingElement;
 import org.telegram.telegrise.core.elements.keyboard.Keyboard;
 import org.telegram.telegrise.core.elements.keyboard.Switch;
 
-import lombok.Getter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class KeyboardState {
     public static final String SWITCH_ENABLED = "enabled";
@@ -33,7 +32,7 @@ public final class KeyboardState {
 
         this.switchStates.putAll(keyboard.getRows().stream()
                 .flatMap(r -> r.getButtons().stream())
-                .filter(b -> b instanceof Switch).map(b -> (Switch) b)
+                .filter(Switch.class::isInstance).map(Switch.class::cast)
                 .collect(Collectors.toMap(Switch::getName, 
                     b -> b.getInitial().generate(pool) ? SWITCH_ENABLED : SWITCH_DISABLED))
         );

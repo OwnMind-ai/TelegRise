@@ -165,7 +165,7 @@ public class XMLElementsParser {
             instance.load(transcriptionMemory);
         }
 
-        //NOTE: Class Keyboard requires method store to run before load (if finishAfterParsin)
+        //NOTE: Class Keyboard requires method store to run before the load (if finishAfterParsing)
         if (instance instanceof StorableElement)
             ((StorableElement) instance).store(transcriptionMemory);
     }

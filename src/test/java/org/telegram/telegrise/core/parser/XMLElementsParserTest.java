@@ -151,15 +151,18 @@ public class XMLElementsParserTest {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
         parser.load();
 
+        Node tree = toNode("<tree name=\"a\"></tree>");
+        parser.setCurrentTree((Tree) parser.parse(tree));
+
         Node node = toNode("""
                 <keyboard name="name" type="inline">
-                                    <row>
-                                        <button data="first">First</button>
-                                        <button data="second">Second</button>
-                                        <button data="third" when="${false}">Third</button>
-                                    </row>
-                                    <row><button url="url">URL</button></row>
-                                </keyboard>""");
+                    <row>
+                        <button data="first">First</button>
+                        <button data="second">Second</button>
+                        <button data="third" when="${false}">Third</button>
+                    </row>
+                    <row><button url="url">URL</button></row>
+                </keyboard>""");
 
         InlineKeyboardMarkup expected = new InlineKeyboardMarkup(List.of(
                 new InlineKeyboardRow(

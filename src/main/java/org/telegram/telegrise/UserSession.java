@@ -21,11 +21,7 @@ import org.telegram.telegrise.transition.TransitionController;
 import org.telegram.telegrise.types.UserRole;
 import org.telegram.telegrise.utils.MessageUtils;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -295,8 +291,11 @@ public class UserSession implements Runnable{
         TreeExecutor executor = this.treeExecutors.getLast();
         ResourcePool pool = this.createResourcePool(update);
 
-        executor.update(update);
-        this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
+        try {
+            executor.update(update);
+        } finally {
+            this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
+        }
 
         if (executor.isClosed())
             this.processClosedTree(update, executor, pool);
@@ -306,7 +305,7 @@ public class UserSession implements Runnable{
         this.updateCaches(pool);
     }
 
-    /** There are four cases when executor is closed:
+    /** There are four cases when the executor is closed:
      * <ol>
      *      <li>Transition is declared — performs transition</li>
      *      <li>Unrecognized (no branch responded) update, but predicate interrupter found — performs interruption</li>

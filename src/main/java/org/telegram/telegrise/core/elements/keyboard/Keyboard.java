@@ -92,7 +92,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
         if (type != null && !List.of(REPLY, INLINE).contains(type))
             throw new TranscriptionParsingException("Invalid keyboard type '" + type + "'", node);
 
-        if(create != null && !rows.isEmpty())
+        if(create != null && rows != null && !rows.isEmpty())
             throw new TranscriptionParsingException("Keyboards with 'create' attribute cannot have children elements", node);
     }
 
@@ -130,9 +130,9 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
         if (this.create != null)
             return this.create.generate(pool);
 
-        SessionMemoryImpl memory = (SessionMemoryImpl) pool.getMemory();
-        KeyboardState state = memory.getKeyboardState(name, parentTree);
-        if(state == null){
+        SessionMemoryImpl memory = pool.getMemory();
+        KeyboardState state = name != null ? memory.getKeyboardState(name, parentTree) : null;
+        if(name != null && state == null){
             state = new KeyboardState(Objects.requireNonNullElse(memory.getCurrentBranch(), parentTree), this, pool);
             memory.putKeyboardState(name, parentTree, state);
         }
