@@ -37,6 +37,9 @@ public class Transition extends NodeElement {
     @Attribute(name = "edit")
     private String edit;
 
+    @Attribute(name = "editSource")
+    private String editSource;
+
     @InnerElement
     private List<ActionElement> actions;
 
@@ -57,6 +60,9 @@ public class Transition extends NodeElement {
 
         if (execute != null && execute && edit != null) 
             throw new TranscriptionParsingException("Attribute 'execute' conflicts with 'edit'", node);
+
+        if(edit == null && editSource != null)
+            throw new TranscriptionParsingException("'edit' must be specified with 'editSource'", node);
         
         if(edit != null && !ExecutionOptions.EDIT_FIRST.equals(edit) && (!memory.containsKey(parentTree, edit) || !(memory.get(parentTree, edit) instanceof ActionElement a) || !a.getName().equals(edit)))
             throw new TranscriptionParsingException("Unable to edit on-transition element named '" + edit + "'", node);
@@ -85,6 +91,6 @@ public class Transition extends NodeElement {
     }
 
     public ExecutionOptions getExecutionOptions() {
-        return new ExecutionOptions(this.execute, this.edit);
+        return new ExecutionOptions(this.execute, this.edit, this.editSource);
     }
 }

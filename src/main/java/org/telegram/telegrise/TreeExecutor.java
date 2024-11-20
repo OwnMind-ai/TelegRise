@@ -57,11 +57,14 @@ public final class TreeExecutor {
                 try {
                     Edit editAction = action.toEdit();
                     if (isFirst && editAction != null) {
+                        if (options.source() != null) editAction.setSource(options.source());
                         universalSender.execute(editAction, pool);
                         return;
                     } else if (!isFirst && options.edit().equals(action.getName())) {
                         if(editAction == null)
                             throw new TelegRiseRuntimeException("Unable to convert element named '%s' to edit action".formatted(options.edit()), action.getElementNode());
+
+                        if (options.source() != null) editAction.setSource(options.source());
                         universalSender.execute(editAction, pool);
                         return;
                     }

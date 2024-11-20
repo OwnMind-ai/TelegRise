@@ -79,7 +79,7 @@ public class TransitionController {
 
         this.applyBack(new Transition(Transition.BACK,
                 GeneratedValue.ofValue(point.from().getName()),
-                false, null, null, null), pool);
+                false, null, null, null, null), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
 
