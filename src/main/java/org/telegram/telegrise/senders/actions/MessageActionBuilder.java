@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.senders.BotSender;
 
@@ -20,7 +21,7 @@ public class MessageActionBuilder {
     private static final Logger logger = LoggerFactory.getLogger(MessageActionBuilder.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageActionBuilder.class);
 
-    protected final BotSender sender;
+    protected final TelegramClient sender;
 
     protected final String chatId;
     protected Integer messageThreadId;
@@ -41,14 +42,14 @@ public class MessageActionBuilder {
     private boolean sneaky = true;
 
     public MessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memoryImpl) {
-        this.sender = sender;
+        this.sender = sender.getClient();
 
         this.chatId = String.valueOf(message.getChatId());
         this.replyToMessageId = message.getMessageId();
     }
 
     public MessageActionBuilder(BotSender sender, String chatId, Integer messageId, SessionMemoryImpl memoryImpl) {
-        this.sender = sender;
+        this.sender = sender.getClient();
 
         this.chatId = chatId;
         this.replyToMessageId = messageId;

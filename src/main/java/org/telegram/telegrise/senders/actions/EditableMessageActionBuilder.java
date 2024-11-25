@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
@@ -25,7 +26,7 @@ import java.util.List;
 public class EditableMessageActionBuilder {
     private static final Logger logger = LoggerFactory.getLogger(EditableMessageActionBuilder.class);
     protected final Message message;
-    protected final BotSender sender;
+    protected final TelegramClient sender;
 
     protected final String chatId;
     protected Integer messageThreadId;
@@ -47,7 +48,7 @@ public class EditableMessageActionBuilder {
 
     public EditableMessageActionBuilder(BotSender sender, Message message, SessionMemoryImpl memory) {
         this.message = message;
-        this.sender = sender;
+        this.sender = sender.getClient();
         this.memory = memory;
         sneaky = memory == null;
 

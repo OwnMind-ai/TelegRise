@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.stickers.SetStickerSetThumbnai
 import org.telegram.telegrambots.meta.api.methods.stickers.UploadStickerFile;
 import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessages;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.File;
@@ -30,6 +31,7 @@ import org.telegram.telegrise.senders.actions.MessageActionBuilder;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -56,6 +58,14 @@ public class BotSender {
 
     public boolean delete(CallbackQuery query) throws TelegramApiException {
         return delete(query.getMessage());
+    }
+
+    public boolean delete(long chatId, int messageId) throws TelegramApiException {
+        return this.client.execute(DeleteMessage.builder().chatId(chatId).messageId(messageId).build());
+    }
+
+    public boolean delete(long chatId, Integer... messageIds) throws TelegramApiException {
+        return this.client.execute(DeleteMessages.builder().chatId(chatId).messageIds(Arrays.asList(messageIds)).build());
     }
 
     public MessageActionBuilder of(String chatId){

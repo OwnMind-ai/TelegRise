@@ -35,7 +35,7 @@ public class CallbackQueryActionBuilder{
     }
 
     public boolean answer(String text, boolean showAlert) throws TelegramApiException{
-        return this.sender.execute(
+        return this.sender.getClient().execute(
                 AnswerCallbackQuery.builder().callbackQueryId(query.getId()).showAlert(showAlert).text(text).build());
     }
 
