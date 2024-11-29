@@ -242,9 +242,17 @@ public class MethodReferenceCompiler {
                 reference.setRight(right);
 
                 if(operator.equals(Syntax.EQUALS_OPERATOR))
-                    reference.setOperation((l, r) -> Objects.equals(l.invoke(), r.invoke()));
+                    reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return Objects.equals(lv, rv) ||
+                                (lv instanceof Number ln && rv instanceof Number rn && ln.doubleValue() == rn.doubleValue());
+                    });
                 else
-                    reference.setOperation((l, r) -> !Objects.equals(l.invoke(), r.invoke()));
+                    reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return !Objects.equals(lv, rv) &&
+                                !(lv instanceof Number ln && rv instanceof Number rn && ln.doubleValue() == rn.doubleValue());
+                    });
 
                 reference.setParameters(
                         Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
