@@ -187,23 +187,35 @@ public class MethodReferenceCompiler {
                 switch (operator){
                     case Syntax.GREATER_OPERATOR -> reference.setOperation((l, r) -> {
                         Object lv = l.invoke(), rv = r.invoke();
-                        return lv != null && rv != null &&
-                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) > 0;
+                        if(lv != null && rv != null && rv.getClass().equals(lv.getClass()))
+                            return ((Comparable<Object>) lv).compareTo(rv) > 0;
+                        else if (rv instanceof Number rn && lv instanceof Number ln)
+                            return ln.doubleValue() > rn.doubleValue();
+                        return false;
                     });
                     case Syntax.GREATER_OR_EQUALS_OPERATOR -> reference.setOperation((l, r) -> {
                         Object lv = l.invoke(), rv = r.invoke();
-                        return lv != null && rv != null &&
-                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) >= 0;
+                        if(lv != null && rv != null && rv.getClass().equals(lv.getClass()))
+                            return ((Comparable<Object>) lv).compareTo(rv) >= 0;
+                        else if (rv instanceof Number rn && lv instanceof Number ln)
+                            return ln.doubleValue() >= rn.doubleValue();
+                        return false;
                     });
                     case Syntax.LESS_OPERATOR -> reference.setOperation((l, r) -> {
                         Object lv = l.invoke(), rv = r.invoke();
-                        return lv != null && rv != null &&
-                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) < 0;
+                        if(lv != null && rv != null && rv.getClass().equals(lv.getClass()))
+                            return ((Comparable<Object>) lv).compareTo(rv) < 0;
+                        else if (rv instanceof Number rn && lv instanceof Number ln)
+                            return ln.doubleValue() < rn.doubleValue();
+                        return false;
                     });
                     case Syntax.LESS_OR_EQUALS_OPERATOR -> reference.setOperation((l, r) -> {
                         Object lv = l.invoke(), rv = r.invoke();
-                        return lv != null && rv != null &&
-                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) <= 0;
+                        if(lv != null && rv != null && rv.getClass().equals(lv.getClass()))
+                            return ((Comparable<Object>) lv).compareTo(rv) <= 0;
+                        else if (rv instanceof Number rn && lv instanceof Number ln)
+                            return ln.doubleValue() <= rn.doubleValue();
+                        return false;
                     });
                     default -> throw new IllegalArgumentException(operator);
                 }

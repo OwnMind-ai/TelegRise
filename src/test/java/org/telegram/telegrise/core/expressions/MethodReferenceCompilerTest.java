@@ -242,6 +242,10 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("#add(1, 4, 6) ; #add(1)")));
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(11, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("#setNum(4) >= 4")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
     }
 
     @Reference
