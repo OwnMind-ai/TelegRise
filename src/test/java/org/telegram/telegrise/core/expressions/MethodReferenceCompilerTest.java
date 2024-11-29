@@ -187,6 +187,10 @@ public class MethodReferenceCompilerTest {
         expression = compiler.compile(parser.parse(), namespace, Long.class, node);
         assertEquals(13L, expression.toGeneratedValue(Long.class, node).generate(pool));
 
+        parser = new Parser(new Lexer(new CharsStream("(#getOne, #getLongTwelve) -> #sum > 0")));
+        expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
+        assertEquals(true, expression.toGeneratedValue(Boolean.class, node).generate(pool));
+
         parser = new Parser(new Lexer(new CharsStream("#getTwo -> ::pow(6)")));
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(64, expression.toGeneratedValue(Integer.class, node).generate(pool));

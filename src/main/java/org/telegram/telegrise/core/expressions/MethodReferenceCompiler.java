@@ -77,6 +77,7 @@ public class MethodReferenceCompiler {
         return new IfReference(predicate, doAction, elseAction);
     }
 
+    @SuppressWarnings("unchecked")
     private ReferenceExpression compileExpression(ExpressionToken token, LocalNamespace namespace, Class<?> returnType, Node node) {
         switch (token.getOperatorToken().getOperator()) {
             case Syntax.AND_OPERATOR:
@@ -165,6 +166,51 @@ public class MethodReferenceCompiler {
                 reference.setParameters(
                         Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
                             .collect(Collectors.toSet()).toArray(Class[]::new)
+                );
+
+                return reference;
+            }
+            case Syntax.GREATER_OPERATOR, Syntax.LESS_OPERATOR, Syntax.LESS_OR_EQUALS_OPERATOR, Syntax.GREATER_OR_EQUALS_OPERATOR: {
+                ReferenceExpression left = this.compile(token.getLeft(), namespace, Comparable.class, node);
+                ReferenceExpression right = this.compile(token.getRight(), namespace, Comparable.class, node);
+
+                String operator = token.getOperatorToken().getOperator();
+                if (ClassUtils.isAssignable(left.returnType(), void.class))
+                    throw new TranscriptionParsingException("Unable to apply '%s' operator: left side returns no value".formatted(operator), node);
+                if (ClassUtils.isAssignable(right.returnType(), void.class))
+                    throw new TranscriptionParsingException("Unable to apply '%s' operator: right side returns no value".formatted(operator), node);
+
+                OperationReference<?, ?> reference = new OperationReference<>(Boolean.class, node);
+                reference.setLeft(left);
+                reference.setRight(right);
+
+                switch (operator){
+                    case Syntax.GREATER_OPERATOR -> reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return lv != null && rv != null &&
+                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) > 0;
+                    });
+                    case Syntax.GREATER_OR_EQUALS_OPERATOR -> reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return lv != null && rv != null &&
+                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) >= 0;
+                    });
+                    case Syntax.LESS_OPERATOR -> reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return lv != null && rv != null &&
+                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) < 0;
+                    });
+                    case Syntax.LESS_OR_EQUALS_OPERATOR -> reference.setOperation((l, r) -> {
+                        Object lv = l.invoke(), rv = r.invoke();
+                        return lv != null && rv != null &&
+                                rv.getClass().equals(lv.getClass()) && ((Comparable<Object>) lv).compareTo(rv) <= 0;
+                    });
+                    default -> throw new IllegalArgumentException(operator);
+                }
+
+                reference.setParameters(
+                        Stream.concat(Arrays.stream(left.parameterTypes()), Arrays.stream(right.parameterTypes()))
+                                .collect(Collectors.toSet()).toArray(Class[]::new)
                 );
 
                 return reference;

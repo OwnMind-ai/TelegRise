@@ -17,7 +17,14 @@ public final class Syntax {
     public static final String OR_OPERATOR = "OR";
     public static final String EQUALS_OPERATOR = "==";
     public static final String NOT_EQUALS_OPERATOR = "!=";
-    public static final List<String> OPERATORS = List.of(PARALLEL_SEPARATOR, CHAIN_SEPARATOR, LIST_SEPARATOR, AND_OPERATOR, OR_OPERATOR, EQUALS_OPERATOR, NOT_EQUALS_OPERATOR);
+    public static final String GREATER_OPERATOR = ">";
+    public static final String GREATER_OR_EQUALS_OPERATOR = ">=";
+    public static final String LESS_OR_EQUALS_OPERATOR = "<=";
+    public static final String LESS_OPERATOR = "<";
+    public static final List<String> OPERATORS = List.of(
+            PARALLEL_SEPARATOR, CHAIN_SEPARATOR, LIST_SEPARATOR, AND_OPERATOR, OR_OPERATOR, EQUALS_OPERATOR,
+            NOT_EQUALS_OPERATOR, GREATER_OPERATOR, LESS_OPERATOR, GREATER_OR_EQUALS_OPERATOR, LESS_OR_EQUALS_OPERATOR
+    );
     public static final int MAX_OPERATORS_LENGTH = 3;
 
     public static final String PARENTHESES_START = "(";
