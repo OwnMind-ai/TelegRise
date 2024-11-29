@@ -103,7 +103,8 @@ public class Parser {
             case LIST_SEPARATOR -> 2;
             case OR_OPERATOR -> 4;
             case AND_OPERATOR -> 5;
-            case EQUALS_OPERATOR, NOT_EQUALS_OPERATOR -> 6;
+            case GREATER_OPERATOR, GREATER_OR_EQUALS_OPERATOR, LESS_OPERATOR, LESS_OR_EQUALS_OPERATOR -> 6;
+            case EQUALS_OPERATOR, NOT_EQUALS_OPERATOR -> 7;
             case CHAIN_SEPARATOR -> 11;
             default ->
                     throw new ReferenceParsingException(ErrorCodes.UNDEFINED_OPERATOR, this.lexer.getPosition() - operator.length());
