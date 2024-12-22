@@ -236,9 +236,9 @@ public class UserSession implements Runnable{
 
     private void applyTree(Update update, Tree tree, boolean execute) {
         if (tree.getBranches() != null || (tree.getController() != null && execute)) {
+            this.sessionMemory.getBranchingElements().add(tree);
             TreeExecutor executor = TreeExecutor.create(tree, this.resourceInjector, this.sender, this.sessionMemory, updatesQueue);
             this.treeExecutors.add(executor);
-            this.sessionMemory.getBranchingElements().add(tree);
 
             try {
                 if (execute)
