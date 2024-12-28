@@ -6,7 +6,7 @@
 
     <groupId>org.telegram</groupId>
     <artifactId>telegrise</artifactId>
-    <version>0.9.11-PREVIEW</version>
+    <version>0.9.12-PREVIEW</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -37,13 +37,13 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-longpolling</artifactId>
-            <version>7.10.0</version>
+            <version>8.0.0</version>
         </dependency>
         <!-- OkHttp client implementation -->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>7.10.0</version>
+            <version>8.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

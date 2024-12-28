@@ -3,6 +3,8 @@ package org.telegram.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -32,6 +34,7 @@ import java.util.function.Function;
 import static org.telegram.telegrise.core.elements.Tree.*;
 
 public class UserSession implements Runnable{
+    private static final Logger logger = LoggerFactory.getLogger(UserSession.class);
     private final ThreadLocal<SessionIdentifier> userIdentifier = new ThreadLocal<>();
     @Getter
     private final SessionMemoryImpl sessionMemory;
@@ -117,6 +120,7 @@ public class UserSession implements Runnable{
             while (!this.updatesQueue.isEmpty())
                 this.handleUpdate(this.updatesQueue.remove());
         } catch (Throwable e) {
+            logger.error("An error occurred running session {}", userIdentifier, e);
             throw TelegRiseRuntimeException.unfold(e);
         } finally {
             this.running.set(false);
