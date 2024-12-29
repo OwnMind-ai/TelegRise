@@ -73,7 +73,7 @@ public class Parser {
     }
 
     private boolean isPassiveToken(Token token){
-        return !List.of(TokenTypes.REFERENCE, TokenTypes.EXPRESSION, TokenTypes.REFERENCE, TokenTypes.VALUE).contains(token.getTokenType());
+        return !List.of(TokenTypes.REFERENCE, TokenTypes.EXPRESSION, TokenTypes.REFERENCE, TokenTypes.VALUE, TokenTypes.IF_CONSTRUCTION).contains(token.getTokenType());
     }
 
     private Token buildExpressionTree(Token previousToken, int currentPrecedence) throws ReferenceParsingException {

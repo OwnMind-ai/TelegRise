@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 //TODO webhooks
-//TODO bot options
 public final class TelegRiseApplication {
     @Setter
     private File transcription;
