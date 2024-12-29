@@ -23,18 +23,19 @@ public class TreeControllerInitializer {
 
         resourceInjector.injectResources(instance);
 
-        Optional<Method> onCreateMethod = Arrays.stream(contollerClass.getMethods())
+        Optional<Method> onCreateMethod = Arrays.stream(contollerClass.getDeclaredMethods())
                 .filter(m -> m.isAnnotationPresent(OnCreate.class)).findFirst();
 
-        if (onCreateMethod.isPresent()) {
+        onCreateMethod.ifPresent(m -> {
             try {
-                onCreateMethod.get().invoke(instance);
+                m.setAccessible(true);
+                m.invoke(instance);
             } catch (IllegalAccessException e) {
                 throw new TelegRiseRuntimeException("Unable to access OnCreate method");
             } catch (InvocationTargetException e) {
                 throw new TelegRiseRuntimeException("An exception occurred while creating the tree controller", e.getTargetException(), true);
             }
-        }
+        });
 
         return instance;
     }

@@ -8,6 +8,8 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.ChatTypes;
+import org.telegram.telegrise.annotations.OnClose;
+import org.telegram.telegrise.annotations.OnCreate;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -24,6 +26,7 @@ import org.telegram.telegrise.types.CommandData;
 import org.telegram.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -94,14 +97,29 @@ public class Tree extends NodeElement implements BranchingElement{
     public void validate(TranscriptionMemory memory) {
         if (improperInterruptionScopes(this.allowedInterruptions))
             throw new TranscriptionParsingException("Undefined interruption scopes", node);
+
+        if (this.controller != null)
+            this.validateSuperclass(this.controller, this.controller.getSuperclass());
     }
 
     @Attribute(name = "controller", priority = Double.POSITIVE_INFINITY)
-    private LocalNamespace extractHandler(Node node, LocalNamespace namespace){
-        if (node.getAttributes().getNamedItem("controller") != null)
+    private LocalNamespace extractController(Node node, LocalNamespace namespace){
+        if (node.getAttributes().getNamedItem("controller") != null) {
             this.controller = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("controller").getNodeValue());
+        }
 
         return this.createNamespace(namespace.getApplicationNamespace());
+    }
+
+    private void validateSuperclass(Class<?> child, Class<?> superclass) {
+        if (superclass == null || superclass.equals(Object.class)) return;
+
+        for (Method m : superclass.getDeclaredMethods())
+            if (m.isAnnotationPresent(OnCreate.class) || m.isAnnotationPresent(OnClose.class))
+                throw new TranscriptionParsingException("Unable to initialize class '%s': superclass '%s' has method '%s' that is annotated with @OnCreate or @OnClose"
+                        .formatted(child.getSimpleName(), superclass.getSimpleName(), m.getName()), node);
+
+        validateSuperclass(child, superclass.getSuperclass());
     }
 
     @Override

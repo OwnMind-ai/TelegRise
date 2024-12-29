@@ -2,6 +2,7 @@
 
 <?import org.telegram.telegrise.utils.MessageUtils ?>
 <?import org.telegram.telegrise.SimpleController ?>
+<?import org.telegram.telegrise.SimpleController$ChildController ?>
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
     <head>
         <link src="test/*"/>
@@ -59,7 +60,7 @@
                 <text byName="startText"/>
             </send>
         </tree>
-        <tree name="testMediaCollector" commands="test_media_collector" description="Test for media collector" controller="SimpleController"  accessLevel="0" >
+        <tree name="testMediaCollector" commands="test_media_collector" description="Test for media collector" controller="ChildController"  accessLevel="0" >
             <send>
                 Send mediagroup
             </send>

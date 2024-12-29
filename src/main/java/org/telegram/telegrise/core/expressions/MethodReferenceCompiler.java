@@ -411,22 +411,29 @@ public class MethodReferenceCompiler {
             throw new TranscriptionParsingException("Unable to compile method '" + token.getMethod() + "': no controller class is assigned", node);
 
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
-
-        Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(annotation) && m.getName().equals(token.getMethod())).toArray(Method[]::new);
-
-        if (found.length == 0)
-            throw new TranscriptionParsingException("Method '" + token.getMethod() + "' not found in class '" + parentClass.getName() + "'", node);
-        else if (found.length > 1)
-            throw new TranscriptionParsingException("More than one method called '" + token.getMethod() + "' are decelerated in class '" + parentClass.getName() + "'", node);
-
-        Method method = found[0];
+        Method method = getMethodFromClass(token, annotation, node, parentClass);
+        if (method == null)
+            throw new TranscriptionParsingException("Method '" + token.getMethod() + "' not found in class '" + parentClass.getName() + "' or its super classes", node);
 
         if ((method.getModifiers() & Modifier.PUBLIC) == 0)
             throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);
 
         method.setAccessible(true);
         return method;
+    }
+
+    private static Method getMethodFromClass(MethodContainer token, Class<? extends Annotation> annotation, Node node, Class<?> parentClass) {
+        Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(annotation) && m.getName().equals(token.getMethod())).toArray(Method[]::new);
+
+        if (found.length == 0) {
+            if (parentClass.getSuperclass() != null)
+                return getMethodFromClass(token, annotation, node, parentClass.getSuperclass());
+            return null;
+        } else if (found.length > 1)
+            throw new TranscriptionParsingException("More than one method called '" + token.getMethod() + "' are decelerated in class '" + parentClass.getName() + "'", node);
+
+        return found[0];
     }
 
     private ReferenceExpression compileParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic, LocalNamespace namespace, Node node) {

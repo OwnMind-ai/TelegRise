@@ -8,8 +8,10 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrise.annotations.*;
-import org.telegram.telegrise.core.ResourcePool;
+import org.telegram.telegrise.annotations.Handler;
+import org.telegram.telegrise.annotations.Reference;
+import org.telegram.telegrise.annotations.Resource;
+import org.telegram.telegrise.annotations.TreeController;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.utils.MessageUtils;
@@ -97,16 +99,6 @@ public class SimpleController {
         });
         application.addService(new SimpleService());
         application.start();
-    }
-
-    @OnCreate
-    public void onCreate(){
-        System.out.println("OnCreate executed, user identifier: " + memory.getSessionIdentifier());
-    }
-
-    @OnClose
-    public void onClose(){
-        System.out.println("OnClose method executed");
     }
 
     @Reference
@@ -197,6 +189,12 @@ public class SimpleController {
     @Reference
     public void consumeReturn(Message result){
         System.out.println("Returned: " + result.getText());
+    }
+
+    @TreeController
+    public static class ChildController extends SimpleController{
+        @Resource
+        private SessionMemory memory;
     }
 
     @Handler(absolute = true)
