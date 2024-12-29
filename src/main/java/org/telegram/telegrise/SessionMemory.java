@@ -22,32 +22,23 @@ public interface SessionMemory {
     Object remove(String key);
 
     private String localKey(Tree tree, String key){
-        if (tree == null) {
+        if (tree == null)
             throw new TelegRiseRuntimeException("Unable to access local memory: there is no tree to access");
-        }
 
         return "@" + tree.getName() + ":" + key;
     }
 
-    default void put(String key, Tree tree, Object value) {
-        put(localKey(tree, key), value);
-    }
+    default void put(String key, Tree tree, Object value) { put(localKey(tree, key), value); }
+    default boolean containsKey(String key, Tree tree){ return containsKey(localKey(tree, key)); }
+    default Object get(String key, Tree tree){ return get(localKey(tree, key)); }
+    default <T> T get(String key, Tree tree, Class<T> tClass){ return get(localKey(tree, key), tClass); }
+    default Object remove(String key, Tree tree){ return remove(localKey(tree, key)); }
 
-    default boolean containsKey(String key, Tree tree){
-        return containsKey(localKey(tree, key));
-    }
-
-    default Object get(String key, Tree tree){
-        return get(localKey(tree, key));
-    }
-
-    default <T> T get(String key, Tree tree, Class<T> tClass){
-        return get(localKey(tree, key), tClass);
-    }
-
-    default Object remove(String key, Tree tree){
-        return remove(localKey(tree, key));
-    }
+    default void putLocal(String key, Object value) { put(key, getCurrentTree(), value); }
+    default boolean containsKeyLocal(String key){ return containsKey(key, getCurrentTree()); }
+    default Object getLocal(String key){ return get(key, getCurrentTree()); }
+    default <T> T getLocal(String key, Class<T> tClass){ return get(key, getCurrentTree(), tClass); }
+    default Object removeLocal(String key){ return remove(key, getCurrentTree()); }
 
     Tree getCurrentTree();
 

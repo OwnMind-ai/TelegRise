@@ -119,7 +119,7 @@ public class MethodReferenceCompiler {
                 //  but there might be a better solution (like an annotation or wrapper idk)
                 // Since 0.9.0
                 if (!left.returnType().equals(Object.class) && (right.parameterTypes().length == 0 ||
-                    (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) || 
+                    (!isLeftList && !(right.parameterTypes()[0].isAssignableFrom(left.returnType()) ||
                         ClassUtils.primitiveToWrapper(right.parameterTypes()[0]).isAssignableFrom(ClassUtils.primitiveToWrapper(left.returnType())))))) {
                     throw new TranscriptionParsingException("Unable to apply '->' operator: left side returns different type '%s' than right side consumes '%s'"
                             .formatted(left.returnType().getName(), Arrays.stream(right.parameterTypes()).map(Class::getName).collect(Collectors.joining(", "))), node);
@@ -129,12 +129,16 @@ public class MethodReferenceCompiler {
                 reference.setLeft(left);
                 reference.setRight(right);
                 reference.setParameters(left.parameterTypes());
+                reference.setComposeRight(false);
 
                 if (!isLeftList || right.parameterTypes().length == 1 && ClassUtils.isAssignable(right.parameterTypes()[0], List.class)) {
-                    reference.setComposeRight(false);
                     reference.setOperation((l, r) -> r.invoke(l.invoke()));
+                } else if (right.parameterTypes().length == 1 && right.parameterTypes()[0].isArray()) {
+                    reference.setOperation((l, r) -> {
+                        List<?> list = (List<?>) l.invoke();
+                        return r.invoke(new Object[]{ list.toArray() });
+                    });
                 } else {
-                    reference.setComposeRight(true);
                     reference.setOperation((l, r) -> {
                         List<?> list = (List<?>) l.invoke();
                         return r.invoke(list.toArray());

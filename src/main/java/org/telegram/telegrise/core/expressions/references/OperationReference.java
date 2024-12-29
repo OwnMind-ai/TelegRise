@@ -59,7 +59,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
         return (K) reference.invoke(pool, instance, parameters);
     }
 
-    private Object @NotNull [] composeParameters(ReferenceExpression reference, Object[] args) {
+    private Object[] composeParameters(ReferenceExpression reference, Object[] args) {
         Map<Class<?>, List<Object>> components = Arrays.stream(args).collect(Collectors.groupingBy(Object::getClass, Collectors.toList()));
 
         if (!Arrays.stream(reference.parameterTypes()).map(p -> p.isPrimitive() ? ClassUtils.primitiveToWrapper(p) : p)

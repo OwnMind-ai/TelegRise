@@ -48,7 +48,7 @@
 
 
 
-                        ${SimpleController#isHello} ${SimpleController#isHello}
+                        ${(SimpleController#isHello, " - ", SimpleController#isHello) -> #concat}
                     </else>
                 </text>
                 <keyboard byName="startKeyboard"/>

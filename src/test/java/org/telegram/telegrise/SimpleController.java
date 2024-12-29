@@ -31,11 +31,11 @@ import java.util.stream.Collectors;
 public class SimpleController extends DefaultController {
     @Reference
     public static boolean isHello(Update update, SessionMemory memory){
-        if (!memory.containsKey("hello", memory.getCurrentTree()))
-            memory.put("hello", memory.getCurrentTree(), false);
+        if (!memory.containsKeyLocal("hello"))
+            memory.putLocal("hello", false);
 
-        memory.put("hello", memory.getCurrentTree(), !memory.get("hello", memory.getCurrentTree(), Boolean.class));
-        return memory.get("hello", memory.getCurrentTree(), Boolean.class);
+        memory.putLocal("hello", !memory.getLocal("hello", Boolean.class));
+        return memory.getLocal("hello", Boolean.class);
     }
 
     @Reference
@@ -57,11 +57,6 @@ public class SimpleController extends DefaultController {
     @Reference
     public static boolean getTrue(Update update){
         return true;
-    }
-
-    @Reference
-    public String concat(String... strings){
-        return String.join(" ", strings);
     }
 
     @Reference

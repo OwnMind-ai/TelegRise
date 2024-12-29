@@ -13,6 +13,16 @@ public class DefaultController {
     //TODO consider making Update a @HiddenParameter, might prove useful
 
     @Reference
+    public String concat(Object... parts){
+        StringBuilder sb = new StringBuilder();
+        for (Object part : parts) {
+            String string = part.toString();
+            sb.append(string);
+        }
+        return sb.toString();
+    }
+
+    @Reference
     public boolean isCallback(Update update){
         return update.hasCallbackQuery();
     }
