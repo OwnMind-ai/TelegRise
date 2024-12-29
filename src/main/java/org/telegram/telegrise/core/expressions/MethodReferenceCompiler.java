@@ -7,6 +7,8 @@ import org.telegram.telegrise.annotations.HiddenParameter;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.*;
+import org.telegram.telegrise.core.builtin.BuiltinReferences;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.core.expressions.references.IfReference;
 import org.telegram.telegrise.core.expressions.references.MethodReference;
 import org.telegram.telegrise.core.expressions.references.OperationReference;
@@ -388,6 +390,10 @@ public class MethodReferenceCompiler {
     private ReferenceExpression compileMethodReference(MethodReferenceToken token, LocalNamespace namespace, Node node) {
         if (token.getClassName() == null && (BuiltinReferences.METHODS.contains(token.getMethod()) || token.getMethod().equals(Syntax.REGISTER))) {
             var dummy = new MethodReferenceToken(BuiltinReferences.class.getName(), token.getMethod(), token.getParams());
+
+            if (dummy.getMethod().equals("todo"))
+                log.warn("Detected '#todo' reference at: {}", NodeElement.formatNode(node));
+
             return compileMethodReference(dummy, namespace, node);
         }
 
@@ -412,8 +418,9 @@ public class MethodReferenceCompiler {
 
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
         Method method = getMethodFromClass(token, annotation, node, parentClass);
-        if (method == null)
-            throw new TranscriptionParsingException("Method '" + token.getMethod() + "' not found in class '" + parentClass.getName() + "' or its super classes", node);
+        if (method == null)      //TODO suggest possible methods ('did you mean..')
+            throw new TranscriptionParsingException("Method '%s', that is annotated by @%s, was not found in class '%s' or its super classes"
+                    .formatted(token.getMethod(), annotation.getSimpleName(), parentClass.getSimpleName()), node);
 
         if ((method.getModifiers() & Modifier.PUBLIC) == 0)
             throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);

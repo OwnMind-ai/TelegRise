@@ -12,6 +12,7 @@ import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.Resource;
 import org.telegram.telegrise.annotations.TreeController;
+import org.telegram.telegrise.core.builtin.DefaultController;
 import org.telegram.telegrise.core.elements.actions.Send;
 import org.telegram.telegrise.senders.BotSender;
 import org.telegram.telegrise.utils.MessageUtils;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @TreeController
-public class SimpleController {
+public class SimpleController extends DefaultController {
     @Reference
     public static boolean isHello(Update update, SessionMemory memory){
         if (!memory.containsKey("hello", memory.getCurrentTree()))

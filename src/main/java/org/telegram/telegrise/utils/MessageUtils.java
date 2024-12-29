@@ -145,7 +145,7 @@ public class MessageUtils {
     }
 
     @Reference
-    public static ReplyKeyboard keyboardRemove(){
+    public static ReplyKeyboard replyKeyboardRemove(){
         return new ReplyKeyboardRemove(true);
     }
 }

@@ -1,4 +1,4 @@
-package org.telegram.telegrise.core;
+package org.telegram.telegrise.core.builtin;
 
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrise.SessionMemory;
@@ -75,5 +75,10 @@ public class BuiltinReferences {
     @Reference
     public static Object memoryGlobal(String name, @HiddenParameter SessionMemory memory){
         return memory.get(name);
+    }
+
+    @Reference
+    public static Object todo(){
+        throw new UnsupportedOperationException("TODO");
     }
 }

@@ -84,8 +84,8 @@
             </branch>
         </tree>
         <tree name="testError" commands="test_error" description="Tests error" accessLevel="0">
-            <send chat="100">
-                Error
+            <send>
+                ${#todo}
             </send>
         </tree>
         <tree name="denied">
@@ -121,7 +121,7 @@
                         <text parseMode="html"><b>Bye</b></text>
                     </send>
                 </branch>
-                <branch callbackTriggers="first" invoke="#send; #log; SimpleController#printHello">
+                <branch when='::callback("first")' invoke="#send; #log; SimpleController#printHello">
                     <transition direction="back" target="root" execute="true"/>
                 </branch>
                 <branch callbackTriggers="second">

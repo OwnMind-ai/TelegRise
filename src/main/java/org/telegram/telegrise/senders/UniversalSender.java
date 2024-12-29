@@ -85,7 +85,7 @@ public class UniversalSender {
         if (action.getReturnConsumer() != null && result != null){
             pool.addComponent(result);
             pool.setApiResponseWrapper(new ApiResponseWrapper(result));
-            action.getReturnConsumer().generate(pool);   //TODO add result to pool
+            action.getReturnConsumer().generate(pool);
         }
     }
 }

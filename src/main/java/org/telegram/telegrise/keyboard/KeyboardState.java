@@ -18,7 +18,7 @@ public final class KeyboardState {
     @Getter
     private final BranchingElement parent;
     private final boolean[][] buttonVisibilities;
-    private final Map<String, String> switchStates = new HashMap<>();   // TODO add carousel swithes
+    private final Map<String, String> switchStates = new HashMap<>();   // TODO add carousel switches
 
     public KeyboardState(BranchingElement parent, Keyboard keyboard, ResourcePool pool){
         this.parent = parent;
