@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <trees>
-    <tree name="linkedTree" commands="linked" accessLevel="0" description="Linked tree form a file">
+    <tree name="linkedTree" command="linked" accessLevel="0" description="Linked tree form a file">
         <send>
             Linked tree!
         </send>

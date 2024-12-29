@@ -58,11 +58,11 @@ public class Tree extends NodeElement implements BranchingElement{
     @Attribute(name = "allowedInterruptions")
     private String[] allowedInterruptions = {INTERRUPT_BY_ALL};
 
-    @Attribute(name = "commands")
+    @Attribute(name = "command")
     private String[] commands;
-    @Attribute(name = "keys")
+    @Attribute(name = "key")
     private String[] keys;
-    @Attribute(name = "callbackTriggers")
+    @Attribute(name = "callback")
     private String[] callbackTriggers;
     @Attribute(name = "predicate")
     private GeneratedValue<Boolean> predicate;

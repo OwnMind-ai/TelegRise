@@ -5,7 +5,7 @@
         <link src="test/keyboards.xml"/>
     </head>
     <root name="Main">
-        <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
+        <tree name="name" callback="callback-data" key="first; second" command="example"
               controller="XMLTranscriptionParserTest">
             <send>
                 <text parseMode="markdown">Text</text>

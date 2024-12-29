@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrise.ChatTypes;
 import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.elements.actions.ActionElement;
@@ -30,9 +30,9 @@ public class Branch extends NodeElement implements BranchingElement {
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
-    @Attribute(name = "keys")
+    @Attribute(name = "key")
     private String[] keys;
-    @Attribute(name = "callbackTriggers")
+    @Attribute(name = "callback")
     private String[] callbackTriggers;
 
     @Attribute(name = "invoke")

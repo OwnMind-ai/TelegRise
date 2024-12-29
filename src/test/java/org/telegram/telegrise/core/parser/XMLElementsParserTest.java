@@ -106,7 +106,7 @@ public class XMLElementsParserTest {
         parser.load();
 
         Node node = toNode("""
-                <tree name="name" predicate="true" callbackTriggers="callback-data" keys="first; second" commands="example"
+                <tree name="name" predicate="true" callback="callback-data" key="first; second" command="example"
                               controller="XMLElementsParserTest">
                             <send chat="-1">
                                <text parseMode="markdown">Text</text>

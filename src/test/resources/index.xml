@@ -19,7 +19,7 @@
         <send>
             <text parseMode="markdown">Menu</text>
         </send>
-        <tree name="startTree" commands="start" description="Start" accessLevel="0"
+        <tree name="startTree" command="start" description="Start" accessLevel="0"
               predicate="SimpleController#getTrue AND SimpleController#checkStart"
                 controller="SimpleController">
             <keyboards>
@@ -54,13 +54,13 @@
                 <keyboard byName="startKeyboard"/>
             </send>
         </tree>
-        <tree name="copyStartText" commands="copy_start_text" description="Test for text loading by name" accessLevel="0">
+        <tree name="copyStartText" command="copy_start_text" description="Test for text loading by name" accessLevel="0">
             <delete registry="name"/>
             <send>
                 <text byName="startText"/>
             </send>
         </tree>
-        <tree name="testMediaCollector" commands="test_media_collector" description="Test for media collector" controller="ChildController"  accessLevel="0" >
+        <tree name="testMediaCollector" command="test_media_collector" description="Test for media collector" controller="ChildController"  accessLevel="0" >
             <send>
                 Send mediagroup
             </send>
@@ -75,7 +75,7 @@
                 </send>
             </default>
         </tree>
-        <tree name="testMedia" commands="test_media" description="Test for media tag" controller="SimpleController"  accessLevel="0" >
+        <tree name="testMedia" command="test_media" description="Test for media tag" controller="SimpleController"  accessLevel="0" >
             <send>
                 <media sendMethod="#createSendMethod"/>
             </send>
@@ -83,7 +83,7 @@
                 <send>Bye!</send>
             </branch>
         </tree>
-        <tree name="testError" commands="test_error" description="Tests error" accessLevel="0">
+        <tree name="testError" command="test_error" description="Tests error" accessLevel="0">
             <send>
                 ${#todo}
             </send>
@@ -91,7 +91,7 @@
         <tree name="denied">
             <send>Sorry, your request was denied</send>
         </tree>
-        <tree name="name" callbackTriggers="callback-data" keys="first; second" commands="example"
+        <tree name="name" callback="callback-data" key="first; second" command="example"
               controller="SimpleController" description="test" accessLevel="0" allowedInterruptions="none">
             <keyboards>
                 <keyboard name="firstt" type="inline">
@@ -124,19 +124,19 @@
                 <branch when='::callback("first")' invoke="#send; #log; SimpleController#printHello">
                     <transition direction="back" target="root" execute="true"/>
                 </branch>
-                <branch callbackTriggers="second">
+                <branch callback="second">
                     <transition direction="jump" target="toBeCalled" execute="true"/>
                 </branch>
-                <branch callbackTriggers="disableMe">
+                <branch callback="disableMe">
                     <invoke method="#disableButton"/>
                     <answer text="Done!"/>
                     <transition direction="back" edit="send"/>
                 </branch>
-                <branch callbackTriggers="switch">
+                <branch callback="switch">
                     <flip keyboard="custom" switch="switch"/>
                     <transition direction="back" edit="first"/>
                 </branch>
-                <branch callbackTriggers="testAnimation">
+                <branch callback="testAnimation">
                     <animate period="0.5" loops="5" parallel="false">
                         <frame>Loading /</frame>
                         <frame>Loading -</frame>
@@ -159,10 +159,10 @@
                     <row><button data="1">1</button></row>
                 </keyboard>
             </send>
-            <branch callbackTriggers="back">
+            <branch callback="back">
                 <transition direction="caller" execute="true"/>
             </branch>
-            <branch callbackTriggers="1" name="initial">
+            <branch callback="1" name="initial">
                 <edit source="callback">
                     <text>1</text>
                     <keyboard type="inline">
@@ -171,7 +171,7 @@
                 </edit>
                 <transition direction="back"/>
             </branch>
-            <branch callbackTriggers="2">
+            <branch callback="2">
                 <edit source="callback">
                     <text>2</text>
                     <keyboard type="inline">

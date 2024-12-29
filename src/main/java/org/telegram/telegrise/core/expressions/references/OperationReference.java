@@ -72,9 +72,9 @@ public class OperationReference<L, R> implements ReferenceExpression{
             Class<?> type = ClassUtils.primitiveToWrapper(reference.parameterTypes()[i]);
             try{
                 List<Object> value = components.entrySet().stream()
-                                .filter(e -> !e.getValue().isEmpty())
-                                .filter(e -> ClassUtils.isAssignable(e.getKey(), type))
-                                .map(Map.Entry::getValue).findFirst().orElseThrow();
+                        .filter(e -> !e.getValue().isEmpty())
+                        .filter(e -> ClassUtils.isAssignable(e.getKey(), type))
+                        .map(Map.Entry::getValue).findFirst().orElseThrow();
                 result[i] = value.remove(0);
             } catch(NullPointerException | IndexOutOfBoundsException | NoSuchElementException e){
                 throw new TelegRiseRuntimeException("Unable to pass arguments of types %s to reference with parameters of types %s"
