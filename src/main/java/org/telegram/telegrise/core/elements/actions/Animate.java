@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.AnimationExecutor;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -41,6 +41,9 @@ public class Animate extends ActionElement{
 
     @Attribute(name = "deleteAfter")
     private boolean deleteAfter = true;
+
+    @Attribute(name = "onError")
+    private GeneratedValue<Void> onError;
 
     @InnerElement(nullable = false)
     private List<Frame> frames;

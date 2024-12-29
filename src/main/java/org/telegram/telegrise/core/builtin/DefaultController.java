@@ -1,16 +1,28 @@
 package org.telegram.telegrise.core.builtin;
 
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.annotations.Reference;
 import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.annotations.TreeController;
+import org.telegram.telegrise.core.elements.NodeElement;
 import org.telegram.telegrise.generators.GeneratedReference;
+import org.w3c.dom.Node;
 
+@Slf4j
 @TreeController
 public class DefaultController {
     //TODO consider making Update a @HiddenParameter, might prove useful
+    @Reference
+    public void logError(TelegramApiException e, Node node){
+        log.error("An error occurred when executing: {}", NodeElement.formatNode(node), e);
+    }
+
+    @Reference
+    public void ignore(){}
 
     @Reference
     public String concat(Object... parts){

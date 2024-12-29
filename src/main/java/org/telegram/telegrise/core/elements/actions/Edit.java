@@ -66,6 +66,9 @@ public class Edit extends ActionElement{
     @Attribute(name = "inputMedia")
     private GeneratedValue<InputMedia> inputMedia;
 
+    @Attribute(name = "onError")
+    private GeneratedValue<Void> onError;
+
     @InnerElement
     private Text text;
     @InnerElement

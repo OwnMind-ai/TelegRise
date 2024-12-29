@@ -15,6 +15,7 @@ public abstract class ActionElement extends NodeElement implements StorableEleme
     public abstract GeneratedValue<Long> getChatId();
     public GeneratedValue<Void> getReturnConsumer() { return null; }
     public abstract GeneratedValue<Boolean> getWhen();
+    public GeneratedValue<Void> getOnError() { return null; }
 
     // Used for <transition edit="..."/>
     public Edit toEdit(){

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrise.SessionMemory;
+import org.telegram.telegrise.core.builtin.DefaultController;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegram.telegrise.senders.BotSender;
 
@@ -28,6 +29,7 @@ public final class ApplicationNamespace {
 
     public ApplicationNamespace(ClassLoader applicationClassloader) {
         this.applicationClassloader = applicationClassloader;
+        importedClasses.put(DefaultController.class.getSimpleName(), DefaultController.class);
     }
 
     public void addClass(String name) throws ClassNotFoundException {

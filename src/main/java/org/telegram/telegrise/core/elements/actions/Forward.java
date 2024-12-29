@@ -1,8 +1,8 @@
 package org.telegram.telegrise.core.elements.actions;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrise.core.GeneratedValue;
@@ -34,9 +34,11 @@ public class Forward extends ActionElement{
     @Attribute(name = "protectContent")
     private GeneratedValue<Boolean> protectContent;
 
-
     @Attribute(name = "returnConsumer")
     private GeneratedValue<Void> returnConsumer;
+
+    @Attribute(name = "onError")
+    private GeneratedValue<Void> onError;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool pool) {

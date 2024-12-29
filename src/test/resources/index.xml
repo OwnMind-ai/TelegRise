@@ -75,7 +75,7 @@
                 </send>
             </default>
         </tree>
-        <tree name="testMedia" command="test_media" description="Test for media tag" controller="SimpleController"  accessLevel="0" >
+        <tree name="testMedia" command="test_media" description="Test for media tag" controller="SimpleController" accessLevel="0" >
             <send>
                 <media sendMethod="#createSendMethod"/>
             </send>

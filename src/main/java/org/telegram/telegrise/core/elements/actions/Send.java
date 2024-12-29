@@ -62,6 +62,9 @@ public class Send extends ActionElement{
     @Attribute(name = "returnConsumer")
     private GeneratedValue<Void> returnConsumer;
 
+    @Attribute(name = "onError")
+    private GeneratedValue<Void> onError;
+
     @Override
     public void validate(TranscriptionMemory memory) {
         if (this.text == null && medias.isEmpty())
