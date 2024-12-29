@@ -9,10 +9,7 @@ import org.telegram.telegrise.annotations.ReferenceGenerator;
 import org.telegram.telegrise.core.*;
 import org.telegram.telegrise.core.builtin.BuiltinReferences;
 import org.telegram.telegrise.core.elements.NodeElement;
-import org.telegram.telegrise.core.expressions.references.IfReference;
-import org.telegram.telegrise.core.expressions.references.MethodReference;
-import org.telegram.telegrise.core.expressions.references.OperationReference;
-import org.telegram.telegrise.core.expressions.references.ReferenceExpression;
+import org.telegram.telegrise.core.expressions.references.*;
 import org.telegram.telegrise.core.expressions.tokens.*;
 import org.telegram.telegrise.exceptions.TelegRiseInternalException;
 import org.telegram.telegrise.exceptions.TelegRiseRuntimeException;
@@ -32,7 +29,7 @@ import static org.telegram.telegrise.core.expressions.references.MethodReference
 @Slf4j
 public class MethodReferenceCompiler {
     // Used to exclude reference duplication
-    private final Map<Method, MethodReference> referenceMap = new HashMap<>();
+    private final Map<AccessibleObject, ReferenceExpression> referenceMap = new HashMap<>();
 
     public ReferenceExpression compile(Token rootToken, LocalNamespace namespace, Class<?> returnType, Node node) {
         return switch (rootToken.getTokenType()) {
@@ -333,7 +330,7 @@ public class MethodReferenceCompiler {
         }
 
         //TODO static generators: can be generated right there once, for W performance
-        Method method = getMethod(token, ReferenceGenerator.class, namespace, node);
+        Method method = (Method) getMethod(token, ReferenceGenerator.class, namespace, node);    // Must be Method and not Field
         ReferenceGenerator annotation = method.getAnnotation(ReferenceGenerator.class);
 
         if (!ClassUtils.isAssignable(method.getReturnType(), GeneratedReferenceBase.class))
@@ -401,41 +398,44 @@ public class MethodReferenceCompiler {
             return compileMethodReference(dummy, namespace, node);
         }
 
-        Method method = getMethod(token, Reference.class, namespace, node);
+        AccessibleObject accessibleObject = getMethod(token, Reference.class, namespace, node);
 
         if (token.getParams() == null) {
-            if (this.referenceMap.containsKey(method)) {
-                return this.referenceMap.get(method);
-            } else {
+            if (this.referenceMap.containsKey(accessibleObject)) {
+                return this.referenceMap.get(accessibleObject);
+            } else if (accessibleObject instanceof Method method){
                 MethodReference methodReference = new MethodReference(method, token.isStatic());
                 this.referenceMap.put(method, methodReference);
                 return methodReference;
-            }
-        } else {
+            } else if (accessibleObject instanceof Field field){
+                FieldReference fieldReference = new FieldReference(field, token.isStatic());
+                this.referenceMap.put(field, fieldReference);
+                return fieldReference;
+            } else
+                throw new IllegalArgumentException(accessibleObject.toString());
+        } else if (accessibleObject instanceof Method method)
             return this.compileParametrizedReference(method, token.getParams(), token.isStatic(), namespace, node);
-        }
+        else
+            throw new TranscriptionParsingException("Field reference '#%s' cannot take any parameters".formatted(token.getMethod()), node);
     }
 
-    private static Method getMethod(MethodContainer token, Class<? extends Annotation> annotation, LocalNamespace namespace, Node node) {
+    private static AccessibleObject getMethod(MethodContainer token, Class<? extends Annotation> annotation, LocalNamespace namespace, Node node) {
         if (!token.isStatic() && namespace.getHandlerClass() == null)
             throw new TranscriptionParsingException("Unable to compile method '" + token.getMethod() + "': no controller class is assigned", node);
 
         Class<?> parentClass = token.isStatic() ? namespace.getApplicationNamespace().getClass(token.getClassName()) : namespace.getHandlerClass();
-        Method method = getMethodFromClass(token, annotation, node, parentClass);
+        AccessibleObject method = getMethodFromClass(token, annotation, node, parentClass);
         if (method == null)      //TODO suggest possible methods ('did you mean..')
             throw new TranscriptionParsingException("Method '%s', that is annotated by @%s, was not found in class '%s' or its super classes"
                     .formatted(token.getMethod(), annotation.getSimpleName(), parentClass.getSimpleName()), node);
-
-        if ((method.getModifiers() & Modifier.PUBLIC) == 0)
-            throw new TranscriptionParsingException("Method '" + method.getName() + "' must be public", node);
 
         method.setAccessible(true);
         return method;
     }
 
-    private static Method getMethodFromClass(MethodContainer token, Class<? extends Annotation> annotation, Node node, Class<?> parentClass) {
-        Method[] found = Arrays.stream(parentClass.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(annotation) && m.getName().equals(token.getMethod())).toArray(Method[]::new);
+    private static AccessibleObject getMethodFromClass(MethodContainer token, Class<? extends Annotation> annotation, Node node, Class<?> parentClass) {
+        AccessibleObject[] found = Stream.concat(Arrays.stream(parentClass.getDeclaredMethods()), Arrays.stream(parentClass.getDeclaredFields()))
+                .filter(m -> m.isAnnotationPresent(annotation) && m.getName().equals(token.getMethod())).toArray(AccessibleObject[]::new);
 
         if (found.length == 0) {
             if (parentClass.getSuperclass() != null)

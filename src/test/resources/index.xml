@@ -45,7 +45,7 @@
                     </if>
                     <else>
                         Hello again!
-
+                        ${#helloText}
 
 
                         ${(SimpleController#isHello, " - ", SimpleController#isHello) -> #concat}

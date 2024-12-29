@@ -75,6 +75,9 @@ public class SimpleController extends DefaultController {
     @Resource
     private TranscriptionManager objectManager;
 
+    @Reference
+    private String helloText = "Hello text";
+
     public static void main(String[] args) {
         TelegRiseApplication application = new TelegRiseApplication(new File("src/test/resources/index.xml"), SimpleController.class);
 //        application.setExecutorService(Executors::newSingleThreadExecutor);

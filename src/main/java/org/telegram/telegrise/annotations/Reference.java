@@ -23,7 +23,7 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})  //TODO add ElementType.FIELD, it would be nice to have getters
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Reference {
     /** Indicates the caching strategy for specific method reference. See <a href="#{@link}">{@link org.telegram.telegrise.caching.CachingStrategy CachingStrategy}</a> for detailed description.
      *
