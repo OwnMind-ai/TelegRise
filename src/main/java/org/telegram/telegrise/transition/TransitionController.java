@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrise.SessionMemoryImpl;
 import org.telegram.telegrise.TreeExecutor;
-import org.telegram.telegrise.core.GeneratedValue;
 import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.*;
 import org.telegram.telegrise.core.parser.TranscriptionMemory;
@@ -47,8 +46,10 @@ public class TransitionController {
         this.sessionMemory.updateJumpPoints();
         JumpPoint point = this.sessionMemory.getJumpPoints().peekLast();
 
-        if (point == null)
-            throw new TelegRiseRuntimeException("Unable to find a caller of tree '" + tree.getName() + "'", transition.getElementNode());
+        if (point == null) {
+            return this.applyBack(new Transition(Transition.BACK, "root", transition.getExecute(),
+                    transition.getEdit(), transition.getEditSource()), pool);
+        }
 
         if (point.actions() != null) {
             TreeExecutor pointExecutor = this.treeExecutors.stream()
@@ -77,9 +78,8 @@ public class TransitionController {
             return this.applyTransition(this.treeExecutors.getLast().getTree(), point.nextTransition(), pool);
         }
 
-        this.applyBack(new Transition(Transition.BACK,
-                GeneratedValue.ofValue(point.from().getName()),
-                false, null, null, null, null), pool);
+        this.applyBack(new Transition(Transition.BACK, point.from().getName(), transition.getExecute(),
+                transition.getEdit(), transition.getEditSource()), pool);
 
         assert this.sessionMemory.getBranchingElements().getLast() instanceof Tree;
 

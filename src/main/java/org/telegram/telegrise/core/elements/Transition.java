@@ -46,6 +46,14 @@ public class Transition extends NodeElement {
     @InnerElement
     private Transition nextTransition;
 
+    public Transition(String direction, String target, boolean execute, String edit, String editSource){
+        this.direction = direction;
+        this.target = GeneratedValue.ofValue(target);
+        this.execute = execute;
+        this.edit = edit;
+        this.editSource = editSource;
+    }
+
     @Override
     public void validate(TranscriptionMemory memory) {
         if (!List.of(BACK, CALLER, JUMP).contains(direction))
