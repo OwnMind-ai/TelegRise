@@ -220,7 +220,7 @@ public class SimpleController extends DefaultController {
         @Resource
         private SessionMemory memory;
         @Resource
-        private TranscriptionManager manager;
+        private SessionsManager sessionsManager;
 
         @Override
         public boolean canHandle(Update update) {
@@ -229,7 +229,7 @@ public class SimpleController extends DefaultController {
 
         @Override
         public void handle(Update update) {
-            manager.reinitializeSession(memory.getSessionIdentifier());
+            sessionsManager.reinitializeSession(memory.getSessionIdentifier());
         }
     }
 

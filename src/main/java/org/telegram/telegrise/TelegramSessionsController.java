@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -28,7 +29,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class TelegramSessionsController {
+public class TelegramSessionsController implements SessionsManager {
     private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 200;
     private static final int DEFAULT_CORE_THREAD_POOL_SIZE = 32;
 
@@ -42,6 +43,7 @@ public class TelegramSessionsController {
     @Setter
     private SessionInitializer sessionInitializer;
     private final List<ResourceFactory<?>> resourceFactories;
+
     @Setter
     private TelegramClient client;
     private List<Class<? extends PrimaryHandler>> userHandlersClasses;
@@ -76,6 +78,7 @@ public class TelegramSessionsController {
 
         if (poolExecutor == null) this.poolExecutor = createExecutorService();
 
+        this.resourceFactories.add(ResourceFactory.ofInstance(this, SessionsManager.class));
         var splitHandlers = userHandlersClasses.stream()
                 .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
@@ -83,7 +86,7 @@ public class TelegramSessionsController {
         BotSender botSender = new BotSender(client, null);
         TranscriptionManager objectManager =  new TranscriptionManager(null, null,
                 null, null, transcription, this::getTranscriptionManager,
-                u -> new ResourcePool(u, null, botSender, null), this::reinitializeSession);
+                u -> new ResourcePool(u, null, botSender, null));
 
         this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
@@ -148,18 +151,24 @@ public class TelegramSessionsController {
         }
     }
 
-    //TODO custom session loader
+    @Override
     public void loadSession(SessionMemory memory){
         if (!(memory instanceof SessionMemoryImpl sessionMemory))
             throw new TelegRiseRuntimeException("Unable to load session with third-party implementation");
 
-        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager, this::reinitializeSession);
+        if (this.sessions.containsKey(memory.getSessionIdentifier())) {
+            log.warn("Unable to load session {}: session with the same credentials already exists", sessionMemory.getSessionIdentifier());
+            return;
+        }
+
+        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager);
 
         this.sessions.put(sessionMemory.getSessionIdentifier(), session);
     }
 
-    private void createSession(SessionIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager, this::reinitializeSession);
+    @Override
+    public void createSession(SessionIdentifier identifier) {
+        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
         session.setRoleProvider(this.roleProvider);
@@ -172,9 +181,20 @@ public class TelegramSessionsController {
         this.sessions.put(identifier, session);
     }
 
-    private void reinitializeSession(SessionIdentifier sessionIdentifier) {
+    @Override
+    public void reinitializeSession(SessionIdentifier sessionIdentifier) {
         sessions.remove(sessionIdentifier);
         createSession(sessionIdentifier);
+    }
+
+    @Override
+    public void killSession(SessionIdentifier identifier) {
+        this.sessions.remove(identifier);
+    }
+
+    @Override
+    public @Nullable SessionMemory getSessionMemory(SessionIdentifier sessionIdentifier) {
+        return Optional.ofNullable(this.sessions.get(sessionIdentifier)).map(UserSession::getSessionMemory).orElse(null);
     }
 
     private void updateSession(UserSession session, Update update){

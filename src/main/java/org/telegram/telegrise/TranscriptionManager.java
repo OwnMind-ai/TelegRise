@@ -20,7 +20,6 @@ import org.telegram.telegrise.types.TextBlock;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -33,7 +32,6 @@ public class TranscriptionManager {
     private final Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter;
     private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
-    private final Consumer<SessionIdentifier> sessionInitializer;
 
     public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor,
                                 BiConsumer<BranchingElement, Update> elementExecutor,
@@ -41,7 +39,7 @@ public class TranscriptionManager {
                                 TransitionController transitionController,
                                 BotTranscription transcription,
                                 Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter,
-                                Function<Update, ResourcePool> resourcePoolProducer, Consumer<SessionIdentifier> sessionInitializer) {
+                                Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
@@ -50,18 +48,12 @@ public class TranscriptionManager {
         this.elementExecutor = elementExecutor;
         this.transcriptionMemory = transcription.getMemory();
         this.transcription = transcription;
-        this.sessionInitializer = sessionInitializer;
     }
 
-    //TODO replace with SessionManager resource object
-    public void reinitializeSession(SessionIdentifier id){
-        sessionInitializer.accept(id);
-    }
-
-    /** Clears cache for specific method reference and returns it previous value.
+    /** Clears cache for specific method reference and returns its previous value.
      * If no cache was stored or method reference was not found, this method will return <code>null</code>.
      *
-     * @param instance instance of declaring class
+     * @param instance instance of declaring a class
      * @param methodName method name, which should match with <code>Method::getName</code>
      * @return previously cached value
      * @since 0.6
@@ -71,7 +63,7 @@ public class TranscriptionManager {
         return clearCache(instance.getClass(), methodName);
     }
 
-    /** Clears cache for specific method reference and returns it previous value.
+    /** Clears cache for specific method reference and returns its previous value.
      * If no cache was stored or method reference was not found, this method will return <code>null</code>.
      *
      * @param clazz declaring class
