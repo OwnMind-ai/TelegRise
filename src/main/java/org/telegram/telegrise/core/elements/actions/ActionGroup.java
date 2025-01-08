@@ -16,6 +16,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a group of actions that executes the {@code ActionElement}s specified in its body.
+ * The {@code when} attribute determines whether the action group should be executed, 
+ * based on the provided condition.
+ * 
+ * <p>This class is particularly useful for grouping related actions and controlling 
+ * their execution based on conditional logic.
+ * 
+ * @since 0.7.5
+ */
 @Element(name = "actionGroup")
 @Getter @Setter @NoArgsConstructor
 public class ActionGroup extends ActionElement{

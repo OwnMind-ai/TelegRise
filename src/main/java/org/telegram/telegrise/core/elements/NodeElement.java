@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The base class for all elements that can be parsed from XML <b>transcriptions</b>. 
+ * 
+ * @since 0.6.4
+ */
 public abstract class NodeElement implements Serializable {
     protected transient Node node;
     @Getter @Setter
