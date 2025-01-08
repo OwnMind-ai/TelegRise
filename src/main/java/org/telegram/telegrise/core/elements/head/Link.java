@@ -34,7 +34,11 @@ public class Link extends NodeElement {
 
         if (source.endsWith("*")) {
             String path = source.substring(0, source.length() - 1);
-            File directory = path.startsWith("/") ? new File(path) : new File(parser.getRootDirectory(), path);
+
+            File directory = new File(path);
+            if(!directory.isAbsolute())
+                directory = new File(parser.getRootDirectory(), path);
+
             File[] files = directory.listFiles();
             if (files == null)
                 throw new TranscriptionParsingException("Unable to find source '" + this.source + "'", node);
@@ -51,7 +55,8 @@ public class Link extends NodeElement {
 
     private void parseSource(String source, Node node, TranscriptionMemory memory, XMLElementsParser parser) {
         try {
-            File file = source.startsWith("/") ? new File(source) : new File(parser.getRootDirectory(), source);
+            File file = new File(source).isAbsolute() ? new File(source) : new File(parser.getRootDirectory(), source);
+
             if (memory.getLinkedFiles().stream().anyMatch(f -> f.getAbsolutePath().equals(file.getAbsolutePath())))
                 return;
             memory.getLinkedFiles().add(file);
