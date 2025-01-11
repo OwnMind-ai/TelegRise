@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<?import org.telegram.telegrise.utils.MessageUtils ?>
-<?import org.telegram.telegrise.SimpleController ?>
-<?import org.telegram.telegrise.SimpleController$ChildController ?>
+<?import org.telegrise.telegrise.utils.MessageUtils ?>
+<?import org.telegrise.telegrise.SimpleController ?>
+<?import org.telegrise.telegrise.SimpleController$ChildController ?>
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
     <head>
         <link src="test/*"/>
