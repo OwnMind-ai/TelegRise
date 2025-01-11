@@ -9,6 +9,7 @@
     <version>0.10.1-PREVIEW</version>
 
     <properties>
+        <api.version>8.2.0</api.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,17 +34,20 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- Long polling bot -->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-longpolling</artifactId>
-            <version>8.2.0</version>
+            <version>${api.version}</version>
         </dependency>
-        <!-- OkHttp client implementation -->
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-webhook</artifactId>
+            <version>${api.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>8.2.0</version>
+            <version>${api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

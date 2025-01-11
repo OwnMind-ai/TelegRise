@@ -25,4 +25,7 @@ public class HeadBlock extends NodeElement {
 
     @InnerElement
     private SessionType sessionType;
+
+    @InnerElement
+    private Webhook webhook;
 }

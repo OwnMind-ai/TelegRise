@@ -40,11 +40,11 @@ public abstract class NodeElement implements Serializable {
     public void load(TranscriptionMemory memory){}
 
     protected final <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){
-        return property == null ? null : property.generate(pool);
+        return GeneratedValue.generate(property, pool);
     }
 
     protected final <T> T generateNullableProperty(GeneratedValue<T> property, T orElse, ResourcePool pool){
-        return property == null ? orElse : property.generate(pool);
+        return GeneratedValue.generate(property, pool, orElse);
     }
 
     public static @NotNull String formatNode(Node node) {

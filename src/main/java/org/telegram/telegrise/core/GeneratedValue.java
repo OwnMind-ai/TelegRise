@@ -1,5 +1,8 @@
 package org.telegram.telegrise.core;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -10,6 +13,14 @@ public interface GeneratedValue<T> extends Serializable {
 
     static <V> GeneratedValue<V> ofValue(V value){
         return new StaticValue<>(value);
+    }
+
+    static <V> @Nullable V generate(@Nullable GeneratedValue<V> generatedValue, ResourcePool pool){
+        return generatedValue == null ? null : generatedValue.generate(pool);
+    }
+
+    static <V> @NotNull V generate(@Nullable GeneratedValue<V> generatedValue, ResourcePool pool, @NotNull V orElse){
+        return generatedValue == null ? orElse : generatedValue.generate(pool);
     }
 
     default boolean equalsTo(GeneratedValue<?> other, ResourcePool resourcePool){

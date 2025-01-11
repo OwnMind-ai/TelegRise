@@ -1,13 +1,13 @@
 package org.telegram.telegrise;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrambots.webhook.TelegramBotsWebhookApplication;
 import org.telegram.telegrise.annotations.Handler;
 import org.telegram.telegrise.core.ApplicationNamespace;
 import org.telegram.telegrise.core.LocalNamespace;
@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-//TODO webhooks
+@Slf4j
 public final class TelegRiseApplication {
     @Setter
     private File transcription;
@@ -47,8 +47,6 @@ public final class TelegRiseApplication {
     private RoleProvider roleProvider;
     @Setter
     private SessionInitializer sessionInitializer;
-
-    private final TelegramBotsLongPollingApplication api = new TelegramBotsLongPollingApplication();
 
     public TelegRiseApplication(Class<?> mainClass) {
         this.mainClass = mainClass;
@@ -67,7 +65,6 @@ public final class TelegRiseApplication {
         if (token == null || !token.matches("\\d+:[a-zA-Z0-9_-]{35}"))
             throw new TelegRiseRuntimeException("Invalid bot token: " + token);
 
-        LongPollingUpdateConsumer bot = BotFactory.createLongPooling(controller);
         TelegramClient client = new OkHttpTelegramClient(token);
         controller.setClient(client);
         controller.initialize();
@@ -82,10 +79,22 @@ public final class TelegRiseApplication {
             controller.initializeSessions();
         }
 
-        try {
-            api.registerBot(token, bot);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+        if(controller.getTranscription().isWebhookBot()){
+            try (var api = new TelegramBotsWebhookApplication(controller.getTranscription().getHead().getWebhook().produceOptions())) {
+                api.registerBot(BotFactory.createWebhookBot(controller, token));
+                Thread.currentThread().join();
+            } catch (Exception e) {
+                log.error("Unable to register webhook bot", e);
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (var api = new TelegramBotsLongPollingApplication()) {
+                api.registerBot(token, BotFactory.createLongPooling(controller));
+                Thread.currentThread().join();
+            } catch (Exception e) {
+                log.error("Unable to register long-polling bot", e);
+                throw new RuntimeException(e);
+            }
         }
     }
 

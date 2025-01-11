@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrise.SessionIdentifier;
 import org.telegram.telegrise.core.GeneratedValue;
+import org.telegram.telegrise.core.ResourcePool;
 import org.telegram.telegrise.core.elements.head.HeadBlock;
 import org.telegram.telegrise.core.elements.security.Role;
 import org.telegram.telegrise.core.elements.security.Roles;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 @Getter @Setter
 @NoArgsConstructor
 public final class BotTranscription extends NodeElement {
-    //TODO webhooks support
     @Attribute(name = "username")
     private GeneratedValue<String> username;
 
@@ -113,5 +113,9 @@ public final class BotTranscription extends NodeElement {
     public void setRoot(Root root) {
         this.root = root;
         root.setTrees(new ArrayList<>(root.getTrees() == null ? List.of() :root.getTrees()));
+    }
+
+    public boolean isWebhookBot() {
+        return head != null && head.getWebhook() != null && head.getWebhook().getEnabled().generate(new ResourcePool());
     }
 }
