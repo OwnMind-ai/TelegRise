@@ -15,6 +15,25 @@ import org.telegram.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.List;
 
+/**
+ * Represents an element used to create text animations. Animations can be
+ * customized with options such as duration, conditions for starting and
+ * stopping, repetition behavior, and a sequence of frames defining the
+ * animation steps.
+ * 
+ * <p>
+ * Loading animation example:
+ * <pre>
+ * {@code
+ * <animate period="0.5" until="#loadFinish">
+ *      <frame>Loading /</frame>
+ *      <frame>Loading -</frame>
+ *      <frame>Loading \</frame>
+ *      <frame>Loading |</frame>
+ * </animate>
+ * }
+ * </pre>
+ */
 @Element(name = "animate")
 @Getter @Setter @NoArgsConstructor
 public class Animate extends ActionElement{

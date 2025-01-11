@@ -10,6 +10,11 @@ import org.telegram.telegrise.utils.MessageUtils;
 
 import java.util.Objects;
 
+/**
+ * The base class for all elements that represent executable action and can (but not required to) produce <code>PartialBotApiMethod</code> for Telegram client excution. 
+ * 
+ * @since 0.1.0
+ */
 public abstract class ActionElement extends NodeElement implements StorableElement {
     public abstract PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool);
     public abstract GeneratedValue<Long> getChatId();
