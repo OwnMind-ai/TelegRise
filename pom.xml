@@ -41,11 +41,6 @@
         </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-webhook</artifactId>
-            <version>${api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
             <version>${api.version}</version>
         </dependency>

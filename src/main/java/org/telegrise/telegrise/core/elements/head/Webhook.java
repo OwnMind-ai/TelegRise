@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telegram.telegrambots.webhook.WebhookOptions;
 import org.telegrise.telegrise.core.GeneratedValue;
-import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.NodeElement;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+@Deprecated
 @Element(name = "webhook")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Webhook extends NodeElement {
@@ -54,16 +53,16 @@ public class Webhook extends NodeElement {
     @Attribute(name = "keyStorePassword")
     private GeneratedValue<String> keyStorePassword;
 
-    public WebhookOptions produceOptions(){
-        var resources = new ResourcePool();
-        var result = new WebhookOptions();
-
-        if (port != null) result.setPort(port.generate(resources));
-        if (enableRequestLogging != null) result.setEnableRequestLogging(enableRequestLogging.generate(resources));
-        if (useHttps != null) result.setUseHttps(useHttps.generate(resources));
-        if (keyStorePath != null) result.setKeyStorePath(keyStorePath.generate(resources));
-        if (keyStorePassword != null) result.setKeyStorePassword(keyStorePassword.generate(resources));
-
-        return result;
-    }
+//    public WebhookOptions produceOptions(){
+//        var resources = new ResourcePool();
+//        var result = new WebhookOptions();
+//
+//        if (port != null) result.setPort(port.generate(resources));
+//        if (enableRequestLogging != null) result.setEnableRequestLogging(enableRequestLogging.generate(resources));
+//        if (useHttps != null) result.setUseHttps(useHttps.generate(resources));
+//        if (keyStorePath != null) result.setKeyStorePath(keyStorePath.generate(resources));
+//        if (keyStorePassword != null) result.setKeyStorePassword(keyStorePassword.generate(resources));
+//
+//        return result;
+//    }
 }

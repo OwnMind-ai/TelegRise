@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
-import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegram.telegrambots.webhook.TelegramBotsWebhookApplication;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.ApplicationNamespace;
 import org.telegrise.telegrise.core.LocalNamespace;
@@ -47,6 +45,8 @@ public final class TelegRiseApplication {
     private RoleProvider roleProvider;
     @Setter
     private SessionInitializer sessionInitializer;
+    @Setter
+    private ApplicationRunner applicationRunner = ApplicationRunner.LONG_POLLING;
 
     public TelegRiseApplication(Class<?> mainClass) {
         this.mainClass = mainClass;
@@ -79,23 +79,7 @@ public final class TelegRiseApplication {
             controller.initializeSessions();
         }
 
-        if(controller.getTranscription().isWebhookBot()){
-            try (var api = new TelegramBotsWebhookApplication(controller.getTranscription().getHead().getWebhook().produceOptions())) {
-                api.registerBot(BotFactory.createWebhookBot(controller, token));
-                Thread.currentThread().join();
-            } catch (Exception e) {
-                log.error("Unable to register webhook bot", e);
-                throw new RuntimeException(e);
-            }
-        } else {
-            try (var api = new TelegramBotsLongPollingApplication()) {
-                api.registerBot(token, BotFactory.createLongPooling(controller));
-                Thread.currentThread().join();
-            } catch (Exception e) {
-                log.error("Unable to register long-polling bot", e);
-                throw new RuntimeException(e);
-            }
-        }
+        this.applicationRunner.run(controller::onUpdateReceived, token);
     }
 
     @NotNull
