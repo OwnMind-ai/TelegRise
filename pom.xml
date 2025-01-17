@@ -6,7 +6,7 @@
 
     <groupId>org.telegrise</groupId>
     <artifactId>telegrise</artifactId>
-    <version>0.10.1-PREVIEW</version>
+    <version>0.10.2-PREVIEW</version>
 
     <properties>
         <api.version>8.2.0</api.version>
@@ -87,11 +87,6 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
