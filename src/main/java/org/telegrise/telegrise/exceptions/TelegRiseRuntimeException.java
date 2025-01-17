@@ -30,6 +30,11 @@ public class TelegRiseRuntimeException extends RuntimeException{
         this.node = node;
     }
 
+    public TelegRiseRuntimeException(Throwable throwable, Node node) {
+        super(throwable);
+        this.node = node;
+    }
+
     public TelegRiseRuntimeException(String message, Throwable throwable, boolean showStackTrace) {
         super(message, throwable, false, showStackTrace);
     }

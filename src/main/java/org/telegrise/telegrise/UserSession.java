@@ -119,7 +119,7 @@ public class UserSession implements Runnable{
             while (!this.updatesQueue.isEmpty())
                 this.handleUpdate(this.updatesQueue.remove());
         } catch (Throwable e) {
-            logger.error("An error occurred running session {}", userIdentifier, e);
+            logger.error("An error occurred running session {}", userIdentifier.get(), e);
             throw TelegRiseRuntimeException.unfold(e);
         } finally {
             this.running.set(false);
