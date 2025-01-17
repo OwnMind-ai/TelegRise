@@ -196,8 +196,8 @@ public class SimpleController extends DefaultController {
         private SessionMemory memory;
     }
 
-    @Handler(absolute = true)
-    public static class PHandler implements PrimaryHandler {
+    @Handler
+    public static class PHandler implements UpdateHandler {
         @Resource
         private BotSender sender;
         @Resource
@@ -215,8 +215,8 @@ public class SimpleController extends DefaultController {
         }
     }
 
-    @Handler(absolute = true)
-    public static class SHandler implements PrimaryHandler {
+    @Handler
+    public static class SHandler implements UpdateHandler {
         @Resource
         private SessionMemory memory;
         @Resource
@@ -233,8 +233,8 @@ public class SimpleController extends DefaultController {
         }
     }
 
-    @Handler(independent = true, absolute = true)
-    public static class SecondHandler implements PrimaryHandler {
+    @Handler(independent = true)
+    public static class SecondHandler implements UpdateHandler {
         @Override
         public boolean canHandle(Update update) {
             return update.hasMessage() && "/second".equals(update.getMessage().getText());

@@ -34,7 +34,7 @@ public final class TelegRiseApplication {
     private File transcription;
     @Setter
     private ClassLoader classLoader = this.getClass().getClassLoader();
-    private List<Class<? extends PrimaryHandler>> handlersClasses = new ArrayList<>();
+    private List<Class<? extends UpdateHandler>> handlersClasses = new ArrayList<>();
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
     private final ServiceManager serviceManager = new ServiceManager();
     private final Class<?> mainClass;
@@ -105,15 +105,15 @@ public final class TelegRiseApplication {
         return controller;
     }
 
-    private List<Class<? extends PrimaryHandler>> loadPrimaryHandlers(){
+    private List<Class<? extends UpdateHandler>> loadPrimaryHandlers(){
         Set<Class<?>> handlerCandidates = new Reflections(this.mainClass.getPackageName()).getTypesAnnotatedWith(Handler.class);
 
         for (Class<?> clazz : handlerCandidates)
-            if (!PrimaryHandler.class.isAssignableFrom(clazz))
+            if (!UpdateHandler.class.isAssignableFrom(clazz))
                 throw new TelegRiseRuntimeException("Handler class '" + clazz.getName() + "' doesn't implement PrimaryHandler interface");
 
         //noinspection unchecked
-        return handlerCandidates.stream().map(c -> (Class<? extends PrimaryHandler>)c).collect(Collectors.toList());
+        return handlerCandidates.stream().map(c -> (Class<? extends UpdateHandler>)c).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unused")

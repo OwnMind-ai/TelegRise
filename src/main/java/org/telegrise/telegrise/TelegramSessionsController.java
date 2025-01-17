@@ -46,14 +46,14 @@ public class TelegramSessionsController implements SessionsManager {
 
     @Setter
     private TelegramClient client;
-    private List<Class<? extends PrimaryHandler>> userHandlersClasses;
-    private PrimaryHandlersController handlersController;
+    private List<Class<? extends UpdateHandler>> userHandlersClasses;
+    private UpdateHandlersController handlersController;
 
-    public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends PrimaryHandler>> handlersClasses) {
+    public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends UpdateHandler>> handlersClasses) {
         this.transcription = transcription;
         this.resourceFactories = resourceFactories;
         this.poolExecutor = this.createExecutorService();
-        this.handlersController = new PrimaryHandlersController(null);
+        this.handlersController = new UpdateHandlersController(null);
         this.userHandlersClasses = handlersClasses;
     }
 
@@ -80,7 +80,7 @@ public class TelegramSessionsController implements SessionsManager {
 
         this.resourceFactories.add(ResourceFactory.ofInstance(this, SessionsManager.class));
         var splitHandlers = userHandlersClasses.stream()
-                .collect(Collectors.<Class<? extends PrimaryHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
+                .collect(Collectors.<Class<? extends UpdateHandler>>partitioningBy(h -> h.getAnnotation(Handler.class).independent()));
         this.userHandlersClasses = splitHandlers.get(false);
 
         BotSender botSender = new BotSender(client, null);
@@ -88,7 +88,7 @@ public class TelegramSessionsController implements SessionsManager {
                 null, null, transcription, this::getTranscriptionManager,
                 u -> new ResourcePool(u, null, botSender, null));
 
-        this.handlersController = new PrimaryHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
+        this.handlersController = new UpdateHandlersController(new ResourceInjector(resourceFactories, client, botSender, objectManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if(this.transcription.getRoot().getChatTypes() == null)
@@ -126,7 +126,7 @@ public class TelegramSessionsController implements SessionsManager {
 
     public void onUpdateReceived(Update update){
         log.debug("Update received: {}", update);
-        Optional<PrimaryHandler> candidate = this.handlersController.getApplicableHandler(update);
+        Optional<UpdateHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
             poolExecutor.submit(() -> this.handlersController.applyHandler(update, candidate.get()));
             if (candidate.get().getClass().getAnnotation(Handler.class).absolute())

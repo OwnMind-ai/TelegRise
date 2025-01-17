@@ -46,7 +46,7 @@ public class UserSession implements Runnable{
 
     private final BlockingQueue<Update> updatesQueue = new LinkedBlockingQueue<>();
     private final TransitionController transitionController;
-    private final PrimaryHandlersController primaryHandlersController;
+    private final UpdateHandlersController updateHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     @Getter
     private final TranscriptionManager transcriptionManager;
@@ -66,7 +66,7 @@ public class UserSession implements Runnable{
                 transitionController, transcription, transcriptionGetter, this::createResourcePool
         );
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
-        this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
+        this.updateHandlersController = new UpdateHandlersController(resourceInjector);
         this.initialize();
     }
 
@@ -86,7 +86,7 @@ public class UserSession implements Runnable{
                 transitionController, transcription, transcriptionGetter, this::createResourcePool
         );
         this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
-        this.primaryHandlersController = new PrimaryHandlersController(resourceInjector);
+        this.updateHandlersController = new UpdateHandlersController(resourceInjector);
 
         this.initialize();
     }
@@ -132,9 +132,9 @@ public class UserSession implements Runnable{
         if (this.roleProvider != null && this.sessionMemory.getUserRole() == null)
             this.updateRole(update);
 
-        Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableHandler(update);
+        Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableHandler(update);
         if (handlerCandidate.isPresent()){
-            boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
+            boolean intercept = this.updateHandlersController.applyHandler(update, handlerCandidate.get());
 
             if (intercept) return;
         }
@@ -225,8 +225,8 @@ public class UserSession implements Runnable{
             TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
                     pool, sender, ExecutionOptions.always());
         } else {
-            Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
-            handlerCandidate.ifPresent(primaryHandler -> this.primaryHandlersController.applyHandler(update, primaryHandler));
+            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
+            handlerCandidate.ifPresent(primaryHandler -> this.updateHandlersController.applyHandler(update, primaryHandler));
         }
     }
 
@@ -339,10 +339,10 @@ public class UserSession implements Runnable{
                 }
             }
 
-            Optional<PrimaryHandler> handlerCandidate = this.primaryHandlersController.getApplicableAfterTreesHandler(update);
+            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
             // Interrupter found case (handler where Handler.afterTress() is true)
             if (handlerCandidate.isPresent()){
-                boolean intercept = this.primaryHandlersController.applyHandler(update, handlerCandidate.get());
+                boolean intercept = this.updateHandlersController.applyHandler(update, handlerCandidate.get());
 
                 if (intercept) return;
             }
@@ -400,8 +400,8 @@ public class UserSession implements Runnable{
         TreeExecutor.invokeBranch(null, element.getActions(), this.createResourcePool(update), sender, options);
     }
 
-    public void addHandlersClasses(List<Class<? extends PrimaryHandler>> classes){
-        classes.forEach(this.primaryHandlersController::add);
+    public void addHandlersClasses(List<Class<? extends UpdateHandler>> classes){
+        classes.forEach(this.updateHandlersController::add);
     }
 
     public void setStandardLanguage(String code){

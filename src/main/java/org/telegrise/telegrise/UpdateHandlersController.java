@@ -14,16 +14,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class PrimaryHandlersController {
-    private final List<PrimaryHandler> handlers = new ArrayList<>();
+public class UpdateHandlersController {
+    private final List<UpdateHandler> handlers = new ArrayList<>();
     @Setter
     private ResourceInjector resourceInjector;
 
-    public PrimaryHandlersController(ResourceInjector injector) {
+    public UpdateHandlersController(ResourceInjector injector) {
         this.resourceInjector = injector;
     }
 
-    public Optional<PrimaryHandler> getApplicableHandler(Update update){
+    public Optional<UpdateHandler> getApplicableHandler(Update update){
         return this.handlers.stream()
                 .filter(h -> !h.getClass().getAnnotation(Handler.class).afterTrees())
                 .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
@@ -31,7 +31,7 @@ public class PrimaryHandlersController {
                 .findFirst();
     }
 
-    public Optional<PrimaryHandler> getApplicableAfterTreesHandler(Update update){
+    public Optional<UpdateHandler> getApplicableAfterTreesHandler(Update update){
         return this.handlers.stream()
                 .filter(h -> h.getClass().getAnnotation(Handler.class).afterTrees())
                 .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
@@ -39,7 +39,7 @@ public class PrimaryHandlersController {
                 .findFirst();
     }
 
-    public boolean applyHandler(Update update, PrimaryHandler handler){
+    public boolean applyHandler(Update update, UpdateHandler handler){
         try {
             handler.handle(update);
         } catch (TelegramApiException e) {
@@ -55,8 +55,8 @@ public class PrimaryHandlersController {
         return false;
     }
 
-    public void add(Class<? extends PrimaryHandler> handlerClass){
-        PrimaryHandler instance;
+    public void add(Class<? extends UpdateHandler> handlerClass){
+        UpdateHandler instance;
         try {
              instance = handlerClass.getConstructor().newInstance();
         } catch (InstantiationException e) {
