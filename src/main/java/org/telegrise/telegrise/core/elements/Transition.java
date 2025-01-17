@@ -40,6 +40,9 @@ public class Transition extends NodeElement {
     @Attribute(name = "editSource")
     private String editSource;
 
+    @Attribute(name = "ignoreError")
+    private boolean ignoreError = true;
+
     @InnerElement
     private List<ActionElement> actions;
 
@@ -99,6 +102,6 @@ public class Transition extends NodeElement {
     }
 
     public ExecutionOptions getExecutionOptions() {
-        return new ExecutionOptions(this.execute, this.edit, this.editSource);
+        return new ExecutionOptions(this.execute, this.edit, this.editSource, ignoreError);
     }
 }

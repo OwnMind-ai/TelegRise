@@ -108,6 +108,7 @@ public class MessageUtils {
         return result;
     }
 
+    @Reference
     public static Integer getMessageId(Update update) {
         return update.hasMessage() ? (update.getMessage().getMessageId())
                 : update.hasCallbackQuery() ? (update.getCallbackQuery().getMessage().getMessageId())

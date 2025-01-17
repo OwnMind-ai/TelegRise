@@ -86,6 +86,7 @@ public final class Lexer {
             return Optional.of(new ValueToken(Long.parseLong(value), Long.class));
         }
 
+        if (this.charsStream.peek(4).equals("null")) return Optional.of(new ValueToken(null, Object.class));
         return Stream.of("true", "false").filter(s -> this.charsStream.peek(5).startsWith(s))
                 .peek(s -> charsStream.next(s.length()))
                 .map(s -> new ValueToken(Boolean.parseBoolean(s), Boolean.class))

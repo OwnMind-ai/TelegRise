@@ -58,6 +58,7 @@ public final class TelegRiseApplication {
     }
 
     public void start(){
+        log.info("Starting TelegRise application...");
         this.handlersClasses = this.loadPrimaryHandlers();
         TelegramSessionsController controller = this.createController();
         final String token = controller.getTranscription().getToken().generate(new ResourcePool());
@@ -79,6 +80,7 @@ public final class TelegRiseApplication {
             controller.initializeSessions();
         }
 
+        log.info("Starting bot server...");
         this.applicationRunner.run(controller::onUpdateReceived, token);
     }
 

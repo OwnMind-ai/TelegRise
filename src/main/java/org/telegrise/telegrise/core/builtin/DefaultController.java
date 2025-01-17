@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.builtin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -47,6 +48,11 @@ public class DefaultController {
     @ReferenceGenerator
     public GeneratedReference<Update, Boolean> callbackMatches(String regex){
         return u -> u.hasCallbackQuery() && u.getCallbackQuery().getData().matches(regex);
+    }
+
+    @Reference
+    public Integer getMessageId(Message message){
+        return message == null ? null : message.getMessageId();
     }
 
     @Reference

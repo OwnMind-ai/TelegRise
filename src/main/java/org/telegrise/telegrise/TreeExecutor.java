@@ -56,6 +56,9 @@ public final class TreeExecutor {
             for (ActionElement action : actions) {
                 try {
                     Edit editAction = action.toEdit();
+                    if (options.ignoreError())
+                        editAction.setOnError(p -> null);
+
                     if (isFirst && editAction != null) {
                         if (options.source() != null) editAction.setSource(options.source());
                         universalSender.execute(editAction, pool);
@@ -69,6 +72,7 @@ public final class TreeExecutor {
                         return;
                     }
                 } catch (TelegramApiException e) {
+                    if (options.ignoreError()) return;
                     throw new TelegRiseInternalException(e);
                 }
             }

@@ -25,6 +25,7 @@ public interface ApplicationRunner {
 
         try (var api = new TelegramBotsLongPollingApplication()) {
             api.registerBot(token, (LongPollingSingleThreadUpdateConsumer) consumer::accept);
+            log.info("Long-polling bot server have been successfully started");
             Thread.currentThread().join();
         } catch (Exception e) {
             log.error("Unable to register long-polling bot (default configuration)", e);

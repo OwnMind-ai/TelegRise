@@ -38,6 +38,7 @@ public class Edit extends ActionElement{
 
     public static final String CALLBACK = "callback";
     public static final String LAST = "last";
+    //TODO add auto
 
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
