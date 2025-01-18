@@ -51,11 +51,13 @@ public class MediaCollector {
         return Collections.unmodifiableList(result);
     }
 
-    private synchronized List<Message> extractMediaGroup(String mediagroupId){
-        return this.updatesQueue.stream()
-                .filter(update -> update.hasMessage() && mediagroupId.equals(update.getMessage().getMediaGroupId()))
-                .peek(updatesQueue::remove)
-                .map(Update::getMessage)
-                .collect(Collectors.toList());
+    private List<Message> extractMediaGroup(String mediagroupId){
+        synchronized (this.updatesQueue) {
+            return this.updatesQueue.stream()
+                    .filter(u -> u.hasMessage() && mediagroupId.equals(u.getMessage().getMediaGroupId()))
+                    .peek(updatesQueue::remove)
+                    .map(Update::getMessage)
+                    .collect(Collectors.toList());
+        }
     }
 }

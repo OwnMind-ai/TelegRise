@@ -11,6 +11,7 @@ import org.telegrise.telegrise.core.builtin.BuiltinReferences;
 import org.telegrise.telegrise.core.elements.NodeElement;
 import org.telegrise.telegrise.core.expressions.references.*;
 import org.telegrise.telegrise.core.expressions.tokens.*;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
@@ -128,17 +129,19 @@ public class MethodReferenceCompiler {
                 reference.setParameters(left.parameterTypes());
                 reference.setComposeRight(false);
 
-                if (!isLeftList || right.parameterTypes().length == 1 && ClassUtils.isAssignable(right.parameterTypes()[0], List.class)) {
+                if (!isLeftList || right.parameterTypes().length == 1 && ReflectionUtils.isAssignableAny(
+                        right.parameterTypes()[0], List.class, Collection.class, Object.class)
+                ) {
                     reference.setOperation((l, r) -> r.invoke(l.invoke()));
                 } else if (right.parameterTypes().length == 1 && right.parameterTypes()[0].isArray()) {
                     reference.setOperation((l, r) -> {
                         List<?> list = (List<?>) l.invoke();
-                        return r.invoke(new Object[]{ list.toArray() });
+                        return r.invoke(list == null ? new Object[0] : new Object[]{ list.toArray() });
                     });
                 } else {
                     reference.setOperation((l, r) -> {
                         List<?> list = (List<?>) l.invoke();
-                        return r.invoke(list.toArray());
+                        return list == null ? r.invoke() : r.invoke(list.toArray());
                     });
                 }
 

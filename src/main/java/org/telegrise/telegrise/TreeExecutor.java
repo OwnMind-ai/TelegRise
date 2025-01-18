@@ -39,19 +39,19 @@ public final class TreeExecutor {
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){
         if (options.execute() != null && !options.execute()) return;
 
+        UniversalSender universalSender = new UniversalSender(sender);
         if (options.execute() != null) {
             if (toInvoke != null) toInvoke.generate(pool);
             if (actions == null) return;
 
             actions.forEach(action -> {
                 try {
-                    new UniversalSender(sender).execute(action, pool);
+                    universalSender.execute(action, pool);
                 } catch (TelegramApiException e) {
                     throw new TelegRiseInternalException(e);
                 }
             });
         } else if (options.edit() != null && actions != null) {
-            UniversalSender universalSender = new UniversalSender(sender);
             boolean isFirst = options.edit().equals(ExecutionOptions.EDIT_FIRST);
             for (ActionElement action : actions) {
                 try {

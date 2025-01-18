@@ -2,7 +2,6 @@ package org.telegrise.telegrise.caching;
 
 import lombok.Getter;
 import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.elements.Tree;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -50,10 +49,8 @@ public class MethodReferenceCache{
     }
 
     private CacheContext extractCheckContext(ResourcePool pool) {
-        if (pool.getMemory().getCurrentBranch() != null)
-            return new CacheContext(pool.getMemory().getCurrentBranch());
-        else if (pool.getMemory().isOnStack(Tree.class))
-            return new CacheContext(pool.getMemory().getFromStack(Tree.class));
+        if (pool.getUpdate() != null)
+            return new CacheContext(pool.getUpdate());
         else
             return null;
     }

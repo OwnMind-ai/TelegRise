@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<trees>
+    <tree name="MediaGroupsTree" controller="org.telegrise.telegrise.bot.controllers.MediaGroupsController" accessLevel="0">
+        <send>
+            <text>Send me a media group.</text>
+            <keyboard type="reply" resize="true">
+                <row><button>🔙 Go back</button></row>
+            </keyboard>
+        </send>
+
+        <branch when="#mediaGroupReceived -> #notNull">
+            <send>
+                <mediaGroup inputMedia="#mediaGroupReceived -> #toInputMedias"/>
+                <text textblock="true">
+                    <b>ℹ️ Info:</b>
+
+                    ${#mediaGroupReceived -> #mediaInfo}
+                </text>
+            </send>
+            <transition direction="back"/>
+        </branch>
+        <branch key="🔙 Go back">
+            <transition direction="caller" execute="true"/>
+        </branch>
+
+        <default>
+            <send>Invalid entry</send>
+        </default>
+    </tree>
+</trees>

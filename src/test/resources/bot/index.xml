@@ -26,6 +26,7 @@
                         <button>Test all action</button>
                     </row>
                     <row>
+                        <button>Jump to media groups</button>
                         <button>Test handlers</button>
                     </row>
                     <row>
@@ -33,6 +34,13 @@
                     </row>
                 </keyboard>
             </send>
+
+            <branch key="Jump to media groups">
+                <transition direction="jump" target="MediaGroupsTree" execute="true"/>
+            </branch>
+            <default>
+                <send>Unrecognized key.</send>
+            </default>
         </tree>
 
         <tree name="TestAdmin" key="Test admin" accessLevel="1">
