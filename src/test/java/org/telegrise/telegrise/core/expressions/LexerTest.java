@@ -1,10 +1,7 @@
 package org.telegrise.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
-import org.telegrise.telegrise.core.expressions.tokens.MethodReferenceToken;
-import org.telegrise.telegrise.core.expressions.tokens.RawToken;
-import org.telegrise.telegrise.core.expressions.tokens.ReferenceGeneratorToken;
-import org.telegrise.telegrise.core.expressions.tokens.ValueToken;
+import org.telegrise.telegrise.core.expressions.tokens.*;
 
 import java.util.List;
 
@@ -34,6 +31,10 @@ class LexerTest {
 
         lexer = new Lexer(new CharsStream("#method(\"\", 123)"));
         assertEquals(new MethodReferenceToken("method", List.of(new ValueToken("", String.class), new ValueToken(123L, Long.class))), lexer.next());
+
+        lexer = new Lexer(new CharsStream("#method == null"));
+        assertEquals(List.of(new MethodReferenceToken("method", null), new OperatorToken("=="), new ValueToken(null, Object.class)),
+                List.of(lexer.next(), lexer.next(), lexer.next()));
 
         lexer = new Lexer(new CharsStream("#method((1 + 2) / (3 - (3 + 1)), controller.getValue())"));
         assertEquals(new MethodReferenceToken("method", List.of(new RawToken("(1+2)/(3-(3+1))"), new RawToken("controller.getValue()"))), lexer.next());

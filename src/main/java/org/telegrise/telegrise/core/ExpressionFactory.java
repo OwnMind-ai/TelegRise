@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegrise.telegrise.core.expressions.*;
 import org.telegrise.telegrise.core.expressions.tokens.Token;
+import org.telegrise.telegrise.core.expressions.tokens.ValueToken;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
@@ -28,6 +29,15 @@ public class ExpressionFactory {
 
         try {
             Token rootToken = parser.parse();
+
+            //Fixes "00" problem
+            if(rootToken instanceof ValueToken v && ClassUtils.isAssignable(v.getType(), Number.class)) {
+                if(type.equals(String.class))
+                    return GeneratedValue.ofValue(type.cast(text));
+
+                return parsePrimitive(text, type, node);
+            }
+
             return methodReferenceCompiler.compile(rootToken, namespace, type, node).toGeneratedValue(type, node);
         } catch (ReferenceParsingException e) {
             if (type.equals(String.class))
