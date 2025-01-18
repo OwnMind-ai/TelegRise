@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<trees>
+    <tree name="AllActionsTree" key="Test all action" accessLevel="0" controller="DefaultController">
+        <send>
+            <text>Are you sure that you want to start this test?</text>
+            <keyboard type="inline">
+                <row>
+                    <button data="no">No</button>
+                    <button data="yes">Yes</button>
+                </row>
+            </keyboard>
+        </send>
+
+        <branch callback="yes">
+            <answer text="Answer action tested"/>
+            <wait timeout="1"/>
+
+            <edit>Okay. I will start to execute every action element with 1-second delay between each. Here we go...</edit>
+            <wait timeout="1"/>
+
+            <send returnConsumer='::register("registry")'>Send action test</send>
+            <wait timeout="1"/>
+
+            <edit source="last">Edit action test</edit>
+            <wait timeout="1"/>
+
+            <delete registry="registry"/>
+            <wait timeout="1"/>
+
+<!--            TODO move these stock files to telegrise.org, replace with free cat videos-->
+            <send>
+                <photo url="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Felis_catus-cat_on_snow.jpg/220px-Felis_catus-cat_on_snow.jpg"/>
+                <text>Sending photo</text>
+            </send>
+            <wait timeout="1"/>
+
+            <send>
+                <photo url="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Felis_catus-cat_on_snow.jpg/220px-Felis_catus-cat_on_snow.jpg"/>
+                <video url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"/>
+                <text>Sending mediagroup</text>
+            </send>
+            <wait timeout="1"/>
+
+            <actionGroup>
+                <invoke method='${System.out.println("Invoke action tested")}'/>
+                <send>Action group test</send>
+            </actionGroup>
+            <wait timeout="1"/>
+
+            <animate period="0.5" loops="2" parallel="false">
+                <frame>Testing animations.</frame>
+                <frame>Testing animations..</frame>
+                <frame>Testing animations...</frame>
+            </animate>
+            <wait timeout="1"/>
+
+            <chatAction action="typing"/>
+            <wait timeout="1"/>
+
+            <send returnConsumer='#getMessageId -> ::store("copyDummy")'>Copy test dummy</send>
+            <copy fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
+            <forward fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
+            <wait timeout="1"/>
+
+            <pin messageId='#memory("copyDummy")'/>
+            <wait timeout="1"/>
+
+            <unpin messageId='#memory("copyDummy")'/>
+            <wait timeout="1"/>
+
+            <send when='${memory.getUserRole().name().equals("admin")}'>If you see this than you are an admin (testing 'when' attribute)</send>
+
+            <send>✅ All test passed! Press /start to choose another test.</send>
+        </branch>
+        <branch callback="no">
+            <edit>Terminating. Press /start to restart testing.</edit>
+        </branch>
+    </tree>
+</trees>

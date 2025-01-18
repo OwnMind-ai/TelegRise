@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<trees>
+    <tree name="CalculatorTree" command="calculator" description="Calculator App" key="Calculator App" accessLevel="0"
+          controller="org.telegrise.telegrise.bot.controllers.CalculatorController">
+        <send name="MainSend">
+            <text textblock="true">
+                🧮 Calculator
+
+                ${#getDisplay}
+            </text>
+            <keyboard type="inline">
+                <row>
+                    <button when="#isClearAll" data="ac">AC</button>
+                    <button when="#isClearAll -> #not" data="c">C</button>
+                    <button data="change-sign">+/-</button>
+                    <button data="%">%</button>
+                    <button data="÷">÷</button>
+                </row>
+                <row>
+                    <button data="7">7</button>
+                    <button data="8">8</button>
+                    <button data="9">9</button>
+                    <button data="×">×</button>
+                </row>
+                <row>
+                    <button data="4">4</button>
+                    <button data="5">5</button>
+                    <button data="6">6</button>
+                    <button data="-">-</button>
+                </row>
+                <row>
+                    <button data="1">1</button>
+                    <button data="2">2</button>
+                    <button data="3">3</button>
+                    <button data="+">+</button>
+                </row>
+                <row>
+                    <button data="0">0</button>
+                    <button data="00">00</button>
+                    <button data=".">.</button>
+                    <button data="=">=</button>
+                </row>
+            </keyboard>
+        </send>
+
+        <branch callback="%" invoke="#toPercent">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch callback="change-sign" invoke="#changeSign">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch when='::callback("=") AND #operation == null'>
+            <answer text="Enter the expression"/>
+            <transition direction="back"/>
+        </branch>
+        <branch callback="=" invoke="#solve">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+
+        <branch when="#getInputOperation -> #notNull" invoke="#getInputOperation -> #setOperation">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch callback=". ; 00" invoke="#typeDigit(update.getCallbackQuery().getData())">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch when="#getInputDigit -> #notNull" invoke="#getInputDigit -> #typeDigit">
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch callback="c" invoke="#clear">
+            <answer text="Cleared"/>
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+        <branch callback="ac" invoke="#allClear">
+            <answer text="Cleared"/>
+            <transition direction="back" edit="MainSend" ignoreError="true"/>
+        </branch>
+    </tree>
+</trees>

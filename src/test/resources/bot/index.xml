@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import org.telegrise.telegrise.bot.controllers.StartController ?>
+<bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
+    <head>
+        <link src="*"/>
+    </head>
+
+    <roles>
+        <role name="admin" level="100" onDeniedTree="DeniedTree"/>
+        <role name="user" level="0" onDeniedTree="DeniedTree"/>
+    </roles>
+
+    <root>
+        <tree name="StartTree" command="start" description="Start test bot" controller="StartController" accessLevel="0">
+            <send disableWebPagePreview="true">
+                <text>
+                    ${#getGreetingText} I am your personal testing assistant, and I am glad to help you develop
+                    <a href="https://github.com/OwnMind-ai/TelegRise">TelegRise</a> framework.<br/>
+                    <br/>
+                    What do you want to test today?
+                </text>
+                <keyboard type="reply" resize="true">
+                    <row>
+                        <button>Test admin</button>
+                        <button>Test all action</button>
+                    </row>
+                    <row>
+                        <button>Test handlers</button>
+                    </row>
+                    <row>
+                        <button>Calculator App</button>
+                    </row>
+                </keyboard>
+            </send>
+        </tree>
+
+        <tree name="TestAdmin" key="Test admin" accessLevel="1">
+            <send>You are an administrator!</send>
+        </tree>
+
+        <tree name="DeniedTree">
+            <send>Sorry, your request was denied</send>
+        </tree>
+    </root>
+</bot>
