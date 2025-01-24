@@ -38,7 +38,7 @@ public class Switch extends Button{
 
     @Override
     public InlineKeyboardButton createInlineButton(ResourcePool pool, KeyboardState keyboardState) {
-        boolean enabled = keyboardState.getSwitchValue(name).equals(KeyboardState.SWITCH_ENABLED);
+        boolean enabled = keyboardState.isSwitchEnabled(name);
 
         return InlineKeyboardButton.builder()
                 .callbackData(prefix.generate(pool) + name + (!explicit ? "" : enabled ? "-off" : "-on"))

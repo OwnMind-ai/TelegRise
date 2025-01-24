@@ -1,7 +1,15 @@
 package org.telegrise.telegrise.generators;
 
+/**
+ * Functional instance of this interface represents a generated <b>reference</b> that takes one parameter
+ * but returns nothing.
+ *
+ * @param <T> single input parameter type
+ * @see org.telegrise.telegrise.annotations.ReferenceGenerator
+ * @since 0.8
+ */
 @FunctionalInterface
-public interface GeneratedVoidReference<T> extends GeneratedReferenceBase {
+public non-sealed interface GeneratedVoidReference<T> extends GeneratedReferenceBase {
     void run(T t);
 
     @SuppressWarnings("unchecked")
