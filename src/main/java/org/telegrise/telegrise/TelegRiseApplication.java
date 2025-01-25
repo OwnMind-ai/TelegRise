@@ -66,7 +66,7 @@ public final class TelegRiseApplication {
         if (token == null || !token.matches("\\d+:[a-zA-Z0-9_-]{35}"))
             throw new TelegRiseRuntimeException("Invalid bot token: " + token);
 
-        TelegramClient client = new OkHttpTelegramClient(token);
+        TelegramClient client = controller.getTranscription().produceClient();
         controller.setClient(client);
         controller.initialize();
 
@@ -81,7 +81,7 @@ public final class TelegRiseApplication {
         }
 
         log.info("Starting bot server...");
-        this.applicationRunner.run(controller::onUpdateReceived, token);
+        this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription());
     }
 
     @NotNull

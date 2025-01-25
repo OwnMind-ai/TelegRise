@@ -28,4 +28,7 @@ public class HeadBlock extends NodeElement {
 
     @InnerElement
     private Webhook webhook;
+
+    @InnerElement
+    private TelegramUrl telegramUrl;
 }

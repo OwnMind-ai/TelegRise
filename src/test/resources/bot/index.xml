@@ -4,6 +4,8 @@
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
     <head>
         <link src="*"/>
+        <telegramUrl schema="http" host="127.0.0.1" port="8081" testServer="false"/>
+        <webhook url="https://127.0.0.1:9091"/>
     </head>
 
     <roles>

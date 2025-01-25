@@ -9,6 +9,9 @@ import java.util.function.Predicate;
 
 @FunctionalInterface
 public interface GeneratedValue<T> extends Serializable {
+    GeneratedValue<Boolean> GENERATED_FALSE = GeneratedValue.ofValue(false);
+    GeneratedValue<Boolean> GENERATED_TRUE = GeneratedValue.ofValue(true);
+
     String ABSTRACT_METHOD_NAME = "generate";
 
     static <V> GeneratedValue<V> ofValue(V value){

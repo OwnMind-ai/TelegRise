@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.meta.TelegramUrl;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionIdentifier;
 import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -117,5 +120,19 @@ public final class BotTranscription extends NodeElement {
 
     public boolean isWebhookBot() {
         return head != null && head.getWebhook() != null && head.getWebhook().getEnabled().generate(new ResourcePool());
+    }
+
+    public TelegramUrl getTelegramUrl(){
+        ResourcePool pool = new ResourcePool();
+        return head.getTelegramUrl() == null ? TelegramUrl.DEFAULT_URL : new TelegramUrl(
+                head.getTelegramUrl().getSchema().generate(pool),
+                head.getTelegramUrl().getHost().generate(pool),
+                head.getTelegramUrl().getPort().generate(pool),
+                head.getTelegramUrl().getTestServer().generate(pool)
+        );
+    }
+
+    public TelegramClient produceClient() {
+        return new OkHttpTelegramClient(token.generate(new ResourcePool()), this.getTelegramUrl());
     }
 }

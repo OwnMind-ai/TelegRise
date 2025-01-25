@@ -9,13 +9,12 @@ import org.telegrise.telegrise.core.elements.NodeElement;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
-@Deprecated
 @Element(name = "webhook")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Webhook extends NodeElement {
     // Allows developers to run test servers as a long-pool by using #env
     @Attribute(name = "enabled")
-    private GeneratedValue<Boolean> enabled = GeneratedValue.ofValue(true);
+    private GeneratedValue<Boolean> enabled = GeneratedValue.GENERATED_TRUE;
 
     @Attribute(name = "url", nullable = false)
     private GeneratedValue<String> url;
@@ -39,30 +38,17 @@ public class Webhook extends NodeElement {
     private GeneratedValue<String> secretToken;
 
     @Attribute(name = "port")
-    private GeneratedValue<Integer> port;
+    private GeneratedValue<Integer> port = GeneratedValue.ofValue(9091);
 
     @Attribute(name = "enableRequestLogging")
-    private GeneratedValue<Boolean> enableRequestLogging;
+    private GeneratedValue<Boolean> enableRequestLogging = GeneratedValue.GENERATED_FALSE;
 
     @Attribute(name = "useHttps")
-    private GeneratedValue<Boolean> useHttps;
+    private GeneratedValue<Boolean> useHttps = GeneratedValue.GENERATED_FALSE;
 
     @Attribute(name = "keyStorePath")
     private GeneratedValue<String> keyStorePath;
 
     @Attribute(name = "keyStorePassword")
     private GeneratedValue<String> keyStorePassword;
-
-//    public WebhookOptions produceOptions(){
-//        var resources = new ResourcePool();
-//        var result = new WebhookOptions();
-//
-//        if (port != null) result.setPort(port.generate(resources));
-//        if (enableRequestLogging != null) result.setEnableRequestLogging(enableRequestLogging.generate(resources));
-//        if (useHttps != null) result.setUseHttps(useHttps.generate(resources));
-//        if (keyStorePath != null) result.setKeyStorePath(keyStorePath.generate(resources));
-//        if (keyStorePassword != null) result.setKeyStorePassword(keyStorePassword.generate(resources));
-//
-//        return result;
-//    }
 }
