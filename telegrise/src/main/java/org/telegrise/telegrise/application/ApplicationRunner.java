@@ -1,13 +1,14 @@
 package org.telegrise.telegrise.application;
 
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.longpolling.util.DefaultGetUpdatesGenerator;
-import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -17,9 +18,9 @@ import java.util.function.Consumer;
  */
 @FunctionalInterface
 public interface ApplicationRunner {
-    void run(Consumer<Update> consumer, String token, BotTranscription transcription);
+    void run(Consumer<Update> consumer, String token, BotTranscription transcription, @Nullable ExecutorService executor);
 
-    ApplicationRunner LONG_POLLING = (consumer, token, bot) -> {
+    ApplicationRunner LONG_POLLING = (consumer, token, bot, executorService) -> {
         Logger log = LoggerFactory.getLogger(ApplicationRunner.class);
 
         try (var api = new TelegramBotsLongPollingApplication()) {
@@ -27,7 +28,7 @@ public interface ApplicationRunner {
                     token,
                     bot::getTelegramUrl,
                     new DefaultGetUpdatesGenerator(),
-                    (LongPollingSingleThreadUpdateConsumer) consumer::accept
+                    new DefaultLongPollingBot(consumer, executorService)
             );
             log.info("Long-polling bot server have been successfully started");
             Thread.currentThread().join();

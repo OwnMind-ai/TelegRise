@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
@@ -41,7 +42,7 @@ public interface ReferenceExpression extends Serializable {
                 Object result = this.invoke(pool, pool.getHandler(), parameters);
                 return ClassUtils.isAssignable(type, Void.class) ? null : cast(result, type);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e.getCause());
+                throw new TelegRiseInternalException(e.getCause());
             }
         };
     }

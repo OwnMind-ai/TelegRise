@@ -34,11 +34,19 @@
                         <button>Test handlers</button>
                     </row>
                     <row>
+                        <button>Test exception</button>
+                    </row>
+                    <row>
                         <button>Calculator App</button>
                     </row>
                 </keyboard>
             </send>
 
+            <branch key="Test exception">
+                <send>Throwing exception, check your terminal!</send>
+                <invoke method="#throwException"/>
+                <transition direction="back"/>
+            </branch>
             <branch key="Jump to media groups">
                 <transition direction="jump" target="MediaGroupsTree" execute="true"/>
             </branch>

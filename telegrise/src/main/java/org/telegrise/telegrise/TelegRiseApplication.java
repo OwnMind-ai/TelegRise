@@ -81,7 +81,8 @@ public final class TelegRiseApplication {
         }
 
         log.info("Starting bot server...");
-        this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription());
+        this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription(),
+                executorService == null ? null : executorService.get());
     }
 
     @NotNull
@@ -96,8 +97,6 @@ public final class TelegRiseApplication {
             controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);
-//            if (executorService != null)
-//                controller.setPoolExecutor(executorService.get());
         } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {
             throw TelegRiseRuntimeException.unfold(e);
         } catch (Exception e) {

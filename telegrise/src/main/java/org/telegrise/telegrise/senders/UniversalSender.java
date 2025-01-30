@@ -62,7 +62,7 @@ public class UniversalSender {
         try {
             method = action.generateMethod(pool);
         } catch (Exception e){
-            throw new TelegRiseRuntimeException(e, action.getElementNode());
+            throw TelegRiseRuntimeException.unfold(e, action.getElementNode());
         }
 
         Object result;

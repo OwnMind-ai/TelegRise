@@ -15,4 +15,9 @@ public class StartController {
         if (now < 17) return "Good afternoon!";
         else return "Good evening!";
     }
+
+    @Reference
+    public void throwException(){
+        throw new RuntimeException("Test exception");
+    }
 }
