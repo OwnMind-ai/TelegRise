@@ -45,7 +45,7 @@ atlassian-ide-plugin.xml
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
-src/test/java/org/telegram/telegrise/BotTest.java
+telegrise/src/test/java/org/telegram/telegrise/BotTest.java
 
 # Codespaces
 .vscode

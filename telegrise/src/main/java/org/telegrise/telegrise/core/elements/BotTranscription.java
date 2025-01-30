@@ -110,7 +110,7 @@ public final class BotTranscription extends NodeElement {
         return new SetMyCommands(this.root.getTrees().stream()
                 .filter(t -> t.isProducesBotCommands(scope, this.root))
                 .map(Tree::getBotCommands)
-                .flatMap(List::stream).collect(Collectors.toList()), scope, null);  //FIXME add language support
+                .flatMap(List::stream).collect(Collectors.toList()), scope, null);  //TODO add language support
     }
 
     public void setRoot(Root root) {
@@ -124,7 +124,8 @@ public final class BotTranscription extends NodeElement {
 
     public TelegramUrl getTelegramUrl(){
         ResourcePool pool = new ResourcePool();
-        return head.getTelegramUrl() == null ? TelegramUrl.DEFAULT_URL : new TelegramUrl(
+        return head.getTelegramUrl() == null || !head.getTelegramUrl().getEnabled().generate(pool) ? TelegramUrl.DEFAULT_URL
+                : new TelegramUrl(
                 head.getTelegramUrl().getSchema().generate(pool),
                 head.getTelegramUrl().getHost().generate(pool),
                 head.getTelegramUrl().getPort().generate(pool),

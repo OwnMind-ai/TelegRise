@@ -4,7 +4,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
-import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.ApplicationNamespace;
