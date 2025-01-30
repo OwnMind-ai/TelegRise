@@ -215,7 +215,7 @@ public class BotSender {
     public List<Message> execute(SendMediaGroup method) throws TelegramApiException {
         logger.debug("Sending mediagroup: {}", method);
         List<Message> message = this.client.execute(method);
-        this.finish(message.get(0));
+        this.finish(message.getFirst());
         return message;
     }
 

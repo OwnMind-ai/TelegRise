@@ -12,11 +12,10 @@ public class CharsStream {
         this.text = input == null ? "" : input;
     }
 
-    public String next(int length) {
+    public void next(int length) {
         String data = peek(length);
         this.position += length;
 
-        return data;
     }
 
     public String peek(int length) {

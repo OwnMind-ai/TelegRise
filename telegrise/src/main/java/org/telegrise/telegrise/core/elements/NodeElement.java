@@ -83,7 +83,7 @@ public abstract class NodeElement implements Serializable {
         if (node.getAttributes().getNamedItem("name") != null)
             s += "['" + node.getAttributes().getNamedItem("name").getNodeValue() + "']";
 
-        path.add(0, s);
+        path.addFirst(s);
         traversePath(path, node.getParentNode());
     }
 

@@ -35,7 +35,7 @@ public class MediaGroupsController {
     private String mediaInfo(List<Message> messages){
         return messages.stream().map(m -> {
             if (m.hasPhoto()) {
-                var photo = m.getPhoto().get(m.getPhoto().size() - 1);
+                var photo = m.getPhoto().getLast();
                 return """
                         Unique ID: <code>%s</code>
                         Size: <code>%d</code>

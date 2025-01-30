@@ -87,7 +87,7 @@ public class JavaExpressionCompiler {
             source = pair.getKey();
             imported = pair.getValue();
         } catch (ParserException e) {
-            throw new TranscriptionParsingException("Syntax error in expression: " + e.getProblems().get(0).getMessage(), node);
+            throw new TranscriptionParsingException("Syntax error in expression: " + e.getProblems().getFirst().getMessage(), node);
         }
 
         File sourceFile = this.createSourceFile(source, hashcode);

@@ -76,7 +76,7 @@ public final class TreeExecutor {
                     throw new TelegRiseInternalException(e);
                 }
             }
-            throw new TelegRiseRuntimeException("Unable to find an element to edit after the transition", actions.get(0).getElementNode());
+            throw new TelegRiseRuntimeException("Unable to find an element to edit after the transition", actions.getFirst().getElementNode());
         }
     }
 

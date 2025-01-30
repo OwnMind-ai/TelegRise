@@ -8,8 +8,8 @@ import java.lang.annotation.*;
  * <p>
  * After selecting the next dialog tree and creating the tree controller, annotated resources are injected, followed by invoking method annotated by <code>OnCreate</code>, if exists.
  * </p><p>
- * In order to connect tree controller to the tree transcription, it should have methods annotated by <a href="#{@link}">{@link Reference Reference}</a> annotation.
- * However, framework allows calling public methods as an expression, regardless of <code>Reference</code> annotation:
+ * To connect tree controller to the tree transcription, it should have methods annotated by <a href="#{@link}">{@link Reference Reference}</a> annotation.
+ * However, the framework allows calling public methods as an expression, regardless of <code>Reference</code> annotation:
  * <pre>
  * &lt;tag expression="${controller.method()}"/&gt;
  * </pre>

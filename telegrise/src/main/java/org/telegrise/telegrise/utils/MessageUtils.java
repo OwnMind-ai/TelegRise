@@ -66,7 +66,7 @@ public class MessageUtils {
 
         if (message.hasPhoto()){
             result = InputMediaPhoto.builder()
-                    .media(message.getPhoto().get(message.getPhoto().size() - 1).getFileId())
+                    .media(message.getPhoto().getLast().getFileId())
                     .hasSpoiler(message.getHasMediaSpoiler())
                     .build();
         } else if (message.hasVideo()) {

@@ -82,8 +82,8 @@ public class UniversalSender {
         }
 
         if (result instanceof List<?> resultList) {
-            if (!resultList.isEmpty() && resultList.get(0) instanceof Message)
-                pool.getMemory().setLastSentMessage((Message) resultList.get(0));
+            if (!resultList.isEmpty() && resultList.getFirst() instanceof Message)
+                pool.getMemory().setLastSentMessage((Message) resultList.getFirst());
 
         } else if (result instanceof Message) {
             pool.getMemory().setLastSentMessage((Message) result);

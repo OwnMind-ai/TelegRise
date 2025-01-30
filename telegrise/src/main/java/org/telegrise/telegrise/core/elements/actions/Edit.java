@@ -187,7 +187,7 @@ public class Edit extends ActionElement{
     private PartialBotApiMethod<?> editMedia(ResourcePool pool, Integer messageId) {
         InputMedia newMedia = null;
         if (this.media != null)
-            newMedia = this.media.createInputMedia(pool).get(0);
+            newMedia = this.media.createInputMedia(pool).getFirst();
         else if (this.inputMedia != null)
             newMedia = inputMedia.generate(pool);
 

@@ -11,7 +11,7 @@ import org.telegrise.telegrise.utils.MessageUtils;
 import java.util.Objects;
 
 /**
- * The base class for all elements that represent executable action and can (but not required to) produce <code>PartialBotApiMethod</code> for Telegram client excution. 
+ * The base class for all elements that represent executable action and can (but not required to) produce <code>PartialBotApiMethod</code> for Telegram client execution.
  * 
  * @since 0.1.0
  */

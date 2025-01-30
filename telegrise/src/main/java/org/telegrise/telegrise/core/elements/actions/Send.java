@@ -90,15 +90,15 @@ public class Send extends ActionElement{
         List<MediaType> readyMedias = this.getReadyMedias(pool);
 
         if (readyMedias.size() == 1){
-            return readyMedias.get(0).createSender(this, pool);
+            return readyMedias.getFirst().createSender(this, pool);
         } else if (readyMedias.size() > 1) {
-            List<InputMedia> first = readyMedias.get(0).createInputMedia(pool);
+            List<InputMedia> first = readyMedias.getFirst().createInputMedia(pool);
             assert !first.isEmpty();
 
             if (this.text != null){
-                first.get(0).setCaption(this.text.generateText(pool));
-                first.get(0).setParseMode(generateNullableProperty(text.getParseMode(), pool));
-                first.get(0).setCaptionEntities(generateNullableProperty(text.getEntities(), List.of(), pool));
+                first.getFirst().setCaption(this.text.generateText(pool));
+                first.getFirst().setParseMode(generateNullableProperty(text.getParseMode(), pool));
+                first.getFirst().setCaptionEntities(generateNullableProperty(text.getEntities(), List.of(), pool));
             }
 
             return SendMediaGroup.builder()

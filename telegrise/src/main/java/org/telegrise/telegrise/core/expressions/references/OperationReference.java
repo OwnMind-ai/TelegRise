@@ -75,7 +75,7 @@ public class OperationReference<L, R> implements ReferenceExpression{
                         .filter(e -> !e.getValue().isEmpty())
                         .filter(e -> ClassUtils.isAssignable(e.getKey(), type))
                         .map(Map.Entry::getValue).findFirst().orElseThrow();
-                result[i] = value.remove(0);
+                result[i] = value.removeFirst();
             } catch(NullPointerException | IndexOutOfBoundsException | NoSuchElementException e){
                 throw new TelegRiseRuntimeException("Unable to pass arguments of types %s to reference with parameters of types %s"
                     .formatted(Arrays.stream(args).map(Object::getClass).toList(), Arrays.deepToString(reference.parameterTypes())), node);

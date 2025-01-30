@@ -300,7 +300,7 @@ public class MethodReferenceCompiler {
                         assert second instanceof List : "Right statement expected to return an instance of List, but got " + second.getClass().getName();
 
                         List<Object> copy = new ArrayList<>((List<?>) second);
-                        copy.add(0, l.invoke());
+                        copy.addFirst(l.invoke());
 
                         return copy;
                     });
@@ -359,8 +359,8 @@ public class MethodReferenceCompiler {
             throw new TelegRiseRuntimeException("Unable to accept generator named '%s'".formatted(method.getName()), node);
 
         boolean isVoid = ClassUtils.isAssignable(method.getReturnType(), GeneratedVoidReference.class);
-        Class<?> returnType = isVoid ? void.class : generics.get(generics.size() - 1);
-        Class<?>[] parameterTypes = isVoid ? new Class[]{generics.get(0)}
+        Class<?> returnType = isVoid ? void.class : generics.getLast();
+        Class<?>[] parameterTypes = isVoid ? new Class[]{generics.getFirst()}
                     : annotation.parameters().length > 0 ? annotation.parameters()
                     : generics.subList(0, generics.size() - 1).toArray(new Class[0]);
 
@@ -373,17 +373,17 @@ public class MethodReferenceCompiler {
                 GeneratedReferenceBase generated = generator.generate(pool);
 
                 //TODO add something better than 'invokeUnsafe'
-                if (generated instanceof GeneratedReference<?,?> reference){
-                    return reference.invokeUnsafe(args[0]);
-                } else if (generated instanceof GeneratedBiReference<?,?,?> reference){
-                    return reference.invokeUnsafe(args[0], args[1]);
-                } else if (generated instanceof GeneratedPolyReference<?> reference){
-                    return reference.run(args);
-                } else if (generated instanceof GeneratedVoidReference<?> reference){
-                    reference.invokeUnsafe(args[0]);
-                    return null;
-                } else
-                    throw new TelegRiseRuntimeException("Invalid generated reference: " + generated.getClass().getName(), node);
+                return switch (generated) {
+                    case GeneratedReference<?, ?> r -> r.invokeUnsafe(args[0]);
+                    case GeneratedBiReference<?, ?, ?> r -> r.invokeUnsafe(args[0], args[1]);
+                    case GeneratedPolyReference<?> r -> r.run(args);
+                    case GeneratedVoidReference<?> r -> {
+                        r.invokeUnsafe(args[0]);
+                        yield null;
+                    }
+                    default ->
+                            throw new TelegRiseRuntimeException("Invalid generated reference: " + generated.getClass().getName(), node);
+                };
             }
 
             @Override public @NotNull Class<?>[] parameterTypes() { return parameterTypes; }

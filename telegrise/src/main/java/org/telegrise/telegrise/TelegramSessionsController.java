@@ -3,7 +3,6 @@ package org.telegrise.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
@@ -25,16 +24,12 @@ import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class TelegramSessionsController implements SessionsManager {
-    private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 200;
-    private static final int DEFAULT_CORE_THREAD_POOL_SIZE = 32;
-
-    @Setter
-    private ExecutorService poolExecutor;
     private final ConcurrentMap<SessionIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
@@ -52,31 +47,12 @@ public class TelegramSessionsController implements SessionsManager {
     public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends UpdateHandler>> handlersClasses) {
         this.transcription = transcription;
         this.resourceFactories = resourceFactories;
-        this.poolExecutor = this.createExecutorService();
         this.handlersController = new UpdateHandlersController(null);
         this.userHandlersClasses = handlersClasses;
     }
 
-    private ExecutorService createExecutorService(){
-        int core = DEFAULT_CORE_THREAD_POOL_SIZE;
-        int max = DEFAULT_MAX_THREAD_POOL_SIZE;
-
-        String coreValue = System.getProperty("telegrise.coreThreadPoolSize");
-        String maxValue = System.getProperty("telegrise.coreThreadPoolSize");
-
-        if(NumberUtils.isDigits(coreValue))
-            core = Integer.parseInt(coreValue);
-
-        if(NumberUtils.isDigits(maxValue))
-            max = Integer.parseInt(maxValue);
-
-        return new Executor(core, max);
-    }
-
     public void initialize(){
         assert client != null;
-
-        if (poolExecutor == null) this.poolExecutor = createExecutorService();
 
         this.resourceFactories.add(ResourceFactory.ofInstance(this, SessionsManager.class));
         var splitHandlers = userHandlersClasses.stream()
@@ -128,7 +104,7 @@ public class TelegramSessionsController implements SessionsManager {
         log.debug("Update received: {}", update);
         Optional<UpdateHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
-            poolExecutor.submit(() -> this.handlersController.applyHandler(update, candidate.get()));
+            this.handlersController.applyHandler(update, candidate.get());
             if (candidate.get().getClass().getAnnotation(Handler.class).absolute())
                 return;
         }
@@ -201,7 +177,7 @@ public class TelegramSessionsController implements SessionsManager {
         session.update(update);
 
         if (!session.isRunning())
-            poolExecutor.submit(session);
+            session.run();
     }
 
     public TranscriptionManager getTranscriptionManager(SessionIdentifier identifier){
@@ -209,34 +185,4 @@ public class TelegramSessionsController implements SessionsManager {
         return session == null ? null : session.getTranscriptionManager();
     }
 
-    private static class Executor extends ThreadPoolExecutor{
-        public Executor(int corePoolSize, int maximumPoolSize) {
-            super(corePoolSize, maximumPoolSize, 0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<>());
-        }
-
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            if (t == null && r instanceof Future<?>) {
-                try {
-                    Future<?> future = (Future<?>) r;
-                    if (future.isDone()) {
-                        future.get();
-                    }
-                } catch (CancellationException ce) {
-                    t = ce;
-                } catch (ExecutionException ee) {
-                    t = ee.getCause();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            if (t != null) {
-                if (t instanceof RuntimeException)
-                    throw (RuntimeException) t;
-                else
-                    throw new RuntimeException(t);
-            }
-        }
-    }
 }

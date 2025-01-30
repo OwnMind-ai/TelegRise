@@ -186,7 +186,6 @@ public class EditableMessageActionBuilder {
     }
 
 
-    @SuppressWarnings("DuplicatedCode")
     private Message executeSend() throws TelegramApiException {
         Message result = this.sender.execute(SendMessage.builder().chatId(chatId).messageThreadId(messageThreadId)
                 .parseMode(entities != null ? null : parseMode).text(text).disableNotification(disableNotification)

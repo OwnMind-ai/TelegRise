@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
+import org.telegrise.telegrise.application.ApplicationRunner;
 import org.telegrise.telegrise.core.ApplicationNamespace;
 import org.telegrise.telegrise.core.LocalNamespace;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -95,8 +96,8 @@ public final class TelegRiseApplication {
             controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);
-            if (executorService != null)
-                controller.setPoolExecutor(executorService.get());
+//            if (executorService != null)
+//                controller.setPoolExecutor(executorService.get());
         } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {
             throw TelegRiseRuntimeException.unfold(e);
         } catch (Exception e) {

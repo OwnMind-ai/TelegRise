@@ -35,7 +35,7 @@ public class AnimationExecutor implements Runnable {
 
     @Override
     public void run() {
-        Frame initial = this.animation.getFrames().get(0);
+        Frame initial = this.animation.getFrames().getFirst();
         try {
             this.executeFrame(initial, Frame.SEND, lockedPool);
             this.sleep(initial, lockedPool);
