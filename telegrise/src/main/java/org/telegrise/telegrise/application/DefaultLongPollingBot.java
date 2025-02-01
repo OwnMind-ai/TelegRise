@@ -19,14 +19,17 @@ import java.util.function.Supplier;
  * that provides a concurrent execution (based on {@code executor}) and fits into corresponding
  * {@link org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication#registerBot(String, Supplier, Function, LongPollingUpdateConsumer) registerBot} method.
  *
- * @see DefaultUpdateConsumer
  * @see ApplicationRunner
  * @since 0.10
  */
 @Setter
-final class DefaultLongPollingBot extends DefaultUpdateConsumer implements LongPollingUpdateConsumer {
+class DefaultLongPollingBot implements LongPollingUpdateConsumer {
+    private final Consumer<Update> updateConsumer;
+    private final ExecutorService executor;
+
     DefaultLongPollingBot(Consumer<Update> updateConsumer, @Nullable ExecutorService executor) {
-        super(updateConsumer, executor);
+        this.updateConsumer = updateConsumer;
+        this.executor = executor == null ? Executors.newVirtualThreadPerTaskExecutor() : executor;
     }
 
     @Override

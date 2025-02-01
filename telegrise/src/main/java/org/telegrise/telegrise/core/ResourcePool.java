@@ -74,4 +74,9 @@ public final class ResourcePool {
         if (memory != null) this.components.put(SessionMemory.class, memory);
         if (apiResponseWrapper != null) this.components.put(ApiResponseWrapper.class, apiResponseWrapper);
     }
+
+    @Override
+    public String toString() {
+        return "ResourcePool{" + "update=" + update + '}';
+    }
 }

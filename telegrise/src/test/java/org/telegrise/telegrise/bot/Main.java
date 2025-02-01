@@ -2,6 +2,7 @@ package org.telegrise.telegrise.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegrise.telegrise.TelegRiseApplication;
+import org.telegrise.telegrise.bot.services.SleepyService;
 
 import java.io.File;
 
@@ -16,6 +17,8 @@ public class Main {
 
         TelegRiseApplication application = new TelegRiseApplication(new File("telegrise/src/test/resources/bot/index.xml"), Main.class);
         application.setRoleProvider((user, sessionMemory) -> user.getId().equals(adminId) ? "admin" : "user");
+
+        application.addService(new SleepyService());
 
         application.start();
     }

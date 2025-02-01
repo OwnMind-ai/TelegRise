@@ -21,13 +21,14 @@ public class ServiceManager {
 
         Thread serviceThread = new Thread(this.threadGroup, service);
 
-        if (service.isDaemon() != null)
-            serviceThread.setDaemon(service.isDaemon());
-
         if (service.threadPriority() != null)
             serviceThread.setPriority(service.threadPriority());
 
         serviceThread.start();
+    }
+
+    public void stop(){
+        threadGroup.interrupt();
     }
 
     public void add(Service service){

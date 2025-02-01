@@ -46,7 +46,7 @@ public final class TelegRiseApplication {
     @Setter
     private SessionInitializer sessionInitializer;
     @Setter
-    private ApplicationRunner applicationRunner = ApplicationRunner.LONG_POLLING;
+    private ApplicationRunner applicationRunner;
 
     public TelegRiseApplication(Class<?> mainClass) {
         this.mainClass = mainClass;
@@ -80,9 +80,18 @@ public final class TelegRiseApplication {
             controller.initializeSessions();
         }
 
+        if(applicationRunner == null)
+            this.applicationRunner = controller.getTranscription().isWebhookBot() ?
+                    ApplicationRunner.WEBHOOK : ApplicationRunner.LONG_POLLING;
+
         log.info("Starting bot server...");
-        this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription(),
-                executorService == null ? null : executorService.get());
+
+        try {
+            this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription(),
+                    executorService == null ? null : executorService.get());
+        } finally {
+            serviceManager.stop();
+        }
     }
 
     @NotNull
