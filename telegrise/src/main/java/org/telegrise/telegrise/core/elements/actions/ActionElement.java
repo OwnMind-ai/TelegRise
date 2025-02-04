@@ -1,10 +1,10 @@
 package org.telegrise.telegrise.core.elements.actions;
 
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.elements.NodeElement;
-import org.telegrise.telegrise.core.elements.StorableElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.elements.base.StorableElement;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.utils.MessageUtils;
 

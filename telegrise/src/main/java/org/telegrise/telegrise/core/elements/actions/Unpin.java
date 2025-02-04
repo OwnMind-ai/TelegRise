@@ -6,8 +6,8 @@ import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinAllChatMessages;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 

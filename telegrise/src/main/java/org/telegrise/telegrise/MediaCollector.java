@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class MediaCollector {
+public final class MediaCollector {
     private final Queue<Update> updatesQueue;
     @Setter
     private Duration delay = Duration.ofMillis(500);

@@ -4,13 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telegrise.telegrise.core.ApplicationNamespace;
-import org.telegrise.telegrise.core.elements.LinkableElement;
-import org.telegrise.telegrise.core.elements.NodeElement;
-import org.telegrise.telegrise.core.parser.Attribute;
-import org.telegrise.telegrise.core.parser.Element;
-import org.telegrise.telegrise.core.parser.InnerElement;
-import org.telegrise.telegrise.core.parser.TranscriptionMemory;
+import org.telegrise.telegrise.core.elements.base.LinkableElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.parser.*;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.List;

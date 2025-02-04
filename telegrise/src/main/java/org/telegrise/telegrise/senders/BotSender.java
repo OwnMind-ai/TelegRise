@@ -24,10 +24,8 @@ import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessa
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegrise.telegrise.SessionMemoryImpl;
-import org.telegrise.telegrise.senders.actions.CallbackQueryActionBuilder;
-import org.telegrise.telegrise.senders.actions.EditableMessageActionBuilder;
-import org.telegrise.telegrise.senders.actions.MessageActionBuilder;
+import org.telegrise.telegrise.SessionMemory;
+import org.telegrise.telegrise.core.SessionMemoryImpl;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -35,10 +33,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * This class is a wrapper for {@link TelegramClient} that integrates in TelegRise message-tracking system.
+ * <p>
+ * All messages sent through this class will be marked at {@link SessionMemory#getLastSentMessage()},
+ * unless bot API method was used with {@link #sneaky()}.
+ *
+ * @since 0.6
+ */
 @SuppressWarnings("unused")
 public class BotSender {
     private static final Logger logger = LoggerFactory.getLogger(BotSender.class);
-    public static final String DEFAULT_PARSE_MODE = "html";
+    public static String DEFAULT_PARSE_MODE = "html";
 
     @Getter
     private final TelegramClient client;
@@ -96,6 +102,17 @@ public class BotSender {
         isSneaky = memory == null;
     }
 
+    /**
+     * Disables marking next sent message at {@link SessionMemory#getLastSentMessage()}.
+     * <p>
+     * Use this method right before the {@code execute} method.
+     * The instance will go back to non-sneaky mode right after the execution of the API method
+     * AND DOESN'T set indefinitely.
+     * Multiple execution of this method has no effect.
+     * {@snippet lang="java":
+     * sender.sneaky().execute(SendMessage.builder().chatId(id).text(text).build());
+     * }
+     */
     public BotSender sneaky(){
         if (memory == null) 
             logger.warn("Sender is already sneaky since there is no session memory");

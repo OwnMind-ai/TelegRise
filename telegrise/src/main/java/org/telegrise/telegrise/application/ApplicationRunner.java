@@ -14,10 +14,10 @@ import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.head.Webhook;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.concurrent.ExecutorService;

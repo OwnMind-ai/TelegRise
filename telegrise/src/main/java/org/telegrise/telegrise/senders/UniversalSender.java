@@ -1,23 +1,32 @@
 package org.telegrise.telegrise.senders;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegrise.telegrise.core.ApiResponseWrapper;
 import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.elements.NodeElement;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.utils.ApiResponseWrapper;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
+import java.io.InvalidClassException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * This class is a wrapper for the {@link BotSender} class
+ * that allows to execute any bot API method with a single method call {@link #execute(PartialBotApiMethod)}.
+ * Additionally, it is used internally to execute ActionElements.
+ *
+ * @since 0.1
+ */
 public class UniversalSender {
     private static final Logger LOGGER = LoggerFactory.getLogger(UniversalSender.class);
 
@@ -37,6 +46,14 @@ public class UniversalSender {
         this.sender = sender;
     }
 
+    /**
+     * Executes any instance of {@link PartialBotApiMethod}
+     * that can be executed in {@link BotSender} with a corresponding typed method.
+     * Passing custom implementations of {@link PartialBotApiMethod} will cause {@code InvalidClassException}.
+     *
+     * @param method method to execute
+     * @return corresponding return value
+     */
     public Serializable execute(PartialBotApiMethod<? extends Serializable> method) throws TelegramApiException{
         if (method == null) return null;
 
@@ -44,8 +61,12 @@ public class UniversalSender {
             return sender.execute((BotApiMethod<? extends Serializable>) method);
 
         try {
-            return (Serializable) methods.get(method.getClass().getName()).invoke(sender, method);
-        } catch (IllegalAccessException e) {
+            var invokable = methods.get(method.getClass().getName());
+            if (invokable == null)
+                throw new InvalidClassException(method.getClass().getName(), "Unable to execute this implementation of PartialBotApiMethod");
+
+            return (Serializable) invokable.invoke(sender, method);
+        } catch (InvalidClassException | IllegalAccessException e) {
             LOGGER.error("An error occurred during invocation of an undefined api method", e);
             throw new TelegRiseInternalException(e);
         } catch (InvocationTargetException e) {
@@ -54,7 +75,7 @@ public class UniversalSender {
         }
     }
 
-    //TODO Move to package-private class
+    @ApiStatus.Internal
     public void execute(ActionElement action, ResourcePool pool) throws TelegramApiException {
         if (action.getWhen() != null && !action.getWhen().generate(pool)) return;
 

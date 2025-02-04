@@ -3,8 +3,8 @@ package org.telegrise.telegrise.core.expressions.references;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.telegrise.telegrise.annotations.HiddenParameter;
-import org.telegrise.telegrise.caching.MethodReferenceCache;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.caching.MethodReferenceCache;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.io.IOException;

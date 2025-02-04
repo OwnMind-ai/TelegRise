@@ -25,7 +25,7 @@ public final class SessionIdentifier implements Serializable {
     private final Long chatId;
 
     @Setter
-    private String languageCode;
+    private String languageCode;   //TODO move to session memory
 
     private SessionIdentifier(Long userId, Long chatId) {
         this.userId = userId;

@@ -1,7 +1,6 @@
 package org.telegrise.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
-import org.telegrise.telegrise.core.Syntax;
 import org.telegrise.telegrise.core.expressions.tokens.*;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package org.telegrise.telegrise.exceptions;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.telegrise.telegrise.core.elements.NodeElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.w3c.dom.Node;
 
 public class TelegRiseRuntimeException extends RuntimeException{

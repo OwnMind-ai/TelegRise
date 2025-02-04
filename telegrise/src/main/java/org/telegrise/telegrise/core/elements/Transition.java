@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
+import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
-import org.telegrise.telegrise.transition.ExecutionOptions;
 import org.w3c.dom.Node;
 
 import java.util.Arrays;

@@ -7,8 +7,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionMemory;
-import org.telegrise.telegrise.SessionMemoryImpl;
-import org.telegrise.telegrise.TreeExecutor;
+import org.telegrise.telegrise.core.utils.ApiResponseWrapper;
 import org.telegrise.telegrise.senders.BotSender;
 
 import java.util.HashMap;

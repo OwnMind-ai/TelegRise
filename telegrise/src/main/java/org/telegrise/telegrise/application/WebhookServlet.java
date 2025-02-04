@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegrise.telegrise.core.TelegramSessionsController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * This class represents a webhook bot application implementation, that uses provided executor service
  * ({@link Executors#newVirtualThreadPerTaskExecutor()} by default).
- * Instance of this class is meant to be used as a wrapper for {@link org.telegrise.telegrise.TelegramSessionsController TelegramSessionController}
+ * Instance of this class is meant to be used as a wrapper for {@link TelegramSessionsController TelegramSessionController}
  * that provides a concurrent execution (based on {@code executor}) and can be served by Jetty.
  *
  * @see ApplicationRunner

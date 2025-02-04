@@ -2,9 +2,9 @@ package org.telegrise.telegrise.core.elements.head;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.telegrise.telegrise.core.LocalNamespace;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
+import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.parser.XMLElementsParser;
 import org.w3c.dom.Node;
 

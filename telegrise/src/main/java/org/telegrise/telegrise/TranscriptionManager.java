@@ -1,20 +1,23 @@
 package org.telegrise.telegrise;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.caching.CachingStrategy;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.SessionMemoryImpl;
+import org.telegrise.telegrise.core.UserSession;
 import org.telegrise.telegrise.core.elements.BotTranscription;
-import org.telegrise.telegrise.core.elements.BranchingElement;
 import org.telegrise.telegrise.core.elements.Transition;
 import org.telegrise.telegrise.core.elements.Tree;
+import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.text.Text;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
+import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegrise.telegrise.transition.TransitionController;
-import org.telegrise.telegrise.types.KeyboardMarkup;
+import org.telegrise.telegrise.keyboard.KeyboardMarkup;
 import org.telegrise.telegrise.types.TextBlock;
 
 import java.io.Serializable;
@@ -33,6 +36,7 @@ public class TranscriptionManager {
     private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
+    @ApiStatus.Internal
     public TranscriptionManager(UserSession.TranscriptionInterrupter interruptor,
                                 BiConsumer<BranchingElement, Update> elementExecutor,
                                 SessionMemoryImpl sessionMemory,

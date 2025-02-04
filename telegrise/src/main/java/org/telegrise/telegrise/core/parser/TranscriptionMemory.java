@@ -2,11 +2,11 @@ package org.telegrise.telegrise.core.parser;
 
 import lombok.Getter;
 import org.slf4j.Logger;
-import org.telegrise.telegrise.core.NamedElement;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.Branch;
-import org.telegrise.telegrise.core.elements.NodeElement;
 import org.telegrise.telegrise.core.elements.Tree;
+import org.telegrise.telegrise.core.elements.base.NamedElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.io.File;

@@ -9,9 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.annotations.TreeController;
-import org.telegrise.telegrise.core.ApplicationNamespace;
-import org.telegrise.telegrise.core.GeneratedValue;
-import org.telegrise.telegrise.core.LocalNamespace;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.Branch;
@@ -25,6 +22,7 @@ import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.keyboard.Row;
 import org.telegrise.telegrise.core.elements.media.Photo;
 import org.telegrise.telegrise.core.elements.text.Text;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;

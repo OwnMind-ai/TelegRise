@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegrise.telegrise.caching.MethodReferenceCache;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.caching.MethodReferenceCache;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 

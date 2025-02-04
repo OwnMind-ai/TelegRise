@@ -3,9 +3,9 @@ package org.telegrise.telegrise.core.expressions;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegrise.telegrise.core.ApplicationNamespace;
-import org.telegrise.telegrise.core.LocalNamespace;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.parser.ApplicationNamespace;
+import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
 import java.io.IOException;

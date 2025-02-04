@@ -2,6 +2,7 @@ package org.telegrise.telegrise.resources;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.telegrise.telegrise.annotations.Resource;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
@@ -10,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ResourceInjector {
+@ApiStatus.Internal
+public final class ResourceInjector {
     private final List<Object> resources;
     @Getter
     private final Map<String, ResourceFactory<?>> resourceFactoryMap = new HashMap<>();

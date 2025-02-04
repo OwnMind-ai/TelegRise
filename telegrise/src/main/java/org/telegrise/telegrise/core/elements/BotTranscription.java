@@ -10,11 +10,12 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionIdentifier;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.core.elements.head.HeadBlock;
 import org.telegrise.telegrise.core.elements.security.Role;
 import org.telegrise.telegrise.core.elements.security.Roles;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
@@ -38,9 +39,6 @@ public final class BotTranscription extends NodeElement {
 
     @Attribute(name = "interruptions")
     private boolean interruptions = false;
-
-    @Attribute(name = "defaultParseMode")
-    private String defaultParseMode = "html";
 
     @Attribute(name = "autoCommands")
     private String autoCommands;

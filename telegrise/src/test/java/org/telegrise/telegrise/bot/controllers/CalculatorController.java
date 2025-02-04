@@ -6,8 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.annotations.TreeController;
+import org.telegrise.telegrise.builtin.DefaultController;
 import org.telegrise.telegrise.caching.CachingStrategy;
-import org.telegrise.telegrise.core.builtin.DefaultController;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

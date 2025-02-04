@@ -2,8 +2,8 @@ package org.telegrise.telegrise.core.expressions.references;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.telegrise.telegrise.core.GeneratedValue;
 import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;

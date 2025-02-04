@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telegrise.telegrise.core.LocalNamespace;
-import org.telegrise.telegrise.core.elements.NodeElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
+import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 

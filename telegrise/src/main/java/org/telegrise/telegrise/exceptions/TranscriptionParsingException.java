@@ -1,7 +1,7 @@
 package org.telegrise.telegrise.exceptions;
 
 import org.jetbrains.annotations.NotNull;
-import org.telegrise.telegrise.core.elements.NodeElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.w3c.dom.Node;
 
 public class TranscriptionParsingException extends RuntimeException{

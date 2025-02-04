@@ -10,17 +10,14 @@ import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope
 import org.telegrise.telegrise.ChatTypes;
 import org.telegrise.telegrise.annotations.OnClose;
 import org.telegrise.telegrise.annotations.OnCreate;
-import org.telegrise.telegrise.core.ApplicationNamespace;
-import org.telegrise.telegrise.core.GeneratedValue;
-import org.telegrise.telegrise.core.LocalNamespace;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
+import org.telegrise.telegrise.core.elements.base.BranchingElement;
+import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboards;
 import org.telegrise.telegrise.core.elements.text.Texts;
-import org.telegrise.telegrise.core.parser.Attribute;
-import org.telegrise.telegrise.core.parser.Element;
-import org.telegrise.telegrise.core.parser.InnerElement;
-import org.telegrise.telegrise.core.parser.TranscriptionMemory;
+import org.telegrise.telegrise.core.expressions.GeneratedValue;
+import org.telegrise.telegrise.core.parser.*;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.telegrise.telegrise.types.CommandData;
 import org.telegrise.telegrise.utils.MessageUtils;
@@ -36,7 +33,7 @@ import java.util.stream.Collectors;
 @Element(name = "tree")
 @Getter @Setter
 @NoArgsConstructor
-public class Tree extends NodeElement implements BranchingElement{
+public class Tree extends NodeElement implements BranchingElement {
     public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
     public static final String INTERRUPT_BY_KEYS = "keys";
     public static final String INTERRUPT_BY_COMMANDS = "commands";

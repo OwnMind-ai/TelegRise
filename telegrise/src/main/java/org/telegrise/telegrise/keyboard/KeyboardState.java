@@ -2,7 +2,7 @@ package org.telegrise.telegrise.keyboard;
 
 import lombok.Getter;
 import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.elements.BranchingElement;
+import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.keyboard.Switch;
 

@@ -5,9 +5,9 @@ import org.telegrise.telegrise.core.expressions.tokens.*;
 
 import java.util.List;
 
-import static org.telegrise.telegrise.core.Syntax.*;
 import static org.telegrise.telegrise.core.expressions.ErrorCodes.ILLEGAL_IF_ARGUMENT;
 import static org.telegrise.telegrise.core.expressions.ErrorCodes.MISSING_DO_STATEMENT;
+import static org.telegrise.telegrise.core.expressions.Syntax.*;
 
 public class Parser {
     private static final PunctuationToken EXPRESSION_START_TOKEN = new PunctuationToken(PARENTHESES_START);

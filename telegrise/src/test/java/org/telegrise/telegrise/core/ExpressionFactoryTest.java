@@ -1,6 +1,9 @@
 package org.telegrise.telegrise.core;
 
 import org.junit.jupiter.api.Test;
+import org.telegrise.telegrise.core.expressions.ExpressionFactory;
+import org.telegrise.telegrise.core.parser.ApplicationNamespace;
+import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.w3c.dom.Node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
