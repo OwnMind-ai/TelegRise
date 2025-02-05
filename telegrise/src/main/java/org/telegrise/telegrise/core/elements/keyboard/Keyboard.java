@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.SessionMemoryImpl;
 import org.telegrise.telegrise.core.elements.Tree;
@@ -33,7 +34,7 @@ import java.util.function.Function;
 
 @Element(name = "keyboard", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
-public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement {
+public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement, org.telegrise.telegrise.transcription.Keyboard {
     public static final String INLINE = "inline";
     public static final String REPLY = "reply";
 
@@ -180,5 +181,10 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
     @Override
     public KeyboardMarkup createInteractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
         return new KeyboardMarkup(this, resourcePoolFunction);
+    }
+
+    @Override
+    public Expression<ReplyKeyboard> getMarkupExpression() {
+        return new Expression<>(this::createMarkup);
     }
 }

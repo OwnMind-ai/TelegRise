@@ -2,9 +2,10 @@ package org.telegrise.telegrise;
 
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
-import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardState;
+import org.telegrise.telegrise.transcription.Branch;
+import org.telegrise.telegrise.transcription.Tree;
 import org.telegrise.telegrise.types.UserRole;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public interface SessionMemory {
     default Object removeLocal(String key){ return remove(key, getCurrentTree()); }
 
     Tree getCurrentTree();
+    Branch getCurrentBranch();
 
     <T> T get(String key, Class<T> tClass);
 

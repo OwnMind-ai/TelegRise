@@ -18,9 +18,9 @@ import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardMarkup;
+import org.telegrise.telegrise.transcription.ElementBase;
 import org.telegrise.telegrise.types.TextBlock;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -98,11 +98,10 @@ public class TranscriptionManager {
         return transitionController.getTreeExecutors().isEmpty() ? null : tClass.cast(transitionController.getTreeExecutors().getLast().getControllerInstance());
     }
 
-    public Tree getCurrentTree(){
+    public org.telegrise.telegrise.transcription.Tree getCurrentTree(){
         checkSessionMemory();
 
         BranchingElement last = sessionMemory.getBranchingElements().getLast();
-        //TODO return immutable proxy of a tree
         return last instanceof Tree ? (Tree) last : null;
     }
 
@@ -154,8 +153,8 @@ public class TranscriptionManager {
             throw new TelegRiseRuntimeException("Memory-oriented methods cannot be called from an independent handler");
     }
 
-    public <T extends Serializable> T get(String name, Class<T> tClass){
-        var result = this.transcriptionMemory.get(this.sessionMemory == null ? null : getCurrentTree(), name);
+    public <T extends ElementBase> T get(String name, Class<T> tClass){
+        var result = this.transcriptionMemory.get(this.sessionMemory == null ? null : (Tree) getCurrentTree(), name);
 
         if (result == null)
             throw new TelegRiseRuntimeException("Element named '" + name + "' does not exist");

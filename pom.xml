@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.telegrise</groupId>
+    <artifactId>TelegRiseFramework</artifactId>
+    <version>0.11.3-PREVIEW</version>
+    <packaging>pom</packaging>
+    <name>TelegRise Framework</name>
+
+    <modules>
+        <module>telegrise</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OwnMind-ai Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ownmind-ai/telegrise</url>
+        </repository>
+    </distributionManagement>
+</project>

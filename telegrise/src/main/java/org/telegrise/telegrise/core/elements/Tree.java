@@ -3,11 +3,13 @@ package org.telegrise.telegrise.core.elements;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegrise.telegrise.ChatTypes;
+import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.annotations.OnClose;
 import org.telegrise.telegrise.annotations.OnCreate;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 @Element(name = "tree")
 @Getter @Setter
 @NoArgsConstructor
-public class Tree extends NodeElement implements BranchingElement {
+public class Tree extends NodeElement implements org.telegrise.telegrise.transcription.Tree, BranchingElement {
     public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
     public static final String INTERRUPT_BY_KEYS = "keys";
     public static final String INTERRUPT_BY_COMMANDS = "commands";
@@ -205,5 +207,10 @@ public class Tree extends NodeElement implements BranchingElement {
     @Override
     public String toString(){
         return "Tree(" + name + ")";
+    }
+
+    @Override
+    public @Nullable Expression<Boolean> getPredicateExpression() {
+        return predicate != null ? predicate.toExpression() : null;
     }
 }

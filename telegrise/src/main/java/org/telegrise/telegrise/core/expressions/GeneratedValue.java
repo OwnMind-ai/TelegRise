@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.expressions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.ResourcePool;
 
 import java.io.Serializable;
@@ -36,6 +37,10 @@ public interface GeneratedValue<T> extends Serializable {
     }
 
     T generate(ResourcePool resourcePool);
+
+    default Expression<T> toExpression(){
+        return new Expression<>(this);
+    }
 
     class StaticValue<T> implements GeneratedValue<T>{
         private final T value;

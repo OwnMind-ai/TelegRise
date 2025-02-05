@@ -195,7 +195,8 @@ public class SessionMemoryImpl implements SessionMemory {
         this.registryMap.computeIfAbsent(name, k -> new ArrayList<>()).add(message);
     }
 
-    public KeyboardState getKeyboardState(String name, Tree parentTree) {
+    @Override
+    public KeyboardState getKeyboardState(String name, org.telegrise.telegrise.transcription.Tree parentTree) {
         return this.keyboardStates.get(parentTree.getName() + ":" + name);
     }
 

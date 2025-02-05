@@ -3,7 +3,9 @@ package org.telegrise.telegrise.core.elements;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.telegrise.telegrise.ChatTypes;
+import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
@@ -22,7 +24,7 @@ import static org.telegrise.telegrise.core.elements.Tree.improperInterruptionSco
 @Element(name = "branch", finishAfterParsing = true)
 @Getter @Setter
 @NoArgsConstructor
-public class Branch extends NodeElement implements BranchingElement {
+public class Branch extends NodeElement implements org.telegrise.telegrise.transcription.Branch, BranchingElement {
     @Attribute(name = "name")
     private String name;
 
@@ -83,5 +85,15 @@ public class Branch extends NodeElement implements BranchingElement {
     public void store(TranscriptionMemory memory) {
         if (this.name != null)
             memory.put(parentTree, this.name, this);
+    }
+
+    @Override
+    public @Nullable Expression<Boolean> getWhenExpression() {
+        return when != null ? when.toExpression() : null;
+    }
+
+    @Override
+    public @Nullable Expression<Void> getToInvokeExpression() {
+        return toInvoke != null ? toInvoke.toExpression() : null;
     }
 }

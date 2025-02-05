@@ -4,9 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.telegrise</groupId>
+    <parent>
+        <groupId>org.telegrise</groupId>
+        <artifactId>TelegRiseFramework</artifactId>
+        <version>0.11.3-PREVIEW</version>
+    </parent>
+
     <artifactId>telegrise</artifactId>
-    <version>0.11.0-PREVIEW</version>
 
     <properties>
         <api.version>8.2.0</api.version>
@@ -18,16 +22,6 @@
         <jetty.version>12.0.16</jetty.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>24.0.1</version>
-                <scope>compile</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.telegram</groupId>
@@ -54,6 +48,12 @@
             <artifactId>lombok</artifactId>
             <version>1.18.36</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

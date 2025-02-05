@@ -3,6 +3,7 @@ package org.telegrise.telegrise.core.elements.text;
 import lombok.*;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.InteractiveElement;
@@ -24,7 +25,8 @@ import java.util.function.Function;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Text extends NodeElement implements EmbeddableElement, InteractiveElement<TextBlock>, NamedElement {
+public class Text extends NodeElement implements EmbeddableElement, InteractiveElement<TextBlock>, NamedElement,
+        org.telegrise.telegrise.transcription.Text {
     @Getter(value = AccessLevel.NONE)
     private GeneratedValue<String> text;
 
@@ -156,5 +158,10 @@ public class Text extends NodeElement implements EmbeddableElement, InteractiveE
     @Override
     public TextBlock createInteractiveObject(Function<Update, ResourcePool> resourcePoolFunction) {
         return new TextBlock(this, resourcePoolFunction);
+    }
+
+    @Override
+    public Expression<String> getTextExpression() {
+        return new Expression<>(this::generateText);
     }
 }
