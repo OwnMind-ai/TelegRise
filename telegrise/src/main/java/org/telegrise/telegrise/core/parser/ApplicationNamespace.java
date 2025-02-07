@@ -40,6 +40,11 @@ public final class ApplicationNamespace {
     }
 
     public void addClass(Class<?> loaded){
+        var existing = importedClasses.get(loaded.getSimpleName());
+        if (existing != null && !existing.equals(loaded))
+            throw new TelegRiseRuntimeException("Conflict of imported classes: '%s' and '%s'"
+                    .formatted(existing.getName(), loaded.getName()));
+
         importedClasses.put(loaded.getSimpleName(), loaded);
     }
 

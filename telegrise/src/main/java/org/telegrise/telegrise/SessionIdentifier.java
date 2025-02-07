@@ -15,23 +15,23 @@ public final class SessionIdentifier implements Serializable {
         return new SessionIdentifier(user.getId(), chatId.getId(), user.getLanguageCode());
     }
     public static SessionIdentifier of(Long user, Long chat) { return new SessionIdentifier(user, chat); }
-    public static SessionIdentifier ofUserOnly(User user) { return new SessionIdentifier(user.getId(), null); }
-    public static SessionIdentifier ofUserOnly(Long id) { return new SessionIdentifier(id, null); }
+    public static SessionIdentifier ofUserOnly(User user) { return new SessionIdentifier(user.getId(), user.getId()); }
+    public static SessionIdentifier ofUserOnly(Long id) { return new SessionIdentifier(id, id); }
 
     public static final String SESSION_CHAT = "chat";
     public static final String SESSION_USER = "user";
 
-    private final Long userId;
-    private final Long chatId;
+    private final long userId;
+    private final long chatId;
 
     @Setter
     private String languageCode;   //TODO move to session memory
 
-    private SessionIdentifier(Long userId, Long chatId) {
+    private SessionIdentifier(long userId, long chatId) {
         this.userId = userId;
         this.chatId = chatId;
     }
-    private SessionIdentifier(Long userId, Long chatId, String languageCode) {
+    private SessionIdentifier(long userId, long chatId, String languageCode) {
         this.chatId = chatId;
         this.userId = userId;
         this.languageCode = languageCode;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <?import org.telegrise.telegrise.bot.controllers.StartController ?>
-<bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="chat">
+<bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="user">
     <head>
         <link src="*"/>
 
