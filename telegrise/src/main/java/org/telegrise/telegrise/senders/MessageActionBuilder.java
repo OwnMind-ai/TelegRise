@@ -21,8 +21,8 @@ import java.util.List;
  * This class extracts all required values for {@code send} and {@code reply} actions
  * and can be configured using builder strategy.
  * It assumes that passed {@link Message} cannot be edited or deleted, so no methods are provided.
- * {@snippet lang=java:
- * // @link substring="sender" target="BotSender":
+ * <pre>
+ * {@code
  * sender.of(message).disableNotification(true).send("Hello, World!", replyMarkup);
  * }
  *

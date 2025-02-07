@@ -109,7 +109,8 @@ public class BotSender {
      * The instance will go back to non-sneaky mode right after the execution of the API method
      * AND DOESN'T set indefinitely.
      * Multiple execution of this method has no effect.
-     * {@snippet lang="java":
+     * <pre>
+     * {@code
      * sender.sneaky().execute(SendMessage.builder().chatId(id).text(text).build());
      * }
      */

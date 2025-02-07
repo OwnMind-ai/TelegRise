@@ -14,7 +14,6 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegrise.telegrise.resources.ResourceInjector;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.senders.UniversalSender;
 import org.telegrise.telegrise.utils.MessageUtils;

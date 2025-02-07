@@ -18,8 +18,8 @@ import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
-import org.telegrise.telegrise.resources.ResourceInjector;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.ChatTypes;
 import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;

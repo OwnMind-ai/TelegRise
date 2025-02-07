@@ -7,6 +7,7 @@ import org.reflections.Reflections;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.application.ApplicationRunner;
+import org.telegrise.telegrise.core.ResourceInjector;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.ServiceManager;
 import org.telegrise.telegrise.core.TelegramSessionsController;
@@ -19,7 +20,6 @@ import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.telegrise.telegrise.resources.ResourceFactory;
-import org.telegrise.telegrise.resources.ResourceInjector;
 import org.telegrise.telegrise.senders.BotSender;
 
 import java.io.File;

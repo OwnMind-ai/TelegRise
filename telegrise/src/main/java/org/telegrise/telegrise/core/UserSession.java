@@ -18,7 +18,6 @@ import org.telegrise.telegrise.core.elements.security.Role;
 import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegrise.telegrise.resources.ResourceInjector;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.types.UserRole;
 import org.telegrise.telegrise.utils.MessageUtils;

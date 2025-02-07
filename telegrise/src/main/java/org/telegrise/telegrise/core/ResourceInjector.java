@@ -1,17 +1,16 @@
-package org.telegrise.telegrise.resources;
+package org.telegrise.telegrise.core;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.ApiStatus;
 import org.telegrise.telegrise.annotations.Resource;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegrise.telegrise.resources.ResourceFactory;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ApiStatus.Internal
 public final class ResourceInjector {
     private final List<Object> resources;
     @Getter
@@ -27,7 +26,7 @@ public final class ResourceInjector {
     }
 
     public void addFactories(List<ResourceFactory<?>> resourceFactories) {
-        resourceFactories.forEach(f -> this.resourceFactoryMap.put(f.gerResourceClass().getName(), f));
+        resourceFactories.forEach(f -> this.resourceFactoryMap.put(f.getResourceClass().getName(), f));
     }
 
     public void injectResources(Object target){

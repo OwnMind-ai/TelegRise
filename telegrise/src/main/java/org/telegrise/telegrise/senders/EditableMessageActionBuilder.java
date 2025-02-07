@@ -28,10 +28,9 @@ import java.util.List;
  * This class extracts all required values for {@code send}, {@code reply}, {@code edit} and {@code delete} actions
  * and can be configured using builder strategy.
  * It assumes that passed {@link Message} can be edited and deleted.
- * {@snippet lang=java:
- * // @link substring="sender" target="BotSender":
+ * <pre>
+ * {@code
  * sender.ofEditable(message).edit("Hello, World!", inlineMarkup);
- * // @link substring="sender" target="BotSender":
  * sender.ofEditable(message).delete();
  * }
  *

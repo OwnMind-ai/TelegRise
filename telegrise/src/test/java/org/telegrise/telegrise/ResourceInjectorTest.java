@@ -3,9 +3,9 @@ package org.telegrise.telegrise;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.telegrise.telegrise.annotations.Resource;
+import org.telegrise.telegrise.core.ResourceInjector;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
-import org.telegrise.telegrise.resources.ResourceInjector;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ class ResourceInjectorTest {
         ResourceInjector resourceInjector = new ResourceInjector(integer, strings);
         resourceInjector.addFactories(List.of(new ResourceFactory<Character>() {
             @Override
-            public @NotNull Class<Character> gerResourceClass() {
+            public @NotNull Class<Character> getResourceClass() {
                 return Character.class;
             }
 

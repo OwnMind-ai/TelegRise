@@ -2,7 +2,6 @@ package org.telegrise.telegrise.core;
 
 import org.telegrise.telegrise.annotations.OnCreate;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegrise.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

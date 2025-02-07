@@ -2,7 +2,6 @@ package org.telegrise.telegrise.core;
 
 import lombok.Setter;
 import org.telegrise.telegrise.Service;
-import org.telegrise.telegrise.resources.ResourceInjector;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +28,7 @@ public class ServiceManager {
     }
 
     public void stop(){
+        services.forEach(Service::onInterruption);
         threadGroup.interrupt();
     }
 

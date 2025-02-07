@@ -16,7 +16,7 @@
             <answer text="Answer action tested"/>
             <wait timeout="1"/>
 
-            <edit>Okay. I will start to execute every action element with 1-second delay between each. Here we go...</edit>
+            <edit>Okay. I will start to execute every action element with a 1-second delay between each. Here we go...</edit>
             <wait timeout="1"/>
 
             <send returnConsumer='::register("registry")'>Send action test</send>

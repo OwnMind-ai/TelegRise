@@ -7,7 +7,6 @@ import org.telegrise.telegrise.UpdateHandler;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
-import org.telegrise.telegrise.resources.ResourceInjector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

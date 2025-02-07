@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.telegrise.telegrise.ChatTypes;
 import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
@@ -15,6 +14,7 @@ import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
+import org.telegrise.telegrise.types.ChatTypes;
 
 import java.util.List;
 import java.util.Objects;

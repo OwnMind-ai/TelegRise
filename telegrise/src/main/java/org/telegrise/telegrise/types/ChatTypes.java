@@ -1,4 +1,4 @@
-package org.telegrise.telegrise;
+package org.telegrise.telegrise.types;
 
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.*;

@@ -15,8 +15,8 @@ import org.telegrise.telegrise.core.SessionMemoryImpl;
  * This class extracts all required values from provided {@code CallbackQuery}.
  * Method {@code message} will return {@link EditableMessageActionBuilder}
  * for handling the message attached to the query.
- * {@snippet lang=java:
- * // @link substring="sender" target="BotSender":
+ * <pre>
+ * {@code
  * sender.of(query).answer("Hello, World!");
  * }
  *
