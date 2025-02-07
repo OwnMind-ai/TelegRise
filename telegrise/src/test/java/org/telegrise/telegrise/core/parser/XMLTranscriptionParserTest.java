@@ -47,12 +47,12 @@ public class XMLTranscriptionParserTest {
         document.getDocumentElement().normalize();
 
         var elementParser = new XMLElementsParser(
-                new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())),
+                new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader(), "")),
                 new File("src/test/resources/")
         );
 
         elementParser.load();
-        XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser, this.getClass().getClassLoader());
+        XMLTranscriptionParser parser = new XMLTranscriptionParser(document, elementParser);
 
         this.transcription = parser.parse();
 

@@ -1,8 +1,10 @@
 package org.telegrise.telegrise.core.parser;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.expressions.Syntax;
@@ -13,6 +15,7 @@ import org.w3c.dom.Node;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 public class XMLTranscriptionParser implements TranscriptionParser{
     private static final Logger logger = LoggerFactory.getLogger(XMLTranscriptionParser.class);
@@ -21,16 +24,17 @@ public class XMLTranscriptionParser implements TranscriptionParser{
     private final XMLElementsParser elementsParser;
     private final ApplicationNamespace applicationNamespace;
 
-    public XMLTranscriptionParser(Document document, XMLElementsParser elementsParser, ClassLoader classLoader) {
+    public XMLTranscriptionParser(Document document, XMLElementsParser elementsParser) {
         this.document = document;
         this.elementsParser = elementsParser;
-        this.applicationNamespace = new ApplicationNamespace(classLoader);
+        this.applicationNamespace = elementsParser.getNamespace().getApplicationNamespace();
         this.elementsParser.setNamespace(this.applicationNamespace.emptyLocal());
     }
 
     public BotTranscription parse() throws Exception {
         long startMillis = System.currentTimeMillis();
         this.processInstructions(XMLUtils.getInstructions(document));
+        this.processAutoImport();
 
         BotTranscription result = (BotTranscription) elementsParser.parse(document.getElementsByTagName(
                     BotTranscription.class.getAnnotation(Element.class).name()).item(0));
@@ -54,6 +58,13 @@ public class XMLTranscriptionParser implements TranscriptionParser{
         ));
 
         return result;
+    }
+
+    private void processAutoImport() {
+        Set<Class<?>> controllers = new Reflections(applicationNamespace.getApplicationPackageName()).getTypesAnnotatedWith(TreeController.class);
+
+        controllers.stream().filter(c -> c.getAnnotation(TreeController.class).autoImport())
+                .forEach(this.applicationNamespace::addClass);
     }
 
     private void processInstructions(Node[] instructions){

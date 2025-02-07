@@ -5,7 +5,7 @@ import org.telegrise.telegrise.annotations.TreeController;
 
 import java.time.LocalDateTime;
 
-@TreeController
+@TreeController(autoImport = false)
 public class StartController {
     @Reference
     public String getGreetingText(){

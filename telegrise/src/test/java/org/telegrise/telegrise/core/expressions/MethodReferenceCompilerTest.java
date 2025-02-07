@@ -29,7 +29,7 @@ public class MethodReferenceCompilerTest {
     @Test
     void compile() throws ReferenceParsingException, ClassNotFoundException {
         MethodReferenceCompiler compiler = new MethodReferenceCompiler();
-        LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader()));
+        LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader(),""));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
         ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), ""));
         Node node = toNode("<tag/>");

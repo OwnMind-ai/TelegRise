@@ -21,7 +21,7 @@ public class JavaExpressionCompilerTest {
     void parse() throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         JavaExpressionCompiler parser = new JavaExpressionCompiler(JavaExpressionCompiler.getTempDirectory());
         String expression = "controller.getData(update.getCallbackQuery(), \" and done\")";
-        LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader()));
+        LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader(),""));
         ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));
 

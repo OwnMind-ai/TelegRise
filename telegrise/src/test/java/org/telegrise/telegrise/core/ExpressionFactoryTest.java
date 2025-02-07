@@ -16,7 +16,7 @@ public class ExpressionFactoryTest {
         String expression = "Some text and ${controller.getNum()} generated";
         Node node = toNode("<tag expression=\"" + expression + "\"/>");
 
-        LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader()));
+        LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader(), ""));
         ResourcePool pool = new ResourcePool(null, this, null, null);
         assertEquals("Some text and 12 generated", ExpressionFactory.createExpression(expression, String.class, node, namespace).generate(pool));
     }

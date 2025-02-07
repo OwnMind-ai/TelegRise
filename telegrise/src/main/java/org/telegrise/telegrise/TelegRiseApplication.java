@@ -98,13 +98,14 @@ public final class TelegRiseApplication {
 
     @NotNull
     private TelegramSessionsController createController() {
-        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(classLoader)), transcription.getParentFile());
+        ApplicationNamespace applicationNamespace = new ApplicationNamespace(classLoader, this.mainClass.getPackageName());
+        XMLElementsParser elementsParser = new XMLElementsParser(new LocalNamespace(null, applicationNamespace), transcription.getParentFile());
         elementsParser.load();
         elementsParser.getTranscriptionMemory().getLinkedFiles().add(transcription); // to prevent cyclic imports
 
         TelegramSessionsController controller;
         try {
-            XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser, classLoader);
+            XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser);
             controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);

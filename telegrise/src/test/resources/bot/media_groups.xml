@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <trees>
-    <tree name="MediaGroupsTree" controller="org.telegrise.telegrise.bot.controllers.MediaGroupsController" accessLevel="0">
+    <tree name="MediaGroupsTree" controller="MediaGroupsController" accessLevel="0">
         <send>
             <text>Send me a media group.</text>
             <keyboard type="reply" resize="true">

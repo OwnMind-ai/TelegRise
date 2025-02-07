@@ -14,7 +14,7 @@ import java.lang.annotation.*;
  * &lt;tag expression="${controller.method()}"/&gt;
  * </pre>
  * </p>
- * After the tree is closed, the method annotated with <code>OnClose</code> will be called, if exists.
+ * After the tree is closed, the method annotated with <code>OnClose</code> will be called, if defined.
  * 
  * @since 0.4
  */
@@ -22,4 +22,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface TreeController {
+    /**
+     * Indicates if an annotated tree should be automatically imported into transcription.
+     * If two trees have the same class name and both have {@code autoImport} as true, an error will be raised.
+     */
+    boolean autoImport() default true;
 }

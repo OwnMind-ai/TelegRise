@@ -45,7 +45,7 @@ public class XMLElementsParserTest {
     }
     @Test
     void parseText() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader(), "")), null);
         parser.load();
         Node node = toNode("<text parseMode=\"html\" entities=\"${java.util.Collections.singletonList(null)}\">val<br/>val</text>");
 
@@ -98,7 +98,7 @@ public class XMLElementsParserTest {
 
     @Test
     void parseTree() throws Exception{
-        ApplicationNamespace namespace = new ApplicationNamespace(this.getClass().getClassLoader());
+        ApplicationNamespace namespace = new ApplicationNamespace(this.getClass().getClassLoader(), "");
         namespace.addClass(this.getClass().getName());
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(this.getClass(), namespace), null);
         parser.load();
@@ -146,7 +146,7 @@ public class XMLElementsParserTest {
 
     @Test
     void parseKeyboard() throws Exception {
-        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader())), null);
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader(), "")), null);
         parser.load();
 
         Node tree = toNode("<tree name=\"a\"></tree>");

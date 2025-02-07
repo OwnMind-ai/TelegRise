@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <trees>
-    <tree name="CalculatorTree" command="calculator" description="Calculator App" key="Calculator App" accessLevel="0"
-          controller="org.telegrise.telegrise.bot.controllers.CalculatorController">
+    <tree name="CalculatorTree" command="calculator" description="Calculator App" key="Calculator App"
+          accessLevel="0" controller="CalculatorController">
         <send name="MainSend">
             <text textblock="true">
                 🧮 Calculator

@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope
 import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.annotations.OnClose;
 import org.telegrise.telegrise.annotations.OnCreate;
+import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
@@ -105,6 +106,8 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
     private LocalNamespace extractController(Node node, LocalNamespace namespace){
         if (node.getAttributes().getNamedItem("controller") != null) {
             this.controller = namespace.getApplicationNamespace().getClass(node.getAttributes().getNamedItem("controller").getNodeValue());
+            if (!controller.isAnnotationPresent(TreeController.class))
+                throw new TranscriptionParsingException("Tree uses a controller the class of which is not annotated with @TreeController", node);
         }
 
         return this.createNamespace(namespace.getApplicationNamespace());

@@ -17,6 +17,8 @@ public final class ApplicationNamespace {
     // Key is a simple name of class
     private final Map<String, Class<?>> importedClasses = new HashMap<>();
     private final ClassLoader applicationClassloader;
+    @Getter
+    private final String applicationPackageName;
 
     @Setter @Getter
     private String updateName = "update";
@@ -27,13 +29,17 @@ public final class ApplicationNamespace {
     @Setter @Getter
     private String memoryName = "memory";
 
-    public ApplicationNamespace(ClassLoader applicationClassloader) {
+    public ApplicationNamespace(ClassLoader applicationClassloader, String applicationPackageName) {
         this.applicationClassloader = applicationClassloader;
+        this.applicationPackageName = applicationPackageName;
         importedClasses.put(DefaultController.class.getSimpleName(), DefaultController.class);
     }
 
     public void addClass(String name) throws ClassNotFoundException {
-        Class<?> loaded = Class.forName(name, true, this.applicationClassloader);
+        addClass(Class.forName(name, true, this.applicationClassloader));
+    }
+
+    public void addClass(Class<?> loaded){
         importedClasses.put(loaded.getSimpleName(), loaded);
     }
 
