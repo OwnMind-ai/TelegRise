@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.telegrise</groupId>
         <artifactId>TelegRiseFramework</artifactId>
-        <version>0.11.3-PREVIEW</version>
+        <version>0.11.4-PREVIEW</version>
     </parent>
 
     <artifactId>telegrise</artifactId>

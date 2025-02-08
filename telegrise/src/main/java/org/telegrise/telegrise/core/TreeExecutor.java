@@ -106,7 +106,7 @@ public final class TreeExecutor {
         this.updatesQueue = updatesQueue;
     }
 
-    public void update(Update update){
+    public boolean update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
         ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, this, updatesQueue);
@@ -145,7 +145,10 @@ public final class TreeExecutor {
                 this.invokeBranch(this.tree.getDefaultBranch().getToInvoke(), this.tree.getDefaultBranch().getActions(), resourcePool);
         } else {
             this.currentBranch = previous;      // Effectively ignores the update
+            return true;
         }
+
+        return false;
     }
 
     private void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool){

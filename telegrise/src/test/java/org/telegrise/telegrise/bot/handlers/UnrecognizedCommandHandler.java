@@ -7,7 +7,7 @@ import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.annotations.Resource;
 import org.telegrise.telegrise.senders.BotSender;
 
-@Handler(independent = true, afterTrees = true)
+@Handler(afterTrees = true)
 public class UnrecognizedCommandHandler implements UpdateHandler {
     @Resource
     private BotSender sender;

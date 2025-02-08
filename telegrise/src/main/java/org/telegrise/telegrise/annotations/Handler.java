@@ -17,7 +17,8 @@ import java.lang.annotation.*;
  *     Independent handlers can't inject {@link org.telegrise.telegrise.SessionMemory SessionMemory}.</li>
  *     <li><code>afterTrees</code>: if handler marked as <code>afterTrees</code>,
  *     it will be executed only when no tree was found to process the Update
- *     (and handler's condition was satisfied).</li>
+ *     or the current tree wasn't able to process it either.
+ *     (and the handler's condition was satisfied).</li>
  *     <li><code>priority</code>: indicates which handlers will be looked at first determining which will process the update (if any).
  *     Handlers with higher <code>priority</code> value will be looked at first.</li>
  * </ul>
@@ -45,7 +46,8 @@ public @interface Handler {
     /**
      * If handler marked as <code>afterTrees</code>,
      * it will be executed only when no tree was found to process the Update
-     * (and handler's condition was satisfied).
+     * or the current tree wasn't able to process it either.
+     * (and the handler's condition was satisfied).
      */
     boolean afterTrees() default false;
 

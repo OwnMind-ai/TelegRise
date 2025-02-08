@@ -61,7 +61,7 @@ public final class TelegRiseApplication {
 
     public void start(){
         log.info("Starting TelegRise application...");
-        this.handlersClasses = this.loadPrimaryHandlers();
+        this.handlersClasses = this.loadUpdateHandlers();
         TelegramSessionsController controller = this.createController();
         final String token = controller.getTranscription().getToken().generate(new ResourcePool());
 
@@ -120,12 +120,17 @@ public final class TelegRiseApplication {
         return controller;
     }
 
-    private List<Class<? extends UpdateHandler>> loadPrimaryHandlers(){
+    private List<Class<? extends UpdateHandler>> loadUpdateHandlers(){
         Set<Class<?>> handlerCandidates = new Reflections(this.mainClass.getPackageName()).getTypesAnnotatedWith(Handler.class);
 
-        for (Class<?> clazz : handlerCandidates)
+        for (Class<?> clazz : handlerCandidates) {
             if (!UpdateHandler.class.isAssignableFrom(clazz))
                 throw new TelegRiseRuntimeException("Handler class '" + clazz.getName() + "' doesn't implement PrimaryHandler interface");
+
+            var annotation = clazz.getAnnotation(Handler.class);
+            if (annotation.afterTrees() && annotation.independent())
+                throw new TelegRiseRuntimeException("An independent handler '%s' can't be ran after trees".formatted(clazz.getSimpleName()));
+        }
 
         //noinspection unchecked
         return handlerCandidates.stream().map(c -> (Class<? extends UpdateHandler>)c).collect(Collectors.toList());

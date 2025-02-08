@@ -50,9 +50,6 @@
             <branch key="Jump to media groups">
                 <transition direction="jump" target="MediaGroupsTree"  execute="true"/>
             </branch>
-            <default>
-                <send>Unrecognized key.</send>
-            </default>
         </tree>
 
         <tree name="TestAdmin" key="Test admin" accessLevel="-100" controller="TestAdminController">

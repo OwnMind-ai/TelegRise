@@ -133,10 +133,9 @@ public class UserSession implements Runnable{
             if (intercept) return;
         }
 
-        if (this.sessionMemory.isOnRoot())
+        if (this.sessionMemory.isOnRoot()) {
             this.initializeTree(update, transcription.getRoot());
-
-        else if (this.sessionMemory.isOnStack(Tree.class)) {
+        } else if (this.sessionMemory.isOnStack(Tree.class)) {
             if (this.transcription.isInterruptions()){
                 TreeExecutor executor = this.treeExecutors.getLast();
                 Optional<Tree> treeCandidate = this.getInterruptionCandidate(update, pool, executor);
@@ -220,7 +219,7 @@ public class UserSession implements Runnable{
                     pool, sender, ExecutionOptions.always());
         } else {
             Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
-            handlerCandidate.ifPresent(primaryHandler -> this.updateHandlersController.applyHandler(update, primaryHandler));
+            handlerCandidate.ifPresent(h -> this.updateHandlersController.applyHandler(update, h));
         }
     }
 
@@ -275,13 +274,17 @@ public class UserSession implements Runnable{
         TreeExecutor executor = this.treeExecutors.getLast();
         ResourcePool pool = this.createResourcePool(update);
 
+        boolean ignored;
         try {
-            executor.update(update);
+            ignored = executor.update(update);
         } finally {
             this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
         }
 
-        if (executor.isClosed())
+        if (ignored) {
+            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
+            handlerCandidate.ifPresent(updateHandler -> this.updateHandlersController.applyHandler(update, updateHandler));
+        } else if (executor.isClosed())
             this.processClosedTree(update, executor, pool);
         else
             this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
