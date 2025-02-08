@@ -1,20 +1,20 @@
 package org.telegrise.telegrise.core;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegrise.telegrise.*;
+import org.telegrise.telegrise.MediaCollector;
+import org.telegrise.telegrise.SessionIdentifier;
+import org.telegrise.telegrise.TranscriptionManager;
+import org.telegrise.telegrise.UpdateHandler;
 import org.telegrise.telegrise.core.caching.MethodReferenceCache;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.Root;
 import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
-import org.telegrise.telegrise.core.elements.security.Role;
 import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
@@ -49,14 +49,12 @@ public class UserSession implements Runnable{
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     @Getter
     private final TranscriptionManager transcriptionManager;
-    @Setter
-    private RoleProvider roleProvider;
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
     public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(sessionIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getUsername().generate(new ResourcePool()));
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getUsername().generate(new ResourcePool()), transcription.getRoleMap());
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
@@ -127,9 +125,6 @@ public class UserSession implements Runnable{
 
     private void handleUpdate(Update update) {
         ResourcePool pool = this.createResourcePool(update);
-
-        if (this.roleProvider != null && this.sessionMemory.getUserRole() == null)
-            this.updateRole(update);
 
         Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableHandler(update);
         if (handlerCandidate.isPresent()){
@@ -230,7 +225,7 @@ public class UserSession implements Runnable{
     }
 
     private void initializeTree(Update update, Tree tree, boolean execute) {
-        if (roleProvider != null && update != null && !this.checkForTreeAccessibility(tree, update))
+        if (!this.checkForTreeAccessibility(tree, update))
             return;
 
         this.applyTree(update, tree, execute);
@@ -260,33 +255,20 @@ public class UserSession implements Runnable{
     }
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){
-        Role role = updateRole(update);
+        UserRole role = sessionMemory.getUserRole();
         if (role == null) return false;
 
-        if (tree.getAccessLevel() != null && role.getLevel() != null && role.getLevel() >= tree.getAccessLevel())
+        if (tree.getAccessLevel() != null && role.level() != null && role.level() >= tree.getAccessLevel())
             return true;
-        else if (role.getTrees() != null && Arrays.stream(role.getTrees()).anyMatch(t -> t.equals(tree.getName())))
+        else if (role.trees() != null && Arrays.stream(role.trees()).anyMatch(t -> t.equals(tree.getName())))
             return true;
 
-        if (role.getOnDeniedTree() != null){
-            Tree onDenied = this.transcription.getMemory().get(role.getOnDeniedTree(), Tree.class, List.of("tree"));
-            this.applyTree(update, onDenied, true);
+        if (role.onDeniedTree() != null){
+            Tree onDenied = this.transcription.getMemory().get(role.onDeniedTree(), Tree.class, List.of("tree"));
+            this.applyTree(update, onDenied, update != null);
         }
 
         return false;
-    }
-
-    @Nullable
-    private Role updateRole(Update update) {
-        String roleName = this.roleProvider.getRole(MessageUtils.getFrom(update), this.sessionMemory);
-        if(roleName == null){
-            this.sessionMemory.setUserRole(null);
-            return null;
-        }
-
-        Role role = this.transcription.getMemory().get(roleName, Role.class, List.of("role"));
-        this.sessionMemory.setUserRole(UserRole.ofRole(role));
-        return role;
     }
 
     private void updateTree(Update update) {

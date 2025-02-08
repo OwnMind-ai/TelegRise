@@ -53,6 +53,10 @@ public interface SessionMemory {
     <T> boolean containsComponent(Class<T> tClass);
 
     UserRole getUserRole();
+    void setUserRole(String roleName);
+    default void setUserRole(UserRole role){
+        setUserRole(role.name());   // role object can be created by user so we use a safe method instead
+    }
 
     @Nullable Message getLastSentMessage();
 

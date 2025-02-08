@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +32,7 @@ public class MethodReferenceCompilerTest {
         MethodReferenceCompiler compiler = new MethodReferenceCompiler();
         LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader(),""));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
-        ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), ""));
+        ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), "", Map.of()));
         Node node = toNode("<tag/>");
 
         Parser parser = new Parser(new Lexer(new CharsStream("\"value\"")));

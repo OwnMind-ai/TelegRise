@@ -9,6 +9,13 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
+/**
+ * This class contains identifying data for a session, specifically {@code userId} and {@code chatId}.
+ * <p>
+ * In the case of the 'user' session type, {@code chatId} will always be equal to {@code userId}.
+ *
+ * @since 0.1
+ */
 @Getter
 public final class SessionIdentifier implements Serializable {
     public static SessionIdentifier of(User user, Chat chatId){

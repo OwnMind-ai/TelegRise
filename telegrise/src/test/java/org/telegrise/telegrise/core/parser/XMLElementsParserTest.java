@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.SessionMemoryImpl;
 import org.telegrise.telegrise.core.elements.Branch;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TreeController
 public class XMLElementsParserTest {
     public static Node toNode(String node){
         try {
@@ -170,7 +172,7 @@ public class XMLElementsParserTest {
                 new InlineKeyboardRow(InlineKeyboardButton.builder().text("URL").url("url").build())
         ));
 
-        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, null))));
+        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, null, Map.of()))));
     }
 
     @Test

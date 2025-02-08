@@ -15,6 +15,7 @@ import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.expressions.references.MethodReference;
 import org.telegrise.telegrise.core.transition.JumpPoint;
+import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardState;
 import org.telegrise.telegrise.types.UserRole;
 
@@ -37,6 +38,7 @@ public class SessionMemoryImpl implements SessionMemory {
     private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
     @Getter
     private final String botUsername;
+    private transient final Map<String, UserRole> roleMap;
 
     @Getter
     private final transient Map<MethodReference, MethodReferenceCache> cacheMap = new ConcurrentHashMap<>();
@@ -44,17 +46,18 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter
     private final Map<String, KeyboardState> keyboardStates = new ConcurrentHashMap<>();
 
-    @Getter @Setter
+    @Getter
     private UserRole userRole;
     @Getter @Setter
     private String languageCode;
     @Getter @Setter
     private Message lastSentMessage;
 
-    public SessionMemoryImpl(int transcriptionHashcode, SessionIdentifier sessionIdentifier, String botUsername) {
+    public SessionMemoryImpl(int transcriptionHashcode, SessionIdentifier sessionIdentifier, String botUsername, Map<String, UserRole> roleMap) {
         this.transcriptionHashcode = transcriptionHashcode;
         this.sessionIdentifier = sessionIdentifier;
         this.botUsername = botUsername;
+        this.roleMap = roleMap;
     }
 
     public Branch getCurrentBranch(){
@@ -124,13 +127,20 @@ public class SessionMemoryImpl implements SessionMemory {
     }
 
     @Override
+    public void setUserRole(String roleName) {
+       this.userRole = roleMap.get(roleName);
+       if (userRole == null)
+           throw new TelegRiseRuntimeException("Unrecognized role '%s' for session %s".formatted(roleName, sessionIdentifier));
+    }
+
+    @Override
     public long getUserId() {
         return this.sessionIdentifier.getUserId();
     }
 
     @Override
     public long getChatId() {
-        return Objects.requireNonNullElse(sessionIdentifier.getChatId(), getUserId());
+        return sessionIdentifier.getChatId();
     }
 
     public boolean isOnStack(Class<?> clazz){

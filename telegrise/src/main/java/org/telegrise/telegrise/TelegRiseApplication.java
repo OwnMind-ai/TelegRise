@@ -77,6 +77,8 @@ public final class TelegRiseApplication {
         serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();
 
+        if (this.roleProvider != null)
+            resourceInjector.injectResources(this.roleProvider);
         if (this.sessionInitializer != null) {
             resourceInjector.injectResources(this.sessionInitializer);
             controller.initializeSessions();

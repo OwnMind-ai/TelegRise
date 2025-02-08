@@ -21,10 +21,9 @@ import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
+import org.telegrise.telegrise.types.UserRole;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Element(name = "bot")
@@ -59,6 +58,8 @@ public final class BotTranscription extends NodeElement {
     private Roles roles;
 
     private TranscriptionMemory memory;
+    @Getter
+    private Map<String, UserRole> roleMap;
 
     @Override
     public void load(TranscriptionMemory memory) {
@@ -83,6 +84,12 @@ public final class BotTranscription extends NodeElement {
 
         if(!List.of(SessionIdentifier.SESSION_CHAT, SessionIdentifier.SESSION_USER).contains(sessionType))
             throw new TranscriptionParsingException("Invalid session type, must be 'chat' or 'user'", node);
+
+        if (roles != null){
+            this.roleMap = new HashMap<>();
+            for (Role role : roles.getRoles())
+                roleMap.put(role.getName(), UserRole.ofRole(role));
+        }
     }
 
     @Override

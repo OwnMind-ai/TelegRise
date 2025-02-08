@@ -48,15 +48,32 @@
                 <transition direction="back"/>
             </branch>
             <branch key="Jump to media groups">
-                <transition direction="jump" target="MediaGroupsTree" execute="true"/>
+                <transition direction="jump" target="MediaGroupsTree"  execute="true"/>
             </branch>
             <default>
                 <send>Unrecognized key.</send>
             </default>
         </tree>
 
-        <tree name="TestAdmin" key="Test admin" accessLevel="1">
-            <send>You are an administrator!</send>
+        <tree name="TestAdmin" key="Test admin" accessLevel="-100" controller="TestAdminController">
+            <send>
+                <text>Choose your role (or /start to return):</text>
+                <keyboard type="inline">
+                    <row>
+                        <button data="previous">◄</button>
+                        <button data="ignore">${#currentRole}</button>
+                        <button data="next">►</button>
+                    </row>
+                </keyboard>
+            </send>
+
+            <branch when="#nextRole -> #notNull" invoke="#nextRole -> #setRole">
+                <transition direction="back" edit="first"/>
+            </branch>
+
+            <default when="#isCallback">
+                <answer text="🛑"/>
+            </default>
         </tree>
 
         <tree name="DeniedTree">

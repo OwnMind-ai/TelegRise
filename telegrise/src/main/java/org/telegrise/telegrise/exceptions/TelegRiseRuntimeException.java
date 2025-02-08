@@ -22,10 +22,11 @@ public class TelegRiseRuntimeException extends RuntimeException{
 
         // After a while statement, cause should be the last TelegRiseInternalException found, so we do one step forward
         e = e.getCause();
+        if (e instanceof TranscriptionParsingException te) return te;
 
         TelegRiseRuntimeException result;
         if (e instanceof RuntimeException) {
-            result = new TelegRiseRuntimeException(e.getClass().getName() + ": " + e.getMessage(), null, true);
+            result = new TelegRiseRuntimeException(e.toString(), null, true);
             result.setStackTrace(e.getStackTrace());
         } else
             result = new TelegRiseRuntimeException(null, e, true);

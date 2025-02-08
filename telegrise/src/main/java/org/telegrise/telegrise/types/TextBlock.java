@@ -1,5 +1,6 @@
 package org.telegrise.telegrise.types;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -13,6 +14,7 @@ public final class TextBlock implements Serializable {
     private final Text linkedText;
     private final Function<Update, ResourcePool> resourcePoolFunction;
 
+    @ApiStatus.Internal
     public TextBlock(Text linkedText, Function<Update, ResourcePool> resourcePoolFunction) {
         this.linkedText = linkedText;
         this.resourcePoolFunction = resourcePoolFunction;

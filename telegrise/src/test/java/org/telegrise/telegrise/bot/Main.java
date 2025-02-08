@@ -16,8 +16,12 @@ public class Main {
             log.warn("Admin id wasn't found. Please, specify 'ADMIN_ID' environment variable with a valid TelegramID");
 
         TelegRiseApplication application = new TelegRiseApplication(new File("telegrise/src/test/resources/bot/index.xml"), Main.class);
-        application.setRoleProvider((user, m) -> user.getId().equals(adminId) ? "admin" : "user");
         application.setSessionInitializer(new Initializer(adminId));
+        application.setRoleProvider((memory) -> {
+            var role = adminId != null && memory.getUserId() == adminId ? "admin" : "user";
+            log.info("User {} got assigned {} role", memory.getUserId(), role);
+            return role;
+        });
 
         application.addService(new SleepyService());
 

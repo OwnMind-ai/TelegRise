@@ -147,12 +147,12 @@ public class TelegramSessionsController implements SessionsManager {
         UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
-        session.setRoleProvider(this.roleProvider);
         session.addHandlersClasses(this.userHandlersClasses);
 
-        if (this.sessionInitializer != null){
+        if (this.sessionInitializer != null)
             this.sessionInitializer.initialize(session.getSessionMemory());
-        }
+        if (this.roleProvider != null)
+            session.getSessionMemory().setUserRole(this.roleProvider.getRole(session.getSessionMemory()));
 
         this.sessions.put(identifier, session);
     }

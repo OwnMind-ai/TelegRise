@@ -12,6 +12,7 @@ import org.telegrise.telegrise.core.elements.Transition;
 import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
+import org.telegrise.telegrise.core.elements.security.Role;
 import org.telegrise.telegrise.core.elements.text.Text;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
@@ -20,10 +21,13 @@ import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardMarkup;
 import org.telegrise.telegrise.transcription.ElementBase;
 import org.telegrise.telegrise.types.TextBlock;
+import org.telegrise.telegrise.types.UserRole;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TranscriptionManager {
@@ -171,6 +175,12 @@ public class TranscriptionManager {
 
     public KeyboardMarkup getKeyboardMarkup(String name){
         return get(name, Keyboard.class).createInteractiveObject(resourcePoolProducer);
+    }
+
+    public List<UserRole> getRoles(){
+        return transcriptionMemory.getStandardMemory().values().stream()
+                .filter(Role.class::isInstance).map(r -> UserRole.ofRole((Role) r))
+                .collect(Collectors.toList());
     }
 
     //TODO getTextBlock(name, lang)
