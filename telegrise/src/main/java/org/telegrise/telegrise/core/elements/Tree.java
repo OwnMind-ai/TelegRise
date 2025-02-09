@@ -21,8 +21,8 @@ import org.telegrise.telegrise.core.elements.text.Texts;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.*;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
-import org.telegrise.telegrise.types.ChatTypes;
 import org.telegrise.telegrise.types.CommandData;
+import org.telegrise.telegrise.utils.ChatTypes;
 import org.telegrise.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 

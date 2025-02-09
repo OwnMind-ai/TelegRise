@@ -1,4 +1,4 @@
-package org.telegrise.telegrise.types;
+package org.telegrise.telegrise.utils;
 
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.*;
@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * This class contains chat type values
+ * which are used in the application to filter incoming updates based on chat scopes.
+ *
+ * @since 0.1
+ */
 @SuppressWarnings("unused")
 public final class ChatTypes {
     public static final String ALL = "all";

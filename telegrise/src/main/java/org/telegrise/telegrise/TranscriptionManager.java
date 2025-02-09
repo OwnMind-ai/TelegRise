@@ -2,6 +2,7 @@ package org.telegrise.telegrise;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.caching.CachingStrategy;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -29,8 +30,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * This class allows access to higher level operations with transcription and attached session, such as
+ * transitions, retrieval of named elements and cache manipulations.
+ * It can be accessed using {@link org.telegrise.telegrise.annotations.Resource Resource} annotation.
+ *
+ * @since 0.3
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class TranscriptionManager {
+public final class TranscriptionManager {
     private final TranscriptionMemory transcriptionMemory;
     private final UserSession.TranscriptionInterrupter interruptor;
     private final SessionMemoryImpl sessionMemory;
@@ -90,29 +98,58 @@ public class TranscriptionManager {
                 }).findFirst().orElse(null);
     }
 
+    /**
+     * Retrieves transcription manager of foreign session with specified identifier.
+     * This method is useful for cross-user tree's operations.
+     * @param sessionIdentifier identifier of foreign session
+     * @return their transcription manager or null if it does not exist
+     */
     public TranscriptionManager getTranscriptionManager(SessionIdentifier sessionIdentifier){
         return this.transcriptionManagerGetter.apply(sessionIdentifier);
     }
 
+    /**
+     * Returns attached session memory
+     * @return session memory
+     */
     public SessionMemory getSessionMemory(){
         return this.sessionMemory;
     }
 
+    /**
+     * Retrieves an instance of a tree controller that is being used at the time of execution, if any.
+     * @return controller's instance or null
+     */
+    public Object getCurrentTreeController(){
+        return transitionController.getTreeExecutors().isEmpty() ? null : transitionController.getTreeExecutors().getLast().getControllerInstance();
+    }
+
+    /**
+     * Retrieves an instance of a tree controller of type {@code T} that is being used at the time of execution, if any.
+     * @param tClass class of the controller
+     * @return controller's instance or null
+     * @param <T> type of the controller
+     */
     public <T> T getCurrentTreeController(Class<T> tClass){
         return transitionController.getTreeExecutors().isEmpty() ? null : tClass.cast(transitionController.getTreeExecutors().getLast().getControllerInstance());
     }
 
-    public org.telegrise.telegrise.transcription.Tree getCurrentTree(){
-        checkSessionMemory();
-
-        BranchingElement last = sessionMemory.getBranchingElements().getLast();
-        return last instanceof Tree ? (Tree) last : null;
-    }
-
+    /**
+     * Performs a transition with 'back' direction, target {@code element} and without execution.
+     * @param element named of the tree or branch
+     */
     public void transitBack(String element){
         this.transitBack(null, element, false);
     }
 
+    /**
+     * Performs a transition with 'back' direction,
+     * target {@code element} and with execution if {@code execute} is true.
+     *
+     * @param update update that will be used for element execution
+     * @param element named of the tree or branch
+     * @param execute if true, the action in a specified element will be executed
+     */
     public void transitBack(Update update, String element, boolean execute){
         if (update == null && execute)
             throw new IllegalArgumentException("Targeted element '" + element + "' can not be execute without update");
@@ -134,10 +171,26 @@ public class TranscriptionManager {
             this.elementExecutor.accept(sessionMemory.getBranchingElements().getLast(), update);
     }
 
+    /**
+     * Performs <b>interruption</b> transition to a specified tree without execution.
+     * This type of transition duplicates the behavior of <i>natural interruption</i> from one tree to another,
+     * by retrieving completely back to root and going to the specified tree.
+     *
+     * @param treeName tree name
+     */
     public void transit(String treeName){
         this.transit(null, treeName, false);
     }
 
+    /**
+     * Performs <b>interruption</b> transition to a specified tree with execution if specified.
+     * This type of transition duplicates the behavior of <i>natural interruption</i> from one tree to another,
+     * by retrieving completely back to root and going to the specified tree.
+     *
+     * @param update update that will be used for tree execution
+     * @param treeName tree name
+     * @param execute if true, the action in a specified tree will be executed
+     */
     public void transit(Update update, String treeName, boolean execute){
         if (update == null && execute)
             throw new IllegalArgumentException("Targeted tree '" + treeName + "' can not be execute without update");
@@ -157,8 +210,21 @@ public class TranscriptionManager {
             throw new TelegRiseRuntimeException("Memory-oriented methods cannot be called from an independent handler");
     }
 
+    /**
+     * Retrieves a data object of a named element of type {@code T} if exists.
+     * <p>
+     * Retrievable elements include: {@link org.telegrise.telegrise.transcription.Branch Branch},
+     * {@link org.telegrise.telegrise.transcription.Tree Tree},
+     * {@link org.telegrise.telegrise.transcription.Keyboard Keyboard} and
+     * {@link org.telegrise.telegrise.transcription.Text Text}.
+     *
+     * @param name name of the element
+     * @param tClass type class
+     * @return element's data object or null
+     * @param <T> type of the element
+     */
     public <T extends ElementBase> T get(String name, Class<T> tClass){
-        var result = this.transcriptionMemory.get(this.sessionMemory == null ? null : (Tree) getCurrentTree(), name);
+        var result = this.transcriptionMemory.get(this.sessionMemory == null ? null : sessionMemory.getCurrentTree(), name);
 
         if (result == null)
             throw new TelegRiseRuntimeException("Element named '" + name + "' does not exist");
@@ -169,14 +235,28 @@ public class TranscriptionManager {
         return tClass.cast(result);
     }
 
-    public TextBlock getTextBlock(String name){
+    /**
+     * Retrieves {@code <text>} element proxy with specified name.
+     * @param name text element name
+     * @return text element proxy
+     */
+    public @NotNull TextBlock getTextBlock(String name){
         return get(name, Text.class).createInteractiveObject(resourcePoolProducer);
     }
 
-    public KeyboardMarkup getKeyboardMarkup(String name){
+    /**
+     * Retrieves {@code <keyboard>} element proxy with specified name.
+     * @param name text element name
+     * @return text element proxy
+     */
+    public @NotNull KeyboardMarkup getKeyboardMarkup(String name){
         return get(name, Keyboard.class).createInteractiveObject(resourcePoolProducer);
     }
 
+    /**
+     * Returns list of user roles that are defined in {@code <roles>} element.
+     * @return list of roles
+     */
     public List<UserRole> getRoles(){
         return transcriptionMemory.getStandardMemory().values().stream()
                 .filter(Role.class::isInstance).map(r -> UserRole.ofRole((Role) r))

@@ -133,16 +133,6 @@ public class SessionMemoryImpl implements SessionMemory {
            throw new TelegRiseRuntimeException("Unrecognized role '%s' for session %s".formatted(roleName, sessionIdentifier));
     }
 
-    @Override
-    public long getUserId() {
-        return this.sessionIdentifier.getUserId();
-    }
-
-    @Override
-    public long getChatId() {
-        return sessionIdentifier.getChatId();
-    }
-
     public boolean isOnStack(Class<?> clazz){
         return !this.branchingElements.isEmpty() && clazz.isInstance(this.branchingElements.getLast());
     }

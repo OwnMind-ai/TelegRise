@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+/**
+ * An object that is used to collect media groups from incoming updates based on {@code mediagroupId}.
+ * Injectable using {@link org.telegrise.telegrise.annotations.Resource Resource} annotation.
+ *
+ * @since 0.3
+ */
 public final class MediaCollector {
     private final Queue<Update> updatesQueue;
     @Setter
@@ -21,6 +27,13 @@ public final class MediaCollector {
         this.updatesQueue = updatesQueue;
     }
 
+    /**
+     * Collects all messages that have the same {@code mediagroupId} as the message in provided {@code Update} instance.
+     *
+     * @param first first update with a message
+     * @return list of all messages with the same {@code mediagroupId}, including the {@code first}
+     * @throws TelegRiseRuntimeException {@code first} has no message or its message has no {@code mediagroupId}
+     */
     public List<Message> collect(Update first){
         if (!first.hasMessage() )
             throw new TelegRiseRuntimeException("Unable to collect media group: first update does not store message");
@@ -28,6 +41,13 @@ public final class MediaCollector {
         return this.collect(first.getMessage());
     }
 
+    /**
+     * Collects all messages that have the same {@code mediagroupId} as in provided {@code Message} instance.
+     *
+     * @param first first message
+     * @return list of all messages with the same {@code mediagroupId}, including the {@code first}
+     * @throws TelegRiseRuntimeException {@code first} has no {@code mediagroupId}
+     */
     public List<Message> collect(Message first){
         if (first.getMediaGroupId() == null)
             throw new TelegRiseRuntimeException("Unable to collect media group: first message doesn't have mediagroupID");

@@ -26,6 +26,8 @@ public class Transition extends NodeElement {
     public static final String BACK = "back";
     public static final String CALLER = "caller";
 
+    private static final String INTERRUPTION = "interruption";  //TODO. See TranscriptionManager#transit
+
     @Attribute(name = "direction", nullable = false)
     private String direction;
 
