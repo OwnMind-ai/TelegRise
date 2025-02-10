@@ -2,7 +2,6 @@ package org.telegrise.telegrise.builtin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -11,6 +10,7 @@ import org.telegrise.telegrise.annotations.ReferenceGenerator;
 import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.generators.GeneratedReference;
+import org.telegrise.telegrise.utils.MessageUtils;
 import org.w3c.dom.Node;
 
 /**
@@ -91,8 +91,8 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
     }
 
     @Reference
-    public Integer getMessageId(Message message){
-        return message == null ? null : message.getMessageId();
+    public Integer getMessageId(Update update){
+        return update == null ? null : MessageUtils.getMessageId(update);
     }
 
     /**

@@ -6,9 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.media.*;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
-import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.types.CommandData;
 
 import java.util.regex.Matcher;
@@ -18,11 +15,20 @@ import java.util.regex.Pattern;
 public class MessageUtils {
     private static final Pattern COMMAND_PATTERN = Pattern.compile("^/(?<name>\\w*)(?>@(?<username>.+))?$");
 
+    /**
+     * Returns true is provided a message has any form of media, such as photo, video, document, audio, and animation.
+     * @param message message to check
+     */
     public static boolean hasMedia(Message message){
         return message != null &&
                 (message.hasPhoto() || message.hasVideo() || message.hasDocument() || message.hasAudio() || message.hasAnimation());
     }
 
+    /**
+     * Extracts {@link User} instance from update's objects like {@code CallbackQuery}, {@code Message}, etc., if it exists.
+     * @param update update to extract from
+     * @return user instance or null
+     */
     public static User getFrom(Update update){
         return update.hasMessage() ? update.getMessage().getFrom()
                 : update.hasCallbackQuery() ? update.getCallbackQuery().getFrom()
@@ -40,6 +46,11 @@ public class MessageUtils {
                 : null;
     }
 
+    /**
+     * Extracts {@link Chat} instance from update's objects like {@code CallbackQuery}, {@code Message}, etc., if it exists.
+     * @param update update to extract from
+     * @return chat instance or null
+     */
     public static Chat getChat(Update update) {
         return update.hasMessage() ? update.getMessage().getChat()
                 : update.hasCallbackQuery() ? update.getCallbackQuery().getMessage().getChat()
@@ -52,6 +63,11 @@ public class MessageUtils {
                 : null;
     }
 
+    /**
+     * Parses string for a Telegram command, extracting command name and bot username.
+     * @param command string with potential command
+     * @return command data or null
+     */
     public static CommandData parseCommand(String command){
         Matcher matcher = COMMAND_PATTERN.matcher(command);
         if (!matcher.find()) return null;
@@ -59,6 +75,11 @@ public class MessageUtils {
         return new CommandData(matcher.group("name"), matcher.group("username"));
     }
 
+    /**
+     * Extracts input media instance from a provided message such as photo, video, audio, document, or animation.
+     * @param message message to extract from
+     * @return input media or null
+     */
     public static InputMedia toInputMedia(Message message){
         if (!hasMedia(message)) return null;
 
@@ -108,7 +129,11 @@ public class MessageUtils {
         return result;
     }
 
-    @Reference
+    /**
+     * Extracts message id from update's objects like {@code CallbackQuery}, {@code Message}, etc., if it exists.
+     * @param update update to extract from
+     * @return message id or null
+     */
     public static Integer getMessageId(Update update) {
         return update.hasMessage() ? (update.getMessage().getMessageId())
                 : update.hasCallbackQuery() ? (update.getCallbackQuery().getMessage().getMessageId())
@@ -118,35 +143,5 @@ public class MessageUtils {
                 : update.hasBusinessMessage() ? (update.getBusinessMessage().getMessageId())
                 : update.hasEditedBusinessMessage() ? (update.getEditedBuinessMessage().getMessageId())
                 : null;
-    }
-
-    @Reference
-    public static boolean hasMessage(Update update){
-        return update.hasMessage();
-    }
-
-    @Reference
-    public static boolean hasTextMessage(Update update){
-        return update.hasMessage() && update.getMessage().hasText();
-    }
-
-    @Reference
-    public static boolean hasCallback(Update update){
-        return update.hasCallbackQuery();
-    }
-
-    @Reference
-    public static boolean key(Update update, String key){
-        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals(key.trim());
-    }
-
-    @Reference
-    public static boolean callbackData(Update update, String key){
-        return update.hasCallbackQuery() && update.getCallbackQuery().getData().equals(key.trim());
-    }
-
-    @Reference
-    public static ReplyKeyboard replyKeyboardRemove(){
-        return new ReplyKeyboardRemove(true);
     }
 }
