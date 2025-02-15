@@ -13,6 +13,20 @@ import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
+/**
+ * Use this method to send answers to callback queries sent from inline keyboards.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#answercallbackquery">answerCallbackQuery</a> method.
+ * ChatId and callbackQueryId are automatically extracted from the incoming update, if exists,
+ * but can be specified if needed.
+ * <pre>
+ * {@code
+ * <answer text="Done!"/>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#answercallbackquery">Telegram API: answerCallbackQuery<a>
+ */
 @Element(name = "answer")
 @Getter @Setter @NoArgsConstructor
 public class Answer extends ActionElement{

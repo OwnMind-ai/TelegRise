@@ -9,6 +9,15 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+/**
+ * Invokes specified method reference or expression. This element doesn't make any API calls.
+ * <pre>
+ * {@code
+ * <invoke method="#execute"/>
+ * }
+ *
+ * @since 0.1
+ */
 @Element(name = "invoke")
 @Getter @Setter @NoArgsConstructor
 public class Invoke extends ActionElement{

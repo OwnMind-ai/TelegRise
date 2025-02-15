@@ -15,6 +15,20 @@ import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Use this method when you need to tell the user that something is happening on the bot's side.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#sendchataction">sendChatAction</a> method.
+ * {@link org.telegrise.telegrise.utils.MessageUtils#getChat ChatId} is automatically extracted from the incoming update, but can be specified if needed.
+ * It is required that this element has a text child element or at least one media element.
+ * <pre>
+ * {@code
+ * <chatAction action="typing"/>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#sendchataction">Telegram API: sendChatAction<a>
+ */
 @Element(name = "chatAction")
 @Getter @Setter @NoArgsConstructor
 public class ChatAction extends ActionElement{

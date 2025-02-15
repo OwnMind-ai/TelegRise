@@ -11,6 +11,22 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+/**
+ * Use this method to remove a message from the list of pinned messages in a chat.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#unpinchatmessage">unpinChatMessage</a> method.
+ * {@link org.telegrise.telegrise.utils.MessageUtils#getChat ChatId} is automatically extracted from the incoming update,
+ * but can be specified if needed.
+ * It is required that this element has {@code messageId} attribute.
+ * <pre>
+ * {@code
+ * <unpin messageId="#getMessageId"/>
+ * <unpin all="true"/>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#unpinchatmessage">Telegram API: unpinChatMessage<a>
+ */
 @Element(name = "unpin")
 @Getter @Setter
 @NoArgsConstructor

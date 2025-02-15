@@ -23,7 +23,7 @@ import java.util.List;
  * <p>This class is particularly useful for grouping related actions and controlling 
  * their execution based on conditional logic.
  * 
- * @since 0.7.5
+ * @since 0.7
  */
 @Element(name = "actionGroup")
 @Getter @Setter @NoArgsConstructor

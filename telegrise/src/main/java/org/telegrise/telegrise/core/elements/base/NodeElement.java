@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.elements.base;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.Tree;
@@ -28,21 +29,61 @@ import java.util.Objects;
  * @since 0.6.4
  */
 public abstract class NodeElement implements Serializable {
+    /**
+     * Actual node instance of this element.
+     */
     protected transient Node node;
+
+    /**
+     * Tree in which element resides, if any.
+     */
     @Getter @Setter
     protected Tree parentTree;
+    
+    /**
+     * Parsed parent element ({@code node.getParentNode()})
+     */
     @Getter @Setter
     protected NodeElement parent;
 
+    /**
+     * If the implementation returns not null, the transcription parser will assume the returned namespace as current. 
+     * 
+     * @param global application namespace
+     * @return new namespace or null
+     */
     public LocalNamespace createNamespace(ApplicationNamespace global){
         return null;
     }
 
+    /**
+     * Validates a parsed element and its content.
+     * Implementation must be used only for this purpose and does not change the state of the element.
+     * @param memory transcription memory
+     * @param namespace application namespace
+     */
     public void validate(TranscriptionMemory memory, ApplicationNamespace namespace){
         validate(memory);
     }
-    
+
+    /**
+     * Validates a parsed element and its contents.
+     * Implementation must be used only for this purpose and does not change the state of the element.
+     * This method is called <b>before</b> {@link #load(TranscriptionMemory)}.
+     * @param memory transcription memory
+     */
+    @Contract(pure = true)
     protected void validate(TranscriptionMemory memory){}
+
+    /**
+     * Loads and mutates this element.
+     * Implementation can use this method
+     * to load the necessary resources from transaction memory or do any other mutation.
+     * This method <b>can</b> throw exceptions instead of {@code validate} if required
+     * and is called <b>after</b> {@link #validate(TranscriptionMemory, ApplicationNamespace)}.
+     * @param memory transcription memory
+     */
+    @Contract
     public void load(TranscriptionMemory memory){}
 
     protected final <T> T generateNullableProperty(GeneratedValue<T> property, ResourcePool pool){
@@ -53,6 +94,11 @@ public abstract class NodeElement implements Serializable {
         return GeneratedValue.generate(property, pool, orElse);
     }
 
+    /**
+     * Converts a node to a good-looking string representation. Used for exceptions.
+     * @param node a node to convert
+     * @return beautiful string
+     */
     public static @NotNull String formatNode(Node node) {
         StringBuilder builder = new StringBuilder();
 
@@ -77,7 +123,7 @@ public abstract class NodeElement implements Serializable {
         return builder.toString();
     }
 
-    public static void traversePath(List<String> path, Node node) {
+    private static void traversePath(List<String> path, Node node) {
         if (node == null || node.getNodeType() == Node.DOCUMENT_NODE) return;
 
         String s = node.getNodeName();

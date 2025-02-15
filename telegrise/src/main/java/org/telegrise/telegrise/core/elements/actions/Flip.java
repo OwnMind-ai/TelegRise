@@ -12,11 +12,21 @@ import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardState;
 
+/**
+ * Use this element to <i>flip</i> (set to the opposite) the value of the switch in the specified keyboard.
+ * This element doesn't make any API calls.
+ * <pre>
+ * {@code
+ * <flip keyboard="keyboardName" switch="switchName"/>
+ * }
+ *
+ * @since 0.1
+ */
 @Element(name = "flip", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
 public class Flip extends ActionElement{
     @Attribute(name = "keyboard", nullable = false)
-    private String keyboard;
+    private GeneratedValue<String> keyboard;
 
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
@@ -29,7 +39,7 @@ public class Flip extends ActionElement{
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
-        KeyboardState state = resourcePool.getMemory().getKeyboardState(keyboard, parentTree);
+        KeyboardState state = resourcePool.getMemory().getKeyboardState(keyboard.generate(resourcePool), parentTree);
         if (state == null) 
             throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
             
@@ -45,7 +55,7 @@ public class Flip extends ActionElement{
 
     @Override
     protected void validate(TranscriptionMemory memory) {
-        if (!memory.containsKey(parentTree, keyboard)) {
+        if (keyboard.validate(s -> !memory.containsKey(parentTree, s))) {
             throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
         }
     }

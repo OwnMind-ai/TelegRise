@@ -15,6 +15,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**
+ * Waits specified number of seconds. This element doesn't make any API calls.
+ * <p>
+ * If {@code listener} attribute specified, provided consumer will handle incoming updates during the waiting time.
+ * <pre>
+ * {@code
+ * <wait timeout="10" listener="#getWarningConsumer"/>
+ * }
+ *
+ * @since 0.1
+ */
 @Element(name = "wait")
 @Getter @Setter @NoArgsConstructor
 public class Wait extends ActionElement{

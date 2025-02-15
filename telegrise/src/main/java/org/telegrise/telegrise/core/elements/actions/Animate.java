@@ -16,7 +16,9 @@ import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import java.util.List;
 
 /**
- * Represents an element used to create text animations. Animations can be
+ * Use this element to create text animations.
+ * <p>
+ * Animations can be
  * customized with options such as duration, conditions for starting and
  * stopping, repetition behavior, and a sequence of frames defining the
  * animation steps.
@@ -25,7 +27,7 @@ import java.util.List;
  * Loading animation example:
  * <pre>
  * {@code
- * <animate period="0.5" until="#loadFinish">
+ * <animate period="0.5" until="#loadFinished">
  *      <frame>Loading /</frame>
  *      <frame>Loading -</frame>
  *      <frame>Loading \</frame>
@@ -33,6 +35,7 @@ import java.util.List;
  * </animate>
  * }
  * </pre>
+ * @since 0.1
  */
 @Element(name = "animate")
 @Getter @Setter @NoArgsConstructor

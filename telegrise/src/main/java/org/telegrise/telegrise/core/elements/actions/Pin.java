@@ -10,6 +10,21 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+/**
+ * Use this method to add a message to the list of pinned messages in a chat.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#pinchatmessage">pinChatMessage</a> method.
+ * {@link org.telegrise.telegrise.utils.MessageUtils#getChat ChatId} is automatically extracted from the incoming update,
+ * but can be specified if needed.
+ * It is required that this element has {@code messageId} attribute.
+ * <pre>
+ * {@code
+ * <pin messageId="#getMessageId"/>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#pinchatmessage">Telegram API: pinChatMessage<a>
+ */
 @Element(name = "pin")
 @Getter @Setter @NoArgsConstructor
 public class Pin extends ActionElement{

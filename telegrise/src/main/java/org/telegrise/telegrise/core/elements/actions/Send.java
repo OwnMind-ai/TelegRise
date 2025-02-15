@@ -23,6 +23,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Use this element to send text messages.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#sendmessage">sendMessage</a> method.
+ * {@link org.telegrise.telegrise.utils.MessageUtils#getChat ChatId} is automatically extracted from the incoming update, but can be specified if needed.
+ * It is required that this element has a text child element or at least one media element.
+ * <p>
+ * Text can be specified using {@link Text text} element, for use with other elements like keyboard or medias.
+ * If send method sends only text, the text can be inputted directly.
+ * <pre>
+ * {@code
+ * <send>
+ *     <text>Text to send with keyboard</text>
+ *     <keyboard byName="sample"/>
+ * </send>
+ * <send>Text to send</send>
+ * }
+ * <p>
+ * If at least one of the media elements is specified as children to this element, then this method takes a form of the
+ * corresponding media-sending API call,
+ * or <a hred="https://core.telegram.org/bots/api#sendmessage">sendMediaGroup</a>
+ * if more than one specified.
+ * The text will become a caption to the first media item.
+ * <pre>
+ * {@code
+ * <send>
+ *     <photo url="path/to/photo"/>
+ *     <text>Caption to the photo</text>
+ * </send>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#sendmessage">Telegram API: sendMessage<a>
+ */
 @Element(name = "send")
 @Getter @Setter @NoArgsConstructor
 public class Send extends ActionElement{

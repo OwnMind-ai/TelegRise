@@ -104,7 +104,7 @@ public final class TranscriptionMemory implements Serializable {
     public boolean containsKey(Tree currentTree, String key){
         return Optional.ofNullable(currentTree).map(treeMemory::get)
                 .map(map -> map.containsKey(key))
-                .map(v -> v ? true : null) // so that code below executes only if key wasn't found in treeMemory
+                .map(v -> v ? true : null) // so that the code below executes only if the key wasn't found in treeMemory
                 .orElseGet(() -> standardMemory.containsKey(key));
     }
 

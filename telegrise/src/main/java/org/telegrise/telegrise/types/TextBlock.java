@@ -10,6 +10,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A wrapper for {@code <text>} element
+ * that allows to text of the element in current context.
+ * In other words, calling {@link #getText(Update)} would duplicate the behavior of {@code <text>} in action.
+ * Use {@link #getText()} if it certain
+ * that text's expressions (if any) do not require {@link Update} instance to be invoked.
+ *
+ * @since 0.3
+ */
 public final class TextBlock implements Serializable {
     private final Text linkedText;
     private final Function<Update, ResourcePool> resourcePoolFunction;

@@ -15,6 +15,16 @@ import org.telegrise.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 
+/**
+ * Use this element to copy messages.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#cpoymessage">copyMessage</a> method.
+ * ChatId is <b>not</b >automatically extracted and must be specified.
+ * It is required that this element has {@code chat}, {@code fromChat} and {@code messageId} attributes.
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#copymessage">Telegram API: copyMessage<a>
+ */
 @Element(name = "copy")
 @Getter @Setter @NoArgsConstructor
 public class Copy extends ActionElement{

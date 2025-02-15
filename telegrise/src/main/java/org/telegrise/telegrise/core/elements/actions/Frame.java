@@ -12,6 +12,12 @@ import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
+/**
+ * Represents a text frame of the animations.
+ *
+ * @since 0.1
+ * @see Animate
+ */
 @Element(name = "frame")
 @Getter @Setter @NoArgsConstructor
 public class Frame extends NodeElement {

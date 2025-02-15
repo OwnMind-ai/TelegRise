@@ -12,6 +12,16 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.Map;
 
+/**
+ * Clears cache of a method with a specified name. This element doesn't make any API calls.
+ * <pre>
+ * {@code
+ * <invoke method="#cachableMethod"/>
+ * <clearCache method="cachableMethod"/>
+ * }
+ *
+ * @since 0.6
+ */
 @Element(name = "clearCache")
 @Getter @Setter
 @NoArgsConstructor

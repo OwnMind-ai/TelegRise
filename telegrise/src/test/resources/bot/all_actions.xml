@@ -59,8 +59,8 @@
             <wait timeout="1"/>
 
             <send returnConsumer='#getMessageId -> ::store("copyDummy")'>Copy test dummy</send>
-            <copy fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
-            <forward fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
+            <copy chat="${memory.getChatId()}" fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
+            <forward chat="${memory.getChatId()}" fromChat="${memory.getChatId()}" messageId='#memory("copyDummy")'/>
             <wait timeout="1"/>
 
             <pin messageId='#memory("copyDummy")'/>

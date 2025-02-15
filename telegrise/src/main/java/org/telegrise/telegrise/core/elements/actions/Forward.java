@@ -10,10 +10,21 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+
+/**
+ * Use this element to forward messages.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#forwardmessage">forwardMessage</a> method.
+ * ChatId is <b>not</b >automatically extracted and must be specified.
+ * It is required that this element has {@code chat}, {@code fromChat} and {@code messageId} attributes.
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#forwardmessage">Telegram API: forwardMessage<a>
+ */
 @Element(name = "forward")
 @Getter @Setter @NoArgsConstructor
 public class Forward extends ActionElement{
-    @Attribute(name = "chat")
+    @Attribute(name = "chat", nullable = false)
     private GeneratedValue<Long> chatId;
 
     @Attribute(name = "when")

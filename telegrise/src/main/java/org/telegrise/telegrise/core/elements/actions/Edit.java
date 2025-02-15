@@ -26,6 +26,30 @@ import org.telegrise.telegrise.utils.MessageUtils;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Use this element to edit any message.
+ * <p>
+ * This element corresponds to one of the edit methods in <a href="https://core.telegram.org/bots/api#updating-messages">"Updating messages"</a>
+ * sections, depending on its parameters:
+ * if {@code type} attribute is not stated, the element will choose one automatically
+ * depending on the type of message to edit and whether a text, media, location, and/or keyboard were provided.
+ * {@link MessageUtils#getChat ChatId} and {@link MessageUtils#getMessageId messageId} are automatically extracted from the incoming update,
+ * but can be specified if needed.
+ * <p>
+ * Text can be specified using {@link Text text} element, for use with other elements like keyboard or medias.
+ * If this method edits only text, the text can be inputted directly.
+ * <pre>
+ * {@code
+ * <edit>
+ *     <text>Text to edit with keyboard</text>
+ *     <keyboard byName="sample"/>
+ * </edit>
+ * <edit>Text to edit</edit>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#updating-messages">Telegram API: Updating messages</a>
+ */
 @Element(name = "edit", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
 public class Edit extends ActionElement{
@@ -88,7 +112,7 @@ public class Edit extends ActionElement{
             throw new TranscriptionParsingException("Unrecognized type. Type could be one of the following: " +
                     String.join(", ", TYPES), node);
 
-        if (keyboard != null && keyboard.getCreate() == null && !keyboard.getType().equals(Keyboard.INLINE))
+        if (keyboard != null && keyboard.getCreate() == null && !Keyboard.INLINE.equals(keyboard.getType()))
             throw new TranscriptionParsingException("New keyboard must be type of 'inline'", node);
 
         if (!LAST.equals(source) && !CALLBACK.equals(source))

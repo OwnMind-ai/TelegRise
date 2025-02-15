@@ -3,7 +3,10 @@ package org.telegrise.telegrise.core.elements.base;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 
 /**
- * Represents an element that has a name. Those types of elements will be stored in a {@link TranscriptionMemory}.
+ * Represents an element that has a name, will be stored in a {@link TranscriptionMemory} by that name
+ * and can be retrieved by {@link org.telegrise.telegrise.TranscriptionManager TranscriptionManager}.
+ *
+ * @since 0.7
  */
 public interface NamedElement {
     /**

@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessages;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegrise.telegrise.SessionMemory;
+import org.telegrise.telegrise.builtin.BuiltinReferences;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -17,6 +19,27 @@ import org.telegrise.telegrise.utils.MessageUtils;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Use this method to delete a message, including service messages.
+ * <p>
+ * This element corresponds to the <a href="https://core.telegram.org/bots/api#deletemessage">deleteMessage</a> method.
+ * {@link MessageUtils#getChat ChatId} and {@link MessageUtils#getMessageId messageId} are automatically extracted from the incoming update,
+ * but can be specified if needed.
+ * <p>
+ * If {@link SessionMemory#putToRegistry registry} name is specified,
+ * this element will delete all messages in specified registry at once using
+ * <a href="https://core.telegram.org/bots/api#deletemessages">deleteMessages</a> method.
+ * <pre>
+ * {@code
+ * <delete/>
+ * <delete registry="registryName"/>
+ * }
+ *
+ * @since 0.1
+ * @see <a href="https://core.telegram.org/bots/api#deletemessage">Telegram API: deleteMessage<a>
+ * @see SessionMemory#putToRegistry
+ * @see BuiltinReferences#register
+ */
 @Element(name = "delete")
 @Getter @Setter @NoArgsConstructor
 public class Delete extends ActionElement{

@@ -22,7 +22,11 @@ public abstract class ActionElement extends NodeElement implements StorableEleme
     public abstract GeneratedValue<Boolean> getWhen();
     public GeneratedValue<Void> getOnError() { return null; }
 
-    // Used for <transition edit="..."/>
+    /**
+     * This method, if overridden, tries to convert this element to {@link Edit} element.
+     * The result will be used for {@code <transition edit="..."/>}.
+     * @return edit instance or null
+     */
     public Edit toEdit(){
         return null;
     }
