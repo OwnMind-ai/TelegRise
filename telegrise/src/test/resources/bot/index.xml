@@ -17,7 +17,7 @@
 
     <root>
         <tree name="StartTree" command="start" description="Start test bot" controller="StartController" accessLevel="0">
-            <send disableWebPagePreview="true">
+            <send disablePreview="true">
                 <text>
                     ${#getGreetingText} I am your personal testing assistant, and I am glad to help you develop
                     <a href="https://github.com/OwnMind-ai/TelegRise">TelegRise</a> framework.<br/>

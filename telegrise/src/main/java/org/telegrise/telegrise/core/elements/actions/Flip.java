@@ -55,7 +55,7 @@ public class Flip extends ActionElement{
 
     @Override
     protected void validate(TranscriptionMemory memory) {
-        if (keyboard.validate(s -> !memory.containsKey(parentTree, s))) {
+        if (!keyboard.validate(s -> memory.containsKey(parentTree, s))) {
             throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
         }
     }

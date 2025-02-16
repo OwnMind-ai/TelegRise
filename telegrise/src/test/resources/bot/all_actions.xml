@@ -71,6 +71,12 @@
 
             <send when='${memory.getUserRole().name().equals("admin")}'>If you see this than you are an admin (testing 'when' attribute)</send>
 
+            <send>
+                <text>Message with preview</text>
+                <preview showAboveText="true" prefer="large"
+                        url="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Felis_catus-cat_on_snow.jpg/220px-Felis_catus-cat_on_snow.jpg"/>
+            </send>
+
             <send>✅ All test passed! Press /start to choose another test.</send>
         </branch>
         <branch callback="no">

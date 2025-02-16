@@ -6,11 +6,13 @@ import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.media.MediaType;
+import org.telegrise.telegrise.core.elements.meta.LinkPreview;
 import org.telegrise.telegrise.core.elements.text.Text;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -60,23 +62,38 @@ import java.util.stream.Stream;
 @Element(name = "send")
 @Getter @Setter @NoArgsConstructor
 public class Send extends ActionElement{
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Name of this action element for later reuse in {@link org.telegrise.telegrise.core.elements.Transition transitions}.
+     */
     @Attribute(name = "name")
     private String name;
 
+    /**
+     * Determines if this element must be executed (if is {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Unique identifier for the target message thread (topic) of the forum.
+     */
     @Attribute(name = "messageThreadId")
     private GeneratedValue<Integer> messageThreadId;
 
     @InnerElement
     private Text text;
 
-    @Attribute(name = "disableWebPagePreview")
-    private GeneratedValue<Boolean> disableWebPagePreview;
+    /**
+     * Disables webpage preview in the message. This is a shortened version of {@code <preview disabled="true"/>}.
+     */
+    @Attribute(name = "disablePreview")
+    private GeneratedValue<Boolean> disablePreview;
     @Attribute(name = "disableNotification")
     private GeneratedValue<Boolean> disableNotification;
     @Attribute(name = "protectContent")
@@ -93,6 +110,9 @@ public class Send extends ActionElement{
     @InnerElement
     private Keyboard keyboard;
 
+    @InnerElement
+    private LinkPreview linkPreview;
+
     @Attribute(name = "returnConsumer")
     private GeneratedValue<Void> returnConsumer;
 
@@ -106,6 +126,9 @@ public class Send extends ActionElement{
 
         if (this.medias.size() > 1 && !this.medias.stream().allMatch(MediaType::isGroupable))
             throw new TranscriptionParsingException("Contains media types that cannot be grouped with others", node);
+
+        if (disablePreview != null && linkPreview != null)
+            throw new TranscriptionParsingException("Attribute 'disablePreview' conflicts with '<preview>' child element", node);
     }
 
 
@@ -158,13 +181,19 @@ public class Send extends ActionElement{
                 .text(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
-                .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))
                 .disableNotification( generateNullableProperty(disableNotification, pool))
                 .protectContent( generateNullableProperty(protectContent, pool))
                 .replyToMessageId( generateNullableProperty(replyTo, pool))
                 .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
                 .replyMarkup(createKeyboard(pool))
+                .linkPreviewOptions(this.createLinkPreviewOptions(pool))
                 .build();
+    }
+
+    private LinkPreviewOptions createLinkPreviewOptions(ResourcePool pool) {
+        if (linkPreview != null) return linkPreview.producePreviewOptions(pool);
+        else if (disablePreview != null) return LinkPreviewOptions.builder().isDisabled(disablePreview.generate(pool)).build();
+        return null;
     }
 
     @Override
