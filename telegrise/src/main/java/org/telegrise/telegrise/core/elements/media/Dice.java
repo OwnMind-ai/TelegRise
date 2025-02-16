@@ -30,9 +30,8 @@ public class Dice extends MediaType{
                 .emoji(generateNullableProperty(emoji, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .replyMarkup(parent.createKeyboard(pool))
+                .replyParameters(parent.createReplyParameters(pool))
                 .build();
     }
 

@@ -86,7 +86,7 @@ public class Edit extends ActionElement{
     private GeneratedValue<String> inlineMessageId;
 
     @Attribute(name = "disableWebPagePreview")
-    private GeneratedValue<Boolean> disableWebPagePreview;
+    private GeneratedValue<Boolean> disableWebPagePreview;  //TODO
 
     @Attribute(name = "inputMedia")
     private GeneratedValue<InputMedia> inputMedia;

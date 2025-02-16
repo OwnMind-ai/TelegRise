@@ -62,12 +62,11 @@ public class Video extends MediaType {
                 .supportsStreaming(generateNullableProperty(this.supportsStreaming, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
                 .caption(parent.getText() != null ? parent.getText().generateText(pool) : null)
                 .captionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), List.of(), pool) : List.of())
                 .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
+                .replyParameters(parent.createReplyParameters(pool))
                 .replyMarkup(parent.createKeyboard(pool))
                 .build();
     }

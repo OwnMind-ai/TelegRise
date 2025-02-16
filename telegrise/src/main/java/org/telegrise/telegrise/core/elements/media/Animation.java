@@ -48,7 +48,7 @@ public class Animation extends MediaType{
     public PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool) {
         MediaSize size = this.generateNullableProperty(this.size, pool);
 
-        return  SendAnimation.builder()
+        return SendAnimation.builder()
                 .chatId(parent.generateChatId(pool))
                 .messageThreadId( generateNullableProperty(parent.getMessageThreadId(), pool))
                 .animation(this.createInputFile(pool))
@@ -58,11 +58,10 @@ public class Animation extends MediaType{
                 .thumbnail(generateNullableProperty(thumbnail, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
+                .replyParameters(parent.createReplyParameters(pool))
                 .caption(parent.getText() != null ? parent.getText().generateText(pool) : null)
                 .captionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), List.of(), pool) : List.of())
                 .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
                 .replyMarkup(parent.createKeyboard(pool))
                 .build();

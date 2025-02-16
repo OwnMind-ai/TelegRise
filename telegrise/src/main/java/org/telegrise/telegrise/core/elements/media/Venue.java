@@ -51,9 +51,8 @@ public class Venue extends MediaType{
                 .googlePlaceType(generateNullableProperty(googlePlaceType, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .replyMarkup(parent.createKeyboard(pool))
+                .replyParameters(parent.createReplyParameters(pool))
                 .build();
     }
 

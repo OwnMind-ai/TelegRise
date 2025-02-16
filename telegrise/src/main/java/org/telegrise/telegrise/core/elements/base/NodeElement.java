@@ -91,7 +91,7 @@ public abstract class NodeElement implements Serializable {
     }
 
     protected final <T> T generateNullableProperty(GeneratedValue<T> property, T orElse, ResourcePool pool){
-        return GeneratedValue.generate(property, pool, orElse);
+        return GeneratedValue.generateOptional(property, pool).orElse(orElse);
     }
 
     /**

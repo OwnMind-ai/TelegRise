@@ -44,13 +44,12 @@ public class Photo extends MediaType{
                 .photo(this.createInputFile(pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
                 .caption(parent.getText() != null ? parent.getText().generateText(pool) : null)
                 .captionEntities(parent.getText() != null ? generateNullableProperty(parent.getText().getEntities(), List.of(), pool) : List.of())
                 .parseMode(parent.getText() != null ? generateNullableProperty(parent.getText().getParseMode(), pool) : null)
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .hasSpoiler(generateNullableProperty(spoiler, pool) != null)
                 .replyMarkup(parent.createKeyboard(pool))
+               .replyParameters(parent.createReplyParameters(pool))
                 .build();
     }
 

@@ -1,12 +1,12 @@
 package org.telegrise.telegrise.core.expressions;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.ResourcePool;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 @FunctionalInterface
@@ -24,8 +24,8 @@ public interface GeneratedValue<T> extends Serializable {
         return generatedValue == null ? null : generatedValue.generate(pool);
     }
 
-    static <V> @NotNull V generate(@Nullable GeneratedValue<V> generatedValue, ResourcePool pool, @NotNull V orElse){
-        return generatedValue == null ? orElse : generatedValue.generate(pool);
+    static <V> Optional<V> generateOptional(@Nullable GeneratedValue<V> generatedValue, ResourcePool pool){
+        return generatedValue == null ? Optional.empty() : Optional.of(generatedValue.generate(pool));
     }
 
     default boolean equalsTo(GeneratedValue<?> other, ResourcePool resourcePool){

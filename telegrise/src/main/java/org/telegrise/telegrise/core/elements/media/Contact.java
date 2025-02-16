@@ -42,9 +42,8 @@ public class Contact extends MediaType {
                 .vCard(generateNullableProperty(vcard, pool))
                 .disableNotification( generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent( generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId( generateNullableProperty(parent.getReplyTo(), pool))
-                .allowSendingWithoutReply( generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .replyMarkup(parent.createKeyboard(pool))
+                .replyParameters(parent.createReplyParameters(pool))
                 .build();
     }
 

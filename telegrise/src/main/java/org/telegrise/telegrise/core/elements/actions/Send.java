@@ -3,16 +3,19 @@ package org.telegrise.telegrise.core.elements.actions;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
+import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.media.MediaType;
 import org.telegrise.telegrise.core.elements.meta.LinkPreview;
+import org.telegrise.telegrise.core.elements.meta.Reply;
 import org.telegrise.telegrise.core.elements.text.Text;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -20,8 +23,10 @@ import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
+import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +34,7 @@ import java.util.stream.Stream;
  * Use this element to send text messages.
  * <p>
  * This element corresponds to the <a href="https://core.telegram.org/bots/api#sendmessage">sendMessage</a> method.
- * {@link org.telegrise.telegrise.utils.MessageUtils#getChat ChatId} is automatically extracted from the incoming update, but can be specified if needed.
+ * {@link MessageUtils#getChat ChatId} is automatically extracted from the incoming update, but can be specified if needed.
  * It is required that this element has a text child element or at least one media element.
  * <p>
  * Text can be specified using {@link Text text} element, for use with other elements like keyboard or medias.
@@ -62,6 +67,7 @@ import java.util.stream.Stream;
 @Element(name = "send")
 @Getter @Setter @NoArgsConstructor
 public class Send extends ActionElement{
+    public static final String REPLY_BACK = "back";
     /**
      * Unique identifier for the target chat.
      */
@@ -86,23 +92,45 @@ public class Send extends ActionElement{
     @Attribute(name = "messageThreadId")
     private GeneratedValue<Integer> messageThreadId;
 
-    @InnerElement
-    private Text text;
-
     /**
      * Disables webpage preview in the message. This is a shortened version of {@code <preview disabled="true"/>}.
      */
     @Attribute(name = "disablePreview")
     private GeneratedValue<Boolean> disablePreview;
+    /**
+     * Sends the message silently. Users will receive a notification with no sound.
+     */
     @Attribute(name = "disableNotification")
     private GeneratedValue<Boolean> disableNotification;
+    /**
+     * Protects the contents of the sent message from forwarding and saving.
+     */
     @Attribute(name = "protectContent")
     private GeneratedValue<Boolean> protectContent;
+    /**
+     * Set to true if a message should be sent even if the specified message to be replied to is not found.
+     * This is a shortened version of {@code <reply allowSendingWithoutReply="true"/>}.
+     */
     @Attribute(name = "allowSendingWithoutReply")
     private GeneratedValue<Boolean> allowSendingWithoutReply;
 
-    @Attribute(name = "replyTo")
-    private GeneratedValue<Integer> replyTo;
+    /**
+     * Identifier of the message that will be replied to in the current chat.
+     * If value is '{@code back}',
+     * the sent message will reply to the message that caused the update (by {@link MessageUtils#getMessageId}).
+     * This is a shortened version of {@code <reply to="..."/>}.
+     */
+    @Attribute(name = "reply")
+    private GeneratedValue<String> reply;
+
+    @Attribute(name = "returnConsumer")
+    private GeneratedValue<Void> returnConsumer;
+
+    @Attribute(name = "onError")
+    private GeneratedValue<Void> onError;
+
+    @InnerElement
+    private Text text;
 
     @InnerElement
     private List<MediaType> medias = List.of();
@@ -113,11 +141,8 @@ public class Send extends ActionElement{
     @InnerElement
     private LinkPreview linkPreview;
 
-    @Attribute(name = "returnConsumer")
-    private GeneratedValue<Void> returnConsumer;
-
-    @Attribute(name = "onError")
-    private GeneratedValue<Void> onError;
+    @InnerElement
+    private Reply replyParameters;
 
     @Override
     public void validate(TranscriptionMemory memory) {
@@ -129,6 +154,15 @@ public class Send extends ActionElement{
 
         if (disablePreview != null && linkPreview != null)
             throw new TranscriptionParsingException("Attribute 'disablePreview' conflicts with '<preview>' child element", node);
+
+        if (reply != null && !reply.validate(s -> REPLY_BACK.equals(s) || NumberUtils.isDigits(s)))
+            throw new TranscriptionParsingException("Attribute 'reply' must be of value 'back' or valid integer (message id)", node);
+
+        if (replyParameters != null && reply != null)
+            throw new TranscriptionParsingException("Attribute 'reply' conflicts with '<reply>' child element", node);
+
+        if (replyParameters != null && allowSendingWithoutReply != null)
+            throw new TranscriptionParsingException("Attribute 'allowSendingWithoutReply' conflicts with '<reply>' child element", node);
     }
 
 
@@ -170,8 +204,7 @@ public class Send extends ActionElement{
                     )
                     .disableNotification( generateNullableProperty(disableNotification, pool))
                     .protectContent( generateNullableProperty(protectContent, pool))
-                    .replyToMessageId( generateNullableProperty(replyTo, pool))
-                    .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
+                    .replyParameters(this.createReplyParameters(pool))
                     .build();
         }
 
@@ -181,16 +214,31 @@ public class Send extends ActionElement{
                 .text(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
-                .disableNotification( generateNullableProperty(disableNotification, pool))
-                .protectContent( generateNullableProperty(protectContent, pool))
-                .replyToMessageId( generateNullableProperty(replyTo, pool))
-                .allowSendingWithoutReply( generateNullableProperty(allowSendingWithoutReply, pool))
+                .disableNotification(generateNullableProperty(disableNotification, pool))
+                .protectContent(generateNullableProperty(protectContent, pool))
                 .replyMarkup(createKeyboard(pool))
                 .linkPreviewOptions(this.createLinkPreviewOptions(pool))
+                .replyParameters(this.createReplyParameters(pool))
                 .build();
     }
 
-    private LinkPreviewOptions createLinkPreviewOptions(ResourcePool pool) {
+    public ReplyParameters createReplyParameters(ResourcePool pool) {
+        if (replyParameters != null) return replyParameters.produceReplyParameters(pool);
+        else if (reply != null) {
+             String replyValue = reply.generate(pool);
+             if (replyValue == null) return null;
+
+            return ReplyParameters.builder()
+                    .messageId(replyValue.equals(REPLY_BACK) ?
+                            Objects.requireNonNull(MessageUtils.getMessageId(pool.getUpdate())) : Integer.valueOf(replyValue))
+                    .allowSendingWithoutReply(GeneratedValue.generate(allowSendingWithoutReply, pool))
+                    .build();
+        }
+
+        return null;
+    }
+
+    public LinkPreviewOptions createLinkPreviewOptions(ResourcePool pool) {
         if (linkPreview != null) return linkPreview.producePreviewOptions(pool);
         else if (disablePreview != null) return LinkPreviewOptions.builder().isDisabled(disablePreview.generate(pool)).build();
         return null;

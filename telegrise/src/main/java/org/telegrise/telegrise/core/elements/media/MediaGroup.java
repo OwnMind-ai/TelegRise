@@ -34,10 +34,9 @@ public class MediaGroup extends MediaType{
 
         return SendMediaGroup.builder().medias(this.applyCaption(media, parent, pool))
                 .chatId(parent.generateChatId(pool))
-                .allowSendingWithoutReply(generateNullableProperty(parent.getAllowSendingWithoutReply(), pool))
                 .disableNotification(generateNullableProperty(parent.getDisableNotification(), pool))
                 .protectContent(generateNullableProperty(parent.getProtectContent(), pool))
-                .replyToMessageId(generateNullableProperty(parent.getReplyTo(), pool))
+                .replyParameters(parent.createReplyParameters(pool))
                 .build();
     }
 
