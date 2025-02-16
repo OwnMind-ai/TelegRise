@@ -65,8 +65,8 @@ class WebhookServlet extends HttpServlet {
                 We can leverage webhook's ability to return bot method as an answer to the request.
                 Currently, webhooks bots behave as longpolling bots in this regard, making it less efficient.
                 It is possible to capture the first BotApiMethod sent to BotSender to execute and pass it here,
-                and execute other normally. However, this is really tricky and bug-prone to do.
-                I am not sure if this even worth it. Maybe it will be beneficial to move session routing system here, idk.
+                and execute others normally. However, this is really tricky and bug-prone to do.
+                I am not sure if this even worth it.
             */
             try {
                 updateConsumer.accept(mapper.readValue(bodyString.toString(), Update.class));

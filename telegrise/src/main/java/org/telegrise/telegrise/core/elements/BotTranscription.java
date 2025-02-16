@@ -130,12 +130,7 @@ public final class BotTranscription extends NodeElement {
     public TelegramUrl getTelegramUrl(){
         ResourcePool pool = new ResourcePool();
         return head.getTelegramUrl() == null || !head.getTelegramUrl().getEnabled().generate(pool) ? TelegramUrl.DEFAULT_URL
-                : new TelegramUrl(
-                head.getTelegramUrl().getSchema().generate(pool),
-                head.getTelegramUrl().getHost().generate(pool),
-                head.getTelegramUrl().getPort().generate(pool),
-                head.getTelegramUrl().getTestServer().generate(pool)
-        );
+                : head.getTelegramUrl().produceTelegramUrl(pool);
     }
 
     public TelegramClient produceClient() {

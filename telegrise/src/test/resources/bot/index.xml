@@ -6,7 +6,7 @@
         <link src="*"/>
 
 <!--        Enable to test webhooks-->
-        <telegramUrl enabled="false" schema="http" host="127.0.0.1" port="8081" testServer="false"/>
+        <telegramUrl enabled="true" url="http://127.0.0.1:8081"/>
         <webhook enabled="false" url="http://127.0.0.1:8443"/>
     </head>
 
