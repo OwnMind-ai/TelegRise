@@ -21,6 +21,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * This element links other transcription files specified in {@code src} attribute to the bot.
+ * Root elements of linked files can be one of: {@code <trees>}, {@code <keyboards>}, {@code <texts>}.
+ *
+ * @since 0.1
+ */
 @Element(name = "link")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

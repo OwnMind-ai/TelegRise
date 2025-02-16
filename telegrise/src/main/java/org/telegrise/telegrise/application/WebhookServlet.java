@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.core.TelegramSessionsController;
 
@@ -25,24 +26,33 @@ import java.util.function.Consumer;
  * @see ApplicationRunner
  * @since 0.10
  */
-@Slf4j
 class WebhookServlet extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 459295714965072L;
+    private static final String SECRET_TOKEN_HEADER = "X-Telegram-Bot-Api-Secret-Token";
+    private static final Logger log = LoggerFactory.getLogger(WebhookServlet.class);
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final Consumer<Update> updateConsumer;
     private final ExecutorService executor;
-    private final boolean enableLogging;
+    private final String secretToken;
 
-    WebhookServlet(Consumer<Update> updateConsumer, @Nullable ExecutorService executor, boolean enableLogging) {
+    WebhookServlet(Consumer<Update> updateConsumer, @Nullable ExecutorService executor, String secretToken) {
         this.updateConsumer = updateConsumer;
         this.executor = executor == null ? Executors.newVirtualThreadPerTaskExecutor() : executor;
-        this.enableLogging = enableLogging;
+        this.secretToken = secretToken;
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (secretToken != null && !secretToken.equals(req.getHeader(SECRET_TOKEN_HEADER))) {
+            log.warn("Webhook server encountered request with invalid secret token from {}. Bot will ignore this request." +
+                    " Expected secret token '{}' but received '{}'", req.getRemoteAddr(), secretToken, req.getHeader(SECRET_TOKEN_HEADER));
+
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         final StringBuilder bodyString = new StringBuilder();
         String line;
         BufferedReader reader = req.getReader();
@@ -63,11 +73,10 @@ class WebhookServlet extends HttpServlet {
             } catch (IOException e) {
                 log.error("Unable to convert request body to Update object", e);
             } finally {
-                if (enableLogging)
-                    log.info("'{}' request received from address '{}'", req.getMethod(), req.getRemoteAddr());
+                log.trace("'{}' request received from address '{}'", req.getMethod(), req.getRemoteAddr());
             }
         });
 
-        resp.setStatus(200);
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 }

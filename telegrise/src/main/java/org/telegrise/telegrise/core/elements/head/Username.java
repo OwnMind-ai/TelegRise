@@ -13,6 +13,15 @@ import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
+/**
+ * Defines a username of this bot. This value will be used for handling commands in group chats.
+ * <pre>
+ * {@code
+ * <username>your bot username</username>
+ * }
+ *
+ * @since 0.9
+ */
 @Element(name = "username")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

@@ -13,6 +13,15 @@ import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
+/**
+ * Defines a token of this bot.
+ * <pre>
+ * {@code
+ * <token>your bot token</token>
+ * }
+ *
+ * @since 0.9
+ */
 @Element(name = "token")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

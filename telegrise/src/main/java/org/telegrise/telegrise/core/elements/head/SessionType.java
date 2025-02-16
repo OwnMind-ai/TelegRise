@@ -11,11 +11,18 @@ import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
+/**
+ * Defines a session type of this bot.
+ * <pre>
+ * {@code
+ * <sessionType>chat</sessionType>
+ * <sessionType>user</sessionType>
+ * }
+ *
+ * @since 0.9
+ */
 @Element(name = "sessionType")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class SessionType extends NodeElement {
     private String type;
 

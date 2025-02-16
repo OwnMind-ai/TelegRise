@@ -10,6 +10,11 @@ import org.telegrise.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 
+/**
+ * This element stores bot configurations and transcription metadata.
+ *
+ * @since 0.1
+ */
 @Element(name = "head")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

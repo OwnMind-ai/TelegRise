@@ -9,6 +9,15 @@ import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 
+/**
+ * Defines a telegram url to be used for API calls.
+ * <pre>
+ * {@code
+ * <telegramUrl schema="http" host="127.0.0.1" port="8081" testServer="false"/>
+ * }
+ *
+ * @since 0.10
+ */
 @Element(name = "telegramUrl")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TelegramUrl extends NodeElement {

@@ -64,7 +64,10 @@ public interface ApplicationRunner {
             log.info("Webhook to url '{}' have been successively set", webhook.getUrl().generate(pool));
 
             var context = new ServletContextHandler();
-            var holder = new ServletHolder(new WebhookServlet(consumer, executor, webhook.getEnableRequestLogging().generate(pool)));
+            var holder = new ServletHolder(new WebhookServlet(
+                    consumer, executor,
+                    GeneratedValue.generate(webhook.getSecretToken(), pool)
+            ));
             context.addServlet(holder, "/");
 
             connector.setPort(webhook.getPort().generate(pool));
@@ -72,6 +75,8 @@ public interface ApplicationRunner {
             server.setHandler(context);
             server.addConnector(connector);
             server.start();
+
+            log.info("Webhook bot server have been successfully started");
             server.join();
         } catch (Exception e) {
             log.error("Unable to register webhook bot (default configuration)", e);

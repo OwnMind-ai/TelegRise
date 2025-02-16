@@ -14,6 +14,7 @@ import java.util.function.Supplier;
  *
  * @since 0.1
  */
+@SuppressWarnings("unused")
 @Slf4j
 public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
     public DefaultThreadPoolExecutor(int coreSize, int maxSize) {
