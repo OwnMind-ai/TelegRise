@@ -15,22 +15,49 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send a point on the map.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendlocation">Telegram API: sendLocation</a>
+ * @since 0.1
+ */
 @Element(name = "location")
 @Getter @Setter @NoArgsConstructor
 public class Location extends MediaType{
+    /**
+     * Latitude of the location
+     */
     @Attribute(name = "latitude", nullable = false)
     private GeneratedValue<Double> latitude;
+    /**
+     * Longitude of the location
+     */
     @Attribute(name = "longitude", nullable = false)
     private GeneratedValue<Double> longitude;
+    /**
+     * The radius of uncertainty for the location, measured in meters
+     */
     @Attribute(name = "horizontalAccuracy")
     private GeneratedValue<Double> horizontalAccuracy;
+    /**
+     * Period in seconds during which the location will be updated
+     */
     @Attribute(name = "livePeriod")
     private GeneratedValue<Integer> livePeriod;
+    /**
+     * For live locations, a direction in which the user is moving, in degrees
+     */
     @Attribute(name = "heading")
     private GeneratedValue<Integer> heading;
+    /**
+     * For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters
+     */
     @Attribute(name = "proximityAlertRadius")
     private GeneratedValue<Integer> proximityAlertRadius;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

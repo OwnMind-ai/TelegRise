@@ -135,7 +135,7 @@ public final class TranscriptionManager {
     }
 
     /**
-     * Performs a transition with 'back' direction, target {@code element} and without execution.
+     * Performs a transition with 'back' type, target {@code element} and without execution.
      * @param element named of the tree or branch
      */
     public void transitBack(String element){
@@ -143,7 +143,7 @@ public final class TranscriptionManager {
     }
 
     /**
-     * Performs a transition with 'back' direction,
+     * Performs a transition with 'back' type,
      * target {@code element} and with execution if {@code execute} is true.
      *
      * @param update update that will be used for element execution
@@ -157,7 +157,7 @@ public final class TranscriptionManager {
         checkSessionMemory();
 
         Transition transition = new Transition();
-        transition.setDirection(Transition.BACK);
+        transition.setType(Transition.BACK);
         transition.setTarget(GeneratedValue.ofValue(element));
         transition.setExecute(execute);
 

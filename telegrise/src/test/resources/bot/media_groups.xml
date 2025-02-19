@@ -18,10 +18,10 @@
                     ${#mediaGroupReceived -> #mediaInfo}
                 </text>
             </send>
-            <transition direction="back"/>
+            <transition type="back"/>
         </branch>
         <branch key="🔙 Go back">
-            <transition direction="caller" execute="true"/>
+            <transition type="caller" execute="true"/>
         </branch>
 
         <default>

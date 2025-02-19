@@ -131,6 +131,10 @@ public class XMLElementsParser {
             }
         }
 
+        LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
+        if (newNamespace != null)
+            this.namespace = newNamespace;
+
         AtomicBoolean hasEmbedded = new AtomicBoolean(false);
         Arrays.stream(element.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(InnerElement.class))
@@ -147,10 +151,6 @@ public class XMLElementsParser {
             throw new TranscriptionParsingException("Unrecognized elements: " + String.join(", ", expected), node);
 
         finishElement(instance);
-
-        LocalNamespace newNamespace = instance.createNamespace(this.namespace.getApplicationNamespace());
-        if (newNamespace != null)
-            this.namespace = newNamespace;
 
         return instance;
     }

@@ -26,9 +26,15 @@ import java.util.Map;
 @Getter @Setter
 @NoArgsConstructor
 public class ClearCache extends ActionElement{
+    /**
+     * Name of the method cache of which needs to be cleared
+     */
     @Attribute(name = "method", nullable = false)
     private GeneratedValue<String> method;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 

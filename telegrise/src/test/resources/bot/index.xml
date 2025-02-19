@@ -18,15 +18,10 @@
     <root>
         <tree name="StartTree" command="start" description="Start test bot" controller="StartController" accessLevel="0">
             <send disablePreview="true">
-                <text>
-                    ${#getGreetingText} I am your personal testing assistant, and I am glad to help you develop
-                    <a href="https://github.com/OwnMind-ai/TelegRise">TelegRise</a> framework.<br/>
-                    <br/>
-                    What do you want to test today?
-                </text>
+                <text byName="StartText"/>
                 <keyboard type="reply" resize="true">
                     <row>
-                        <button>Test admin</button>
+                        <button accessLevel="100">Test admin</button>
                         <button>Test all action</button>
                     </row>
                     <row>
@@ -34,6 +29,7 @@
                         <button>Test handlers</button>
                     </row>
                     <row>
+                        <button>Test keyboard</button>
                         <button>Test exception</button>
                     </row>
                     <row>
@@ -45,13 +41,51 @@
             <branch key="Test exception">
                 <send>Throwing exception, check your terminal!</send>
                 <invoke method="#throwException"/>
-                <transition direction="back"/>
+                <transition type="back"/>
             </branch>
             <branch key="Jump to media groups">
-                <transition direction="jump" target="MediaGroupsTree"  execute="true"/>
+                <transition type="jump" target="MediaGroupsTree" execute="true"/>
             </branch>
         </tree>
 
+        <tree name="TestKeyboard" key="Test keyboard" accessLevel="0" controller="TestKeyboardController">
+            <send returnConsumer='::register("mainMenu")'>
+                <text>Removing reply keyboard...</text>
+                <keyboard create="#replyKeyboardRemove"/>
+            </send>
+            <send returnConsumer='::register("mainMenu")' name="send">
+                <text>Here is your dynamic keyboard:</text>
+                <keyboard name="MainKeyboard" type="inline">
+                    <row>
+                        <button data="button1">${#button1}</button>
+                        <button data="button2">${#button2}</button>
+                    </row>
+                    <row><button data="disable">Disable me</button></row>
+                    <row><switch name="switch" on="Switch: On" off="Switch: Off"/></row>
+                    <row>
+                        <button data="back">← Go back</button>
+                    </row>
+                </keyboard>
+            </send>
+
+            <branch when='::callbackMatches("button\\d+")' invoke="#incrementButton">
+                <edit>
+                    <keyboard byName="MainKeyboard"/>
+                </edit>
+                <transition type="back"/>
+            </branch>
+            <branch callback="disable" invoke="#disableButton">
+                <transition type="back" edit="send"/>
+            </branch>
+            <branch callback="switch">
+                <flip keyboard="MainKeyboard" switch="switch"/>
+                <transition type="back" edit="send"/>
+            </branch>
+            <branch callback="back">
+                <delete registry="mainMenu"/>
+                <transition type="jump" target="StartTree" execute="true"/>
+            </branch>
+        </tree>
         <tree name="TestAdmin" key="Test admin" accessLevel="-100" controller="TestAdminController">
             <send>
                 <text>Choose your role (or /start to return):</text>
@@ -65,7 +99,7 @@
             </send>
 
             <branch when="#nextRole -> #notNull" invoke="#nextRole -> #setRole">
-                <transition direction="back" edit="first"/>
+                <transition type="back" edit="first"/>
             </branch>
 
             <default when="#isCallback">

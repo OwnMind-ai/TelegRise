@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.parser;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
@@ -45,6 +46,7 @@ public class XMLElementsParserTest {
             throw new RuntimeException(e);
         }
     }
+
     @Test
     void parseText() throws Exception {
         XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader(), "")), null);
@@ -55,6 +57,23 @@ public class XMLElementsParserTest {
         text.setEntities(GeneratedValue.ofValue(java.util.Collections.singletonList(null)));
         Assertions.assertNull(text.getParseMode());
         assertElements(text, parser.parse(node), new ResourcePool());
+    }
+
+    @Test
+    void parseConditionalText() throws Exception {
+        XMLElementsParser parser = new XMLElementsParser(new LocalNamespace(null, new ApplicationNamespace(this.getClass().getClassLoader(), "")), null);
+        parser.load();
+        Node node = toNode("<text>" +
+                "<if condition='${update == null}'>No update</if>" +
+                "<else>Has update</else>" +
+                "</text>");
+
+        Text text = (Text) parser.parse(node);
+        ResourcePool pool = new ResourcePool();
+        assertEquals("No update", text.generateText(pool));
+
+        pool.setUpdate(new Update());
+        assertEquals("Has update", text.generateText(pool));
     }
 
     @Test

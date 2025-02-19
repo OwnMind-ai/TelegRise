@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessages;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.SessionMemory;
 import org.telegrise.telegrise.builtin.BuiltinReferences;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -43,18 +44,34 @@ import java.util.Optional;
 @Element(name = "delete")
 @Getter @Setter @NoArgsConstructor
 public class Delete extends ActionElement{
+    /**
+     * Unique identifier for the target chat
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Identifier of the message to delete
+     */
     @Attribute(name = "messageId")
     private GeneratedValue<Integer> messageId;
 
+    /**
+     * Name of the registry to delete messages from
+     */
     @Attribute(name = "registry")
     private GeneratedValue<String> registry;
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

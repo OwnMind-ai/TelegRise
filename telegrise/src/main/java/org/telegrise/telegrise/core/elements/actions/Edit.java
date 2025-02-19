@@ -5,14 +5,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.*;
+import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.media.Location;
 import org.telegrise.telegrise.core.elements.media.MediaType;
+import org.telegrise.telegrise.core.elements.meta.LinkPreview;
 import org.telegrise.telegrise.core.elements.text.Text;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -21,6 +24,7 @@ import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
+import org.telegrise.telegrise.types.ApiResponse;
 import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;
@@ -64,33 +68,74 @@ public class Edit extends ActionElement{
     public static final String LAST = "last";
     //TODO add auto
 
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Type of the edit method, such as {@code 'text'}, {@code 'caption'},
+     * {@code 'media'}, {@code 'location'} or {@code 'markup'}.
+     * If this attribute is not defined, the element will choose one automatically
+     * depending on the type of message to edit and its parameters.
+     */
     @Attribute(name = "type")
     private GeneratedValue<String> type;
 
+    /**
+     * Name of this action element for later use in {@link org.telegrise.telegrise.core.elements.Transition transitions}.
+     */
     @Attribute(name = "name")
     private String name;
 
+    /**
+     * Source of the message to be edited.
+     */
     @Attribute(name = "source")
     private String source = LAST;
 
+    /**
+     * Identifier of the message to edit.
+     */
     @Attribute(name = "messageId")
     private GeneratedValue<Integer> messageId;
 
+    /**
+     * Identifier of the inline message.
+     */
     @Attribute(name = "inlineMessageId")
     private GeneratedValue<String> inlineMessageId;
 
-    @Attribute(name = "disableWebPagePreview")
-    private GeneratedValue<Boolean> disableWebPagePreview;  //TODO
+    /**
+     * Disables webpage preview in the message. This is a shortened version of {@code <preview disabled="true"/>}.
+     */
+    @Attribute(name = "disablePreview")
+    private GeneratedValue<Boolean> disablePreview;
 
+    /**
+     * A new media content of the message.
+     */
     @Attribute(name = "inputMedia")
     private GeneratedValue<InputMedia> inputMedia;
 
+    /**
+     * Provides a result of the executed API call (a boolean).
+     * Method references can use parameter of type {@code boolean} or {@link ApiResponse} to access returned value.
+     */
+    @Attribute(name = "returnConsumer")
+    private GeneratedValue<Void> returnConsumer;
+
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 
@@ -103,8 +148,8 @@ public class Edit extends ActionElement{
     @InnerElement(priority = 1)
     private Location location;
 
-    @Attribute(name = "returnConsumer")
-    private GeneratedValue<Void> returnConsumer;
+    @InnerElement
+    private LinkPreview linkPreview;
 
     @Override
     public void validate(TranscriptionMemory memory) {
@@ -259,9 +304,15 @@ public class Edit extends ActionElement{
                 .text(text.generateText(pool))
                 .parseMode(generateNullableProperty(text.getParseMode(), pool))
                 .entities(generateNullableProperty(text.getEntities(), List.of(), pool))
-                .disableWebPagePreview( generateNullableProperty(disableWebPagePreview, pool))
+                .linkPreviewOptions(createLinkPreviewOptions(pool))
                 .replyMarkup(this.getMarkup(pool))
                 .build();
+    }
+
+    public LinkPreviewOptions createLinkPreviewOptions(ResourcePool pool) {
+        if (linkPreview != null) return linkPreview.producePreviewOptions(pool);
+        else if (disablePreview != null) return LinkPreviewOptions.builder().isDisabled(disablePreview.generate(pool)).build();
+        return null;
     }
 
     @Override

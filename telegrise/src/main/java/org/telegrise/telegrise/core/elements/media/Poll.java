@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.polls.SendPoll;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.polls.input.InputPollOption;
 import org.telegrise.telegrise.core.ResourcePool;
@@ -17,33 +16,79 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send a native poll.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendpoll">Telegram API: sendPoll</a>
+ * @since 0.1
+ */
 @Element(name = "poll")
 @Getter @Setter @NoArgsConstructor
 public class Poll extends MediaType {
+    /* TODO IMPROVEMENTS:
+        |> Add option to define list of answer as child elements
+        |> Question and explanation can have formation, so they MUST have their separate element:
+        |  <poll>
+        |      <question>Sample <b>question</b>?</question>
+        |      <explanation>Sample <b>explanation</b>.</explanation>
+        |  </poll>
+        |  In this example, elements <question> and <explanation> are just <text> element with another name
+        |  (and must be internally like that, use inheritance)
+    */
+
+    /**
+     * Poll question, 1-300 characters
+     */
     @Attribute(name = "question", nullable = false)
     private GeneratedValue<String> question;
+    /**
+     * A list of 2-10 answer options
+     */
     @Attribute(name = "options", nullable = false)
     private GeneratedValue<List<InputPollOption>> options;
+    /**
+     * Set to true if the poll needs to be anonymous
+     */
     @Attribute(name = "isAnonymous")
     private GeneratedValue<Boolean> isAnonymous;
+    /**
+     * Poll type, "quiz" or "regular"
+     */
     @Attribute(name = "type")
     private GeneratedValue<String> type;
+    /**
+     * Set to true, if the poll allows multiple answers, ignored for polls in quiz mode
+     */
     @Attribute(name = "allowMultipleAnswers")
     private GeneratedValue<Boolean> allowMultipleAnswers;
+    /**
+     * 0-based identifier of the correct answer option, required for polls in quiz mode
+     */
     @Attribute(name = "correctOptionId")
     private GeneratedValue<Integer> correctOptionId;
+    /**
+     * Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll
+     */
     @Attribute(name = "explanation")
     private GeneratedValue<String> explanation;
-    @Attribute(name = "parseMode")
-    private GeneratedValue<String> parseMode;
-    @Attribute(name = "entities")
-    private GeneratedValue<List<MessageEntity>> entities;
+    /**
+     * Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with close_date.
+     */
     @Attribute(name = "openPeriod")
     private GeneratedValue<Integer> openPeriod;
+    /**
+     * Point in time (Unix timestamp) when the poll will be automatically closed.
+     */
     @Attribute(name = "closeDate")
     private GeneratedValue<Integer> closeDate;
+    /**
+     * Set to true if the poll needs to be immediately closed. This can be useful for poll preview.
+     */
     @Attribute(name = "isClosed")
     private GeneratedValue<Boolean> isClosed;
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 
@@ -57,8 +102,6 @@ public class Poll extends MediaType {
                 .allowMultipleAnswers(generateNullableProperty(allowMultipleAnswers, pool))
                 .correctOptionId(generateNullableProperty(correctOptionId, pool))
                 .explanation(generateNullableProperty(explanation, pool))
-                .explanationParseMode(generateNullableProperty(parseMode, pool))
-                .explanationEntities(generateNullableProperty(entities, pool))
                 .openPeriod(generateNullableProperty(openPeriod, pool))
                 .closeDate(generateNullableProperty(closeDate, pool))
                 .isClosed(generateNullableProperty(isClosed, pool))

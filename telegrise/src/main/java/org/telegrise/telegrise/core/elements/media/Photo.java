@@ -17,22 +17,43 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Represents a photo to be sent.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#inputmediaphoto">Telegram API: InputMediaPhoto</a>
+ * @since 0.1
+ */
 @Element(name = "photo")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class Photo extends MediaType{
+    /**
+     * Identifier for this photo file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the photo file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as a photo
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Set to true if the video needs to be covered with a spoiler animation
+     */
     @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

@@ -13,6 +13,16 @@ import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 
 import java.util.List;
 
+/**
+ * A base class for elements that represent Telegram media and other interactive message types.
+ * <p>
+ * If {@link #isGroupable()} is true
+ * then implementation can be used in media groups and can be applied more than once in API methods.
+ * If implementation is the only media provided, then API method (typically {@link Send}) will ask the implementation
+ * for the appropriate API method for that type of media.
+ *
+ * @since 0.1
+ */
 public abstract class MediaType extends NodeElement {
     public abstract PartialBotApiMethod<?> createSender(Send parent, ResourcePool pool);
     public abstract List<InputMedia> createInputMedia(ResourcePool pool);

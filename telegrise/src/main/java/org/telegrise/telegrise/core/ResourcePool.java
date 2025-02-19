@@ -7,8 +7,8 @@ import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionMemory;
-import org.telegrise.telegrise.core.utils.ApiResponseWrapper;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.ApiResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public final class ResourcePool {
     private TreeExecutor currentExecutor;
     private BlockingQueue<Update> updates;
 
-    private ApiResponseWrapper apiResponseWrapper;
+    private ApiResponse apiResponse;
 
     @Getter
     private final Map<Class<?>, Object> components = new HashMap<>(Map.of(ResourcePool.class,this));
@@ -71,7 +71,7 @@ public final class ResourcePool {
             this.components.put(TelegramClient.class, sender.getClient());
         }
         if (memory != null) this.components.put(SessionMemory.class, memory);
-        if (apiResponseWrapper != null) this.components.put(ApiResponseWrapper.class, apiResponseWrapper);
+        if (apiResponse != null) this.components.put(ApiResponse.class, apiResponse);
     }
 
     @Override

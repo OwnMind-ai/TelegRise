@@ -18,15 +18,27 @@ import org.telegrise.telegrise.keyboard.KeyboardState;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a row of a keyboard, inline or reply type, depending on the type of the keyboard.
+ *
+ * @since 0.1
+ */
 @Element(name = "row")
 @Getter @Setter @NoArgsConstructor
 public class Row extends NodeElement {
     @InnerElement(nullable = false)
     private List<Button> buttons;
 
+    /**
+     * If the specified expression returns false, the row will not be included in the keyboard when sending a message
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * If the specified access level is lower than the user's level,
+     * the row will not be included in the keyboard when sending a message
+     */
     @Attribute(name = "accessLevel")
     private Integer accessLevel;
 

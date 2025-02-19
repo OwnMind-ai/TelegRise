@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegrise.telegrise.Expression;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.SessionMemoryImpl;
-import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.InteractiveElement;
 import org.telegrise.telegrise.core.elements.base.NamedElement;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
@@ -32,6 +31,45 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * This element represents a Telegram keyboard that contains rows of buttons.
+ * <p>
+ * Keyboard must define its type: {@code reply} or {@code inline}.
+ * Inline keyboards must have {@code data} attribute in its buttons.
+ * Keyboard can have a {@code name} that can be reused to create a copy of keyboard using {@code byName} attribute.
+ * <pre>
+ * {@code
+ * <keyboard type="inline" name="SampleKeyboard">
+ *     <row>
+ *         <button data="1">Button1</data>
+ *         <button data="2">Button2</data>
+ *     </row>
+ * </keyboard>
+ * ...
+ * <keyboard byName="SampleKeyboard"/>
+ * }
+ * Keyboards can be changed dynamically using {@link KeyboardMarkup} object,
+ * which allows enabling/disabling rows and buttons, and change state of <b>switches</b>.
+ * Switches represent a button that has multiple states that change on being pressed.
+ * <pre>
+ * {@code
+ * <keyboard type="inline">
+ *     <row>
+ *         <switch name="switchName" on="Switch: On" off="Switch: off"/>
+ *     </row>
+ * </keyboard>
+ * }
+ * Keyboards can be created using custom Java code that returns instance of {@link ReplyKeyboard}.
+ *
+ * <pre>
+ * {@code
+ * <keyboard create="#createKeyboard"/>
+ * }
+ *
+ * @see <a href="https://core.telegram.org/bots/api#replykeyboardmarkup">Telegram API: ReplyKeyboardMarkup</a>
+ * @see <a href="https://core.telegram.org/bots/api#inlinekeyboardmarkup">Telegram API: InlineKeyboardMarkup</a>
+ * @since 0.1
+ */
 @Element(name = "keyboard", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
 public class Keyboard extends NodeElement implements InteractiveElement<KeyboardMarkup>, NamedElement, org.telegrise.telegrise.transcription.Keyboard {
@@ -50,40 +88,65 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
         return true;
     }
 
+    /**
+     * Use to duplicate a keyboard by name
+     */
     @Attribute(name = "byName")
     private String byName;
 
+    /**
+     * Type of the keyboard, '{@code reply}' or '{@code inline}'
+     */
     @Attribute(name = "type")
     private String type;
 
+    /**
+     * Name of the keyboard that can be used for switches and duplication keyboards
+     */
     @Attribute(name = "name")
     private String name;
 
+    /**
+     * If true, the keyboard will be available outside a parent tree
+     */
     @Attribute(name = "global")
     private boolean global;
 
+    /**
+     * An expression that provides instance of {@link ReplyKeyboard} to be used as keyboard
+     */
     @Attribute(name = "create")
     private GeneratedValue<ReplyKeyboard> create;
 
+    /**
+     * Requests clients to always show the keyboard when the regular keyboard is hidden; Only for reply keyboards
+     */
     @Attribute(name = "isPersistent")
     private GeneratedValue<Boolean> persistent;
-
+    /**
+     * Requests clients to hide the keyboard as soon as it's been used; Only for reply keyboards
+     */
     @Attribute(name = "oneTime")
     private GeneratedValue<Boolean> oneTime;
-
+    /**
+     * Requests clients to resize the keyboard vertically for optimal fit; Only for reply keyboards
+     */
     @Attribute(name = "resize")
     private GeneratedValue<Boolean> resize;
 
+    /**
+     * Use this parameter if you want to show the keyboard to specific users only; Only for reply keyboards
+     */
     @Attribute(name = "selective")
     private GeneratedValue<Boolean> selective;
-
+    /**
+     * The placeholder to be shown in the input field when the keyboard is active; Only for reply keyboards
+     */
     @Attribute(name = "placeholder")
     private GeneratedValue<String> placeholder;
 
     @InnerElement
     private List<Row> rows;
-
-    private Tree parentTree;
 
     @Override
     public void validate(TranscriptionMemory memory) {
@@ -123,7 +186,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
 
     @Override
     public void store(TranscriptionMemory memory) {
-        if (name != null)    // Method ::store runs before ::load
+        if (name != null)    // Method 'store' runs before 'load'
             memory.put(parentTree, name, this);
     }
 

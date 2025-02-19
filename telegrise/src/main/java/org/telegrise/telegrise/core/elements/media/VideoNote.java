@@ -15,27 +15,54 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send video messages.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendvideonote">Telegram API: sendVideoNote</a>
+ * @since 0.1
+ */
 @Element(name = "videoNote")
 @Getter @Setter @NoArgsConstructor
 public class VideoNote extends MediaType{
+    /**
+     * Identifier for this video note file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the video note file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as a video note
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Duration of sent video in seconds
+     */
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    /**
+     * Diameter of the video message
+     */
     @Attribute(name = "length")
     private GeneratedValue<Integer> length;
 
+    /**
+     * Thumbnail of the file sent
+     */
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

@@ -45,35 +45,35 @@
         </send>
 
         <branch callback="%" invoke="#toPercent">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch callback="change-sign" invoke="#changeSign">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch when='::callback("=") AND #operation == null'>
             <answer text="Enter the expression"/>
-            <transition direction="back"/>
+            <transition type="back"/>
         </branch>
         <branch callback="=" invoke="#solve">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
 
         <branch when="#getInputOperation -> #notNull" invoke="#getInputOperation -> #setOperation">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch callback=". ; 00" invoke="#typeDigit(update.getCallbackQuery().getData())">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch when="#getInputDigit -> #notNull" invoke="#getInputDigit -> #typeDigit">
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch callback="c" invoke="#clear">
             <answer text="Cleared"/>
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
         <branch callback="ac" invoke="#allClear">
             <answer text="Cleared"/>
-            <transition direction="back" edit="MainSend" ignoreError="true"/>
+            <transition type="back" edit="MainSend" ignoreError="true"/>
         </branch>
     </tree>
 </trees>

@@ -12,5 +12,4 @@ public @interface Attribute {
     boolean nullable() default true;
 
     double priority() default 0;
-//    String types(); TODO, for docs
 }

@@ -28,6 +28,9 @@ import java.util.List;
 @Element(name = "actionGroup")
 @Getter @Setter @NoArgsConstructor
 public class ActionGroup extends ActionElement{
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 

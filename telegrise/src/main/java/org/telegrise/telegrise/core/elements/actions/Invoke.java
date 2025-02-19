@@ -14,6 +14,7 @@ import org.telegrise.telegrise.core.parser.Element;
  * <pre>
  * {@code
  * <invoke method="#execute"/>
+ * <invoke method='${System.out.println("Hello!")}'/>
  * }
  *
  * @since 0.1
@@ -21,12 +22,22 @@ import org.telegrise.telegrise.core.parser.Element;
 @Element(name = "invoke")
 @Getter @Setter @NoArgsConstructor
 public class Invoke extends ActionElement{
+    /**
+     * Expression to be executed
+     */
     @Attribute(name = "method", nullable = false)
     private GeneratedValue<Void> method;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link Exception} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

@@ -24,9 +24,15 @@ public class Frame extends NodeElement {
     public static final String SEND = "send";
     public static final String EDIT = "edit";
 
+    /**
+     * Delay after the frame in addition to an animation period.
+     */
     @Attribute(name = "delay")
     private GeneratedValue<Float> delay = GeneratedValue.ofValue(0f);
 
+    /**
+     * Action to execute at the frame: 'send' or 'edit' (by default)
+     */
     @Attribute(name = "action")
     private String action = EDIT;
 

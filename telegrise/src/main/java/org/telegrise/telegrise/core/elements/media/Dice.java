@@ -15,12 +15,24 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send an animated emoji that will display a random value.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#senddice">Telegram API: sendDice</a>
+ * @since 0.1
+ */
 @Element(name = "dice")
 @Getter @Setter @NoArgsConstructor
 public class Dice extends MediaType{
+    /**
+     * Emoji on which the dice throw animation is based
+     */
     @Attribute(name = "emoji")
     private GeneratedValue<String> emoji;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

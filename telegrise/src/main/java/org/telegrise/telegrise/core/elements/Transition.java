@@ -19,6 +19,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * An element in branches that forces the transcription state to move to another branch or trees.
+ * <p>
+ * Transitions have three types:
+ * <ul>
+ *     <li>"{@code back}": Goes back to the branch, tree or root that are down the branching path</li>
+ *     <li>"{@code jump}": Jumps to a specified tree.
+ *     After that tree abrupts, or it executes transition of type "caller",
+ *     the state will go back to the tree that caused a jump.
+ *     If this element of the type "jump" has transition or action child elements, they will be executed instead.</li>
+ *     <li>"{@code caller}": Goes back to the tree that caused the jump to current tree.</li>
+ * </ul>
+ *
+ * @since 0.1
+ */
 @Element(name = "transition", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Transition extends NodeElement {
@@ -28,21 +43,42 @@ public class Transition extends NodeElement {
 
     private static final String INTERRUPTION = "interruption";  //TODO. See TranscriptionManager#transit
 
-    @Attribute(name = "direction", nullable = false)
-    private String direction;
+    /**
+     * Type of the transition: back, jump or caller.
+     */
+    @Attribute(name = "type", nullable = false)
+    private String type;
 
+    /**
+     * Name of the tree, root or branch to do transition to.
+     * If the type is "back" and the target is not specified,
+     * transition will happen to the parent of the current branch or tree.
+     */
     @Attribute(name = "target")
     private GeneratedValue<String> target;
 
+    /**
+     * Set to true to execute action elements in a target tree after transition
+     */
     @Attribute(name = "execute")
     private Boolean execute;
 
+    /**
+     * Specifies an element name ({@code <send>} or {@code <edit>}) to be used to edit the current message,
+     * or "{@code first}" to use the first action element.
+     */
     @Attribute(name = "edit")
     private String edit;
 
+    /**
+     * Source of the message to be edited, "{@code last}" or "{@code callback}"
+     */
     @Attribute(name = "editSource")
     private String editSource;
 
+    /**
+     * Ignore error on execution
+     */
     @Attribute(name = "ignoreError")
     private boolean ignoreError = true;
 
@@ -52,8 +88,8 @@ public class Transition extends NodeElement {
     @InnerElement
     private Transition nextTransition;
 
-    public Transition(String direction, String target, boolean execute, String edit, String editSource){
-        this.direction = direction;
+    public Transition(String type, String target, boolean execute, String edit, String editSource){
+        this.type = type;
         this.target = GeneratedValue.ofValue(target);
         this.execute = execute;
         this.edit = edit;
@@ -62,15 +98,15 @@ public class Transition extends NodeElement {
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (!List.of(BACK, CALLER, JUMP).contains(direction))
-            throw new TranscriptionParsingException("Invalid direction '" + this.direction + "', possible directions are: '" +
+        if (!List.of(BACK, CALLER, JUMP).contains(type))
+            throw new TranscriptionParsingException("Invalid type '" + this.type + "', possible types are: '" +
                     BACK + "', '" + CALLER + "' or '" + JUMP + "'" , node);
 
-        if (!JUMP.equals(this.direction) && (this.nextTransition != null || this.actions != null))
+        if (!JUMP.equals(this.type) && (this.nextTransition != null || this.actions != null))
             throw new TranscriptionParsingException("Transitions with direction other then '" + JUMP + "' cannot contain next transition or actions", node);
 
-        if (target == null && JUMP.equals(this.direction))
-            throw new TranscriptionParsingException("Target for direction '" + this.direction + "' is not specified" , node);
+        if (target == null && JUMP.equals(this.type))
+            throw new TranscriptionParsingException("Target for type '" + this.type + "' is not specified" , node);
 
         if (execute != null && execute && edit != null) 
             throw new TranscriptionParsingException("Attribute 'execute' conflicts with 'edit'", node);
@@ -85,12 +121,12 @@ public class Transition extends NodeElement {
     }
 
     private void validateTarget(Node node, TranscriptionMemory memory) {
-        if (CALLER.equals(this.direction)) return;
+        if (CALLER.equals(this.type)) return;
 
         // Code fragment 'this.target.generate(null)' is allowed in the code bellow because if tests fail,
         // then this.target is for sure an instance of StaticValue class
 
-        if (BACK.equals(direction) && target != null && !this.target.validate(createValidationFor(memory, Branch.class, Tree.class, Root.class)))
+        if (BACK.equals(type) && target != null && !this.target.validate(createValidationFor(memory, Branch.class, Tree.class, Root.class)))
             throw new TranscriptionParsingException("Unable to find element named '" + this.target.generate(null) + "'" , node);
     }
 

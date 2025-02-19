@@ -156,4 +156,7 @@ public interface SessionMemory {
     void putToRegistry(String name, Message message);
 
     KeyboardState getKeyboardState(String name, Tree parentTree);
+    default KeyboardState getKeyboardState(String name){
+        return getKeyboardState(name, getCurrentTree());
+    }
 }

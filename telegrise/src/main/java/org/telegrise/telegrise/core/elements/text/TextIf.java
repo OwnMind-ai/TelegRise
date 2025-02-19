@@ -15,12 +15,25 @@ import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+/**
+ * A conditional branch of {@code <text>} element. If the condition is true, the text of this element will be used.
+ *
+ * @since 0.1
+ * @see Text
+ */
 @Element(name = "if", checkInner = false)
 @Getter @Setter @NoArgsConstructor
 public class TextIf extends NodeElement implements TextConditionalElement {
+    /**
+     * If this condition returns true, a text of this element will be used
+     */
     @Attribute(name = "condition", nullable = false)
     private GeneratedValue<Boolean> condition;
 
+    /**
+     * If set to true, the element will use striped whitespaces in linebreaks to parse text,
+     * otherwise tag {@code <br/>} must be used to create a line break.
+     */
     @Attribute(name = "textblock", priority = 1)
     private boolean textblock;
 

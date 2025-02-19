@@ -16,27 +16,54 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Represents an audio file to be treated as music to be sent.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#inputmediaaudio">Telegram API: InputMediaAudio</a>
+ * @since 0.1
+ */
 @Element(name = "audio")
 @Getter @Setter @NoArgsConstructor
 public class Audio extends MediaType{
+    /**
+     * Identifier for this audio file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the audio file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as audio
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Duration of the audio in seconds
+     */
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    /**
+     * Title of the audio
+     */
     @Attribute(name = "title")
     private GeneratedValue<String> title;
 
+    /**
+     * Thumbnail of the file sent
+     */
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

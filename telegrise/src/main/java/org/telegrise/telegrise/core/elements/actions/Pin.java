@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -28,18 +29,34 @@ import org.telegrise.telegrise.core.parser.Element;
 @Element(name = "pin")
 @Getter @Setter @NoArgsConstructor
 public class Pin extends ActionElement{
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Identifier of a message to pin.
+     */
     @Attribute(name = "messageId", nullable = false)
     private GeneratedValue<Integer> messageId;
 
+    /**
+     * Set to true if it is not necessary to send a notification to all chat members about the new pinned message.
+     */
     @Attribute(name = "disableNotification")
     private GeneratedValue<Boolean> disableNotification;
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

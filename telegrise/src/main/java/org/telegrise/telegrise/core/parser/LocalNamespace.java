@@ -23,14 +23,14 @@ public class LocalNamespace {
                         %s %s = %s.getHandler() instanceof %s ? (%s) %s.getHandler() : null;
                         %s %s = %s.getSender();
                         %s %s = %s.getMemory();
-                        %s message = %s.getApiResponseWrapper() == null ? null : %s.getApiResponseWrapper().getMessage();
-                        %s response = %s.getApiResponseWrapper() == null ? null : %s.getApiResponseWrapper().getSerializable();
+                        %s message = %s.getApiResponse() != null && %s.getApiResponse().hasMessage() ? %s.getApiResponse().getMessage() : null;
+                        %s response = %s.getApiResponse() == null ? null : %s.getApiResponse().getSerializable();
                         """,
                 Update.class.getName(), applicationNamespace.getUpdateName(), poolName,
                 handlerClassName, applicationNamespace.getControllerName(), poolName, handlerClassName, handlerClassName, poolName,
                 BotSender.class.getName(), applicationNamespace.getSenderName(), poolName,
                 SessionMemory.class.getName(), applicationNamespace.getMemoryName(), poolName,
-                Message.class.getName(), poolName, poolName,
+                Message.class.getName(), poolName, poolName, poolName,
                 Serializable.class.getName(), poolName, poolName
         );
     }

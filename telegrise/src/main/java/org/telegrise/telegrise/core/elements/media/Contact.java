@@ -15,21 +15,42 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send phone contacts.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendcontact">Telegram API: sendContant</a>
+ * @since 0.1
+ */
 @Element(name = "contact")
 @Getter @Setter @NoArgsConstructor
 public class Contact extends MediaType {
+    /**
+     * Contact's phone number
+     */
     @Attribute(name = "phoneNumber")
     private GeneratedValue<String> phoneNumber;
 
+    /**
+     * Contact's first name
+     */
     @Attribute(name = "firstName")
     private GeneratedValue<String> firstName;
 
+    /**
+     * Contact's last name
+     */
     @Attribute(name = "lastName")
     private GeneratedValue<String> lastName;
 
+    /**
+     * Additional data about the contact in the form of a {@code vCard}
+     */
     @Attribute(name = "vcard")
     private GeneratedValue<String> vcard;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

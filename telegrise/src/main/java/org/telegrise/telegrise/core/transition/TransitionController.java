@@ -35,14 +35,14 @@ public class TransitionController {
     }
 
     public boolean applyTransition(Tree tree, Transition transition, ResourcePool pool){
-        return switch (transition.getDirection()) {
+        return switch (transition.getType()) {
             case Transition.BACK -> this.applyBack(transition, pool);
             case Transition.JUMP -> {
                 this.applyJump(tree, transition, pool);
                 yield false;
             }
             case Transition.CALLER -> this.applyCaller(tree, transition, pool);
-            default -> throw new TelegRiseRuntimeException("Invalid direction '" + transition.getDirection() + "'", transition.getElementNode());
+            default -> throw new TelegRiseRuntimeException("Invalid type '" + transition.getType() + "'", transition.getElementNode());
         };
     }
 

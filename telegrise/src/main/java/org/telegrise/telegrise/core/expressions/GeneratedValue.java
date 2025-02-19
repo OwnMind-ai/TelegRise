@@ -35,6 +35,9 @@ public interface GeneratedValue<T> extends Serializable {
     default boolean validate(Predicate<T> predicate){
         return true;
     }
+    default boolean isStatic() {
+        return false;
+    }
 
     T generate(ResourcePool resourcePool);
 
@@ -57,6 +60,11 @@ public interface GeneratedValue<T> extends Serializable {
         @Override
         public boolean validate(Predicate<T> predicate) {
             return predicate.test(value);
+        }
+
+        @Override
+        public boolean isStatic() {
+            return true;
         }
     }
 }

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionIdentifier;
+import org.telegrise.telegrise.TelegRiseApplication;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.core.elements.head.HeadBlock;
@@ -26,25 +27,64 @@ import org.telegrise.telegrise.types.UserRole;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The main element that contains configuration and trees of a Telegram bot.
+ * <p>
+ * This element must be a root node of an XML file
+ * and be specified at {@link TelegRiseApplication#TelegRiseApplication TelegRiseApplication} constructor.
+ * <pre>
+ * {@code
+ * <bot>
+ *     <head>
+ *     ...
+ *     </head>
+ *     <root>
+ *     ...
+ *     </root>
+ * </bot>
+ * }
+ *
+ * @see <a href="https://core.telegram.org/bots/api">Telegram API</a>
+ * @since 0.1
+ */
 @Element(name = "bot")
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public final class BotTranscription extends NodeElement {
+    /**
+     * Username of this bot.
+     * If not provided, the application will make an API call to retrieve this information automatically.
+     */
     @Attribute(name = "username")
     private GeneratedValue<String> username;
 
+    /**
+     * Token of this bot to make API calls
+     */
     @Attribute(name = "token")
     private GeneratedValue<String> token;
 
+    /**
+     * Set to true to allow trees to interrupt each other when their condition is met to be jumped to
+     */
     @Attribute(name = "interruptions")
     private boolean interruptions = false;
 
+    /**
+     * Set to true to automatically generate a command list based on trees commands and description
+     */
     @Attribute(name = "autoCommands")
     private String autoCommands;
 
+    /**
+     * Defines a session type of this bot, '{@code chat}' or '{@code user}'
+     */
     @Attribute(name = "sessionType")
     private String sessionType;
 
+    /**
+     * If set, the application will ignore updates <i>from a specific user</i> that are coming to quickly:
+     * in a window of {@code throttlingTime} milliseconds
+     */
     @Attribute(name = "throttlingTime")  // ms
     private Integer throttlingTime;
 

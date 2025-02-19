@@ -17,33 +17,66 @@ import org.telegrise.telegrise.types.MediaSize;
 
 import java.util.List;
 
+/**
+ * Represents a video to be sent.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#inputmediavideo">Telegram API: InputMediaVideo</a>
+ * @since 0.1
+ */
 @Element(name = "video")
 @Getter @Setter @NoArgsConstructor
 public class Video extends MediaType {
+    /**
+     * Identifier for this video file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the url file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as a video
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Set to true if the video needs to be covered with a spoiler animation
+     */
     @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
+    /**
+     * Video duration in seconds
+     */
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    /**
+     * Width and height of the animation
+     */
     @Attribute(name = "size")
     private GeneratedValue<MediaSize> size;
 
+    /**
+     * Thumbnail of the file sent
+     */
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    /**
+     * Set to true if the uploaded video is suitable for streaming
+     */
     @Attribute(name = "supportsStreaming")
     private GeneratedValue<Boolean> supportsStreaming;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

@@ -29,17 +29,23 @@ import java.util.function.Consumer;
 @Element(name = "wait")
 @Getter @Setter @NoArgsConstructor
 public class Wait extends ActionElement{
+    /**
+     * Number of seconds to sleep for.
+     */
     @Attribute(name = "timeout", nullable = false)
     private GeneratedValue<Double> timeout;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * If defined, provided consumer will handle incoming updates during a timeout period.
+     */
     @Attribute(name = "listener")
     private GeneratedValue<Consumer<Update>> listener;
-
-    @Attribute(name = "onInterrupted")
-    private GeneratedValue<Consumer<InterruptedException>> onInterrupted;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
@@ -57,10 +63,7 @@ public class Wait extends ActionElement{
             if(listenerThread != null && listenerThread.isAlive())
                 listenerThread.interrupt();
         } catch (InterruptedException e) {
-            if(onInterrupted != null)
-                onInterrupted.generate(resourcePool).accept(e);
-            else
-                throw new TelegRiseRuntimeException("Waiting action was interrupted:" + e.getMessage(), node);
+            throw new TelegRiseRuntimeException("Waiting action was interrupted:" + e.getMessage(), node);
         }
 
         return null;

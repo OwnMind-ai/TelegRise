@@ -10,9 +10,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.actions.ActionElement;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
-import org.telegrise.telegrise.core.utils.ApiResponseWrapper;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegrise.telegrise.types.ApiResponse;
 
 import java.io.InvalidClassException;
 import java.io.Serializable;
@@ -112,7 +112,7 @@ public class UniversalSender {
 
         if (action.getReturnConsumer() != null && result != null){
             pool.addComponent(result);
-            pool.setApiResponseWrapper(new ApiResponseWrapper(result));
+            pool.setApiResponse(new ApiResponse(result));
             action.getReturnConsumer().generate(pool);
         }
     }

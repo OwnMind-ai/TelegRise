@@ -15,26 +15,59 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send information about a venue.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendvanue">Telegram API: sendVenue</a>
+ * @since 0.1
+ */
 @Element(name = "venue")
 @Getter @Setter
 @NoArgsConstructor
 public class Venue extends MediaType{
+    /**
+     * Latitude of the venue
+     */
     @Attribute(name = "latitude", nullable = false)
     private GeneratedValue<Double> latitude;
+    /**
+     * Longitude of the venue
+     */
     @Attribute(name = "longitude", nullable = false)
     private GeneratedValue<Double> longitude;
+    /**
+     * Name of the venue
+     */
     @Attribute(name = "title", nullable = false)
     private GeneratedValue<String> title;
+    /**
+     * Address of the venue
+     */
     @Attribute(name = "address", nullable = false)
     private GeneratedValue<String> address;
+    /**
+     * Foursquare identifier of the venue
+     */
     @Attribute(name = "foursquareId")
     private GeneratedValue<String> foursquareId;
+    /**
+     * Foursquare type of the venue, if known
+     */
     @Attribute(name = "foursquareType")
     private GeneratedValue<String> foursquareType;
+    /**
+     * Google Places identifier of the venue
+     */
     @Attribute(name = "googlePlaceId")
     private GeneratedValue<String> googlePlaceId;
+    /**
+     * Google Places type of the venue
+     */
     @Attribute(name = "googlePlaceType")
     private GeneratedValue<String> googlePlaceType;
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

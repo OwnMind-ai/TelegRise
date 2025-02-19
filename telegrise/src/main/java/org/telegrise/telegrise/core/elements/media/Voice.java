@@ -15,21 +15,42 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Use this element to send audio files if you want Telegram clients to display the file as a playable voice message.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#sendvoice">Telegram API: sendVoice</a>
+ * @since 0.1
+ */
 @Element(name = "voice")
 @Getter @Setter @NoArgsConstructor
 public class Voice extends MediaType{
+    /**
+     * Identifier for this audio file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the audio file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as audio
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Duration of the voice message in seconds
+     */
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

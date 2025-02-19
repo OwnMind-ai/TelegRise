@@ -9,6 +9,11 @@ import org.telegrise.telegrise.core.parser.InnerElement;
 
 import java.util.List;
 
+/**
+ * An element that allows to define roles for users.
+ *
+ * @since 0.1
+ */
 @Element(name = "roles")
 @Getter @Setter @NoArgsConstructor
 public class Roles extends NodeElement {

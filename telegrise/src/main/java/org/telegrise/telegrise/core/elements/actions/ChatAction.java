@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -35,21 +36,34 @@ public class ChatAction extends ActionElement{
     private static final Set<String> ACTIONS = Set.of("typing", "upload_photo", "record_video", "upload_video",
             "record_voice", "upload_voice", "upload_document", "choose_sticker", "find_location", "record_video_note", "upload_video_note");
 
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Unique identifier for the target message thread.
+     */
     @Attribute(name = "messageThreadId")
     private GeneratedValue<Integer> messageThreadId;
 
+    /**
+     * Type of action to broadcast
+     */
     @Attribute(name = "action", nullable = false)
     private GeneratedValue<String> action;
 
-    @Attribute(name = "returnConsumer")
-    private GeneratedValue<Void> returnConsumer;
-
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

@@ -17,30 +17,60 @@ import org.telegrise.telegrise.types.MediaSize;
 
 import java.util.List;
 
+/**
+ * This object represents an animation file (GIF or H.264/MPEG-4 AVC video without a sound).
+ *
+ * @see <a href="https://core.telegram.org/bots/api#inputmediaanimation">Telegram API: InputMediaAnimation</a>
+ * @since 0.1
+ */
 @Element(name = "animation")
 @Getter @Setter @NoArgsConstructor
 public class Animation extends MediaType{
+    /**
+     * Identifier for this animation file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the animation file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as animation
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Set to true if the video needs to be covered with a spoiler animation
+     */
     @Attribute(name = "spoiler")
     private GeneratedValue<Boolean> spoiler;
 
+    /**
+     * Animation duration in seconds
+     */
     @Attribute(name = "duration")
     private GeneratedValue<Integer> duration;
 
+    /**
+     * Width and height of the animation
+     */
     @Attribute(name = "size")
     private GeneratedValue<MediaSize> size;
 
+    /**
+     * Thumbnail of the file sent
+     */
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

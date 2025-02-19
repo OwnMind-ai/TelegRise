@@ -21,24 +21,56 @@ import java.util.Objects;
 
 import static org.telegrise.telegrise.core.elements.Tree.improperInterruptionScopes;
 
+/**
+ * A branch of a tree or another branch that can be chosen to go to if its conditions are met.
+ *
+ * @see Tree
+ * @since 0.1
+ */
 @Element(name = "branch", finishAfterParsing = true)
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Branch extends NodeElement implements org.telegrise.telegrise.transcription.Branch, BranchingElement {
+    /**
+     * Name of the branch that can be used as a target for transition
+     */
     @Attribute(name = "name")
     private String name;
 
+    /**
+     * Defines types of interruptions that allowed in this branch and its children
+     */
     @Attribute(name = "allowedInterruptions")
     private String[] allowedInterruptions;
 
+    /**
+     * Defines a predicate that will be used to determine if this branch can handle an update
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Text of a message (the key) or list of them that this branch will respond to
+     */
     @Attribute(name = "key")
     private String[] keys;
+    /**
+     * Callback data or a list of them that this branch will respond to
+     */
     @Attribute(name = "callback")
     private String[] callbackTriggers;
 
+    /**
+     * An expression or method reference
+     * to execute if this branch is chosen to handle an update before all action elements.
+     * Equivalent to:
+     * <pre>
+     * {@code
+     * <branch ...>
+     *     <invoke method="..."/>
+     *     ...
+     * </branch>
+     * }
+     */
     @Attribute(name = "invoke")
     private GeneratedValue<Void> toInvoke;
 

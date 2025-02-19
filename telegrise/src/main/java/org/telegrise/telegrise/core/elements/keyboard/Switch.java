@@ -15,7 +15,7 @@ import org.telegrise.telegrise.keyboard.KeyboardState;
 @Element(name = "switch")
 @Getter @Setter @NoArgsConstructor
 public class Switch extends Button{
-    @Attribute(name = "name")
+    @Attribute(name = "name", nullable = false)
     private String name;
 
     @Attribute(name = "on", nullable = false)
@@ -33,15 +33,12 @@ public class Switch extends Button{
     @Attribute(name = "explicit")
     private boolean explicit = false;     // If true, callback data will have "-on" or "-off"
 
-    @Attribute(name = "prefix")
-    private GeneratedValue<String> prefix = GeneratedValue.ofValue("switch-");
-
     @Override
     public InlineKeyboardButton createInlineButton(ResourcePool pool, KeyboardState keyboardState) {
         boolean enabled = keyboardState.isSwitchEnabled(name);
 
         return InlineKeyboardButton.builder()
-                .callbackData(prefix.generate(pool) + name + (!explicit ? "" : enabled ? "-off" : "-on"))
+                .callbackData(name + (!explicit ? "" : enabled ? "-off" : "-on"))
                 .text(enabled ? onState.generate(pool) : offState.generate(pool))
                 .build();
     }

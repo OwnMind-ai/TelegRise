@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinAllChatMessages;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
@@ -31,18 +32,34 @@ import org.telegrise.telegrise.core.parser.Element;
 @Getter @Setter
 @NoArgsConstructor
 public class Unpin extends ActionElement{
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "messageId", nullable = false)
     private GeneratedValue<Integer> messageId;
 
+    /**
+     * Set to true to unpin all chat messages.
+     */
     @Attribute(name = "all")
     private GeneratedValue<Boolean> all = GeneratedValue.ofValue(false);
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

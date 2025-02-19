@@ -16,21 +16,42 @@ import org.telegrise.telegrise.core.parser.Element;
 
 import java.util.List;
 
+/**
+ * Represents a general file to be sent.
+ *
+ * @see <a href="https://core.telegram.org/bots/api#inputmediadocument">Telegram API: InputMediaDocument</a>
+ * @since 0.1
+ */
 @Element(name = "document")
 @Getter @Setter @NoArgsConstructor
 public class Document extends MediaType{
+    /**
+     * Identifier for this document file.
+     */
     @Attribute(name = "fileId")
     private GeneratedValue<String> fileId;
 
+    /**
+     * URL to the document file.
+     */
     @Attribute(name = "url")
     private GeneratedValue<String> url;
 
+    /**
+     * InputFile instance to be used as a document
+     */
     @Attribute(name = "inputFile")
     private GeneratedValue<InputFile> inputFile;
 
+    /**
+     * Thumbnail of the file sent
+     */
     @Attribute(name = "thumbnail")
     private GeneratedValue<InputFile> thumbnail;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when = GeneratedValue.ofValue(true);
 

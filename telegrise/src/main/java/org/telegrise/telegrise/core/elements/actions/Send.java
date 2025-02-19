@@ -10,7 +10,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.LinkPreviewOptions;
 import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.keyboard.Keyboard;
 import org.telegrise.telegrise.core.elements.media.MediaType;
@@ -23,6 +25,7 @@ import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
+import org.telegrise.telegrise.types.ApiResponse;
 import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;
@@ -75,13 +78,13 @@ public class Send extends ActionElement{
     private GeneratedValue<Long> chatId;
 
     /**
-     * Name of this action element for later reuse in {@link org.telegrise.telegrise.core.elements.Transition transitions}.
+     * Name of this action element for later use in {@link org.telegrise.telegrise.core.elements.Transition transitions}.
      */
     @Attribute(name = "name")
     private String name;
 
     /**
-     * Determines if this element must be executed (if is {@code true})
+     * Determines if this element must be executed (if returns {@code true})
      */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
@@ -123,9 +126,19 @@ public class Send extends ActionElement{
     @Attribute(name = "reply")
     private GeneratedValue<String> reply;
 
+    /**
+     * Provides a result of the send method.
+     * Java expressions can use variable {@code message},
+     * Method references can use parameter of type
+     * {@link Message} or {@link ApiResponse} to access returned value.
+     */
     @Attribute(name = "returnConsumer")
     private GeneratedValue<Void> returnConsumer;
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

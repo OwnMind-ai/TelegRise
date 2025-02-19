@@ -16,6 +16,13 @@ import java.util.List;
 
 /**
  * Describes reply parameters for the message that is being sent.
+ * <pre>
+ * {@code
+ * <reply to="#messageId"/>
+ * <reply to="#messageId">
+ *     quote with <b>formatting</b>
+ * </reply>
+ * }
  *
  * @since 0.11
  */

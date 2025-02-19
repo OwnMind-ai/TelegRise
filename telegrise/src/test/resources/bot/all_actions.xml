@@ -33,8 +33,6 @@
                 <photo url="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Felis_catus-cat_on_snow.jpg/220px-Felis_catus-cat_on_snow.jpg"/>
                 <text>Sending photo</text>
             </send>
-            <wait timeout="1"/>
-
             <send>
                 <photo url="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Felis_catus-cat_on_snow.jpg/220px-Felis_catus-cat_on_snow.jpg"/>
                 <video url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"/>
@@ -46,14 +44,11 @@
                 <invoke method='${System.out.println("Invoke action tested")}'/>
                 <send>Action group test</send>
             </actionGroup>
-            <wait timeout="1"/>
-
             <animate period="0.5" loops="2" parallel="false">
                 <frame>Testing animations.</frame>
                 <frame>Testing animations..</frame>
                 <frame>Testing animations...</frame>
             </animate>
-            <wait timeout="1"/>
 
             <chatAction action="typing"/>
             <wait timeout="1"/>
@@ -64,8 +59,6 @@
             <wait timeout="1"/>
 
             <pin messageId='#memory("copyDummy")'/>
-            <wait timeout="1"/>
-
             <unpin messageId='#memory("copyDummy")'/>
             <wait timeout="1"/>
 
@@ -80,6 +73,12 @@
             <send>
                 <text>Test reply</text>
                 <reply to="${memory.getLastSentMessage().getMessageId()}">message <b>with</b> preview</reply>
+            </send>
+            <send>
+                <text>
+                    <if condition="true">True</if>
+                    <else>False</else>
+                </text>
             </send>
 
             <send>✅ All test passed! Press /start to choose another test.</send>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<texts context="StartController">
+    <text name="StartText">
+        ${#getGreetingText} I am your personal testing assistant, and I am glad to help you develop
+        <a href="https://github.com/OwnMind-ai/TelegRise">TelegRise</a> framework.<br/>
+        <br/>
+        What do you want to test today?
+    </text>
+</texts>

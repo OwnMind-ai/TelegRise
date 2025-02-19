@@ -19,13 +19,28 @@ import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.util.List;
 
+/**
+ * A root element that contains trees of this transcription.
+ * <p>
+ * This element can have action elements like {@code <send>} but cannot have a controller
+ * (if needed, static references must be used).
+ * Branching that has no other branches and no transition will lead to this element after handling the update.
+ *
+ * @since 0.1
+ */
 @Element(name = "root")
 @Getter @Setter
 @NoArgsConstructor
 public class Root extends NodeElement implements BranchingElement {
+    /**
+     * Name of the root element to be used in transition target, defaults to {@code "root"}
+     */
     @Attribute(name = "name")
     private String name = "root";
 
+    /**
+     * List of chat types that this bot can be used in
+     */
     @Attribute(name = "chats")
     private String[] chatTypes;
 

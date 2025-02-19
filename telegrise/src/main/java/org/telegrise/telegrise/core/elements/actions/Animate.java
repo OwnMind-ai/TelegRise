@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.core.AnimationExecutor;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
@@ -40,30 +41,58 @@ import java.util.List;
 @Element(name = "animate")
 @Getter @Setter @NoArgsConstructor
 public class Animate extends ActionElement{
+    /**
+     * Unique identifier for the target chat.
+     */
     @Attribute(name = "chat")
     private GeneratedValue<Long> chatId;
 
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
     @Attribute(name = "when")
     private GeneratedValue<Boolean> when;
 
+    /**
+     * Number of seconds between frames.
+     */
     @Attribute(name = "period", nullable = false)
     private GeneratedValue<Float> period;
 
+    /**
+     * If true, this element won't halt tree/branch flow during execution.
+     */
     @Attribute(name = "parallel")
     private boolean parallel;
 
+    /**
+     * Expression to execute after animation is finished.
+     */
     @Attribute(name = "after")
     private GeneratedValue<Void> after;
 
+    /**
+     * An expression what will be used between every frame to determine if animation must be finished
+     */
     @Attribute(name = "until")
     private GeneratedValue<Boolean> until;
 
+    /**
+     * Number of iterations of frames to execute.
+     */
     @Attribute(name = "loops")
     private GeneratedValue<Integer> loops;
 
+    /**
+     * If true (by default), the message of the animation will be deleted after the animation finishes
+     */
     @Attribute(name = "deleteAfter")
     private boolean deleteAfter = true;
 
+    /**
+     * Specified expression is invoked when an API error occurs; exception will not be thrown.
+     * Referenced method can use parameter of type {@link TelegramApiException} to handle the exception.
+     */
     @Attribute(name = "onError")
     private GeneratedValue<Void> onError;
 

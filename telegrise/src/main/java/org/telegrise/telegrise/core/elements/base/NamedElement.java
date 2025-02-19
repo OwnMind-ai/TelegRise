@@ -18,5 +18,8 @@ public interface NamedElement {
      */
     default boolean isGlobal(){ return false; }
 
+    /**
+     * The name of the element
+     */
     String getName();
 }

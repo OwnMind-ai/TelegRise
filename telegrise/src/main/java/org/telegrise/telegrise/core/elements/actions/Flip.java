@@ -25,17 +25,23 @@ import org.telegrise.telegrise.keyboard.KeyboardState;
 @Element(name = "flip", finishAfterParsing = true)
 @Getter @Setter @NoArgsConstructor
 public class Flip extends ActionElement{
+    /**
+     * Name of the keyboard that contains a switch
+     */
     @Attribute(name = "keyboard", nullable = false)
     private GeneratedValue<String> keyboard;
 
-    @Attribute(name = "when")
-    private GeneratedValue<Boolean> when;
-
+    /**
+     * Name of the switch to be flipped
+     */
     @Attribute(name = "switch", nullable = false)
     private GeneratedValue<String> switchName;
 
-    @Attribute(name = "onError")
-    private GeneratedValue<Void> onError;
+    /**
+     * Determines if this element must be executed (if returns {@code true})
+     */
+    @Attribute(name = "when")
+    private GeneratedValue<Boolean> when;
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {

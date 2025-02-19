@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.expressions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.telegrise.telegrise.annotations.HiddenParameter;
 import org.telegrise.telegrise.annotations.Reference;
@@ -382,8 +383,6 @@ public class MethodReferenceCompiler {
                         r.invokeUnsafe(args[0]);
                         yield null;
                     }
-                    default ->
-                            throw new TelegRiseRuntimeException("Invalid generated reference: " + generated.getClass().getName(), node);
                 };
             }
 
@@ -486,8 +485,11 @@ public class MethodReferenceCompiler {
 
     private static @NotNull ReferenceExpression compileExplicitParametrizedReference(Method method, List<PrimitiveToken> parameters, boolean isStatic) {
         List<ValueToken> tokenList = parameters.stream().map(ValueToken.class::cast).toList();
+
+        // Since here arguments have been passed by as and not Java compiler, we need to escape string ourselves
         Object[] tokenParams = IntStream.range(0, tokenList.size())
                 .mapToObj(i -> tokenList.get(i).getValue(method.getParameterTypes()[i]))
+                .map(a -> a instanceof String s ? StringEscapeUtils.unescapeJava(s) : a)
                 .toArray();
 
         Class<?>[] parametersMapping = compileParametersMapping(method);

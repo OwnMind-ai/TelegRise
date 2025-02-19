@@ -33,9 +33,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * A main unit in a branching system of bot's transcription.
+ * This element must be placed inside a {@code <root>} or {@code <trees>}.
+ *
+ * @since 0.1
+ */
 @Element(name = "tree")
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class Tree extends NodeElement implements org.telegrise.telegrise.transcription.Tree, BranchingElement {
     public static final String INTERRUPT_BY_CALLBACKS = "callbacks";
     public static final String INTERRUPT_BY_KEYS = "keys";
@@ -53,28 +58,60 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
                 || s.equals(INTERRUPT_BY_COMMANDS) || s.equals(INTERRUPT_BY_PREDICATES) || s.equals(INTERRUPT_BY_ALL));
     }
 
+    /**
+     * Name of the tree
+     */
     @Attribute(name = "name", nullable = false)
     private String name;
+    /**
+     * Defines types of interruptions that allowed in this tree
+     */
     @Attribute(name = "allowedInterruptions")
     private String[] allowedInterruptions = {INTERRUPT_BY_ALL};
 
+    /**
+     * Command or list of command that this tree will respond to
+     */
     @Attribute(name = "command")
     private String[] commands;
+    /**
+     * Text of a message (the key) or list of them that this tree will respond to
+     */
     @Attribute(name = "key")
     private String[] keys;
+    /**
+     * Callback data or a list of them that this tree will respond to
+     */
     @Attribute(name = "callback")
     private String[] callbackTriggers;
+    /**
+     * An expression that determines if this tree should respond to an update.
+     * This attribute <b>cannot</b> use method references from attached controller
+     */
     @Attribute(name = "predicate")
     private GeneratedValue<Boolean> predicate;
+    /**
+     * Types of chat that this tree can be used in
+     */
     @Attribute(name = "chats")
     private String[] chatTypes;
 
+    /**
+     * Description to this tree that can be used to generate a command list
+     */
     @Attribute(name = "description")
     private String description;
 
+    /**
+     * Chat scopes that command of this tree belongs to
+     * @see <a href="https://core.telegram.org/bots/api#botcommandscope">Telegram API: BotCommandScope</a>
+     */
     @Attribute(name = "commandScopes")
     private String[] scopes;
 
+    /**
+     * Users of lesser access level than specified will not be able to use this tree.
+     */
     @Attribute(name = "accessLevel")
     private Integer accessLevel;
 
@@ -102,6 +139,9 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
             this.validateSuperclass(this.controller, this.controller.getSuperclass());
     }
 
+    /**
+     * Controller for this tree that provides backend logic to the tree such as method references.
+     */
     @Attribute(name = "controller", priority = Double.POSITIVE_INFINITY)
     private LocalNamespace extractController(Node node, LocalNamespace namespace){
         if (node.getAttributes().getNamedItem("controller") != null) {
@@ -110,7 +150,7 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
                 throw new TranscriptionParsingException("Tree uses a controller the class of which is not annotated with @TreeController", node);
         }
 
-        return this.createNamespace(namespace.getApplicationNamespace());
+        return new LocalNamespace(this.controller, namespace.getApplicationNamespace());
     }
 
     private void validateSuperclass(Class<?> child, Class<?> superclass) {
@@ -122,11 +162,6 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
                         .formatted(child.getSimpleName(), superclass.getSimpleName(), m.getName()), node);
 
         validateSuperclass(child, superclass.getSuperclass());
-    }
-
-    @Override
-    public LocalNamespace createNamespace(ApplicationNamespace global) {
-        return new LocalNamespace(controller, global);
     }
 
     public boolean canHandleMessage(ResourcePool pool, Chat chat){

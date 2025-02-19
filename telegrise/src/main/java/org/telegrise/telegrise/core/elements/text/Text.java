@@ -1,6 +1,7 @@
 package org.telegrise.telegrise.core.elements.text;
 
 import lombok.*;
+import org.jetbrains.annotations.ApiStatus;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.Expression;
@@ -20,55 +21,107 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
+/**
+ * An element that is used to define a text with optional formating for message-related API methods.
+ * <p>
+ * By default, this element uses HTML parse mode to format its content.
+ * The text can contain Java expressions and method references.
+ * If {@code textblock} is true, the element will use striped whitespaces in linebreaks to parse text,
+ * otherwise tag {@code <br/>} must be used to create a line break.
+ * <pre>
+ * {@code
+ * <text textblock="true">
+ *     Hello, ${#getFirstName}!
+ *
+ *     <i>How are you?</i>
+ * </text>
+ * }
+ * <p>
+ * Text element can have multiple variants under certain conditions.
+ * In this case, defining {@code textblock}, {@code parseMode}
+ * and text in the {@code <text>} is obsolete and all the configuration must be moved to individual parts themselves.
+ * Conditional text must have an <b>else</b> case.
+ * <pre>
+ * {@code
+ * <text textblock="true">
+ *     <if condition="#condition">Hello!</if>
+ *     <else>Bye!</else>
+ * </text>
+ * }
+ *
+ * @see TextElse
+ * @see TextIf
+ * @since 0.1
+ */
 @Element(name = "text", checkInner = false, finishAfterParsing = true)
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Text extends NodeElement implements EmbeddableElement, InteractiveElement<TextBlock>, NamedElement,
         org.telegrise.telegrise.transcription.Text {
     @Getter(value = AccessLevel.NONE)
     private GeneratedValue<String> text;
 
-    @Attribute(name = "name")
+    /**
+     * Name of the text to be used to duplicate text
+     */
+    @Attribute(name = "name", priority = 2)
     private String name;
 
-    @Attribute(name = "byName")
+    /**
+     * Use to duplicate text by name
+     */
+    @Attribute(name = "byName", priority = 3)
     private String byName;
 
+    /**
+     * Parse mode for text formating, default 'html'
+     */
     @Attribute(name = "parseMode")
     private GeneratedValue<String> parseMode = GeneratedValue.ofValue("html");
 
+    /**
+     * List of formating entities
+     */
     @Attribute(name = "entities")
     private GeneratedValue<List<MessageEntity>> entities;
 
+    /**
+     * An expression that can be used to transform text after being generated
+     */
     @Attribute(name = "transformer")
     private GeneratedValue<String> transformer;
 
+    /**
+     * If set to true, the element will use striped whitespaces in linebreaks to parse text,
+     * otherwise tag {@code <br/>} must be used to create a line break.
+     */
     @Attribute(name = "textblock", priority = 1)
     private boolean textblock;
 
-    @Attribute(name = "conditional", priority = 1)
-    private boolean conditional;
-
+    /**
+     * If true, the text will be available outside a parent tree
+     */
     @Attribute(name = "global")
     private boolean global;
 
     @InnerElement
     private List<TextConditionalElement> textConditionalElements;
 
+    @ApiStatus.Experimental  //TODO dont forget to mention in docs here and Texts when implemented
     @Attribute(name = "lang")
     private String lang;
 
     private Tree parentTree;
+    private boolean conditional;
 
     @Override
     public void validate(TranscriptionMemory memory) {
         if (text == null && !conditional && byName == null)
             throw new TranscriptionParsingException("Text is empty", node);
 
-        if (conditional && (textConditionalElements == null || textConditionalElements.isEmpty()))
-            throw new TranscriptionParsingException("Conditional text has no conditional elements such as <if> or <else>", node);
+        if (textConditionalElements != null && textConditionalElements.stream().noneMatch(TextElse.class::isInstance))
+            throw new TranscriptionParsingException("Conditional text must have an else case", node);
     }
 
     @Override
@@ -120,33 +173,28 @@ public class Text extends NodeElement implements EmbeddableElement, InteractiveE
 
     @Attribute(name = "", nullable = false)
     private void parseText(Node node, LocalNamespace namespace){
-        if (!this.conditional && this.byName == null) {
-            String raw;
-            if (this.textblock) raw = XMLUtils.innerXMLTextBlock(node);
-            else raw = XMLUtils.innerXML(node);
+        this.conditional = this.determineIfConditional(node);
+        if (this.conditional || this.byName != null) return;
 
-            if (raw == null) return;
+        String raw;
+        if (this.textblock) raw = XMLUtils.innerXMLTextBlock(node);
+        else raw = XMLUtils.innerXML(node);
 
-            Class<?> controllerClass = namespace.getHandlerClass();
-            if (parent instanceof Texts texts && texts.getContext() != null) {
-                try {
-                    Class<?> contextClass = namespace.getApplicationNamespace().getClass(texts.getContext());
-                    if (controllerClass != null && !controllerClass.getName().equals(contextClass.getName()))
-                        throw new TranscriptionParsingException("Conflict of contexts between '%s' and '%s'".formatted(contextClass.getName(), controllerClass.getName()), node);
+        if (raw == null) return;
+        this.text = ExpressionFactory.createExpression(raw, String.class, node, namespace);
+    }
 
-                    controllerClass = contextClass;
-                } catch (TelegRiseRuntimeException e){
-                    throw new TranscriptionParsingException(e.getMessage(), node);
-                }
-            }
-
-            this.text = ExpressionFactory.createExpression(raw, String.class, node, new LocalNamespace(controllerClass, namespace.getApplicationNamespace()));
-        }
+    private boolean determineIfConditional(Node node) {
+        return IntStream.range(0, node.getChildNodes().getLength())
+                .mapToObj(node.getChildNodes()::item)
+                .anyMatch(n -> n.getNodeType() == Node.ELEMENT_NODE && (n.getNodeName().equals("if") || n.getNodeName().equals("else")));
     }
 
     @Override
     public void parse(Node parent, LocalNamespace namespace) {
         this.parseText(parent, namespace);
+        if (isConditional())
+            throw new TranscriptionParsingException("Text without <text> element cannot be conditional. Please, wrap your text in <text> tag.", parent);
     }
 
     @Override

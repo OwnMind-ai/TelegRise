@@ -15,10 +15,20 @@ import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.w3c.dom.Node;
 
+/**
+ * A conditional branch of {@code <text>} element.
+ * If all other conditions failed before this one, the text of this element will be used.
+ *
+ * @since 0.1
+ * @see Text
+ */
 @Element(name = "else", checkInner = false)
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class TextElse extends NodeElement implements TextConditionalElement {
+    /**
+     * If set to true, the element will use striped whitespaces in linebreaks to parse text,
+     * otherwise tag {@code <br/>} must be used to create a line break.
+     */
     @Attribute(name = "textblock", priority = 1)
     private boolean textblock;
 
