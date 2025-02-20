@@ -86,7 +86,7 @@ public final class TelegRiseApplication {
 
         if(applicationRunner == null)
             this.applicationRunner = controller.getTranscription().isWebhookBot() ?
-                    ApplicationRunner.WEBHOOK : ApplicationRunner.LONG_POLLING;
+                    ApplicationRunner.getWebhookRunner() : ApplicationRunner.LONG_POLLING;
 
         log.info("Starting bot server...");
 

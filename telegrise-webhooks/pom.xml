@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.telegrise</groupId>
+        <artifactId>TelegRiseFramework</artifactId>
+        <version>0.11.6-PREVIEW</version>
+    </parent>
+
+    <artifactId>telegrise-webhooks</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <jetty.version>12.0.16</jetty.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.telegrise</groupId>
+            <artifactId>telegrise</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OwnMind-ai Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ownmind-ai/telegrise</url>
+        </repository>
+    </distributionManagement>
+</project>
