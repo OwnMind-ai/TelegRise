@@ -52,3 +52,4 @@ telegrise/src/test/java/org/telegram/telegrise/BotTest.java
 .fleet
 
 *.env
+.local
