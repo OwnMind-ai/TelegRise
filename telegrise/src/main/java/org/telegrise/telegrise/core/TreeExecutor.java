@@ -27,11 +27,11 @@ import java.util.concurrent.BlockingQueue;
 
 public final class TreeExecutor {
     public static TreeExecutor create(Tree tree, ResourceInjector resourceInjector, BotSender sender, SessionMemoryImpl memory, BlockingQueue<Update> updatesQueue) {
-        Object handler = null;
+        Object controller = null;
         if (tree.getController() != null)
-            handler = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
+            controller = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
 
-        return new TreeExecutor(memory, handler, tree, sender, updatesQueue);
+        return new TreeExecutor(memory, controller, tree, sender, updatesQueue);
     }
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){

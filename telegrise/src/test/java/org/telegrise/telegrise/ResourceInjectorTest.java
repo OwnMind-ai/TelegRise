@@ -27,7 +27,7 @@ class ResourceInjectorTest {
             }
 
             @Override
-            public Character getResource(Object target) {
+            public Character getResource(Class<?> target) {
                 return '1';
             }
         }));

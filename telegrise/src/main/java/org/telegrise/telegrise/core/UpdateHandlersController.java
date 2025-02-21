@@ -5,10 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.UpdateHandler;
 import org.telegrise.telegrise.annotations.Handler;
-import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
-import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -56,17 +53,7 @@ public class UpdateHandlersController {
     }
 
     public void add(Class<? extends UpdateHandler> handlerClass){
-        UpdateHandler instance;
-        try {
-             instance = handlerClass.getConstructor().newInstance();
-        } catch (InstantiationException e) {
-            throw new TelegRiseInternalException(e);
-        } catch (InvocationTargetException e) {
-            throw new TelegRiseInternalException(e.getTargetException());
-        } catch (NoSuchMethodException | IllegalAccessException  e) {
-            throw new TelegRiseRuntimeException("Primary handler '" + handlerClass.getSimpleName() + "' must have a public constructor with no arguments");
-        }
-
+        UpdateHandler instance = resourceInjector.createInstance(handlerClass);
         this.resourceInjector.injectResources(instance);
         this.handlers.add(instance);
     }

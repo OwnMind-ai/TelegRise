@@ -1,16 +1,15 @@
 package org.telegrise.telegrise;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.application.ApplicationRunner;
-import org.telegrise.telegrise.core.ResourceInjector;
-import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.ServiceManager;
-import org.telegrise.telegrise.core.TelegramSessionsController;
+import org.telegrise.telegrise.core.*;
 import org.telegrise.telegrise.core.parser.ApplicationNamespace;
 import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.parser.XMLElementsParser;
@@ -39,6 +38,9 @@ public final class TelegRiseApplication {
     private List<Class<? extends UpdateHandler>> handlersClasses = new ArrayList<>();
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
     private final ServiceManager serviceManager = new ServiceManager();
+    @Getter(onMethod_ = @ApiStatus.Internal)
+    private final ResourceProvider resourceProvider = new ResourceProvider();
+    @Getter
     private final Class<?> mainClass;
     @Setter
     private Supplier<? extends ExecutorService> executorService;
@@ -73,6 +75,8 @@ public final class TelegRiseApplication {
         controller.initialize();
 
         ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null));
+        // BotSender and other session-specific resources will be added at TelegramSessionsController
+        resourceProvider.add(TelegramClient.class, client);
 
         serviceManager.setInjector(resourceInjector);
         serviceManager.startServices();
@@ -108,7 +112,7 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser);
-            controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
+            controller = new TelegramSessionsController(parser.parse(), resourceFactories, resourceProvider, this.handlersClasses);
             controller.setRoleProvider(this.roleProvider);
             controller.setSessionInitializer(this.sessionInitializer);
         } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {

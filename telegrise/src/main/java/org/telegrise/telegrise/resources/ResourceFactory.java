@@ -29,7 +29,7 @@ public interface ResourceFactory<T> {
             }
 
             @Override
-            public U getResource(Object target) {
+            public U getResource(Class<?> target) {
                 return instance;
             }
         };
@@ -48,8 +48,8 @@ public interface ResourceFactory<T> {
      * This method is called every time an injection is required.
      * Ideally, this method should be <i>pure</i>, but that is up to implementation and its use case.
      *
-     * @param target An object (controller, handler, service, etc.) that requires injection
+     * @param injectionPoint A class of the object that this resource being injected to (controller, handler, service, etc.)
      * @return An instance to be injected
      */
-    T getResource(Object target);
+    T getResource(Class<?> injectionPoint);
 }

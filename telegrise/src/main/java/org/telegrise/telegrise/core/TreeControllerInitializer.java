@@ -18,8 +18,7 @@ public class TreeControllerInitializer {
     }
 
     public Object initialize(){
-        Object instance = this.createInstance();
-
+        Object instance = resourceInjector.createInstance(contollerClass);
         resourceInjector.injectResources(instance);
 
         Optional<Method> onCreateMethod = Arrays.stream(contollerClass.getDeclaredMethods())
@@ -37,18 +36,5 @@ public class TreeControllerInitializer {
         });
 
         return instance;
-    }
-
-    private Object createInstance(){
-        try {
-            return contollerClass.getConstructor().newInstance();
-        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            String startMessage = "Cannot create instance of '" + contollerClass.getSimpleName() + "': ";
-
-            if (e instanceof NoSuchMethodException)
-                throw new TelegRiseRuntimeException(startMessage + "class must have constructor with no arguments");
-            else
-                throw new TelegRiseRuntimeException(startMessage + e.getMessage());
-        }
     }
 }
