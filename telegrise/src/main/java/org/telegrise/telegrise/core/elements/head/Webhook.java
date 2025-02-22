@@ -39,8 +39,9 @@ import java.util.List;
  *          certificate="path/to/certificate"
  *          keyStorePassword="*****"/>
  * }
- * @apiNote To use webhooks,
- * it is required
+ * </pre>
+ * <p>
+ * To use webhooks, it is required
  * to have <a href="https://mvnrepository.com/artifact/org.telegrise/telegrise-webhooks">telegrise-webhook</a> dependency.
  * @since 0.10
  */

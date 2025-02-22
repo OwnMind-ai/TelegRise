@@ -50,10 +50,11 @@ import java.util.stream.Stream;
  * </send>
  * <send>Text to send</send>
  * }
+ * </pre>
  * <p>
  * If at least one of the media elements is specified as children to this element, then this method takes a form of the
  * corresponding media-sending API call,
- * or <a hred="https://core.telegram.org/bots/api#sendmessage">sendMediaGroup</a>
+ * or <a href="https://core.telegram.org/bots/api#sendmessage">sendMediaGroup</a>
  * if more than one specified.
  * The text will become a caption to the first media item.
  * <pre>
@@ -63,9 +64,10 @@ import java.util.stream.Stream;
  *     <text>Caption to the photo</text>
  * </send>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#sendmessage">Telegram API: sendMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#sendmessage">Telegram API: sendMessage</a>
  */
 @Element(name = "send")
 @Getter @Setter @NoArgsConstructor

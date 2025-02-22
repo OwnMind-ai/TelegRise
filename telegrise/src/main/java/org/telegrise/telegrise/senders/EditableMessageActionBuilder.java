@@ -33,6 +33,7 @@ import java.util.List;
  * sender.ofEditable(message).edit("Hello, World!", inlineMarkup);
  * sender.ofEditable(message).delete();
  * }
+ * </pre>
  *
  * @see EditableMessageActionBuilder
  * @since 0.6

@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegrise.telegrise.TelegRiseApplication;
 
 import java.util.concurrent.*;
-import java.util.function.Supplier;
 
 /**
  * A basic extension of ThreadPoolExecutor that is meant to be used in
- * {@link TelegRiseApplication#setExecutorService(Supplier)} method and ensures proper error-handling.
+ * {@link TelegRiseApplication} method and ensures proper error-handling.
  * <p>
- * This class has been used in older versions (<0.10) of the framework before the migration to Java 21 and adoption of <code>Virtual Threads</code>.
+ * This class has been used in older versions ({@code <0.10})
+ * of the framework before the migration to Java 21 and adoption of <code>Virtual Threads</code>.
  *
  * @since 0.1
  */

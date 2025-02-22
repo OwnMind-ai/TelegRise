@@ -6,36 +6,93 @@
 
     <groupId>org.telegrise</groupId>
     <artifactId>TelegRiseFramework</artifactId>
-    <version>0.11.6-PREVIEW</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
-    <name>TelegRise Framework</name>
 
     <modules>
         <module>telegrise</module>
+        <module>telegrise-webhooks</module>
+        <module>telegrise-springboot-starter</module>
     </modules>
+
+    <name>TelegRise Framework</name>
+    <description>The main package of the TelegRise framework.</description>
+    <url>https://telegrise.org/</url>
 
     <licenses>
         <license>
             <name>MIT License</name>
             <url>https://www.opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
         </license>
     </licenses>
+    <developers>
+        <developer>
+            <name>Dmytro Holovko</name>
+            <email>dmytro.holovko@telegrise.org</email>
+            <url>https://github.com/OwnMind-ai</url>
+            <id>OwnMind</id>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/OwnMind-ai/TelegRise</url>
+        <connection>scm:git:git://github.com/OwnMind-ai/TelegRise.git</connection>
+        <developerConnection>scm:git:git@github.com:OwnMind-ai/TelegRise.git</developerConnection>
+    </scm>
 
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub OwnMind-ai Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/ownmind-ai/telegrise</url>
-        </repository>
-    </distributionManagement>
 </project>

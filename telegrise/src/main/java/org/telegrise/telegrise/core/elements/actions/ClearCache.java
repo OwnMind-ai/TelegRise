@@ -19,6 +19,7 @@ import java.util.Map;
  * <invoke method="#cachableMethod"/>
  * <clearCache method="cachableMethod"/>
  * }
+ * </pre>
  *
  * @since 0.6
  */

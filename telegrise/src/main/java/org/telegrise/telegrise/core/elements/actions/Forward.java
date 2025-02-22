@@ -22,7 +22,7 @@ import org.telegrise.telegrise.types.ApiResponse;
  * It is required that this element has {@code chat}, {@code fromChat} and {@code messageId} attributes.
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#forwardmessage">Telegram API: forwardMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#forwardmessage">Telegram API: forwardMessage</a>
  */
 @Element(name = "forward")
 @Getter @Setter @NoArgsConstructor

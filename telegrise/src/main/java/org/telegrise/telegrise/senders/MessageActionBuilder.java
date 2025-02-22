@@ -25,6 +25,7 @@ import java.util.List;
  * {@code
  * sender.of(message).disableNotification(true).send("Hello, World!", replyMarkup);
  * }
+ * </pre>
  *
  * @see EditableMessageActionBuilder
  * @since 0.6

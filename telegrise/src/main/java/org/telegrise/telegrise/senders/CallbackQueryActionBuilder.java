@@ -19,6 +19,7 @@ import org.telegrise.telegrise.core.SessionMemoryImpl;
  * {@code
  * sender.of(query).answer("Hello, World!");
  * }
+ * </pre>
  *
  * @see EditableMessageActionBuilder
  * @since 0.6

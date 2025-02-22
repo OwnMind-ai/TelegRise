@@ -113,7 +113,7 @@ public final class KeyboardState {
     }
 
     /**
-     * Returns true, if button at specific {@code row} and {@code column} is enabled (by default returns true).
+     * Returns true, if button at specific {@code row} and {@code column} is enabled (by default, returns true).
      *
      * @param row keyboard row
      * @param column index of a button in the row

@@ -65,6 +65,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::callback("data")'>
      * }
+     * </pre>
      *
      * @param data expected data of a callback query
      * @return generated reference
@@ -81,6 +82,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::callbackMatches("\\d+")'>
      * }
+     * </pre>
      *
      * @param regex a pattern to be matched with
      * @return generated reference
@@ -129,6 +131,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageText("text")'>
      * }
+     * </pre>
      *
      * @param text expected text of the message
      * @return generated reference
@@ -145,6 +148,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageTextMatches("\\d+")'>
      * }
+     * </pre>
      *
      * @param regex a pattern to be matched with
      * @return generated reference
@@ -161,6 +165,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageCaption("caption")'>
      * }
+     * </pre>
      *
      * @param text expected caption of the message
      * @return generated reference
@@ -177,6 +182,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageCaptionMatches("\\d+")'>
      * }
+     * </pre>
      *
      * @param regex a pattern to be matched with
      * @return generated reference
@@ -193,6 +199,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageTextOrCaption("caption")'>
      * }
+     * </pre>
      *
      * @param text expected text or caption of the message
      * @return generated reference
@@ -210,6 +217,7 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
      * {@code
      * <branch when='::messageTextOrCaptionMatches("\\d+")'>
      * }
+     * </pre>
      *
      * @param regex a pattern to be matched with
      * @return generated reference

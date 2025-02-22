@@ -27,6 +27,7 @@ import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
  *     <role name="user" accessLevel="0" onDeniedTree="DeniedTree"/>
  * </roles>
  * }
+ * </pre>
  *
  * @see RoleProvider
  * @since 0.1

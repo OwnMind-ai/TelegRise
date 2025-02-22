@@ -48,6 +48,7 @@ import java.util.function.Function;
  * ...
  * <keyboard byName="SampleKeyboard"/>
  * }
+ * </pre>
  * Keyboards can be changed dynamically using {@link KeyboardMarkup} object,
  * which allows enabling/disabling rows and buttons, and change state of <b>switches</b>.
  * Switches represent a button that has multiple states that change on being pressed.
@@ -59,12 +60,14 @@ import java.util.function.Function;
  *     </row>
  * </keyboard>
  * }
+ * </pre>
  * Keyboards can be created using custom Java code that returns instance of {@link ReplyKeyboard}.
  *
  * <pre>
  * {@code
  * <keyboard create="#createKeyboard"/>
  * }
+ * </pre>
  *
  * @see <a href="https://core.telegram.org/bots/api#replykeyboardmarkup">Telegram API: ReplyKeyboardMarkup</a>
  * @see <a href="https://core.telegram.org/bots/api#inlinekeyboardmarkup">Telegram API: InlineKeyboardMarkup</a>

@@ -6,10 +6,33 @@
     <parent>
         <groupId>org.telegrise</groupId>
         <artifactId>TelegRiseFramework</artifactId>
-        <version>0.11.6-PREVIEW</version>
+        <version>0.0.1</version>
     </parent>
 
     <artifactId>telegrise-webhooks</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>The main package of the TelegRise framework.</description>
+    <url>https://telegrise.org/</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Dmytro Holovko</name>
+            <email>dmytro.holovko@telegrise.org</email>
+            <url>https://github.com/OwnMind-ai</url>
+            <id>OwnMind</id>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/OwnMind-ai/TelegRise</url>
+        <connection>scm:git:git://github.com/OwnMind-ai/TelegRise.git</connection>
+        <developerConnection>scm:git:git@github.com:OwnMind-ai/TelegRise.git</developerConnection>
+    </scm>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -36,12 +59,4 @@
             <version>${jetty.version}</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub OwnMind-ai Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/ownmind-ai/telegrise</url>
-        </repository>
-    </distributionManagement>
 </project>

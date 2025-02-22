@@ -24,9 +24,10 @@ import org.telegrise.telegrise.core.parser.Element;
  * <unpin messageId="#getMessageId"/>
  * <unpin all="true"/>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#unpinchatmessage">Telegram API: unpinChatMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#unpinchatmessage">Telegram API: unpinChatMessage</a>
  */
 @Element(name = "unpin")
 @Getter @Setter

@@ -32,6 +32,7 @@ public class DefaultBranch extends NodeElement {
      *     ...
      * </default>
      * }
+     * </pre>
      */
     @Attribute(name = "invoke")
     private GeneratedValue<Void> toInvoke;

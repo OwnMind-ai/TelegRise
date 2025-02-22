@@ -113,6 +113,7 @@ public class BotSender {
      * {@code
      * sender.sneaky().execute(SendMessage.builder().chatId(id).text(text).build());
      * }
+     * </pre>
      */
     public BotSender sneaky(){
         if (memory == null) 

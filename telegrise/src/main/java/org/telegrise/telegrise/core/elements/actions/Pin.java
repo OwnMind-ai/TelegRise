@@ -22,9 +22,10 @@ import org.telegrise.telegrise.core.parser.Element;
  * {@code
  * <pin messageId="#getMessageId"/>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#pinchatmessage">Telegram API: pinChatMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#pinchatmessage">Telegram API: pinChatMessage</a>
  */
 @Element(name = "pin")
 @Getter @Setter @NoArgsConstructor

@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
  * {@code
  * <username>your bot username</username>
  * }
+ * </pre>
  *
  * @since 0.9
  */

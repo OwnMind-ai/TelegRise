@@ -24,9 +24,10 @@ import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
  * {@code
  * <answer text="Done!"/>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#answercallbackquery">Telegram API: answerCallbackQuery<a>
+ * @see <a href="https://core.telegram.org/bots/api#answercallbackquery">Telegram API: answerCallbackQuery</a>
  */
 @Element(name = "answer")
 @Getter @Setter @NoArgsConstructor

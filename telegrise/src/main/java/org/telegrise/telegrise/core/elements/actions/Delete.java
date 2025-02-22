@@ -35,9 +35,10 @@ import java.util.Optional;
  * <delete/>
  * <delete registry="registryName"/>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#deletemessage">Telegram API: deleteMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#deletemessage">Telegram API: deleteMessage</a>
  * @see SessionMemory#putToRegistry
  * @see BuiltinReferences#register
  */

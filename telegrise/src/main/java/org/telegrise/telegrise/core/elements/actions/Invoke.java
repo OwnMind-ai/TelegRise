@@ -16,6 +16,7 @@ import org.telegrise.telegrise.core.parser.Element;
  * <invoke method="#execute"/>
  * <invoke method='${System.out.println("Hello!")}'/>
  * }
+ * </pre>
  *
  * @since 0.1
  */

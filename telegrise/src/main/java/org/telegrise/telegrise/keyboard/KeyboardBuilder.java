@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class KeyboardBuilder {
     /**
-     * Creates basic inline keyboard button.
+     * Creates a basic inline keyboard button.
      * @param data inline data
      * @param text button text
      * @return inline button
@@ -35,7 +35,7 @@ public class KeyboardBuilder {
     }
 
     /**
-     * Creates basic reply keyboard button.
+     * Creates a basic reply keyboard button.
      * @param text button text
      * @return reply button
      */

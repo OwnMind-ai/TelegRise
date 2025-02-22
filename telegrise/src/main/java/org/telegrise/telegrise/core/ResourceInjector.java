@@ -1,7 +1,6 @@
 package org.telegrise.telegrise.core;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.telegrise.telegrise.annotations.Resource;
@@ -16,11 +15,11 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public final class ResourceInjector {
-    @Setter(onMethod_ = @ApiStatus.Internal)
     private static BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer = (c, i) -> {
         try {
             return c.getConstructor().newInstance();
-        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             String startMessage = "Cannot create instance of '" + c.getSimpleName() + "': ";
 
             if (e instanceof NoSuchMethodException)
@@ -29,6 +28,11 @@ public final class ResourceInjector {
                 throw new TelegRiseRuntimeException(startMessage + e.getMessage());
         }
     };
+
+    @ApiStatus.Internal
+    public static void setInstanceInitializer(BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer) {
+        ResourceInjector.instanceInitializer = instanceInitializer;
+    }
 
     @Getter
     private final Map<String, ResourceFactory<?>> resourceFactoryMap = new HashMap<>();
@@ -47,7 +51,7 @@ public final class ResourceInjector {
         resourceFactories.forEach(f -> this.resourceFactoryMap.put(f.getResourceClass().getName(), f));
     }
 
-    public void injectResources(Object target){
+    public void injectResources(Object target) {
         for (Field field : getFieldsToInject(target.getClass())) {
             if (!field.isAnnotationPresent(Resource.class)) continue;
             field.setAccessible(true);
@@ -65,15 +69,16 @@ public final class ResourceInjector {
     }
 
     private Field[] getFieldsToInject(Class<?> clazz) {
-        if (clazz == null || clazz.equals(Object.class)) return null;   // Forces the line below to return the exact copy of the first argument
+        if (clazz == null || clazz.equals(Object.class))
+            return null;   // Forces the line below to return the exact copy of the first argument
         return ArrayUtils.addAll(clazz.getDeclaredFields(), getFieldsToInject(clazz.getSuperclass()));
     }
 
-    public <T> T createInstance(Class<T> clazz){
+    public <T> T createInstance(Class<T> clazz) {
         return clazz.cast(instanceInitializer.apply(clazz, this));
     }
 
-    private Object getResource(Class<?> type, Class<?> target){
+    private Object getResource(Class<?> type, Class<?> target) {
         Object resource = null;
         for (Object r : resources) {
             if (type.isAssignableFrom(r.getClass())) {
@@ -82,7 +87,7 @@ public final class ResourceInjector {
             }
         }
 
-        if (resource == null){
+        if (resource == null) {
             ResourceFactory<?> factory = resourceFactoryMap.get(type.getName());
 
             if (factory == null)
@@ -93,7 +98,7 @@ public final class ResourceInjector {
         return resource;
     }
 
-    public <T> T get(Class<T> tClass, Class<?> target){
+    public <T> T get(Class<T> tClass, Class<?> target) {
         return tClass.cast(getResource(tClass, target));
     }
 }

@@ -70,6 +70,7 @@ public class Branch extends NodeElement implements org.telegrise.telegrise.trans
      *     ...
      * </branch>
      * }
+     * </pre>
      */
     @Attribute(name = "invoke")
     private GeneratedValue<Void> toInvoke;

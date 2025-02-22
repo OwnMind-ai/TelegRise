@@ -38,6 +38,7 @@ import java.util.stream.IntStream;
  *     <i>How are you?</i>
  * </text>
  * }
+ * </pre>
  * <p>
  * Text element can have multiple variants under certain conditions.
  * In this case, defining {@code textblock}, {@code parseMode}
@@ -50,6 +51,7 @@ import java.util.stream.IntStream;
  *     <else>Bye!</else>
  * </text>
  * }
+ * </pre>
  *
  * @see TextElse
  * @see TextIf

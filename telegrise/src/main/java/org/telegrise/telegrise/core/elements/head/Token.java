@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
  * {@code
  * <token>your bot token</token>
  * }
+ * </pre>
  *
  * @since 0.9
  */

@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
  * <telegramUrl url="http://127.0.0.1:8081"/>
  * <telegramUrl schema="http" host="127.0.0.1" port="8081" testServer="false"/>
  * }
+ * </pre>
  *
  * @since 0.10
  */

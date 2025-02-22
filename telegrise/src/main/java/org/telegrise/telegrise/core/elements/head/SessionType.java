@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
  * <sessionType>chat</sessionType>
  * <sessionType>user</sessionType>
  * }
+ * </pre>
  *
  * @since 0.9
  */

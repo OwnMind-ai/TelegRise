@@ -23,6 +23,7 @@ import java.util.function.Consumer;
  * {@code
  * <wait timeout="10" listener="#getWarningConsumer"/>
  * }
+ * </pre>
  *
  * @since 0.1
  */

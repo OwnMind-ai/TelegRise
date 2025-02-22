@@ -19,6 +19,7 @@ import java.util.List;
  * {@code
  * <invoke when='#env("VAR") -> #notNull AND #memory("var") -> #not' method='false -> :store("var")' />
  * }
+ * </pre>
  *
  * @since 0.8
  */
@@ -67,6 +68,7 @@ public class BuiltinReferences {
      * {@code
      * <bot token='#env("BOT_TOKEN")'>
      * }
+     * </pre>
      *
      * @param key name of the variable
      * @return string value of that variable or null if there is none
@@ -83,6 +85,7 @@ public class BuiltinReferences {
      * {@code
      * <branch when='#messageText -> ::matches("\\d+")'>
      * }
+     * </pre>
      *
      * @param regex a pattern to be matched with
      * @return generated reference
@@ -99,6 +102,7 @@ public class BuiltinReferences {
      * {@code
      * <send returnConsumer='::register("toDelete")'>
      * }
+     * </pre>
      *
      * @return generated reference
      */

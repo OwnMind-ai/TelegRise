@@ -28,7 +28,7 @@ import java.util.List;
  * It is required that this element has {@code chat}, {@code fromChat} and {@code messageId} attributes.
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#copymessage">Telegram API: copyMessage<a>
+ * @see <a href="https://core.telegram.org/bots/api#copymessage">Telegram API: copyMessage</a>
  */
 @Element(name = "copy")
 @Getter @Setter @NoArgsConstructor

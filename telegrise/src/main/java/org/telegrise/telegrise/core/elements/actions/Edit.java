@@ -50,6 +50,7 @@ import java.util.Set;
  * </edit>
  * <edit>Text to edit</edit>
  * }
+ * </pre>
  *
  * @since 0.1
  * @see <a href="https://core.telegram.org/bots/api#updating-messages">Telegram API: Updating messages</a>

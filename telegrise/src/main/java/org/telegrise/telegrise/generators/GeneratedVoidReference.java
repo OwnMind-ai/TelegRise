@@ -1,7 +1,7 @@
 package org.telegrise.telegrise.generators;
 
 /**
- * Functional instance of this interface represents a generated <b>reference</b> that takes one parameter
+ * A functional instance of this interface represents a generated <b>reference</b> that takes one parameter
  * but returns nothing.
  *
  * @param <T> single input parameter type

@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  *     </root>
  * </bot>
  * }
+ * </pre>
  *
  * @see <a href="https://core.telegram.org/bots/api">Telegram API</a>
  * @since 0.1

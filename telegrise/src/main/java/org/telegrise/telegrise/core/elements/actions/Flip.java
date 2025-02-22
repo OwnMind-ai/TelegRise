@@ -19,6 +19,7 @@ import org.telegrise.telegrise.keyboard.KeyboardState;
  * {@code
  * <flip keyboard="keyboardName" switch="switchName"/>
  * }
+ * </pre>
  *
  * @since 0.1
  */

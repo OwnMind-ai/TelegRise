@@ -26,9 +26,10 @@ import java.util.stream.Collectors;
  * {@code
  * <chatAction action="typing"/>
  * }
+ * </pre>
  *
  * @since 0.1
- * @see <a href="https://core.telegram.org/bots/api#sendchataction">Telegram API: sendChatAction<a>
+ * @see <a href="https://core.telegram.org/bots/api#sendchataction">Telegram API: sendChatAction</a>
  */
 @Element(name = "chatAction")
 @Getter @Setter @NoArgsConstructor
