@@ -56,4 +56,11 @@ public interface SessionsManager {
      * @return session memory of the session or null
      */
     @Nullable SessionMemory getSessionMemory(SessionIdentifier sessionIdentifier);
+
+    /**
+     * Returns a transcription manager for this bot.
+     * @apiNote Returned transcription manager is not attached to a session and all session-related method will fail
+     * @return transcription manager
+     */
+    TranscriptionManager getTranscriptionManager();
 }

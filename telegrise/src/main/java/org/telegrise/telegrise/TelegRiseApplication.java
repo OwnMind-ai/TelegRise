@@ -3,13 +3,15 @@ package org.telegrise.telegrise;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.application.ApplicationRunner;
-import org.telegrise.telegrise.core.*;
+import org.telegrise.telegrise.core.ResourceInjector;
+import org.telegrise.telegrise.core.ResourcePool;
+import org.telegrise.telegrise.core.ServiceManager;
+import org.telegrise.telegrise.core.TelegramSessionsController;
 import org.telegrise.telegrise.core.parser.ApplicationNamespace;
 import org.telegrise.telegrise.core.parser.LocalNamespace;
 import org.telegrise.telegrise.core.parser.XMLElementsParser;
@@ -38,8 +40,6 @@ public final class TelegRiseApplication {
     private List<Class<? extends UpdateHandler>> handlersClasses = new ArrayList<>();
     private final List<ResourceFactory<?>> resourceFactories = new ArrayList<>();
     private final ServiceManager serviceManager = new ServiceManager();
-    @Getter(onMethod_ = @ApiStatus.Internal)
-    private final ResourceProvider resourceProvider = new ResourceProvider();
     @Getter
     private final Class<?> mainClass;
     @Setter
@@ -51,6 +51,9 @@ public final class TelegRiseApplication {
     private SessionInitializer sessionInitializer;
     @Setter
     private ApplicationRunner applicationRunner;
+    private TelegramSessionsController sessionsController;
+    private TelegramClient client;
+    private String token;
 
     public TelegRiseApplication(Class<?> mainClass) {
         this.mainClass = mainClass;
@@ -61,41 +64,47 @@ public final class TelegRiseApplication {
         this.mainClass = mainClass;
     }
 
-    public void start(){
+    public void preload(){
         log.info("Starting TelegRise application...");
         this.handlersClasses = this.loadUpdateHandlers();
-        TelegramSessionsController controller = this.createController();
-        final String token = controller.getTranscription().getToken().generate(new ResourcePool());
+        this.sessionsController = this.createController();
+        token = sessionsController.getTranscription().getToken().generate(new ResourcePool());
 
         if (token == null || !token.matches("\\d+:[a-zA-Z0-9_-]{35}"))
             throw new TelegRiseRuntimeException("Invalid bot token: " + token);
 
-        TelegramClient client = controller.getTranscription().produceClient();
-        controller.setClient(client);
-        controller.initialize();
+        client = sessionsController.getTranscription().produceClient();
+        sessionsController.setClient(client);
+    }
 
+    public void start(){
+        if (sessionsController == null)
+            preload();
+
+        sessionsController.initialize();
         ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null));
-        // BotSender and other session-specific resources will be added at TelegramSessionsController
-        resourceProvider.add(TelegramClient.class, client);
 
         serviceManager.setInjector(resourceInjector);
-        serviceManager.startServices();
 
-        if (this.roleProvider != null)
+        if (this.roleProvider != null) {
+            sessionsController.setRoleProvider(this.roleProvider);
             resourceInjector.injectResources(this.roleProvider);
+        }
         if (this.sessionInitializer != null) {
+            sessionsController.setSessionInitializer(this.sessionInitializer);
             resourceInjector.injectResources(this.sessionInitializer);
-            controller.initializeSessions();
+            sessionsController.initializeSessions();
         }
 
         if(applicationRunner == null)
-            this.applicationRunner = controller.getTranscription().isWebhookBot() ?
+            this.applicationRunner = sessionsController.getTranscription().isWebhookBot() ?
                     ApplicationRunner.getWebhookRunner() : ApplicationRunner.LONG_POLLING;
 
         log.info("Starting bot server...");
+        serviceManager.startServices();
 
         try {
-            this.applicationRunner.run(controller::onUpdateReceived, token, controller.getTranscription(),
+            this.applicationRunner.run(sessionsController::onUpdateReceived, token, sessionsController.getTranscription(),
                     executorService == null ? null : executorService.get());
         } finally {
             serviceManager.stop();
@@ -112,9 +121,7 @@ public final class TelegRiseApplication {
         TelegramSessionsController controller;
         try {
             XMLTranscriptionParser parser = new XMLTranscriptionParser(XMLUtils.loadDocument(transcription), elementsParser);
-            controller = new TelegramSessionsController(parser.parse(), resourceFactories, resourceProvider, this.handlersClasses);
-            controller.setRoleProvider(this.roleProvider);
-            controller.setSessionInitializer(this.sessionInitializer);
+            controller = new TelegramSessionsController(parser.parse(), resourceFactories, this.handlersClasses);
         } catch (TelegRiseRuntimeException | TelegRiseInternalException | TranscriptionParsingException e) {
             throw TelegRiseRuntimeException.unfold(e);
         } catch (Exception e) {
@@ -148,5 +155,13 @@ public final class TelegRiseApplication {
     @SuppressWarnings("unused")
     public void addService(Service service){
         this.serviceManager.add(service);
+    }
+
+    public SessionsManager getSessionManager() {
+        return sessionsController;
+    }
+
+    public TelegramClient getTelegramClient() {
+        return client;
     }
 }

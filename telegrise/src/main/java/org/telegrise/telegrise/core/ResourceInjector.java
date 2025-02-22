@@ -13,12 +13,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public final class ResourceInjector {
     @Setter(onMethod_ = @ApiStatus.Internal)
-    private static Function<Class<?>, Object> instanceInitializer = (c) -> {
+    private static BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer = (c, i) -> {
         try {
             return c.getConstructor().newInstance();
         }  catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -34,11 +33,6 @@ public final class ResourceInjector {
     @Getter
     private final Map<String, ResourceFactory<?>> resourceFactoryMap = new HashMap<>();
     private final List<Object> resources;
-    /**
-     * This is a <i>temporary</i> solution to the problem of bean's initialization for Spring support
-     */
-    @Getter @SuppressWarnings("WriteOnlyObject")
-    private final AtomicReference<Class<?>> currentlyCreating = new AtomicReference<>(null);
 
     public ResourceInjector(Object... resources) {
         this.resources = List.of(resources);
@@ -59,7 +53,11 @@ public final class ResourceInjector {
             field.setAccessible(true);
 
             try {
-                field.set(target, getResource(field.getType(), target.getClass()));
+                Object resource = getResource(field.getType(), target.getClass());
+                if (resource == null)
+                    throw new TelegRiseRuntimeException("Unable to find resource '" + field.getType().getSimpleName() + "' in class '" + target.getClass().getSimpleName() + "'");
+
+                field.set(target, resource);
             } catch (IllegalAccessException e) {
                 throw new TelegRiseRuntimeException(String.format("No access to the field %s in %s requiring injection", field.getName(), target.getClass().getName()));
             }
@@ -72,12 +70,7 @@ public final class ResourceInjector {
     }
 
     public <T> T createInstance(Class<T> clazz){
-        currentlyCreating.set(clazz);
-        try {
-            return clazz.cast(instanceInitializer.apply(clazz));
-        } finally {
-            currentlyCreating.set(null);
-        }
+        return clazz.cast(instanceInitializer.apply(clazz, this));
     }
 
     private Object getResource(Class<?> type, Class<?> target){
@@ -93,7 +86,7 @@ public final class ResourceInjector {
             ResourceFactory<?> factory = resourceFactoryMap.get(type.getName());
 
             if (factory == null)
-                throw new TelegRiseRuntimeException("Unable to find resource '" + type.getSimpleName() + "' in class '" + target.getSimpleName() + "'");
+                return null;
             resource = factory.getResource(target);
         }
 

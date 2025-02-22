@@ -1,7 +1,6 @@
 package org.telegrise.telegrise.starter;
 
 import lombok.Setter;
-import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -9,7 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.DependsOn;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.core.ResourceInjector;
@@ -28,22 +27,11 @@ public class TelegRiseStarterConfiguration {
         if (transcription == null || !(new File(transcription).exists()))
             throw new TelegRiseRuntimeException("No transcription file specified or file doesn't exists. Please, add 'telegrise.transcription'" +
                     " to the application properties with a valid path to the transcription file.");
-        return new TelegRiseApplication(new File(transcription), this.getApplicationClass(context));
-    }
 
-    @Bean
-    public ApplicationRunner telegRiseRunner(ConfigurableApplicationContext context, TelegRiseApplication app){
-        return args -> {
-            context.getBeansOfType(Service.class).values().forEach(app::addService);
-            context.getBeansOfType(SessionInitializer.class).values().stream().findFirst().ifPresent(app::setSessionInitializer);
-            context.getBeansOfType(RoleProvider.class).values().stream().findFirst().ifPresent(app::setRoleProvider);
-            context.getBeansOfType(TelegRiseExecutorService.class).values().stream().findFirst()
-                    .ifPresent(e -> app.setExecutorService(() -> e));
+        var app = new TelegRiseApplication(new File(transcription), this.getApplicationClass(context));
 
-            ResourceInjector.setInstanceInitializer(context::getBean);
-
-            app.start();
-        };
+        app.preload();
+        return app;
     }
 
     private Class<?> getApplicationClass(ApplicationContext context) {
@@ -53,42 +41,39 @@ public class TelegRiseStarterConfiguration {
     }
 
     @Bean
-    public TelegRiseBeanRegistry beanRegistry(TelegRiseApplication app){
-        return new TelegRiseBeanRegistry(app);
+    public ApplicationRunner telegRiseRunner(TelegRiseApplication app, ApplicationContext context, TelegRiseSessionContextProvider contextProvider){
+        context.getBeansOfType(Service.class).values().forEach(app::addService);
+        context.getBeansOfType(SessionInitializer.class).values().stream().findFirst().ifPresent(app::setSessionInitializer);
+        context.getBeansOfType(RoleProvider.class).values().stream().findFirst().ifPresent(app::setRoleProvider);
+        context.getBeansOfType(TelegRiseExecutorService.class).values().stream().findFirst()
+                .ifPresent(e -> app.setExecutorService(() -> e));
+
+        ResourceInjector.setInstanceInitializer(contextProvider::getBean);
+
+        return args -> app.start();
     }
 
     @Bean
+    @DependsOn("telegRiseApplication")
     public TelegramClient telegramClient(TelegRiseApplication app){
-        return app.getResourceProvider().get(TelegramClient.class, null);
+        return app.getTelegramClient();
     }
 
     @Bean
-    @Scope("prototype")
-    public BotSender botSender(TelegRiseApplication app, InjectionPoint injectionPoint){
-        return app.getResourceProvider().get(BotSender.class, injectionPoint.getMember().getDeclaringClass());
+    @DependsOn("telegRiseApplication")
+    public BotSender botSender(TelegramClient client){
+        return new BotSender(client, null);
     }
 
     @Bean
-    @Scope("prototype")
-    public SessionsManager sessionsManager(TelegRiseApplication app, InjectionPoint injectionPoint){
-        return app.getResourceProvider().get(SessionsManager.class, injectionPoint.getMember().getDeclaringClass() );
+    @DependsOn("telegRiseApplication")
+    public SessionsManager sessionsManager(TelegRiseApplication app){
+        return app.getSessionManager();
     }
 
     @Bean
-    @Scope("prototype")
-    public SessionMemory sessionMemory(TelegRiseApplication app, InjectionPoint injectionPoint){
-        return app.getResourceProvider().get(SessionMemory.class, injectionPoint.getMember().getDeclaringClass() );
-    }
-
-    @Bean
-    @Scope("prototype")
-    public TranscriptionManager transcriptionManager(TelegRiseApplication app, InjectionPoint injectionPoint){
-        return app.getResourceProvider().get(TranscriptionManager.class, injectionPoint.getMember().getDeclaringClass() );
-    }
-
-    @Bean
-    @Scope("prototype")
-    public MediaCollector mediaCollector(TelegRiseApplication app, InjectionPoint injectionPoint){
-        return app.getResourceProvider().get(MediaCollector.class, injectionPoint.getMember().getDeclaringClass() );
+    @DependsOn("telegRiseApplication")
+    public TranscriptionManager transcriptionManager(TelegRiseApplication app){
+        return app.getSessionManager().getTranscriptionManager();
     }
 }
