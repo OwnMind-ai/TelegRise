@@ -4,13 +4,11 @@
 <bot token='#env("BOT_TOKEN")' autoCommands="true" interruptions="true" sessionType="user">
     <head>
         <link src="*"/>
+        <roles>
+            <role name="admin" level="100" onDeniedTree="DeniedTree"/>
+            <role name="user" level="0" onDeniedTree="DeniedTree"/>
+        </roles>
     </head>
-
-    <roles>
-        <role name="admin" level="100" onDeniedTree="DeniedTree"/>
-        <role name="user" level="0" onDeniedTree="DeniedTree"/>
-    </roles>
-
     <root>
         <tree name="StartTree" command="start" description="Start test bot" controller="StartController" accessLevel="0">
             <send disablePreview="true">

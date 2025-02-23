@@ -15,7 +15,6 @@ import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
 import org.telegrise.telegrise.core.elements.head.HeadBlock;
 import org.telegrise.telegrise.core.elements.security.Role;
-import org.telegrise.telegrise.core.elements.security.Roles;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
@@ -89,14 +88,11 @@ public final class BotTranscription extends NodeElement {
     @Attribute(name = "throttlingTime")  // ms
     private Integer throttlingTime;
 
-    @InnerElement(priority = 10)
+    @InnerElement(priority = 10, nullable = false)
     private HeadBlock head;
 
     @InnerElement(nullable = false)
     private Root root;
-
-    @InnerElement(priority = -1)
-    private Roles roles;
 
     private TranscriptionMemory memory;
     @Getter
@@ -126,17 +122,17 @@ public final class BotTranscription extends NodeElement {
         if(!List.of(SessionIdentifier.SESSION_CHAT, SessionIdentifier.SESSION_USER).contains(sessionType))
             throw new TranscriptionParsingException("Invalid session type, must be 'chat' or 'user'", node);
 
-        if (roles != null){
+        if (head.getRoles() != null){
             this.roleMap = new HashMap<>();
-            for (Role role : roles.getRoles())
+            for (Role role : head.getRoles().getRoles())
                 roleMap.put(role.getName(), UserRole.ofRole(role));
         }
     }
 
     @Override
     public void validate(TranscriptionMemory memory) {
-        if (roles != null)
-            roles.getRoles().stream()
+        if (head.getRoles() != null)
+            head.getRoles().getRoles().stream()
                     .peek(r -> {
                         if (r.getOnDeniedTree() != null && (!memory.containsKey(r.getOnDeniedTree()) || !(memory.get(r.getOnDeniedTree()) instanceof Tree)))
                             throw new TranscriptionParsingException("Role '" + r.getName() + "' refers to a non-existent tree '" + r.getOnDeniedTree() + "' in attribute 'onDeniedTree'", r.getElementNode());

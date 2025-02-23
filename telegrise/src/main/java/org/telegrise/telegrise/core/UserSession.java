@@ -255,7 +255,7 @@ public class UserSession implements Runnable{
 
     private boolean checkForTreeAccessibility(Tree tree, Update update){
         UserRole role = sessionMemory.getUserRole();
-        if (role == null) return false;
+        if (role == null) return true;
 
         if (tree.getAccessLevel() != null && role.level() != null && role.level() >= tree.getAccessLevel())
             return true;

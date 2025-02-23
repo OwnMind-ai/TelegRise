@@ -5,6 +5,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegrise.telegrise.SessionMemory;
+import org.telegrise.telegrise.annotations.HiddenParameter;
 import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.annotations.ReferenceGenerator;
 import org.telegrise.telegrise.annotations.TreeController;
@@ -33,6 +35,16 @@ public class DefaultController {  //TODO consider making Update a @HiddenParamet
 
     @Reference
     public void ignore(){}
+
+    /**
+     * Compares user's role with provided string
+     * @param roleName name of the role
+     * @return true if roles match
+     */
+    @Reference
+    public boolean userRole(String roleName, @HiddenParameter SessionMemory memory){
+        return memory.getUserRole() != null && memory.getUserRole().name().equals(roleName);
+    }
 
     /**
      * Concatenates an array of strings or array of object's {@code ::toString}.

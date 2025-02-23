@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.elements.security.Roles;
 import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 
@@ -36,4 +37,7 @@ public class HeadBlock extends NodeElement {
 
     @InnerElement
     private TelegramUrl telegramUrl;
+
+    @InnerElement(priority = -1)
+    private Roles roles;
 }
