@@ -1,0 +1,3 @@
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+  org.telegrise.telegrise.starter.TelegRiseRuntimeExceptionAnalyzer,\
+  org.telegrise.telegrise.starter.TranscriptionExceptionAnalyzer
