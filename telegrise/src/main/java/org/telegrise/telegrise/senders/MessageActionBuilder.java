@@ -62,11 +62,10 @@ public class MessageActionBuilder {          //TODO add media support
         this.replyToMessageId = message.getMessageId();
     }
 
-    MessageActionBuilder(BotSender sender, String chatId, Integer messageId, SessionMemoryImpl memoryImpl) {
+    MessageActionBuilder(BotSender sender, String chatId, SessionMemoryImpl memoryImpl) {
         this.sender = sender.getClient();
 
         this.chatId = chatId;
-        this.replyToMessageId = messageId;
     }
 
     /**

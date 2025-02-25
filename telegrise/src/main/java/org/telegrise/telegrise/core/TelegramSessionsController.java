@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
-import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,7 +14,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.elements.BotTranscription;
-import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
@@ -45,6 +43,7 @@ public class TelegramSessionsController implements SessionsManager {
     private UpdateHandlersController handlersController;
     @Getter
     private TranscriptionManager transcriptionManager;
+    private User botUser;
 
     public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends UpdateHandler>> handlersClasses) {
         this.transcription = transcription;
@@ -53,7 +52,7 @@ public class TelegramSessionsController implements SessionsManager {
         this.userHandlersClasses = handlersClasses;
     }
 
-    public void initialize(){
+    public void initialize() {
         assert client != null;
 
         this.resourceFactories.add(ResourceFactory.ofInstance(this, SessionsManager.class));
@@ -62,20 +61,22 @@ public class TelegramSessionsController implements SessionsManager {
         this.userHandlersClasses = splitHandlers.get(false);
 
         BotSender botSender = new BotSender(client, null);
-        this.transcriptionManager =  new TranscriptionManager(null, null,
+        this.transcriptionManager = new TranscriptionManager(null, null,
                 null, null, transcription, this::getTranscriptionManager,
                 u -> new ResourcePool(u, null, botSender, null));
 
         this.handlersController = new UpdateHandlersController(new ResourceInjector(resourceFactories, client, botSender, this.transcriptionManager));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
-        if(this.transcription.getRoot().getChatTypes() == null)
+        if (this.transcription.getRoot().getChatTypes() == null)
             this.transcription.getRoot().setChatTypes(new String[]{ChatTypes.ALL});
 
         if (Boolean.parseBoolean(this.transcription.getAutoCommands())) {
             try {
                 this.client.execute(new DeleteMyCommands());
-            } catch (TelegramApiException e) { throw new RuntimeException(e); }
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
 
             ChatTypes.GENERAL_SCOPES_LIST.forEach(l -> {
                 SetMyCommands setMyCommands = this.transcription.getSetCommands(l);
@@ -89,12 +90,10 @@ public class TelegramSessionsController implements SessionsManager {
             });
         }
 
-        if (transcription.getUsername() == null){
-            try {
-                transcription.setUsername(GeneratedValue.ofValue(botSender.execute(new GetMe()).getUserName()));
-            } catch (TelegramApiException e) {
-                throw new TelegRiseRuntimeException("Bot username wasn't specified and the attempt of getting one caused TelegramApiException: " + e.getMessage());
-            }
+        try {
+            botUser = botSender.getMe();
+        } catch (TelegramApiException e) {
+            throw new TelegRiseRuntimeException("Attempt of getting bot's User caused TelegramApiException: " + e.getMessage());
         }
     }
 
@@ -146,7 +145,7 @@ public class TelegramSessionsController implements SessionsManager {
 
     @Override
     public void createSession(SessionIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
+        UserSession session = new UserSession(identifier, this.transcription, botUser, this.client, this::getTranscriptionManager);
         this.sessions.put(identifier, session);  // This MUST happen before session#addHandlersClasses
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);

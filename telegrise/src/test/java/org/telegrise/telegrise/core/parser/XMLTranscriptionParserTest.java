@@ -117,8 +117,7 @@ public class XMLTranscriptionParserTest {
         expectedRoot.setTrees(List.of(expectedTree));
 
         BotTranscription transcription = new BotTranscription();
-        transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml")), null, null, null, null, null, null));
-        transcription.setUsername(GeneratedValue.ofValue("bot"));
+        transcription.setHead(new HeadBlock(List.of(new Link("test/keyboards.xml")), null, null, null, null, null));
         transcription.setToken(GeneratedValue.ofValue("token"));
         transcription.setSessionType("chat");
         transcription.setRoot(expectedRoot);

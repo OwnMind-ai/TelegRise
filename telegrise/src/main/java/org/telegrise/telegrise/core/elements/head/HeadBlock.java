@@ -27,9 +27,6 @@ public class HeadBlock extends NodeElement {
     private Token token;
 
     @InnerElement
-    private Username username;
-
-    @InnerElement
     private SessionType sessionType;
 
     @InnerElement

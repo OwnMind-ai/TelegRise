@@ -75,11 +75,11 @@ public class BotSender {
     }
 
     public MessageActionBuilder of(String chatId){
-        return new MessageActionBuilder(this, chatId, null, memory);
+        return new MessageActionBuilder(this, chatId, memory);
     }
 
     public MessageActionBuilder of(long chatId){
-        return new MessageActionBuilder(this, Long.toString(chatId), null, memory);
+        return new MessageActionBuilder(this, Long.toString(chatId), memory);
     }
 
     public MessageActionBuilder of(Message message){

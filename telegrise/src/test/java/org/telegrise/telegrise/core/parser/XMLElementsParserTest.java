@@ -3,6 +3,7 @@ package org.telegrise.telegrise.core.parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
@@ -191,7 +192,7 @@ public class XMLElementsParserTest {
                 new InlineKeyboardRow(InlineKeyboardButton.builder().text("URL").url("url").build())
         ));
 
-        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, null, Map.of()))));
+        assertEquals(expected, ((Keyboard) parser.parse(node)).createMarkup(new ResourcePool(null, null, null, new SessionMemoryImpl(0, null, new User(1L, "", true), Map.of()))));
     }
 
     @Test

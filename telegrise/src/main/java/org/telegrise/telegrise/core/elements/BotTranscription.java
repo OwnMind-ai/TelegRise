@@ -51,13 +51,6 @@ import java.util.stream.Collectors;
 @Getter @Setter @NoArgsConstructor
 public final class BotTranscription extends NodeElement {
     /**
-     * Username of this bot.
-     * If not provided, the application will make an API call to retrieve this information automatically.
-     */
-    @Attribute(name = "username")
-    private GeneratedValue<String> username;
-
-    /**
      * Token of this bot to make API calls
      */
     @Attribute(name = "token")
@@ -103,18 +96,12 @@ public final class BotTranscription extends NodeElement {
         if (token != null && head.getToken() != null) 
             throw new TranscriptionParsingException("Conflicting configurations: 'token' in <bot> and <token> in <head>", node);
 
-        if (username != null && head.getUsername() != null) 
-            throw new TranscriptionParsingException("Conflicting configurations: 'username' in <bot> and <username> in <head>", node);
-
         if (token == null) {
             if (head.getToken() == null)
                 throw new TranscriptionParsingException("No bot token was specified. Include 'token' attribute to the <bot> element or add <token>your token</token> in the <head> element", node);
 
             token = head.getToken().getToken();
         }
-
-        if (username == null && head.getUsername() != null) 
-            username = head.getUsername().getUsername();
 
         if (sessionType == null)
             sessionType = head.getSessionType() != null ? head.getSessionType().getType() : SessionIdentifier.SESSION_CHAT;

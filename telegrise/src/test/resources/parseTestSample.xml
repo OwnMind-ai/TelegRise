@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <?import org.telegrise.telegrise.core.parser.XMLTranscriptionParserTest ?>
-<bot username="bot" token="token">
+<bot token="token">
     <head>
         <link src="test/keyboards.xml"/>
     </head>
