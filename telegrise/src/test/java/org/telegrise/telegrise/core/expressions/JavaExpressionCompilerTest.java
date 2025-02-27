@@ -22,7 +22,7 @@ public class JavaExpressionCompilerTest {
         JavaExpressionCompiler parser = new JavaExpressionCompiler(JavaExpressionCompiler.getTempDirectory());
         String expression = "controller.getData(update.getCallbackQuery(), \" and done\")";
         LocalNamespace namespace = new LocalNamespace(this.getClass(), new ApplicationNamespace(this.getClass().getClassLoader(),""));
-        ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null);
+        ResourcePool resourcePool = new ResourcePool(new Update(), this, null, null, null);
         resourcePool.getUpdate().setCallbackQuery(new CallbackQuery("", null, null, "", "data", "", ""));
 
         assertEquals("data and done", parser.compile(expression, namespace, String.class, toNode("<tag expression='${" + expression + "}'/>")).generate(resourcePool));

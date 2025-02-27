@@ -197,7 +197,7 @@ public class Tree extends NodeElement implements org.telegrise.telegrise.transcr
         boolean isUserChat = Objects.requireNonNull(chat).isUserChat();
 
         //TODO Add an option to allow/restrict anon commands in groups (disable 'command.username() == null' bellow)
-        if (command != null && (isUserChat || command.username() == null || pool.getMemory().getBotUsername().equals(command.username())))
+        if (command != null && (isUserChat || command.username() == null || pool.getBotUser().getUsername().equals(command.username())))
             return Arrays.stream(this.commands)
                     .anyMatch(c -> c.equals(command.name()));
 

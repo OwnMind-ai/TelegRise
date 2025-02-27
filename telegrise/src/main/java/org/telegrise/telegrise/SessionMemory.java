@@ -143,8 +143,6 @@ public interface SessionMemory {
 
     @Nullable Message getLastSentMessage();
 
-    String getBotUsername();
-    Long getBotId();
     SessionIdentifier getSessionIdentifier();
     default long getUserId() { return getSessionIdentifier().getUserId(); }
     default long getChatId() { return getSessionIdentifier().getChatId(); }

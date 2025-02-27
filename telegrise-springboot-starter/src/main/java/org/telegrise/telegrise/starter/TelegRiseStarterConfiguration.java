@@ -3,6 +3,7 @@ package org.telegrise.telegrise.starter;
 import lombok.Setter;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -14,12 +15,14 @@ import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.core.ResourceInjector;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.BotUser;
 
 import java.io.File;
 
 @Setter
 @Configuration
 @ComponentScan
+@EnableConfigurationProperties(TelegRiseProperties.class)
 public class TelegRiseStarterConfiguration {
     @Bean
     public TelegRiseApplication telegRiseApplication(ConfigurableApplicationContext context) {
@@ -69,6 +72,12 @@ public class TelegRiseStarterConfiguration {
     @DependsOn("telegRiseApplication")
     public SessionsManager sessionsManager(TelegRiseApplication app){
         return app.getSessionManager();
+    }
+
+    @Bean
+    @DependsOn("telegRiseApplication")
+    public BotUser botUser(TelegRiseApplication app){
+        return app.getBotUser();
     }
 
     @Bean

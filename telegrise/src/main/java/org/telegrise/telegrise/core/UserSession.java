@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.MediaCollector;
@@ -20,6 +19,7 @@ import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.BotUser;
 import org.telegrise.telegrise.types.UserRole;
 import org.telegrise.telegrise.utils.MessageUtils;
 
@@ -53,9 +53,9 @@ public class UserSession implements Runnable{
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, User me, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter) {
+    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter) {
         this.userIdentifier.set(sessionIdentifier);
-        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, me, transcription.getRoleMap());
+        this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getRoleMap());
         this.transcription = transcription;
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
@@ -371,6 +371,7 @@ public class UserSession implements Runnable{
                 this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getControllerInstance(),
                 this.sender,
                 this.sessionMemory,
+                resourceInjector.get(BotUser.class, null),  //FIXME
                 this.treeExecutors.peekLast(),
                 this.updatesQueue
         );

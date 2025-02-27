@@ -31,6 +31,6 @@ public final class Expression<T> {
             throw new IllegalArgumentException("Controller must be annotated as tree controller'");
 
         var actualMemory = memory == null ? null : (SessionMemoryImpl) memory;
-        return value.generate(new ResourcePool(update, controller, sender, actualMemory));
+        return value.generate(new ResourcePool(update, controller, sender, actualMemory, null));
     }
 }

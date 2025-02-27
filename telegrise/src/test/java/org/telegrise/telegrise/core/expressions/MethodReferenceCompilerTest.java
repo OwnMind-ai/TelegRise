@@ -1,7 +1,6 @@
 package org.telegrise.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegrise.telegrise.SessionIdentifier;
 import org.telegrise.telegrise.SessionMemory;
 import org.telegrise.telegrise.annotations.HiddenParameter;
@@ -33,7 +32,7 @@ public class MethodReferenceCompilerTest {
         MethodReferenceCompiler compiler = new MethodReferenceCompiler();
         LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader(),""));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
-        ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), new User(1L, "", true), Map.of()));
+        ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), Map.of()), null);
         Node node = toNode("<tag/>");
 
         Parser parser = new Parser(new Lexer(new CharsStream("\"value\"")));

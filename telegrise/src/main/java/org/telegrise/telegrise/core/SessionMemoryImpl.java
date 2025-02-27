@@ -3,7 +3,6 @@ package org.telegrise.telegrise.core;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegrise.telegrise.SessionIdentifier;
 import org.telegrise.telegrise.SessionMemory;
@@ -37,10 +36,6 @@ public class SessionMemoryImpl implements SessionMemory {
     private final Deque<BranchingElement> branchingElements = new ConcurrentLinkedDeque<>();
     @Getter
     private final Deque<JumpPoint> jumpPoints = new ConcurrentLinkedDeque<>();
-    @Getter
-    private final String botUsername;
-    @Getter
-    private final Long botId;
     private transient final Map<String, UserRole> roleMap;
 
     @Getter
@@ -56,11 +51,9 @@ public class SessionMemoryImpl implements SessionMemory {
     @Getter @Setter
     private Message lastSentMessage;
 
-    public SessionMemoryImpl(int transcriptionHashcode, SessionIdentifier sessionIdentifier, User botUser, Map<String, UserRole> roleMap) {
+    public SessionMemoryImpl(int transcriptionHashcode, SessionIdentifier sessionIdentifier, Map<String, UserRole> roleMap) {
         this.transcriptionHashcode = transcriptionHashcode;
         this.sessionIdentifier = sessionIdentifier;
-        this.botUsername = botUser.getUserName();
-        this.botId = botUser.getId();
         this.roleMap = roleMap;
     }
 

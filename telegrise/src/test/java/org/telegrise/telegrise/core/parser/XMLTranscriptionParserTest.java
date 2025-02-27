@@ -122,7 +122,7 @@ public class XMLTranscriptionParserTest {
         transcription.setSessionType("chat");
         transcription.setRoot(expectedRoot);
 
-        assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null));
+        assertElements(transcription, this.transcription, new ResourcePool(update, this, null, null, null));
     }
 
     @Reference

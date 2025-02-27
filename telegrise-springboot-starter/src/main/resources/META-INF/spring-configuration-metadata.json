@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "telegrise.transcription",
+      "type": "java.lang.String",
+      "description": "Path to the main transcription file for the TelegRise application.",
+      "sourceType": "org.telegrise.telegrise.starter.TelegRiseProperties"
+    }
+  ]
+}

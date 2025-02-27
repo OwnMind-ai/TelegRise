@@ -17,6 +17,7 @@ import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.BotUser;
 import org.telegrise.telegrise.utils.ChatTypes;
 import org.telegrise.telegrise.utils.MessageUtils;
 
@@ -43,7 +44,8 @@ public class TelegramSessionsController implements SessionsManager {
     private UpdateHandlersController handlersController;
     @Getter
     private TranscriptionManager transcriptionManager;
-    private User botUser;
+    @Getter
+    private BotUser botUser;
 
     public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends UpdateHandler>> handlersClasses) {
         this.transcription = transcription;
@@ -63,9 +65,15 @@ public class TelegramSessionsController implements SessionsManager {
         BotSender botSender = new BotSender(client, null);
         this.transcriptionManager = new TranscriptionManager(null, null,
                 null, null, transcription, this::getTranscriptionManager,
-                u -> new ResourcePool(u, null, botSender, null));
+                u -> new ResourcePool(u, null, botSender, null, botUser));
 
-        this.handlersController = new UpdateHandlersController(new ResourceInjector(resourceFactories, client, botSender, this.transcriptionManager));
+        try {
+            botUser = new BotUser(botSender.getMe());
+        } catch (TelegramApiException e) {
+            throw new TelegRiseRuntimeException("Attempt of getting bot's User caused TelegramApiException: " + e.getMessage());
+        }
+
+        this.handlersController = new UpdateHandlersController(new ResourceInjector(resourceFactories, client, botSender, this.transcriptionManager, botUser));
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if (this.transcription.getRoot().getChatTypes() == null)
@@ -88,12 +96,6 @@ public class TelegramSessionsController implements SessionsManager {
                     throw new RuntimeException(e);
                 }
             });
-        }
-
-        try {
-            botUser = botSender.getMe();
-        } catch (TelegramApiException e) {
-            throw new TelegRiseRuntimeException("Attempt of getting bot's User caused TelegramApiException: " + e.getMessage());
         }
     }
 
@@ -145,10 +147,11 @@ public class TelegramSessionsController implements SessionsManager {
 
     @Override
     public void createSession(SessionIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, botUser, this.client, this::getTranscriptionManager);
+        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
         this.sessions.put(identifier, session);  // This MUST happen before session#addHandlersClasses
         session.setStandardLanguage(identifier.getLanguageCode());
         session.getResourceInjector().addFactories(resourceFactories);
+        session.getResourceInjector().addFactories(List.of(ResourceFactory.ofInstance(botUser, BotUser.class)));
         session.addHandlersClasses(this.userHandlersClasses);
 
         if (this.sessionInitializer != null)

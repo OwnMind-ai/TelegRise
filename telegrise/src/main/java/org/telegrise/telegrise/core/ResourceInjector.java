@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+//TODO refactor
+// Add parent injector and move 'resources' to factories
 public final class ResourceInjector {
     private static BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer = (c, i) -> {
         try {

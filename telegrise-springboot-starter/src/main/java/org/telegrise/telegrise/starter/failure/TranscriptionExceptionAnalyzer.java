@@ -1,4 +1,4 @@
-package org.telegrise.telegrise.starter;
+package org.telegrise.telegrise.starter.failure;
 
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;

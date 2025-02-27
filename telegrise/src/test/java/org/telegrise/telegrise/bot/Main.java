@@ -2,6 +2,7 @@ package org.telegrise.telegrise.bot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegrise.telegrise.TelegRiseApplication;
+import org.telegrise.telegrise.bot.services.InfoService;
 import org.telegrise.telegrise.bot.services.SleepyService;
 
 import java.io.File;
@@ -24,6 +25,7 @@ public class Main {
         });
 
         application.addService(new SleepyService());
+        application.addService(new InfoService());
 
         application.start();
     }

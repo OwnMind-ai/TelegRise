@@ -22,6 +22,7 @@ import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
+import org.telegrise.telegrise.types.BotUser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public final class TelegRiseApplication {
             preload();
 
         sessionsController.initialize();
-        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null));
+        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null), getBotUser());
 
         serviceManager.setInjector(resourceInjector);
 
@@ -163,5 +164,9 @@ public final class TelegRiseApplication {
 
     public TelegramClient getTelegramClient() {
         return client;
+    }
+
+    public BotUser getBotUser() {
+        return this.sessionsController.getBotUser();
     }
 }

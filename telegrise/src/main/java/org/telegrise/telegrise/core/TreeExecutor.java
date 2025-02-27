@@ -16,6 +16,7 @@ import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.senders.UniversalSender;
+import org.telegrise.telegrise.types.BotUser;
 import org.telegrise.telegrise.utils.MessageUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +32,7 @@ public final class TreeExecutor {
         if (tree.getController() != null)
             controller = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
 
-        return new TreeExecutor(memory, controller, tree, sender, updatesQueue);
+        return new TreeExecutor(memory, controller, tree, sender, updatesQueue, resourceInjector.get(BotUser.class, null));
     }
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){
@@ -94,22 +95,24 @@ public final class TreeExecutor {
     private boolean closed;
     @Getter
     private boolean naturallyClosed;
+    private final BotUser botUser;
 
     @Getter
     private Branch lastBranch;
 
-    public TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, BotSender sender, BlockingQueue<Update> updatesQueue) {
+    private TreeExecutor(SessionMemoryImpl memory, Object controllerInstance, Tree tree, BotSender sender, BlockingQueue<Update> updatesQueue, BotUser botUser) {
         this.memory = memory;
         this.controllerInstance = controllerInstance;
         this.tree = tree;
         this.sender = sender;
         this.updatesQueue = updatesQueue;
+        this.botUser = botUser;
     }
 
     public boolean update(Update update){
         this.closed = false;
         List<Branch> nextBranches = currentBranch != null ? currentBranch.getBranches() : tree.getBranches();
-        ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, this, updatesQueue);
+        ResourcePool resourcePool = new ResourcePool(update, controllerInstance, this.sender, this.memory, botUser, this, updatesQueue);
 
         Branch previous = this.currentBranch;
         this.currentBranch = this.getNextBranch(nextBranches, resourcePool);
