@@ -49,6 +49,7 @@ public class Texts extends NodeElement implements LinkableElement {
 
     @Override
     public LocalNamespace createNamespace(ApplicationNamespace global) {
+        if (parentTree != null) return null;
         if (context == null) return global.emptyLocal();
 
         Class<?> controller = global.getClass(context);

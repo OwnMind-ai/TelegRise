@@ -46,9 +46,10 @@ public class Flip extends ActionElement{
 
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
-        KeyboardState state = resourcePool.getMemory().getKeyboardState(keyboard.generate(resourcePool), parentTree);
+        String keyboardName = keyboard.generate(resourcePool);
+        KeyboardState state = resourcePool.getMemory().getKeyboardState(keyboardName, parentTree);
         if (state == null) 
-            throw new TelegRiseRuntimeException("Keyboard '" + keyboard + "' doesn't exist in current scope", node);
+            throw new TelegRiseRuntimeException("Keyboard '" + keyboardName + "' doesn't exist in current scope", node);
             
         String name = switchName.generate(resourcePool);
 
