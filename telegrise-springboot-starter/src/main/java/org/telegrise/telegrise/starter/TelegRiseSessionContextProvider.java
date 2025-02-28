@@ -8,6 +8,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegrise.telegrise.MediaCollector;
 import org.telegrise.telegrise.SessionIdentifier;
@@ -33,7 +34,7 @@ public class TelegRiseSessionContextProvider {
         try {
             return applicationContext.getBean(beanType.getName());
         } catch (NoSuchBeanDefinitionException e){
-            if (!(applicationContext instanceof AnnotationConfigApplicationContext context))
+            if (!(applicationContext instanceof GenericApplicationContext context))  //FIXME
                 throw e;
 
             var definition = new GenericBeanDefinition();

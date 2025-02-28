@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.application.ApplicationRunner;
@@ -76,6 +78,12 @@ public final class TelegRiseApplication {
 
         client = sessionsController.getTranscription().produceClient();
         sessionsController.setClient(client);
+
+        try {
+            sessionsController.setBotUser(new BotUser(client.execute(new GetMe())));
+        } catch (TelegramApiException e) {
+            throw new TelegRiseRuntimeException("Attempt of getting bot's User caused TelegramApiException: " + e.getMessage());
+        }
     }
 
     public void start(){
