@@ -27,9 +27,7 @@ class ResourceInjectorTest {
             }
 
             @Override
-            public Character getResource(Class<?> target) {
-                return '1';
-            }
+            public Character getResource() { return '1'; }
         }));
 
         CorrectInjectionExample obj = new CorrectInjectionExample();

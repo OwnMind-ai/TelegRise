@@ -7,6 +7,7 @@ import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.SessionMemoryImpl;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.senders.BotSender;
 
 @ApiStatus.Experimental
@@ -27,7 +28,7 @@ public final class Expression<T> {
     }
 
     public T get(@Nullable Update update, @Nullable Object controller, @Nullable BotSender sender, @Nullable SessionMemory memory) {
-        if (controller != null && !controller.getClass().isAnnotationPresent(TreeController.class))
+        if (controller != null && !ReflectionUtils.hasAnnotation(controller, TreeController.class))
             throw new IllegalArgumentException("Controller must be annotated as tree controller'");
 
         var actualMemory = memory == null ? null : (SessionMemoryImpl) memory;

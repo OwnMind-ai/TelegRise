@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegrise.telegrise.UpdateHandler;
 import org.telegrise.telegrise.annotations.Handler;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,16 +23,16 @@ public class UpdateHandlersController {
 
     public Optional<UpdateHandler> getApplicableHandler(Update update){
         return this.handlers.stream()
-                .filter(h -> !h.getClass().getAnnotation(Handler.class).afterTrees())
-                .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
+                .filter(h -> !ReflectionUtils.annotation(h, Handler.class).afterTrees())
+                .sorted(Comparator.comparingInt(h -> -ReflectionUtils.annotation(h, Handler.class).priority()))
                 .filter(h -> h.canHandle(update))
                 .findFirst();
     }
 
     public Optional<UpdateHandler> getApplicableAfterTreesHandler(Update update){
         return this.handlers.stream()
-                .filter(h -> h.getClass().getAnnotation(Handler.class).afterTrees())
-                .sorted(Comparator.comparingInt(h -> -h.getClass().getAnnotation(Handler.class).priority()))
+                .filter(h -> ReflectionUtils.annotation(h, Handler.class).afterTrees())
+                .sorted(Comparator.comparingInt(h -> -ReflectionUtils.annotation(h, Handler.class).priority()))
                 .filter(h -> h.canHandle(update))
                 .findFirst();
     }
@@ -43,9 +44,8 @@ public class UpdateHandlersController {
             handler.onException(e);
         }
 
-        if (handler.getClass().isAnnotationPresent(Handler.class)){
-            Handler annotation = handler.getClass().getAnnotation(Handler.class);
-
+        if (ReflectionUtils.hasAnnotation(handler, Handler.class)){
+            Handler annotation = ReflectionUtils.annotation(handler, Handler.class);
             return annotation.absolute();
         }
 

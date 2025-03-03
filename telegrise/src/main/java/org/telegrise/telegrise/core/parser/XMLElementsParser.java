@@ -157,7 +157,7 @@ public class XMLElementsParser {
 
     private void finishElement(NodeElement instance) {
         // ORDER MATTERS:
-        if(instance.getClass().getAnnotation(Element.class).finishAfterParsing())
+        if(ReflectionUtils.annotation(instance, Element.class).finishAfterParsing())
             this.transcriptionMemory.getPendingFinalization().add(instance);
         else {
             instance.validate(transcriptionMemory, namespace.getApplicationNamespace());

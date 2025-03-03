@@ -44,7 +44,6 @@ public final class TranscriptionManager {
     private final SessionMemoryImpl sessionMemory;
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
-    private final Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter;
     private final BotTranscription transcription;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
@@ -54,14 +53,23 @@ public final class TranscriptionManager {
                                 SessionMemoryImpl sessionMemory,
                                 TransitionController transitionController,
                                 BotTranscription transcription,
-                                Function<SessionIdentifier, TranscriptionManager> transcriptionManagerGetter,
                                 Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
-        this.transcriptionManagerGetter = transcriptionManagerGetter;
         this.resourcePoolProducer = resourcePoolProducer;
         this.elementExecutor = elementExecutor;
+        this.transcriptionMemory = transcription.getMemory();
+        this.transcription = transcription;
+    }
+
+    @ApiStatus.Internal
+    public TranscriptionManager(BotTranscription transcription, Function<Update, ResourcePool> resourcePoolProducer) {
+        this.interruptor = null;
+        this.sessionMemory = null;
+        this.transitionController = null;
+        this.resourcePoolProducer = resourcePoolProducer;
+        this.elementExecutor = null;
         this.transcriptionMemory = transcription.getMemory();
         this.transcription = transcription;
     }
@@ -96,16 +104,6 @@ public final class TranscriptionManager {
                     c.clear();
                     return res;
                 }).findFirst().orElse(null);
-    }
-
-    /**
-     * Retrieves transcription manager of foreign session with specified identifier.
-     * This method is useful for cross-user tree's operations.
-     * @param sessionIdentifier identifier of foreign session
-     * @return their transcription manager or null if it does not exist
-     */
-    public TranscriptionManager getTranscriptionManager(SessionIdentifier sessionIdentifier){
-        return this.transcriptionManagerGetter.apply(sessionIdentifier);
     }
 
     /**

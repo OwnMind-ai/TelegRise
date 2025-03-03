@@ -21,17 +21,13 @@ public interface ResourceFactory<T> {
      * @return resource factory
      * @param <U> type of the resource
      */
-    static <U> ResourceFactory<U> ofInstance(U instance, Class<U> uClass){
+    static <U> ResourceFactory<U> ofInstance(U instance, Class<? extends U> uClass){
         return new ResourceFactory<>() {
             @Override
-            public @NotNull Class<U> getResourceClass() {
-                return uClass;
-            }
+            public @NotNull Class<? extends U> getResourceClass() { return uClass; }
 
             @Override
-            public U getResource(Class<?> target) {
-                return instance;
-            }
+            public U getResource() { return instance; }
         };
     }
 
@@ -40,7 +36,7 @@ public interface ResourceFactory<T> {
      *
      * @return type of the produced resource
      */
-    @NotNull Class<T> getResourceClass();
+    @NotNull Class<? extends T> getResourceClass();
 
     /**
      * Produces resource of the type {@code T} that will be injected to a class field
@@ -48,8 +44,7 @@ public interface ResourceFactory<T> {
      * This method is called every time an injection is required.
      * Ideally, this method should be <i>pure</i>, but that is up to implementation and its use case.
      *
-     * @param injectionPoint A class of the object that this resource being injected to (controller, handler, service, etc.)
      * @return An instance to be injected
      */
-    T getResource(Class<?> injectionPoint);
+    T getResource();
 }

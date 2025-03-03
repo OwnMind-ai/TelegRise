@@ -10,6 +10,7 @@ import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.core.parser.XMLElementsParser;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.core.utils.XMLUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
@@ -72,7 +73,7 @@ public class Link extends NodeElement {
             NodeElement result = parser.parse(document.getDocumentElement());
 
             if (!(result instanceof LinkableElement linkableElement))
-                throw new TranscriptionParsingException("Unable to link element '" + result.getClass().getAnnotation(Element.class).name() + "' in '" + source + "'", node);
+                throw new TranscriptionParsingException("Unable to link element '" + ReflectionUtils.annotation(result, Element.class).name() + "' in '" + source + "'", node);
 
             if (linkableElement.afterParsedTask() != null)
                 memory.getTasks().add(linkableElement.afterParsedTask());

@@ -7,6 +7,7 @@ import org.telegrise.telegrise.core.elements.Branch;
 import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.NamedElement;
 import org.telegrise.telegrise.core.elements.base.NodeElement;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public final class TranscriptionMemory implements Serializable {
 
         if (!tClass.isAssignableFrom(result.getClass()))
             throw new TelegRiseRuntimeException(String.format("Element '%s' represents the <%s> tag, required: %s",
-                    name, result.getClass().getAnnotation(Element.class).name(),
+                    name, ReflectionUtils.annotation(result, Element.class).name(),
                     possibleTags.stream().map(s -> "<" + s + ">").collect(Collectors.joining(" or "))
             ));
 

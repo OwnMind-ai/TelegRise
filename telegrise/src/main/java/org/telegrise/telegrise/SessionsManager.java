@@ -36,7 +36,7 @@ public interface SessionsManager {
      * Creates to session based on specified identifier without the need of actual interaction with the user.
      * @param identifier credentials of the session
      */
-    void createSession(SessionIdentifier identifier);
+    void createSession(SessionIdentifier identifier, @Nullable String languageCode);
 
     /**
      * Forces session to be recreated with a blank state.
@@ -59,8 +59,14 @@ public interface SessionsManager {
 
     /**
      * Returns a transcription manager for this bot.
-     * Returned transcription manager is not attached to a session and all session-related method will fail
+     * Returned transcription manager is not attached to a session and all session-related methods will fail
      * @return transcription manager
      */
     TranscriptionManager getTranscriptionManager();
+
+    /**
+     * Returns a transcription manager for a specified user.
+     * @return transcription manager
+     */
+    TranscriptionManager getTranscriptionManager(SessionIdentifier identifier);
 }

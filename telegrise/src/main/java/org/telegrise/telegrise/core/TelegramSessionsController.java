@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.elements.BotTranscription;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
@@ -46,6 +47,8 @@ public class TelegramSessionsController implements SessionsManager {
     private TranscriptionManager transcriptionManager;
     @Getter @Setter
     private BotUser botUser;
+    @Setter
+    private ResourceInjector mainInjector;
 
     public TelegramSessionsController(BotTranscription transcription, List<ResourceFactory<?>> resourceFactories, List<Class<? extends UpdateHandler>> handlersClasses) {
         this.transcription = transcription;
@@ -56,6 +59,7 @@ public class TelegramSessionsController implements SessionsManager {
 
     public void initialize() {
         assert client != null;
+        assert mainInjector != null;
 
         this.resourceFactories.add(ResourceFactory.ofInstance(this, SessionsManager.class));
         var splitHandlers = userHandlersClasses.stream()
@@ -63,11 +67,9 @@ public class TelegramSessionsController implements SessionsManager {
         this.userHandlersClasses = splitHandlers.get(false);
 
         BotSender botSender = new BotSender(client, null);
-        this.transcriptionManager = new TranscriptionManager(null, null,
-                null, null, transcription, this::getTranscriptionManager,
-                u -> new ResourcePool(u, null, botSender, null, botUser));
+        this.transcriptionManager = new TranscriptionManager(transcription, u -> new ResourcePool(u, null, botSender, null, botUser));
 
-        this.handlersController = new UpdateHandlersController(new ResourceInjector(resourceFactories, client, botSender, this.transcriptionManager, botUser));
+        this.handlersController = new UpdateHandlersController(mainInjector);
         splitHandlers.get(true).forEach(this.handlersController::add);
 
         if (this.transcription.getRoot().getChatTypes() == null)
@@ -94,7 +96,7 @@ public class TelegramSessionsController implements SessionsManager {
     }
 
     public void initializeSessions() {
-        this.sessionInitializer.getInitializionList().forEach(this::createSession);
+        this.sessionInitializer.getInitializionList().forEach(identifier -> createSession(identifier, null));
     }
 
     public void onUpdateReceived(Update update){
@@ -102,7 +104,7 @@ public class TelegramSessionsController implements SessionsManager {
         Optional<UpdateHandler> candidate = this.handlersController.getApplicableHandler(update);
         if (candidate.isPresent()){
             this.handlersController.applyHandler(update, candidate.get());
-            if (candidate.get().getClass().getAnnotation(Handler.class).absolute())
+            if (ReflectionUtils.annotation(candidate, Handler.class).absolute())
                 return;
         }
 
@@ -118,10 +120,17 @@ public class TelegramSessionsController implements SessionsManager {
                 throw new IllegalStateException(transcription.getSessionType());
 
             if (!sessions.containsKey(identifier))
-                this.createSession(identifier);
+                this.createSession(identifier, from.getLanguageCode());
 
             this.updateSession(this.sessions.get(identifier), update);
         }
+    }
+
+    private void updateSession(UserSession session, Update update){
+        session.update(update);
+
+        if (!session.isRunning())
+            session.run();
     }
 
     @Override
@@ -134,18 +143,17 @@ public class TelegramSessionsController implements SessionsManager {
             return;
         }
 
-        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client, this::getTranscriptionManager);
+        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client);
 
         this.sessions.put(sessionMemory.getSessionIdentifier(), session);
     }
 
     @Override
-    public void createSession(SessionIdentifier identifier) {
-        UserSession session = new UserSession(identifier, this.transcription, this.client, this::getTranscriptionManager);
+    public void createSession(SessionIdentifier identifier, @Nullable String languageCode) {
+        UserSession session = new UserSession(identifier, this.transcription, this.client);
         this.sessions.put(identifier, session);  // This MUST happen before session#addHandlersClasses
-        session.setStandardLanguage(identifier.getLanguageCode());
-        session.getResourceInjector().addFactories(resourceFactories);
-        session.getResourceInjector().addFactories(List.of(ResourceFactory.ofInstance(botUser, BotUser.class)));
+        session.setStandardLanguage(languageCode);
+        session.getResourceInjector().setParent(mainInjector);
         session.addHandlersClasses(this.userHandlersClasses);
 
         if (this.sessionInitializer != null)
@@ -157,8 +165,8 @@ public class TelegramSessionsController implements SessionsManager {
 
     @Override
     public void reinitializeSession(SessionIdentifier sessionIdentifier) {
-        sessions.remove(sessionIdentifier);
-        createSession(sessionIdentifier);
+        var session = sessions.remove(sessionIdentifier);
+        createSession(sessionIdentifier, session.getSessionMemory().getLanguageCode());
     }
 
     @Override
@@ -171,13 +179,7 @@ public class TelegramSessionsController implements SessionsManager {
         return Optional.ofNullable(this.sessions.get(sessionIdentifier)).map(UserSession::getSessionMemory).orElse(null);
     }
 
-    private void updateSession(UserSession session, Update update){
-        session.update(update);
-
-        if (!session.isRunning())
-            session.run();
-    }
-
+    @Override
     public TranscriptionManager getTranscriptionManager(SessionIdentifier identifier){
         UserSession session = this.sessions.get(identifier);
         return session == null ? null : session.getTranscriptionManager();

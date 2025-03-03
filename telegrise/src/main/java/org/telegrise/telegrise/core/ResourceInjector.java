@@ -1,6 +1,6 @@
 package org.telegrise.telegrise.core;
 
-import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.telegrise.telegrise.annotations.Resource;
@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-//TODO refactor
-// Add parent injector and move 'resources' to factories
 public final class ResourceInjector {
     private static BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer = (c, i) -> {
         try {
@@ -36,21 +34,14 @@ public final class ResourceInjector {
         ResourceInjector.instanceInitializer = instanceInitializer;
     }
 
-    @Getter
     private final Map<String, ResourceFactory<?>> resourceFactoryMap = new HashMap<>();
-    private final List<Object> resources;
+    @Setter
+    private ResourceInjector parent;
+
+    public ResourceInjector() {}
 
     public ResourceInjector(Object... resources) {
-        this.resources = List.of(resources);
-    }
-
-    public ResourceInjector(List<ResourceFactory<?>> resourceFactories, Object... resources) {
-        this.resources = List.of(resources);
-        this.addFactories(resourceFactories);
-    }
-
-    public void addFactories(List<ResourceFactory<?>> resourceFactories) {
-        resourceFactories.forEach(f -> this.resourceFactoryMap.put(f.getResourceClass().getName(), f));
+        addResources(resources);
     }
 
     public void injectResources(Object target) {
@@ -59,7 +50,7 @@ public final class ResourceInjector {
             field.setAccessible(true);
 
             try {
-                Object resource = getResource(field.getType(), target.getClass());
+                Object resource = get(field.getType());
                 if (resource == null)
                     throw new TelegRiseRuntimeException("Unable to find resource '" + field.getType().getSimpleName() + "' in class '" + target.getClass().getSimpleName() + "'");
 
@@ -68,6 +59,19 @@ public final class ResourceInjector {
                 throw new TelegRiseRuntimeException(String.format("No access to the field %s in %s requiring injection", field.getName(), target.getClass().getName()));
             }
         }
+    }
+
+    public void addFactories(List<ResourceFactory<?>> resourceFactories) {
+        resourceFactories.forEach(this::addFactory);
+    }
+
+    public void addFactory(ResourceFactory<?> factory) {
+        this.resourceFactoryMap.put(factory.getResourceClass().getName(), factory);
+    }
+
+    public void addResources(Object... resources) {
+        for (Object resource : resources)
+            addFactory(ResourceFactory.ofInstance(resource, resource.getClass()));
     }
 
     private Field[] getFieldsToInject(Class<?> clazz) {
@@ -80,27 +84,15 @@ public final class ResourceInjector {
         return clazz.cast(instanceInitializer.apply(clazz, this));
     }
 
-    private Object getResource(Class<?> type, Class<?> target) {
-        Object resource = null;
-        for (Object r : resources) {
-            if (type.isAssignableFrom(r.getClass())) {
-                resource = r;
-                break;
-            }
-        }
+    public Object get(String name) {
+        ResourceFactory<?> factory = resourceFactoryMap.get(name);
+        if (factory == null && parent != null)
+            return parent.get(name);
 
-        if (resource == null) {
-            ResourceFactory<?> factory = resourceFactoryMap.get(type.getName());
-
-            if (factory == null)
-                return null;
-            resource = factory.getResource(target);
-        }
-
-        return resource;
+        return factory == null ? null : factory.getResource();
     }
 
-    public <T> T get(Class<T> tClass, Class<?> target) {
-        return tClass.cast(getResource(tClass, target));
+    public <T> T get(Class<? extends T> tClass) {
+        return tClass.cast(get(tClass.getName()));
     }
 }

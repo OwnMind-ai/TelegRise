@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.telegrise.telegrise.MediaCollector;
-import org.telegrise.telegrise.SessionIdentifier;
-import org.telegrise.telegrise.TranscriptionManager;
-import org.telegrise.telegrise.UpdateHandler;
+import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.core.caching.MethodReferenceCache;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.Root;
@@ -18,6 +15,7 @@ import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.transition.ExecutionOptions;
 import org.telegrise.telegrise.core.transition.TransitionController;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.types.BotUser;
 import org.telegrise.telegrise.types.UserRole;
@@ -28,48 +26,40 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import static org.telegrise.telegrise.core.elements.Tree.*;
 
 public class UserSession implements Runnable{
     private static final Logger logger = LoggerFactory.getLogger(UserSession.class);
-    private final ThreadLocal<SessionIdentifier> userIdentifier = new ThreadLocal<>();
+    private final SessionIdentifier userIdentifier;
     @Getter
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
-    private final BotSender sender;
+    private BotSender sender;
     @Getter
-    private final ResourceInjector resourceInjector;
+    private ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
 
     private final BlockingQueue<Update> updatesQueue = new LinkedBlockingQueue<>();
-    private final TransitionController transitionController;
-    private final UpdateHandlersController updateHandlersController;
+    private TransitionController transitionController;
+    private UpdateHandlersController updateHandlersController;
     private final MediaCollector mediaCollector = new MediaCollector(this.updatesQueue);
     @Getter
-    private final TranscriptionManager transcriptionManager;
+    private TranscriptionManager transcriptionManager;
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter) {
-        this.userIdentifier.set(sessionIdentifier);
+    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client) {
+        this.userIdentifier = sessionIdentifier;
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getRoleMap());
         this.transcription = transcription;
-        this.sender = new BotSender(client, sessionMemory);
-        this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(
-                this::interruptTreeChain, this::executeBranchingElement, sessionMemory,
-                transitionController, transcription, transcriptionGetter, this::createResourcePool
-        );
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
-        this.updateHandlersController = new UpdateHandlersController(resourceInjector);
-        this.initialize();
+
+        this.initialize(client);
     }
 
-    public UserSession(SessionIdentifier sessionIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client, Function<SessionIdentifier, TranscriptionManager> transcriptionGetter) {
-        this.userIdentifier.set(sessionIdentifier);
+    public UserSession(SessionIdentifier sessionIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client) {
+        this.userIdentifier = sessionIdentifier;
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
             this.sessionMemory = sessionMemory;
@@ -77,19 +67,20 @@ public class UserSession implements Runnable{
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
 
+        this.initialize(client);
+    }
+
+    private void initialize(TelegramClient client){
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(
-                this::interruptTreeChain, this::executeBranchingElement, this.sessionMemory,
-                transitionController, transcription, transcriptionGetter, this::createResourcePool
+                this::interruptTreeChain, this::executeBranchingElement, sessionMemory,
+                transitionController, transcription, this::createResourcePool
         );
-        this.resourceInjector = new ResourceInjector(this.sessionMemory, this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector = new ResourceInjector(this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector.addFactory(ResourceFactory.ofInstance(sessionMemory, SessionMemory.class));
         this.updateHandlersController = new UpdateHandlersController(resourceInjector);
 
-        this.initialize();
-    }
-
-    private void initialize(){
         this.sessionMemory.getBranchingElements().add(this.transcription.getRoot());
     }
 
@@ -117,7 +108,7 @@ public class UserSession implements Runnable{
             while (!this.updatesQueue.isEmpty())
                 this.handleUpdate(this.updatesQueue.remove());
         } catch (Throwable e) {
-            logger.error("An error occurred running session {}", userIdentifier.get(), e);
+            logger.error("An error occurred running session {}", userIdentifier, e);
             throw TelegRiseRuntimeException.unfold(e);
         } finally {
             this.running.set(false);
@@ -371,7 +362,7 @@ public class UserSession implements Runnable{
                 this.treeExecutors.isEmpty() ? null : this.treeExecutors.getLast().getControllerInstance(),
                 this.sender,
                 this.sessionMemory,
-                resourceInjector.get(BotUser.class, null),  //FIXME
+                resourceInjector.get(BotUser.class),  //FIXME
                 this.treeExecutors.peekLast(),
                 this.updatesQueue
         );

@@ -90,18 +90,22 @@ public final class TelegRiseApplication {
         if (sessionsController == null)
             preload();
 
-        sessionsController.initialize();
-        ResourceInjector resourceInjector = new ResourceInjector(this.resourceFactories, client, new BotSender(client, null), getBotUser());
+        ResourceInjector injector = new ResourceInjector();
+        injector.addFactories(this.resourceFactories);
+        injector.addResources(client, new BotSender(client, null), getBotUser());
 
-        serviceManager.setInjector(resourceInjector);
+        sessionsController.setMainInjector(injector);
+        serviceManager.setInjector(injector);
+
+        sessionsController.initialize();
 
         if (this.roleProvider != null) {
             sessionsController.setRoleProvider(this.roleProvider);
-            resourceInjector.injectResources(this.roleProvider);
+            injector.injectResources(this.roleProvider);
         }
         if (this.sessionInitializer != null) {
             sessionsController.setSessionInitializer(this.sessionInitializer);
-            resourceInjector.injectResources(this.sessionInitializer);
+            injector.injectResources(this.sessionInitializer);
             sessionsController.initializeSessions();
         }
 

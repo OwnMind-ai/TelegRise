@@ -32,7 +32,7 @@ public final class TreeExecutor {
         if (tree.getController() != null)
             controller = new TreeControllerInitializer(tree.getController(), resourceInjector).initialize();
 
-        return new TreeExecutor(memory, controller, tree, sender, updatesQueue, resourceInjector.get(BotUser.class, null));
+        return new TreeExecutor(memory, controller, tree, sender, updatesQueue, resourceInjector.get(BotUser.class));
     }
 
     public static void invokeBranch(GeneratedValue<Void> toInvoke, List<ActionElement> actions, ResourcePool pool, BotSender sender, ExecutionOptions options){

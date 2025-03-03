@@ -20,6 +20,7 @@ import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
 import org.telegrise.telegrise.core.parser.InnerElement;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TranscriptionParsingException;
 import org.telegrise.telegrise.keyboard.KeyboardMarkup;
@@ -172,7 +173,7 @@ public class Keyboard extends NodeElement implements InteractiveElement<Keyboard
                 throw new TranscriptionParsingException("Missing keyboard named '" + byName + "'", node);
             else if (!(element instanceof Keyboard))
                 throw new TranscriptionParsingException(String.format("The name '%s' belongs to an object of type '%s', type keyboard is required",
-                        byName, element.getClass().getAnnotation(Element.class).name()), node);
+                        byName, ReflectionUtils.annotation(element, Element.class).name()), node);
 
             Keyboard original = (Keyboard) element;
             this.name = Objects.requireNonNullElse(this.name, original.getName());

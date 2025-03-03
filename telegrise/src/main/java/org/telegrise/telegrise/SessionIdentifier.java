@@ -1,7 +1,6 @@
 package org.telegrise.telegrise;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 
@@ -19,7 +18,7 @@ import java.util.Objects;
 @Getter
 public final class SessionIdentifier implements Serializable {
     public static SessionIdentifier of(User user, Chat chatId){
-        return new SessionIdentifier(user.getId(), chatId.getId(), user.getLanguageCode());
+        return new SessionIdentifier(user.getId(), chatId.getId());
     }
     public static SessionIdentifier of(Long user, Long chat) { return new SessionIdentifier(user, chat); }
     public static SessionIdentifier ofUserOnly(User user) { return new SessionIdentifier(user.getId(), user.getId()); }
@@ -31,17 +30,9 @@ public final class SessionIdentifier implements Serializable {
     private final long userId;
     private final long chatId;
 
-    @Setter
-    private String languageCode;   //TODO move to session memory
-
     private SessionIdentifier(long userId, long chatId) {
         this.userId = userId;
         this.chatId = chatId;
-    }
-    private SessionIdentifier(long userId, long chatId, String languageCode) {
-        this.chatId = chatId;
-        this.userId = userId;
-        this.languageCode = languageCode;
     }
 
     @Override
@@ -65,7 +56,6 @@ public final class SessionIdentifier implements Serializable {
         return "SessionIdentifier{" +
                 "userId=" + userId +
                 ", chatId=" + chatId +
-                ", languageCode='" + languageCode + '\'' +
                 '}';
     }
 }
