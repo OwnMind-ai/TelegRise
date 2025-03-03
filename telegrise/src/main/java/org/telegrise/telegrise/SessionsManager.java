@@ -2,6 +2,8 @@ package org.telegrise.telegrise;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 /**
  * An object that manages sessions in the application.
  * <p>
@@ -69,4 +71,11 @@ public interface SessionsManager {
      * @return transcription manager
      */
     TranscriptionManager getTranscriptionManager(SessionIdentifier identifier);
+
+
+    /**
+     * Registers a functional callback that will be invoked when a user session is being destroyed.
+     * @param callback function to be executed
+     */
+    void registerSessionDestructionCallback(BiConsumer<SessionIdentifier, SessionMemory> callback);
 }

@@ -12,10 +12,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public final class ResourceInjector {
-    private static BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer = (c, i) -> {
+    private static Function<Class<?>, Object> instanceInitializer = (c) -> {
         try {
             return c.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -30,7 +30,7 @@ public final class ResourceInjector {
     };
 
     @ApiStatus.Internal
-    public static void setInstanceInitializer(BiFunction<Class<?>, ResourceInjector, Object> instanceInitializer) {
+    public static void setInstanceInitializer(Function<Class<?>, Object> instanceInitializer) {
         ResourceInjector.instanceInitializer = instanceInitializer;
     }
 
@@ -81,7 +81,7 @@ public final class ResourceInjector {
     }
 
     public <T> T createInstance(Class<T> clazz) {
-        return clazz.cast(instanceInitializer.apply(clazz, this));
+        return clazz.cast(instanceInitializer.apply(clazz));
     }
 
     public Object get(String name) {

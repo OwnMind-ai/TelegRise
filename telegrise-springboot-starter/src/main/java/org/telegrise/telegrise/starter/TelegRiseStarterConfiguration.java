@@ -1,18 +1,22 @@
 package org.telegrise.telegrise.starter;
 
 import lombok.Setter;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.*;
+import org.telegrise.telegrise.annotations.Handler;
+import org.telegrise.telegrise.annotations.TreeController;
 import org.telegrise.telegrise.core.ResourceInjector;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.types.BotUser;
@@ -44,45 +48,76 @@ public class TelegRiseStarterConfiguration {
     }
 
     @Bean
-    public ApplicationRunner telegRiseRunner(TelegRiseApplication app, ApplicationContext context, TelegRiseSessionContextProvider contextProvider){
+    public ApplicationRunner telegRiseRunner(TelegRiseApplication app, GenericApplicationContext context){
         context.getBeansOfType(Service.class).values().forEach(app::addService);
         context.getBeansOfType(SessionInitializer.class).values().stream().findFirst().ifPresent(app::setSessionInitializer);
         context.getBeansOfType(RoleProvider.class).values().stream().findFirst().ifPresent(app::setRoleProvider);
         context.getBeansOfType(TelegRiseExecutorService.class).values().stream().findFirst()
                 .ifPresent(e -> app.setExecutorService(() -> e));
 
-        ResourceInjector.setInstanceInitializer(contextProvider::getBean);
+        TelegRiseSessionScope scope = new TelegRiseSessionScope();
+        context.getBeanFactory().registerScope(TelegRiseSessionScope.NAME, scope);
+        app.getSessionManager().registerSessionDestructionCallback((i, m) -> scope.destroySession(i));
+
+        registerApplicationBeans(context);
+
+        ResourceInjector.setInstanceInitializer(context::getBean);
+        ReflectionUtils.setClassGetter(AopProxyUtils::ultimateTargetClass);
 
         return args -> app.start();
     }
 
+    private void registerApplicationBeans(GenericApplicationContext context) {
+        var provider = new ClassPathScanningCandidateComponentProvider(false);
+        provider.addIncludeFilter(new AnnotationTypeFilter(TreeController.class));
+        provider.addIncludeFilter(new AnnotationTypeFilter(Handler.class));
+
+        for (BeanDefinition definition : provider.findCandidateComponents(getApplicationClass(context).getPackageName())){
+            if (definition.getBeanClassName() == null) continue;
+
+            definition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+            context.registerBeanDefinition(definition.getBeanClassName(), definition);
+        }
+    }
+
     @Bean
-    @DependsOn("telegRiseApplication")
     public TelegramClient telegramClient(TelegRiseApplication app){
         return app.getTelegramClient();
     }
 
-    @Bean
-    @DependsOn("telegRiseApplication")
+    @Bean(name = "org.telegrise.telegrise.senders.BotSender")
+    @Scope(TelegRiseSessionScope.NAME)
     public BotSender botSender(TelegramClient client){
         return new BotSender(client, null);
     }
 
-    @Bean
+    @Bean(name = "org.telegrise.telegrise.TranscriptionManager")
+    @Scope(TelegRiseSessionScope.NAME)
+    public TranscriptionManager transcriptionManager(TelegRiseApplication app){
+        return app.getSessionManager().getTranscriptionManager();
+    }
+
+    @Bean(name = "org.telegrise.telegrise.SessionMemory")
     @DependsOn("telegRiseApplication")
+    @Scope(TelegRiseSessionScope.NAME)
+    public SessionMemory sessionMemory(){
+        return null;
+    }
+
+    @Bean(name = "org.telegrise.telegrise.MediaCollector")
+    @DependsOn("telegRiseApplication")
+    @Scope(TelegRiseSessionScope.NAME)
+    public MediaCollector mediaCollector(){
+        return null;
+    }
+
+    @Bean
     public SessionsManager sessionsManager(TelegRiseApplication app){
         return app.getSessionManager();
     }
 
     @Bean
-    @DependsOn("telegRiseApplication")
     public BotUser botUser(TelegRiseApplication app){
         return app.getBotUser();
-    }
-
-    @Bean
-    @DependsOn("telegRiseApplication")
-    public TranscriptionManager transcriptionManager(TelegRiseApplication app){
-        return app.getSessionManager().getTranscriptionManager();
     }
 }

@@ -36,7 +36,6 @@ public class UserSession implements Runnable{
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
     private BotSender sender;
-    @Getter
     private ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();
@@ -50,15 +49,13 @@ public class UserSession implements Runnable{
     private final AtomicBoolean running = new AtomicBoolean();
     private long lastUpdateReceivedAt = 0;
 
-    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription, TelegramClient client) {
+    public UserSession(SessionIdentifier sessionIdentifier, BotTranscription transcription) {
         this.userIdentifier = sessionIdentifier;
         this.sessionMemory = new SessionMemoryImpl(transcription.hashCode(), sessionIdentifier, transcription.getRoleMap());
         this.transcription = transcription;
-
-        this.initialize(client);
     }
 
-    public UserSession(SessionIdentifier sessionIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription, TelegramClient client) {
+    public UserSession(SessionIdentifier sessionIdentifier, SessionMemoryImpl sessionMemory, BotTranscription transcription) {
         this.userIdentifier = sessionIdentifier;
 
         if (sessionMemory.getTranscriptionHashcode() == transcription.hashCode()){
@@ -66,11 +63,9 @@ public class UserSession implements Runnable{
             this.transcription = transcription;
         } else
             throw new TelegRiseRuntimeException("Loaded SessionMemory object relates to another bot transcription");
-
-        this.initialize(client);
     }
 
-    private void initialize(TelegramClient client){
+    public void initialize(TelegramClient client, List<Class<? extends UpdateHandler>> classes, ResourceInjector parentInjector){
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
         this.transcriptionManager = new TranscriptionManager(
@@ -78,8 +73,14 @@ public class UserSession implements Runnable{
                 transitionController, transcription, this::createResourcePool
         );
         this.resourceInjector = new ResourceInjector(this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector.setParent(parentInjector);
         this.resourceInjector.addFactory(ResourceFactory.ofInstance(sessionMemory, SessionMemory.class));
+
+        // Context is used to initialize handlers
+        TelegRiseSessionContext.setCurrentContext(userIdentifier, sessionMemory, resourceInjector);
         this.updateHandlersController = new UpdateHandlersController(resourceInjector);
+        classes.forEach(this.updateHandlersController::add);
+        TelegRiseSessionContext.clearContext();
 
         this.sessionMemory.getBranchingElements().add(this.transcription.getRoot());
     }
@@ -103,6 +104,7 @@ public class UserSession implements Runnable{
         if (this.running.get()) return;
 
         this.running.set(true);
+        TelegRiseSessionContext.setCurrentContext(userIdentifier, sessionMemory, resourceInjector);
 
         try {
             while (!this.updatesQueue.isEmpty())
@@ -111,6 +113,7 @@ public class UserSession implements Runnable{
             logger.error("An error occurred running session {}", userIdentifier, e);
             throw TelegRiseRuntimeException.unfold(e);
         } finally {
+            TelegRiseSessionContext.clearContext();
             this.running.set(false);
         }
     }
@@ -375,10 +378,6 @@ public class UserSession implements Runnable{
     private void executeBranchingElement(BranchingElement element, Update update, ExecutionOptions options){
         if (element.getActions() == null) return;
         TreeExecutor.invokeBranch(null, element.getActions(), this.createResourcePool(update), sender, options);
-    }
-
-    public void addHandlersClasses(List<Class<? extends UpdateHandler>> classes){
-        classes.forEach(this.updateHandlersController::add);
     }
 
     public void setStandardLanguage(String code){

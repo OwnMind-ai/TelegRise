@@ -22,10 +22,12 @@ import org.telegrise.telegrise.types.BotUser;
 import org.telegrise.telegrise.utils.ChatTypes;
 import org.telegrise.telegrise.utils.MessageUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +40,7 @@ public class TelegramSessionsController implements SessionsManager {
     @Setter
     private SessionInitializer sessionInitializer;
     private final List<ResourceFactory<?>> resourceFactories;
+    private final List<BiConsumer<SessionIdentifier, SessionMemory>> destructionCallbacks = new ArrayList<>();
 
     @Setter
     private TelegramClient client;
@@ -143,18 +146,19 @@ public class TelegramSessionsController implements SessionsManager {
             return;
         }
 
-        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription, client);
+        UserSession session = new UserSession(sessionMemory.getSessionIdentifier(), sessionMemory, transcription);
+        session.setStandardLanguage(memory.getLanguageCode());
+        session.initialize(client, this.userHandlersClasses, mainInjector);
 
         this.sessions.put(sessionMemory.getSessionIdentifier(), session);
     }
 
     @Override
     public void createSession(SessionIdentifier identifier, @Nullable String languageCode) {
-        UserSession session = new UserSession(identifier, this.transcription, this.client);
+        UserSession session = new UserSession(identifier, this.transcription);
         this.sessions.put(identifier, session);  // This MUST happen before session#addHandlersClasses
         session.setStandardLanguage(languageCode);
-        session.getResourceInjector().setParent(mainInjector);
-        session.addHandlersClasses(this.userHandlersClasses);
+        session.initialize(client, this.userHandlersClasses, mainInjector);
 
         if (this.sessionInitializer != null)
             this.sessionInitializer.initialize(session.getSessionMemory());
@@ -171,7 +175,8 @@ public class TelegramSessionsController implements SessionsManager {
 
     @Override
     public void killSession(SessionIdentifier identifier) {
-        this.sessions.remove(identifier);
+        var session = this.sessions.remove(identifier);
+        destructionCallbacks.forEach(c -> c.accept(identifier, session.getSessionMemory()));
     }
 
     @Override
@@ -183,5 +188,10 @@ public class TelegramSessionsController implements SessionsManager {
     public TranscriptionManager getTranscriptionManager(SessionIdentifier identifier){
         UserSession session = this.sessions.get(identifier);
         return session == null ? null : session.getTranscriptionManager();
+    }
+
+    @Override
+    public void registerSessionDestructionCallback(BiConsumer<SessionIdentifier, SessionMemory> callback) {
+        destructionCallbacks.add(callback);
     }
 }
