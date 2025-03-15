@@ -19,7 +19,9 @@ class ResourceInjectorTest {
         Integer integer = 123;
         List<String> strings = List.of("some", "strings");
 
-        ResourceInjector resourceInjector = new ResourceInjector(integer, strings);
+        ResourceInjector resourceInjector = new ResourceInjector();
+        resourceInjector.addFactory(ResourceFactory.ofInstance(integer, Number.class));
+        resourceInjector.addFactory(ResourceFactory.ofInstance(strings, List.class));
         resourceInjector.addFactories(List.of(new ResourceFactory<Character>() {
             @Override
             public @NotNull Class<Character> getResourceClass() {

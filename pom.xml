@@ -13,6 +13,7 @@
         <module>telegrise</module>
         <module>telegrise-webhooks</module>
         <module>telegrise-springboot-starter</module>
+        <module>telegrise-kotlin-extensions</module>
     </modules>
 
     <name>TelegRise Framework</name>
