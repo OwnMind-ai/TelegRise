@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.telegrise.telegrise.ReferenceHolders;
 import org.telegrise.telegrise.annotations.HiddenParameter;
 import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.annotations.ReferenceGenerator;
@@ -478,6 +479,11 @@ public class MethodReferenceCompiler {
             assert a == passedParameters.length;
 
         String caller = isStatic ? method.getDeclaringClass().getName() : namespace.getApplicationNamespace().getControllerName();
+        if (isStatic && ReferenceHolders.get(method.getDeclaringClass()) != null)
+            caller = "%s.get(%s.class)".formatted(ReferenceHolders.class.getName(), caller);
+        // Replaces children class pathing symbol '$' to the standard dot syntax
+        caller = caller.replace("$", ".");
+
         String expression = String.format("%s.%s(%s)", caller, method.getName(), String.join(", ", actualParameters));
 
         return getReferenceExpression(namespace, method.getReturnType(), node, expression);
@@ -493,11 +499,12 @@ public class MethodReferenceCompiler {
                 .toArray();
 
         Class<?>[] parametersMapping = compileParametersMapping(method);
+        Object referenceHolder =  ReferenceHolders.get(method.getDeclaringClass());
 
         return new ReferenceExpression() {
             @Override
             public Object invoke(ResourcePool pool, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-                return method.invoke(isStatic ? null : instance, MethodReference.compileArgs(tokenParams, pool, parametersMapping));
+                return method.invoke(isStatic ? referenceHolder : instance, MethodReference.compileArgs(tokenParams, pool, parametersMapping));
             }
 
             @Override

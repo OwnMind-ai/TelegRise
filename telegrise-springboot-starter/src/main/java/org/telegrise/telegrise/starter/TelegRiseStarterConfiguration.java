@@ -37,6 +37,9 @@ public class TelegRiseStarterConfiguration {
 
         var app = new TelegRiseApplication(new File(transcription), this.getApplicationClass(context));
 
+        ResourceInjector.setInstanceInitializer(context::getBean);
+        ReflectionUtils.setClassGetter(AopProxyUtils::ultimateTargetClass);
+
         app.preload();
         return app;
     }
@@ -60,9 +63,6 @@ public class TelegRiseStarterConfiguration {
         app.getSessionManager().registerSessionDestructionCallback((i, m) -> scope.destroySession(i));
 
         registerApplicationBeans(context);
-
-        ResourceInjector.setInstanceInitializer(context::getBean);
-        ReflectionUtils.setClassGetter(AopProxyUtils::ultimateTargetClass);
 
         return args -> app.start();
     }

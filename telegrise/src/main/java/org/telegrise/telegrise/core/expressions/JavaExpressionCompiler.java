@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class JavaExpressionCompiler {
     // Change to force recompilation of expressions when incompatible changes introduced
-    public static final String VERSION = "1.2.3";
+    public static final String VERSION = "1.2.4";
     private static final String VERSION_FIELD = "VERSION";
 
     public static String getTempDirectory(){

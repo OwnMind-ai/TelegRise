@@ -18,7 +18,7 @@ public class TreeControllerInitializer {
     }
 
     public Object initialize(){
-        Object instance = resourceInjector.createInstance(contollerClass);
+        Object instance = ResourceInjector.createInstance(contollerClass);
         resourceInjector.injectResources(instance);
 
         Optional<Method> onCreateMethod = Arrays.stream(contollerClass.getDeclaredMethods())

@@ -80,7 +80,7 @@
                 <transition type="jump" target="StartTree" execute="true"/>
             </branch>
         </tree>
-        <tree name="TestAdmin" key="Test admin" accessLevel="-100" controller="TestAdminController">
+        <tree name="TestAdmin" key="Test admin" accessLevel="1" controller="TestAdminController">
             <send>
                 <text>Choose your role (or /start to return):</text>
                 <keyboard type="inline">
@@ -102,7 +102,7 @@
         </tree>
 
         <tree name="DeniedTree">
-            <send>Sorry, your request was denied</send>
+            <send>Sorry, ${ReferenceHolder#firstName}, your request was denied</send>
         </tree>
     </root>
 </bot>

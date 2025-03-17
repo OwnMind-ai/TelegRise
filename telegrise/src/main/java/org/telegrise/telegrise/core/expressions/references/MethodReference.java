@@ -2,6 +2,7 @@ package org.telegrise.telegrise.core.expressions.references;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.telegrise.telegrise.ReferenceHolders;
 import org.telegrise.telegrise.annotations.HiddenParameter;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.caching.MethodReferenceCache;
@@ -23,7 +24,7 @@ public class MethodReference implements ReferenceExpression{
     private transient Method method;
     /**
      * Length == method.getParametersCount(). If the element is not null,
-     * then the parameter at the same index is annotated as @HiddenParameter,
+     * then the parameter at the same index is annotated as @HiddenParameter
      * and requires a global value of the type that the element is. Otherwise, it is a regular parameter.
      * See implementations of prepareParameters and compileArgs methods.
      */
@@ -67,7 +68,7 @@ public class MethodReference implements ReferenceExpression{
         } else {
             Object result;
             if (isStatic)
-                result = method.invoke(null, compileArgs(args, pool, parametersMapping));
+                result = method.invoke(ReferenceHolders.get(declaringClass), compileArgs(args, pool, parametersMapping));
             else
                 result = method.invoke(instance, compileArgs(args, pool, parametersMapping));
 

@@ -34,6 +34,11 @@ public final class ResourceInjector {
         ResourceInjector.instanceInitializer = instanceInitializer;
     }
 
+    @ApiStatus.Internal
+    public static <T> T createInstance(Class<T> clazz) {
+        return clazz.cast(instanceInitializer.apply(clazz));
+    }
+
     private final Map<String, ResourceFactory<?>> resourceFactoryMap = new HashMap<>();
     @Setter
     private ResourceInjector parent;
@@ -78,10 +83,6 @@ public final class ResourceInjector {
         if (clazz == null || clazz.equals(Object.class))
             return null;   // Forces the line below to return the exact copy of the first argument
         return ArrayUtils.addAll(clazz.getDeclaredFields(), getFieldsToInject(clazz.getSuperclass()));
-    }
-
-    public <T> T createInstance(Class<T> clazz) {
-        return clazz.cast(instanceInitializer.apply(clazz));
     }
 
     public Object get(String name) {

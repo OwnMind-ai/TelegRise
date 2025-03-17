@@ -53,7 +53,7 @@ public class UpdateHandlersController {
     }
 
     public void add(Class<? extends UpdateHandler> handlerClass){
-        UpdateHandler instance = resourceInjector.createInstance(handlerClass);
+        UpdateHandler instance = ResourceInjector.createInstance(handlerClass);
         this.resourceInjector.injectResources(instance);
         this.handlers.add(instance);
     }

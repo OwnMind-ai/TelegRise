@@ -1,11 +1,13 @@
 package org.telegrise.telegrise.core.expressions;
 
 import org.junit.jupiter.api.Test;
+import org.telegrise.telegrise.ReferenceHolders;
 import org.telegrise.telegrise.SessionIdentifier;
 import org.telegrise.telegrise.SessionMemory;
 import org.telegrise.telegrise.annotations.HiddenParameter;
 import org.telegrise.telegrise.annotations.Reference;
 import org.telegrise.telegrise.annotations.ReferenceGenerator;
+import org.telegrise.telegrise.annotations.StaticReferenceHolder;
 import org.telegrise.telegrise.core.ResourcePool;
 import org.telegrise.telegrise.core.SessionMemoryImpl;
 import org.telegrise.telegrise.core.expressions.references.ReferenceExpression;
@@ -32,6 +34,8 @@ public class MethodReferenceCompilerTest {
         MethodReferenceCompiler compiler = new MethodReferenceCompiler();
         LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader(),""));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
+        namespace.getApplicationNamespace().addClass(Holder.class.getName());
+        ReferenceHolders.add(new Holder());
         ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), Map.of()), null);
         Node node = toNode("<tag/>");
 
@@ -50,6 +54,23 @@ public class MethodReferenceCompilerTest {
         parser = new Parser(new Lexer(new CharsStream("MethodReferenceCompilerTest#getOne")));
         expression = compiler.compile(parser.parse(), namespace, Integer.class, node);
         assertEquals(1, expression.toGeneratedValue(Integer.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("1 -> Holder#getStatic")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("static", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("Holder#getStatic(1)")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("static", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        // Triggers Java expression compilation
+        parser = new Parser(new Lexer(new CharsStream("Holder#getStatic(1 + 5 * 3)")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("static", expression.toGeneratedValue(String.class, node).generate(pool));
+
+        parser = new Parser(new Lexer(new CharsStream("1 -> Holder::generator(1)")));
+        expression = compiler.compile(parser.parse(), namespace, String.class, node);
+        assertEquals("generator", expression.toGeneratedValue(String.class, node).generate(pool));
 
         parser = new Parser(new Lexer(new CharsStream("#second(false)")));
         expression = compiler.compile(parser.parse(), namespace, Boolean.class, node);
@@ -355,5 +376,18 @@ public class MethodReferenceCompilerTest {
     @Reference
     public boolean isNull(String s){
         return s == null;
+    }
+
+    @StaticReferenceHolder
+    public static class Holder{
+        @Reference
+        public String getStatic(int i){
+            return "static";
+        }
+
+        @ReferenceGenerator
+        public GeneratedReference<Integer, String> generator(int a){
+            return i -> "generator";
+        }
     }
 }
