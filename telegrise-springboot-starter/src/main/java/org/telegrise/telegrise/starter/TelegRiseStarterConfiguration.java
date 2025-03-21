@@ -58,8 +58,9 @@ public class TelegRiseStarterConfiguration {
         context.getBeansOfType(TelegRiseExecutorService.class).values().stream().findFirst()
                 .ifPresent(e -> app.setExecutorService(() -> e));
 
-        TelegRiseSessionScope scope = new TelegRiseSessionScope();
-        context.getBeanFactory().registerScope(TelegRiseSessionScope.NAME, scope);
+
+        TelegRiseSessionScope scope = (TelegRiseSessionScope) context.getBeanFactory().getRegisteredScope(TelegRiseSessionScope.NAME);
+        assert scope != null;
         app.getSessionManager().registerSessionDestructionCallback((i, m) -> scope.destroySession(i));
 
         registerApplicationBeans(context);

@@ -1,5 +1,6 @@
 package org.telegrise.telegrise.starter.failure;
 
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
@@ -14,9 +15,15 @@ public class TelegRiseBeanAnalyzer extends AbstractFailureAnalyzer<NoSuchBeanDef
     @Override
     protected FailureAnalysis analyze(Throwable rootFailure, NoSuchBeanDefinitionException cause) {
         if (cause.getBeanType() != null && CLASSES.contains(cause.getBeanType())) {
-            return new FailureAnalysis(
-                    "The bean %s can be used only in tree controllers and non-independent handlers".formatted(cause.getBeanType().getSimpleName()),
+            if (rootFailure instanceof BeanCreationException creationException)
+                return new FailureAnalysis(
+                    "The bean %s can be used only in tree controllers and non-independent handlers; '%s' is not one".formatted(
+                            cause.getBeanType().getSimpleName(), creationException.getBeanName()),
                     null, cause);
+            else
+                return new FailureAnalysis(
+                        "The bean %s can be used only in tree controllers and non-independent handlers".formatted(cause.getBeanType().getSimpleName()),
+                        null, cause);
         }
 
         return null;
