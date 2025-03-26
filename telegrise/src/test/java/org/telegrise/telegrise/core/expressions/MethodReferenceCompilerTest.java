@@ -35,7 +35,7 @@ public class MethodReferenceCompilerTest {
         LocalNamespace namespace = new LocalNamespace(MethodReferenceCompilerTest.class, new ApplicationNamespace(this.getClass().getClassLoader(),""));
         namespace.getApplicationNamespace().addClass(MethodReferenceCompilerTest.class.getName());
         namespace.getApplicationNamespace().addClass(Holder.class.getName());
-        ReferenceHolders.add(new Holder());
+        ReferenceHolders.add(Holder.class, new Holder());
         ResourcePool pool = new ResourcePool(null, this, null, new SessionMemoryImpl(0, SessionIdentifier.ofUserOnly(0L), Map.of()), null);
         Node node = toNode("<tag/>");
 

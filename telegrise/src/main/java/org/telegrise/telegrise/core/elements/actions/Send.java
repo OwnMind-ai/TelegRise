@@ -267,6 +267,7 @@ public class Send extends ActionElement{
         edit.setText(this.text);
         edit.setWhen(this.when);
         edit.setElementNode(this.getElementNode());
+        edit.setOnError(this.onError);
 
         return edit;
     }

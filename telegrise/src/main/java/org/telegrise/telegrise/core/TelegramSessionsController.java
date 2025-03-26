@@ -16,6 +16,7 @@ import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
+import org.telegrise.telegrise.exceptions.TelegRiseSessionException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.types.BotUser;
@@ -28,10 +29,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class TelegramSessionsController implements SessionsManager {
+public class TelegramSessionsController implements SessionsManager, InternalSessionExtensions {
     private final ConcurrentMap<SessionIdentifier, UserSession> sessions = new ConcurrentHashMap<>();
     @Getter
     private final BotTranscription transcription;
@@ -82,7 +84,7 @@ public class TelegramSessionsController implements SessionsManager {
             try {
                 this.client.execute(new DeleteMyCommands());
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                log.error("Unable to delete commands", e);
             }
 
             ChatTypes.GENERAL_SCOPES_LIST.forEach(l -> {
@@ -92,7 +94,7 @@ public class TelegramSessionsController implements SessionsManager {
                     if (!setMyCommands.getCommands().isEmpty())
                         this.client.execute(setMyCommands);
                 } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
+                    log.error("Unable to set commands", e);
                 }
             });
         }
@@ -193,5 +195,24 @@ public class TelegramSessionsController implements SessionsManager {
     @Override
     public void registerSessionDestructionCallback(BiConsumer<SessionIdentifier, SessionMemory> callback) {
         destructionCallbacks.add(callback);
+    }
+
+    @Override
+    public boolean isSessionActive(SessionIdentifier identifier) {
+        return this.sessions.containsKey(identifier);
+    }
+
+    @Override
+    public <T> T runWithSessionContext(SessionIdentifier identifier, Supplier<T> runnable) {
+        UserSession session = this.sessions.get(identifier);
+        if (session == null)
+            throw new TelegRiseSessionException("Session not found: " + identifier);
+
+        TelegRiseSessionContext.setCurrentContext(identifier, session.getSessionMemory(), session.getResourceInjector());
+        try {
+            return runnable.get();
+        } finally {
+            TelegRiseSessionContext.clearContext();
+        }
     }
 }

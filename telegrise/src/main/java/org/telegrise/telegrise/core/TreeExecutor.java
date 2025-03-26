@@ -54,8 +54,9 @@ public final class TreeExecutor {
             boolean isFirst = options.edit().equals(ExecutionOptions.EDIT_FIRST);
             for (ActionElement action : actions) {
                 try {
+                    //TODO creates action for every action, not singular one (for !isFirst). Can be optimized
                     Edit editAction = action.toEdit();
-                    if (options.ignoreError())
+                    if (options.ignoreError() && editAction != null)
                         editAction.setOnError(p -> null);
 
                     if (isFirst && editAction != null) {

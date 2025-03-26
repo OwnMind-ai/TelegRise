@@ -26,7 +26,7 @@ public interface SessionsManager {
     void loadSession(SessionMemory memory);
 
     /**
-     * Destroys session with a specified identifier.
+     * Destroys the session with a specified identifier.
      * Killed session can reappear (with a new state)
      * if update with the same credentials causes the creating of a new session.
      *
@@ -35,7 +35,7 @@ public interface SessionsManager {
     void killSession(SessionIdentifier identifier);
 
     /**
-     * Creates to session based on specified identifier without the need of actual interaction with the user.
+     * Creates to session based on a specified identifier without the need of actual interaction with the user.
      * @param identifier credentials of the session
      */
     void createSession(SessionIdentifier identifier, @Nullable String languageCode);
@@ -53,7 +53,7 @@ public interface SessionsManager {
     void reinitializeSession(SessionIdentifier sessionIdentifier);
 
     /**
-     * Retrieves session memory of session with the same identifier as specified, or null if no such session exists.
+     * Retrieves session memory of the session with the same identifier as specified, or null if no such session exists.
      * @param sessionIdentifier credentials of the session
      * @return session memory of the session or null
      */
@@ -61,7 +61,7 @@ public interface SessionsManager {
 
     /**
      * Returns a transcription manager for this bot.
-     * Returned transcription manager is not attached to a session and all session-related methods will fail
+     * Returned transcription manager is not attached to a session, and all session-related methods will fail
      * @return transcription manager
      */
     TranscriptionManager getTranscriptionManager();
@@ -78,4 +78,12 @@ public interface SessionsManager {
      * @param callback function to be executed
      */
     void registerSessionDestructionCallback(BiConsumer<SessionIdentifier, SessionMemory> callback);
+
+    /**
+     * Checks if the session with the specified identifier is active (exists).
+     *
+     * @param identifier credentials of the session
+     * @return true if the session is active, false otherwise
+     */
+    boolean isSessionActive(SessionIdentifier identifier);
 }

@@ -36,6 +36,7 @@ public class UserSession implements Runnable{
     private final SessionMemoryImpl sessionMemory;
     private final BotTranscription transcription;
     private BotSender sender;
+    @Getter
     private ResourceInjector resourceInjector;
     @Getter
     private final Deque<TreeExecutor> treeExecutors = new ConcurrentLinkedDeque<>();

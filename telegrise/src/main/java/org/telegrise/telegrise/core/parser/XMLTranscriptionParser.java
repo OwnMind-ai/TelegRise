@@ -71,7 +71,7 @@ public class XMLTranscriptionParser implements TranscriptionParser{
         var holders = reflection.getTypesAnnotatedWith(StaticReferenceHolder.class);
 
         for (Class<?> holder : holders){
-            ReferenceHolders.add(ResourceInjector.createInstance(holder));
+            ReferenceHolders.add(holder, ResourceInjector.createInstance(holder));
             applicationNamespace.addClass(holder);
         }
     }

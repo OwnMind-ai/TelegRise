@@ -25,7 +25,7 @@ public class ReferenceHolders {
     }
 
     @ApiStatus.Internal
-    public static void add(Object holder){
-        holders.put(holder.getClass().getName(), holder);
+    public static void add(Class<?> clazz, Object holder){
+        holders.put(clazz.getName(), holder);
     }
 }
