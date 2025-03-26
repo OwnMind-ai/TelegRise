@@ -122,9 +122,9 @@ public class UserSession implements Runnable{
     private void handleUpdate(Update update) {
         ResourcePool pool = this.createResourcePool(update);
 
-        Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableHandler(update);
-        if (handlerCandidate.isPresent()){
-            boolean intercept = this.updateHandlersController.applyHandler(update, handlerCandidate.get());
+        var candidates = this.updateHandlersController.getApplicableHandlers(update);
+        if (!candidates.isEmpty()){
+            boolean intercept = this.updateHandlersController.applyHandlers(update, candidates);
 
             if (intercept) return;
         }
@@ -214,8 +214,8 @@ public class UserSession implements Runnable{
             TreeExecutor.invokeBranch(root.getDefaultBranch().getToInvoke(), root.getDefaultBranch().getActions(),
                     pool, sender, ExecutionOptions.always());
         } else {
-            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
-            handlerCandidate.ifPresent(h -> this.updateHandlersController.applyHandler(update, h));
+            var candidates = this.updateHandlersController.getApplicableAfterTreesHandler(update);
+            this.updateHandlersController.applyHandlers(update, candidates);
         }
     }
 
@@ -278,8 +278,8 @@ public class UserSession implements Runnable{
         }
 
         if (ignored) {
-            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
-            handlerCandidate.ifPresent(updateHandler -> this.updateHandlersController.applyHandler(update, updateHandler));
+            var candidates = this.updateHandlersController.getApplicableAfterTreesHandler(update);
+            this.updateHandlersController.applyHandlers(update, candidates);
         } else if (executor.isClosed())
             this.processClosedTree(update, executor, pool);
         else
@@ -319,10 +319,10 @@ public class UserSession implements Runnable{
                 }
             }
 
-            Optional<UpdateHandler> handlerCandidate = this.updateHandlersController.getApplicableAfterTreesHandler(update);
+            var candidates = this.updateHandlersController.getApplicableAfterTreesHandler(update);
             // Interrupter found case (handler where Handler.afterTress() is true)
-            if (handlerCandidate.isPresent()){
-                boolean intercept = this.updateHandlersController.applyHandler(update, handlerCandidate.get());
+            if (candidates.isEmpty()){
+                boolean intercept = this.updateHandlersController.applyHandlers(update, candidates);
 
                 if (intercept) return;
             }

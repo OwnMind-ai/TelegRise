@@ -14,7 +14,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.*;
 import org.telegrise.telegrise.annotations.Handler;
 import org.telegrise.telegrise.core.elements.BotTranscription;
-import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.exceptions.TelegRiseSessionException;
 import org.telegrise.telegrise.resources.ResourceFactory;
@@ -106,11 +105,10 @@ public class TelegramSessionsController implements SessionsManager, InternalSess
 
     public void onUpdateReceived(Update update){
         log.debug("Update received: {}", update);
-        Optional<UpdateHandler> candidate = this.handlersController.getApplicableHandler(update);
-        if (candidate.isPresent()){
-            this.handlersController.applyHandler(update, candidate.get());
-            if (ReflectionUtils.annotation(candidate, Handler.class).absolute())
-                return;
+        var candidates = this.handlersController.getApplicableHandlers(update);
+        if (!candidates.isEmpty()){
+            var absolute = this.handlersController.applyHandlers(update, candidates);
+            if (absolute) return;
         }
 
         User from = MessageUtils.getFrom(update);

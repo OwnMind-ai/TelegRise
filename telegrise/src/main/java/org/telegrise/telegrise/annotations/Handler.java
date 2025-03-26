@@ -8,10 +8,11 @@ import java.lang.annotation.*;
  * Indicates that an annotated class is a primary handler.
  * The annotated class must implement the interface {@link UpdateHandler UpdateHandler}.
  * <p>
- * This annotation provides configuration for handler's behavior. The parameters are:
+ * This annotation provides configuration for the handler's behavior. The parameters are:
  * <ul>
  *     <li><code>absolute</code>: if handler marked as <code>absolute</code>, it will halt update processing after handler's execution.
- *     Otherwise, the application will try to find a suitable tree for the update (as if no handler was used).</li>
+ *     Otherwise, the application will continue selecting handlers (absolute and not) to find a suitable tree for the update
+ *     (as if no handler was used).</li>
  *     <li><code>independent</code>: if handler marked as <code>independent</code>, it will be executed before determining user session.
  *     These handlers will share state with all users that trigger it.
  *     Independent handlers can't inject {@link org.telegrise.telegrise.SessionMemory SessionMemory}.</li>
@@ -32,7 +33,9 @@ import java.lang.annotation.*;
 public @interface Handler {
     /**
      * If handler marked as <code>absolute</code>, it will halt update processing after handler's execution.
-     * Otherwise, the application will try to find a suitable tree for the update (as if no handler was used).
+     * Otherwise,
+     * the application will continue selecting handlers (absolute and not) to find a suitable tree for the update
+     * (as if no handler was used).
      */
     boolean absolute() default true;
 
