@@ -9,6 +9,7 @@ import org.telegrise.telegrise.core.caching.MethodReferenceCache;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.Attribute;
 import org.telegrise.telegrise.core.parser.Element;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class ClearCache extends ActionElement{
     @Override
     public PartialBotApiMethod<?> generateMethod(ResourcePool resourcePool) {
         String methodName = method.generate(resourcePool);
-        Class<?> clazz = resourcePool.getCurrentExecutor().getControllerInstance().getClass();
+        Class<?> clazz = ReflectionUtils.getClass(resourcePool.getCurrentExecutor().getControllerInstance());
 
         resourcePool.getMemory().getCacheMap().entrySet().stream()
                 .filter(e -> e.getKey().getDeclaringClass().equals(clazz) && e.getKey().getMethod().getName().equals(methodName))

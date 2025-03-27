@@ -18,6 +18,7 @@ import org.telegrise.telegrise.core.elements.text.Text;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.parser.TranscriptionMemory;
 import org.telegrise.telegrise.core.transition.TransitionController;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardMarkup;
 import org.telegrise.telegrise.transcription.ElementBase;
@@ -74,7 +75,7 @@ public final class TranscriptionManager {
         this.transcription = transcription;
     }
 
-    /** Clears cache for specific method reference and returns its previous value.
+    /** Clears cache for a specific method reference and returns its previous value.
      * If no cache was stored or method reference was not found, this method will return <code>null</code>.
      *
      * @param instance instance of declaring a class
@@ -84,10 +85,10 @@ public final class TranscriptionManager {
      * @see CachingStrategy
      */
     public Object clearCache(Object instance, String methodName){
-        return clearCache(instance.getClass(), methodName);
+        return clearCache(ReflectionUtils.getClass(instance), methodName);
     }
 
-    /** Clears cache for specific method reference and returns its previous value.
+    /** Clears cache for a specific method reference and returns its previous value.
      * If no cache was stored or method reference was not found, this method will return <code>null</code>.
      *
      * @param clazz declaring class

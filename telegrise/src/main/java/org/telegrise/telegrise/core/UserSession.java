@@ -281,7 +281,12 @@ public class UserSession implements Runnable{
             var candidates = this.updateHandlersController.getApplicableAfterTreesHandler(update);
             this.updateHandlersController.applyHandlers(update, candidates);
         } else if (executor.isClosed())
-            this.processClosedTree(update, executor, pool);
+            try {
+                this.processClosedTree(update, executor, pool);
+            } finally {
+                if (executor.isClosed())
+                    executor.beforeRemoving();
+            }
         else
             this.sessionMemory.setCurrentBranch(executor.getCurrentBranch());
 

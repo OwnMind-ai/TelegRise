@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegrise.telegrise.SessionMemory;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.senders.BotSender;
 import org.telegrise.telegrise.types.ApiResponse;
 import org.telegrise.telegrise.types.BotUser;
@@ -70,7 +71,7 @@ public final class ResourcePool {
     }
 
     public void addComponent(Object object){
-        this.components.put(object.getClass(), object);
+        this.components.put(ReflectionUtils.getClass(object), object);
     }
 
     private void bakeComponents(){

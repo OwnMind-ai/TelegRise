@@ -15,6 +15,7 @@ import org.telegrise.telegrise.core.elements.Tree;
 import org.telegrise.telegrise.core.elements.base.BranchingElement;
 import org.telegrise.telegrise.core.expressions.references.MethodReference;
 import org.telegrise.telegrise.core.transition.JumpPoint;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.keyboard.KeyboardState;
 import org.telegrise.telegrise.types.UserRole;
@@ -102,7 +103,7 @@ public class SessionMemoryImpl implements SessionMemory {
 
     @Override
     public String addComponent(Object value){
-        String key = value.getClass().getName();
+        String key = ReflectionUtils.getClass(value).getName();
         this.memory.put(key, value);
 
         return key;

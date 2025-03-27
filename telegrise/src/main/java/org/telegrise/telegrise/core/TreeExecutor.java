@@ -12,6 +12,7 @@ import org.telegrise.telegrise.core.elements.actions.ActionElement;
 import org.telegrise.telegrise.core.elements.actions.Edit;
 import org.telegrise.telegrise.core.expressions.GeneratedValue;
 import org.telegrise.telegrise.core.transition.ExecutionOptions;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseInternalException;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.senders.BotSender;
@@ -180,7 +181,7 @@ public final class TreeExecutor {
     private void executeOnCloseMethod() {
         if (this.controllerInstance == null) return;
 
-        Optional<Method> onCloseMethod = Arrays.stream(this.controllerInstance.getClass().getMethods())
+        Optional<Method> onCloseMethod = Arrays.stream(ReflectionUtils.getClass(this.controllerInstance).getMethods())
                 .filter(m -> m.isAnnotationPresent(OnClose.class)).findFirst();
 
         if (onCloseMethod.isPresent()) {

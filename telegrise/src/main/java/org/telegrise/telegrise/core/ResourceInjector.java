@@ -4,6 +4,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.telegrise.telegrise.annotations.Resource;
+import org.telegrise.telegrise.core.utils.ReflectionUtils;
 import org.telegrise.telegrise.exceptions.TelegRiseRuntimeException;
 import org.telegrise.telegrise.resources.ResourceFactory;
 
@@ -50,18 +51,18 @@ public final class ResourceInjector {
     }
 
     public void injectResources(Object target) {
-        for (Field field : getFieldsToInject(target.getClass())) {
+        for (Field field : getFieldsToInject(ReflectionUtils.getClass(target))) {
             if (!field.isAnnotationPresent(Resource.class)) continue;
             field.setAccessible(true);
 
             try {
                 Object resource = get(field.getType());
                 if (resource == null)
-                    throw new TelegRiseRuntimeException("Unable to find resource '" + field.getType().getSimpleName() + "' in class '" + target.getClass().getSimpleName() + "'");
+                    throw new TelegRiseRuntimeException("Unable to find resource '" + field.getType().getSimpleName() + "' in class '" + ReflectionUtils.getClass(target).getSimpleName() + "'");
 
                 field.set(target, resource);
             } catch (IllegalAccessException e) {
-                throw new TelegRiseRuntimeException(String.format("No access to the field %s in %s requiring injection", field.getName(), target.getClass().getName()));
+                throw new TelegRiseRuntimeException(String.format("No access to the field %s in %s requiring injection", field.getName(), ReflectionUtils.getClass(target).getName()));
             }
         }
     }
@@ -76,7 +77,7 @@ public final class ResourceInjector {
 
     public void addResources(Object... resources) {
         for (Object resource : resources)
-            addFactory(ResourceFactory.ofInstance(resource, resource.getClass()));
+            addFactory(ResourceFactory.ofInstance(resource, ReflectionUtils.getClass(resource)));
     }
 
     private Field[] getFieldsToInject(Class<?> clazz) {

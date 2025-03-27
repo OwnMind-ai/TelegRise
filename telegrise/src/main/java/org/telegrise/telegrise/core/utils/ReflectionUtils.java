@@ -21,6 +21,10 @@ public class ReflectionUtils {
         return classGetter.apply(o).isAnnotationPresent(annotation);
     }
 
+    public static Class<?> getClass(Object o){
+        return classGetter.apply(o);
+    }
+
     public static Class<?> getRawGenericType(Field field){
         if ( field.getGenericType() instanceof Class) return (Class<?>) field.getGenericType();
 
