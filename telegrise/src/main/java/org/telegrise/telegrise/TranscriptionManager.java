@@ -1,13 +1,12 @@
 package org.telegrise.telegrise;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegrise.telegrise.caching.CachingStrategy;
-import org.telegrise.telegrise.core.ResourcePool;
-import org.telegrise.telegrise.core.SessionMemoryImpl;
-import org.telegrise.telegrise.core.UserSession;
+import org.telegrise.telegrise.core.*;
 import org.telegrise.telegrise.core.elements.BotTranscription;
 import org.telegrise.telegrise.core.elements.Transition;
 import org.telegrise.telegrise.core.elements.Tree;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
  *
  * @since 0.3
  */
+@Slf4j
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public final class TranscriptionManager {
     private final TranscriptionMemory transcriptionMemory;
@@ -46,6 +46,7 @@ public final class TranscriptionManager {
     private final TransitionController transitionController;
     private final BiConsumer<BranchingElement, Update> elementExecutor;
     private final BotTranscription transcription;
+    private final ResourceInjector resourceInjector;
     private final Function<Update, ResourcePool> resourcePoolProducer;
 
     @ApiStatus.Internal
@@ -54,10 +55,12 @@ public final class TranscriptionManager {
                                 SessionMemoryImpl sessionMemory,
                                 TransitionController transitionController,
                                 BotTranscription transcription,
+                                ResourceInjector resourceInjector,
                                 Function<Update, ResourcePool> resourcePoolProducer) {
         this.interruptor = interruptor;
         this.sessionMemory = sessionMemory;
         this.transitionController = transitionController;
+        this.resourceInjector = resourceInjector;
         this.resourcePoolProducer = resourcePoolProducer;
         this.elementExecutor = elementExecutor;
         this.transcriptionMemory = transcription.getMemory();
@@ -66,6 +69,7 @@ public final class TranscriptionManager {
 
     @ApiStatus.Internal
     public TranscriptionManager(BotTranscription transcription, Function<Update, ResourcePool> resourcePoolProducer) {
+        this.resourceInjector = null;
         this.interruptor = null;
         this.sessionMemory = null;
         this.transitionController = null;
@@ -134,6 +138,42 @@ public final class TranscriptionManager {
     }
 
     /**
+     * Wraps a transition logic to be executed within a controlled context.
+     * <p>
+     * Since initialization of tree controllers (as well as other framework-controller beans)
+     * using Spring Boot extension relies
+     * on {@link org.telegrise.telegrise.core.TelegRiseSessionContext TelegRiseSessionContext}
+     * that is attached to executing thread,
+     * we must wrap transition logic in separate thread with correct context of <b>this</b> manager in case
+     * if it is being executed in other's session thread.
+     * Wrapping does not happen if transition is being executed in the same thread as manager.
+     *
+     * @param transition the transition logic to be executed
+     */
+    private void wrapTransition(Runnable transition){
+        var context = TelegRiseSessionContext.getCurrentContext();
+        if (context == null || context.getIdentifier().equals(this.sessionMemory.getSessionIdentifier())) {
+            transition.run();
+            return;
+        }
+
+        var thread = new Thread(() -> {
+            TelegRiseSessionContext.setCurrentContext(sessionMemory.getSessionIdentifier(), sessionMemory, resourceInjector);
+            transition.run();
+
+            TelegRiseSessionContext.clearContext();
+        });
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            log.warn("Transition thread was interrupted while waiting for completion: {}", e.getMessage());
+        }
+    }
+
+    /**
      * Performs a transition with 'back' type, target {@code element} and without execution.
      * @param element named of the tree or branch
      */
@@ -150,24 +190,26 @@ public final class TranscriptionManager {
      * @param execute if true, the action in a specified element will be executed
      */
     public void transitBack(Update update, String element, boolean execute){
-        if (update == null && execute)
-            throw new IllegalArgumentException("Targeted element '" + element + "' can not be execute without update");
+        wrapTransition(() -> {
+            if (update == null && execute)
+                throw new IllegalArgumentException("Targeted element '" + element + "' can not be execute without update");
 
-        checkSessionMemory();
+            checkSessionMemory();
 
-        Transition transition = new Transition();
-        transition.setType(Transition.BACK);
-        transition.setTarget(GeneratedValue.ofValue(element));
-        transition.setExecute(execute);
+            Transition transition = new Transition();
+            transition.setType(Transition.BACK);
+            transition.setTarget(GeneratedValue.ofValue(element));
+            transition.setExecute(execute);
 
-        // Simulates a naturally closed tree
-        if (!this.transitionController.getTreeExecutors().isEmpty())
-            this.transitionController.getTreeExecutors().getLast().close();
+            // Simulates a naturally closed tree
+            if (!this.transitionController.getTreeExecutors().isEmpty())
+                this.transitionController.getTreeExecutors().getLast().close();
 
-        this.transitionController.applyTransition(null, transition, this.resourcePoolProducer.apply(update));
+            this.transitionController.applyTransition(null, transition, this.resourcePoolProducer.apply(update));
 
-        if (execute)
-            this.elementExecutor.accept(sessionMemory.getBranchingElements().getLast(), update);
+            if (execute)
+                this.elementExecutor.accept(sessionMemory.getBranchingElements().getLast(), update);
+        });
     }
 
     /**
@@ -191,17 +233,20 @@ public final class TranscriptionManager {
      * @param execute if true, the action in a specified tree will be executed
      */
     public void transit(Update update, String treeName, boolean execute){
-        if (update == null && execute)
-            throw new IllegalArgumentException("Targeted tree '" + treeName + "' can not be execute without update");
+        wrapTransition(() -> {
+            if (update == null && execute)
+                throw new IllegalArgumentException("Targeted tree '" + treeName + "' can not be execute without update");
 
-        checkSessionMemory();
+            checkSessionMemory();
 
-        Tree requestedTree = this.transcription.getRoot().getTrees().stream()
-                .filter(t -> t.getName().equals(treeName)).findFirst().orElse(null);
+            Tree requestedTree = this.transcription.getRoot().getTrees().stream()
+                    .filter(t -> t.getName().equals(treeName)).findFirst().orElse(null);
 
-        if (requestedTree == null) throw new IllegalArgumentException("Tree '" + treeName + "' has not been found at root menu");
+            if (requestedTree == null)
+                throw new IllegalArgumentException("Tree '" + treeName + "' has not been found at root menu");
 
-        this.interruptor.transit(update, requestedTree, execute);
+            this.interruptor.transit(update, requestedTree, execute);
+        });
     }
 
     private void checkSessionMemory(){

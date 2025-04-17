@@ -69,13 +69,15 @@ public class UserSession implements Runnable{
     public void initialize(TelegramClient client, List<Class<? extends UpdateHandler>> classes, ResourceInjector parentInjector){
         this.sender = new BotSender(client, sessionMemory);
         this.transitionController = new TransitionController(this.sessionMemory, treeExecutors, transcription.getMemory(), this.sender);
-        this.transcriptionManager = new TranscriptionManager(
-                this::interruptTreeChain, this::executeBranchingElement, sessionMemory,
-                transitionController, transcription, this::createResourcePool
-        );
-        this.resourceInjector = new ResourceInjector(this.sender, this.sender.getClient(), this.mediaCollector, this.transcriptionManager);
+        this.resourceInjector = new ResourceInjector(this.sender, this.sender.getClient(), this.mediaCollector);
         this.resourceInjector.setParent(parentInjector);
         this.resourceInjector.addFactory(ResourceFactory.ofInstance(sessionMemory, SessionMemory.class));
+
+        this.transcriptionManager = new TranscriptionManager(
+                this::interruptTreeChain, this::executeBranchingElement, sessionMemory,
+                transitionController, transcription, resourceInjector, this::createResourcePool
+        );
+        this.resourceInjector.addFactory(ResourceFactory.ofInstance(transcriptionManager, TranscriptionManager.class));
 
         // Context is used to initialize handlers
         TelegRiseSessionContext.setCurrentContext(userIdentifier, sessionMemory, resourceInjector);
