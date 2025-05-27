@@ -152,7 +152,7 @@ public final class TranscriptionManager {
      */
     private void wrapTransition(Runnable transition){
         var context = TelegRiseSessionContext.getCurrentContext();
-        if (context == null || context.getIdentifier().equals(this.sessionMemory.getSessionIdentifier())) {
+        if (context != null && context.getIdentifier().equals(sessionMemory.getSessionIdentifier())) {
             transition.run();
             return;
         }
