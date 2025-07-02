@@ -25,6 +25,6 @@ public class TestKeyboardController extends DefaultController {
 
     @Reference
     public void disableButton(){
-        memory.getKeyboardState("MainKeyboard").disableButtonsOfData("disable");
+        memory.getKeyboardState("MainKeyboard").disableButtonsOfCallback("disable");
     }
 }

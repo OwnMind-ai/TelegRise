@@ -310,6 +310,9 @@ public class UserSession implements Runnable{
             boolean interrupted = this.transitionController.applyTransition(executor.getTree(), executor.getLastBranch().getTransition(), pool);
             execute = executor.getLastBranch().getTransition().getExecutionOptions();
 
+            if (sessionMemory.isOnStack(Tree.class) && sessionMemory.getFromStack(Tree.class) == executor.getTree())
+                executor.open();
+
             if (interrupted) return;
         } else if(!executor.isNaturallyClosed()){
             Chat chat = MessageUtils.getChat(update);

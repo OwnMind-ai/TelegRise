@@ -164,7 +164,6 @@ public class TelegramSessionsController implements SessionsManager, InternalSess
             this.sessionInitializer.initialize(session.getSessionMemory());
         if (this.roleProvider != null)
             session.getSessionMemory().setUserRole(this.roleProvider.getRole(session.getSessionMemory()));
-
     }
 
     @Override
